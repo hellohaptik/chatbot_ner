@@ -6,17 +6,17 @@ SOCKFILE=/home/ubuntu/run/gunicorn.sock           # we will communicate using th
 USER=ubuntu                                       # the user to run as
 GROUP=ubuntu                                     # the group to run as
 NUM_WORKERS=2                                     # how many worker processes should Gunicorn spawn
-DJANGO_SETTINGS_MODULE=chatbot_ner.settings # which settings file should Django use
-DJANGO_WSGI_MODULE=chatbot_ner.wsgi                    # WSGI module name
 PORT=8081
 TIMEOUT=600
 
+DJANGO_SETTINGS_MODULE=chatbot_ner.settings # which settings file should Django use
+DJANGO_WSGI_MODULE=chatbot_ner.wsgi                    # WSGI module name
 
 echo "Starting $NAME as `whoami`"
 
 # Activate the virtual environment
 cd $DJANGODIR
-source ~/Envs/vhaptikenv/bin/activate
+source ~/Envs/vchatbotner/bin/activate
 export DJANGO_SETTINGS_MODULE=$DJANGO_SETTINGS_MODULE
 export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 

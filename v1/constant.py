@@ -1,10 +1,3 @@
-# Stdlib imports
-import os
-
-# Following index is used for gogo entity detection
-ES_INDEX_TEXT_DETECTION = 'gogo_entity_data'
-ES_DOC_TYPE_TEXT_DETECTION = 'data_dictionary'
-
 # ************************ constant used for detection_method ************************
 
 # when entity is detected from message
@@ -42,6 +35,5 @@ PARAMETER_STRUCTURED_VALUE_VERIFICATION = 'structured_value_verification'
 PARAMETER_FALLBACK_VALUE = 'fallback_value'
 PARAMETER_EXPERT_MESSAGE = 'expert_message'
 
-DICTIONARY_DATA_GENERAL = 'general'
+# ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
-DICTIONARY_DATA_NGRAMS = 'ngrams'

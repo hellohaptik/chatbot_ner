@@ -47,9 +47,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'haptik_ner.urls'
+ROOT_URLCONF = 'chatbot_ner.urls'
 
-WSGI_APPLICATION = 'haptik_ner.wsgi.application'
+WSGI_APPLICATION = 'chabot_ner.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
