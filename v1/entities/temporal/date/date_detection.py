@@ -253,19 +253,6 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    # TODO Method is not called anywhere, Is this redundant ?
-    # TODO Method is Haptik Specific ?
-    def _get_exact_date_for_arrival_departure(self, date_list, original_list):
-        """
-        Performs exact date detection formarrival and departure
-        for example 23rd to 24th March, 23-24 March
-        :return: tuple (list of dates , original text)
-        """
-        date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
-        self._update_processed_text(original_list)
-
-        return date_list, original_list
-
     def _update_processed_text(self, original_date_strings):
         """
         Replaces detected date entities with tag generated from entity_name used to initialize the object with
