@@ -1,6 +1,5 @@
-#!/bin/python
-
 import os
+
 import nltk
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -25,3 +24,4 @@ print "Creating the structure ..."
 db.create()
 print "Populating data from " + os.path.join(BASE_DIR, 'data', 'entity_data') + " ..."
 db.populate()
+print "Done!"

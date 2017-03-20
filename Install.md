@@ -70,9 +70,9 @@
    - Edit the `config` file and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
 
 
-8. Run setup.sh to install required nltk corpora and populate Elasticsearch with data from csv files
+8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files
 
-        $ ./initial_setup
+        $ python initial_setup.py
         
         
 ## Starting the NER
