@@ -498,8 +498,8 @@ class TimeDetector(object):
         # print 'processed text: ', self.processed_text
         patterns = re.findall(r'((?:by|before|after|at|on|dot|exactly|exact)[\s-]*([1-9]|1[0-2]?))\D',
                               self.processed_text.lower())
-        pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)', self.processed_text.lower())
-        pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)', self.processed_text.lower())
+        pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere|am)', self.processed_text.lower())
+        pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham|pm)', self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)', self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
