@@ -68,12 +68,14 @@
 
 	> **<span style="color:black"> IMPORTANT NOTE:</span> Chatbot NER reads the required connection settings to connect to the DataStore engine from a file called <span style="color:red">`config`</span> located at the root of the repository and exports them in the working environment for further use. In case you don't want to provide this <span style="color:red">`config`</span> file, make sure the required connection settings variables as described in the [DataStore Settings Environment Variables](#dseve) section are somehow set in the environment. Failing to do so will throw a <span style="color:red">`DataStoreSettingsImproperlyConfiguredException`</span> exception while trying to connect to the underlying engine.**
 	   
-	   - Copy `config.example` located in the root of the repository to a separate file named `config`
+   - Copy `config.example` located in the root of the repository to a separate file named `config`
+
+		```
+		$ cd ~/chatbot_ner/
+		$ cp config.example config
+		```
 	
-	        $ cd ~/chatbot_ner/
-	        $ cp config.example config
-	
-	   - Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
+   - Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 
@@ -91,3 +93,5 @@
    Or if you wish to run it in background
    
     $ ./start_server.sh &
+    
+## Test with few curl requests
