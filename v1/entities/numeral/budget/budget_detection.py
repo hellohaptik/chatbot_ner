@@ -2,14 +2,14 @@ import re
 
 from v1.entities.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
 from lib.nlp.regex import Regex
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 
 
 class BudgetDetector(object):
     """Detects budget from the text  and tags them.
 
     Detects the budget from the text and replaces them by entity_name.
-    This detection logic first checks for budget using regular expressions and also uses TextDetection class to extract 
+    This detection logic first checks for budget using regular expressions and also uses TextDetector class to extract
     data in textual format (i.e. Hundred, Thousand, etc).
 
     This detector captures  additional attributes like max_budget, min_budget whether the budget is
@@ -101,7 +101,7 @@ class BudgetDetector(object):
         regex_for_thousand = [(r'(\d+)k', r'\g<1>000')]
         self.regex_object = Regex(regex_for_thousand)
         self.tag = '__' + self.entity_name + '__'
-        self.text_detection_object = TextDetection(entity_name=ES_BUDGET_LIST)
+        self.text_detection_object = TextDetector(entity_name=ES_BUDGET_LIST)
 
     def detect_entity(self, text):
         """Detects budget in the text string
@@ -331,7 +331,7 @@ class BudgetDetector(object):
         return budget_list, original_list
 
     def _detect_text_budget(self, budget_list=None, original_list=None):
-        """Detects budget  from text using text detection logic i.e.TextDetection
+        """Detects budget  from text using text detection logic i.e.TextDetector
         This is a function which will be called when we want to detect the budget using text
 
         Returns:

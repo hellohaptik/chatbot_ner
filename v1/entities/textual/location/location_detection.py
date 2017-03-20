@@ -1,4 +1,4 @@
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 from dateutil import parser
 
 
@@ -10,7 +10,7 @@ class LocationDetector(object):
         self.processed_text = ''
         self.location = []
         self.original_location_text = []
-        self.text_detection_object = TextDetection(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
         self.user_address = None
         self.user_lat_long = None
         self.user_location_updated_at = None

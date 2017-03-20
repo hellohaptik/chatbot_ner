@@ -1,5 +1,4 @@
 # Stdlib imports
-import os
 
 # Following index is used for gogo entity detection
 ES_INDEX_TEXT_DETECTION = 'gogo_entity_data'

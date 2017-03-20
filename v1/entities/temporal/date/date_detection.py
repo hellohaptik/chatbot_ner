@@ -1,20 +1,15 @@
 import re
 import copy
-from lib.nlp.regex import Regex
-from v1.entities.constant import TYPE_EXACT, ENTITY_MONTH, ENTITY_DAY, TYPE_EVERYDAY, TYPE_TODAY, \
-    TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
-    TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
-    DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS
-from datetime import timedelta
 import datetime
 import pytz
-from datastore import DataStore
+from lib.nlp.regex import Regex
+from v1.entities.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
+    TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
+    TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
+    DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT
 
 
 # TODO add code examples
-# TODO Consider removing dependency on elastic search. This is a common entity, used widely by many. Dependency on
-# elasticsearch creates inconvenience
-# TODO Consider moving Date types constants to class itself
 class DateDetector(object):
     """
     Detects date in various formats from given text and tags them.
@@ -41,7 +36,7 @@ class DateDetector(object):
                             fuzzy variants(spell errors, abbreviations)
 
         SUPPORTED_FORMAT                                            METHOD_NAME
-
+        ------------------------------------------------------------------------------------------------------------
         1. day/month/year                                           _gregorian_day_month_year_format
         2. year/month/day                                           _gregorian_year_month_day_format
         3. day/month/year (Month in abbreviation or full)           _gregorian_advanced_day_month_year_format
@@ -96,9 +91,8 @@ class DateDetector(object):
         self.tag = '__' + entity_name + '__'
         self.timezone = timezone
         self.date_object = datetime.datetime.now(self.timezone)
-        db = DataStore()
-        self.month_dictionary = db.get_entity_dictionary(ENTITY_MONTH)
-        self.day_dictionary = db.get_entity_dictionary(ENTITY_DAY)
+        self.month_dictionary = MONTH_DICT
+        self.day_dictionary = DAY_DICT
 
     def detect_entity(self, text):
         """
@@ -253,19 +247,6 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    # TODO Method is not called anywhere, Is this redundant ?
-    # TODO Method is Haptik Specific ?
-    def _get_exact_date_for_arrival_departure(self, date_list, original_list):
-        """
-        Performs exact date detection formarrival and departure
-        for example 23rd to 24th March, 23-24 March
-        :return: tuple (list of dates , original text)
-        """
-        date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
-        self._update_processed_text(original_list)
-
-        return date_list, original_list
-
     def _update_processed_text(self, original_date_strings):
         """
         Replaces detected date entities with tag generated from entity_name used to initialize the object with
@@ -330,7 +311,7 @@ class DateDetector(object):
                 'type': TYPE_EXACT
             }
             date_list.append(date)
-            original = self.regx_to_process.text_substitute(original)
+            # original = self.regx_to_process.text_substitute(original)
             original_list.append(original)
         return date_list, original_list
 
@@ -383,7 +364,7 @@ class DateDetector(object):
                 'type': TYPE_EXACT
             }
             date_list.append(date)
-            original = self.regx_to_process.text_substitute(original)
+            # original = self.regx_to_process.text_substitute(original)
             original_list.append(original)
         return date_list, original_list
 
@@ -444,7 +425,7 @@ class DateDetector(object):
 
                 }
                 date_list.append(date)
-                original = self.regx_to_process.text_substitute(original)
+                # original = self.regx_to_process.text_substitute(original)
                 original_list.append(original)
         return date_list, original_list
 
@@ -557,7 +538,7 @@ class DateDetector(object):
                     'type': TYPE_EXACT
                 }
                 date_list.append(date)
-                original = self.regx_to_process.text_substitute(original)
+                # original = self.regx_to_process.text_substitute(original)
                 original_list.append(original)
         return date_list, original_list
 
@@ -868,7 +849,7 @@ class DateDetector(object):
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
-            tommorow = self.date_object + timedelta(days=1)
+            tommorow = self.date_object + datetime.timedelta(days=1)
             dd = tommorow.day
             mm = tommorow.month
             yy = tommorow.year
@@ -908,7 +889,7 @@ class DateDetector(object):
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
-            yesterday = self.date_object - timedelta(days=1)
+            yesterday = self.date_object - datetime.timedelta(days=1)
             dd = yesterday.day
             mm = yesterday.month
             yy = yesterday.year
@@ -949,7 +930,7 @@ class DateDetector(object):
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
-            day_after = self.date_object + timedelta(days=2)
+            day_after = self.date_object + datetime.timedelta(days=2)
             dd = day_after.day
             mm = day_after.month
             yy = day_after.year
@@ -990,7 +971,7 @@ class DateDetector(object):
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
-            day_before = self.date_object - timedelta(days=2)
+            day_before = self.date_object - datetime.timedelta(days=2)
             dd = day_before.day
             mm = day_before.month
             yy = day_before.year
@@ -1043,7 +1024,7 @@ class DateDetector(object):
             current_day = self.__get_day_index(self.date_object.strftime("%A"))
             if day and current_day:
                 date_after_days = int(day) - int(current_day) + 7
-                day_to_set = self.date_object + timedelta(days=date_after_days)
+                day_to_set = self.date_object + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
                 yy = day_to_set.year
@@ -1099,7 +1080,7 @@ class DateDetector(object):
                     date_after_days = int(day) - int(current_day)
                 else:
                     date_after_days = int(day) - int(current_day) + 7
-                day_to_set = self.date_object + timedelta(days=date_after_days)
+                day_to_set = self.date_object + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
                 yy = day_to_set.year
@@ -1294,7 +1275,7 @@ class DateDetector(object):
         if original_list is None:
             original_list = []
         now = datetime.datetime.now()
-        end = now + timedelta(days=n_days)
+        end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b((everyday|daily|every\s{0,3}day|all\sdays?))\b', self.processed_text.lower())
         # print 'pattern : ', patterns
         if patterns:
@@ -1309,7 +1290,7 @@ class DateDetector(object):
 
             while now < end:
                 date_list.append(copy.deepcopy(date_dict))
-                now += timedelta(days=1)
+                now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
                     'mm': now.month,
@@ -1345,8 +1326,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         now = datetime.datetime.now()
-        end = now + timedelta(days=n_days)
-        # TODO if text is lowered, why check for uppercase E, D, W
+        end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b(([eE]veryday|[dD]aily)|all\sdays[\s]?except[\s]?([wW]eekend|[wW]eekends))\b',
                               self.processed_text.lower())
 
@@ -1354,7 +1334,6 @@ class DateDetector(object):
             patterns = re.findall(r'\b(weekdays|weekday|week day|week days| all weekdays)\b',
                                   self.processed_text.lower())
         constant_type = WEEKDAYS
-        # TODO haptik specific code
         if self._is_everyday_present(self.text):
             constant_type = REPEAT_WEEKDAYS
         today = now.weekday()
@@ -1368,7 +1347,7 @@ class DateDetector(object):
                 weekend.append(copy.deepcopy(date_day))
             count += 1
             today += 1
-            date_day = date_day + timedelta(days=1)
+            date_day = date_day + datetime.timedelta(days=1)
         i = 0
         weekend_digit = []
         while i <= (len(weekend) - 1):
@@ -1387,7 +1366,7 @@ class DateDetector(object):
             while now < end:
                 if current_date not in weekend_digit:
                     date_list.append(copy.deepcopy(date_dict))
-                now += timedelta(days=1)
+                now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
                     'mm': now.month,
@@ -1425,7 +1404,7 @@ class DateDetector(object):
         if original_list is None:
             original_list = []
         now = datetime.datetime.now()
-        end = now + timedelta(days=n_days)
+        end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?([wW]eekday|[wW]eekdays))\b'
                               , self.processed_text.lower())
 
@@ -1447,7 +1426,7 @@ class DateDetector(object):
                 weekend.append(copy.deepcopy(date_day))
             count += 1
             today += 1
-            date_day = date_day + timedelta(days=1)
+            date_day = date_day + datetime.timedelta(days=1)
         i = 0
         weekend_digit = []
         while i <= (len(weekend) - 1):
@@ -1466,7 +1445,7 @@ class DateDetector(object):
             while now < end:
                 if current_date in weekend_digit:
                     date_list.append(copy.deepcopy(date_dict))
-                now += timedelta(days=1)
+                now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
                     'mm': now.month,

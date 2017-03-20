@@ -5,8 +5,10 @@
 #   $ source chatbot_ner/config
 # Please don't add spaces around '='
 
-# This is the primary engine to use. Valid values are elasticsearch
-ENGINE=elasticsearch
+# This is the primary engine to use. Valid values are onr of the following:
+#     elasticsearch
+
+ENGINE=
 
 # ES prefixed values correspond to settings for elasticsearch.
 # ES_URL is the complete url with auth name and password required to connect. If provided, this will override ES_HOST,
@@ -20,7 +22,7 @@ ES_DOC_TYPE=
 ES_AUTH_NAME=
 ES_AUTH_PASSWORD=
 
-# ES_BULK_MSG_SIZE is a integer value
+# ES_BULK_MSG_SIZE is an integer value
 ES_BULK_MSG_SIZE=
 
 # Provide the following values if you need AWS authentication

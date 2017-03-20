@@ -5,12 +5,12 @@ from lib.nlp.levenshtein_distance import Levenshtein
 from lib.nlp.regex import Regex
 
 
-class TextDetection:
+class TextDetector(object):
     """
-    TextDetection detects custom entities in text string by performing similarity searches against a list fetched from
+    TextDetector detects custom entities in text string by performing similarity searches against a list fetched from
     datastore (elasticsearch) and tags them.
 
-    TextDetection detects text type custom entities that do not adhere to some strict/weak formats which other entities
+    TextDetector detects text type custom entities that do not adhere to some strict/weak formats which other entities
     like date, time, email, etc do. Examples of such types of entites can be city, food dish name, brand names etc
 
 
@@ -100,7 +100,7 @@ class TextDetection:
                         u'koramangala': [u'koramangala']
                     }
 
-            text_detection = TextDetection('city')
+            text_detection = TextDetector('city')
             text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
 
                 Output:
@@ -167,29 +167,29 @@ class TextDetection:
 
     def _get_entity_from_text(self, variant, text):
         """
-            Checks ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
+        Checks ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
 
-            Args:
-                variant: string, ngram of variant to fuzzy detect in the text using Levenshtein distance
-                text: text to detect entities from
+        Args:
+            variant: string, ngram of variant to fuzzy detect in the text using Levenshtein distance
+            text: text to detect entities from
 
-            Returns:
-                part of the given text that was detected as entity given the variant, None otherwise
+        Returns:
+            part of the given text that was detected as entity given the variant, None otherwise
 
-            Example:
-                text_detection = TextDetection('city')
-                ...
-                text_detection._get_entity_from_text(self, variant, text)
-                text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
-                text_detection.get_entity_from_text('chennai', text)
+        Example:
+            text_detection = TextDetector('city')
+            ...
+            text_detection._get_entity_from_text(self, variant, text)
+            text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
+            text_detection.get_entity_from_text('chennai', text)
 
-                Output:
-                    'chennai'
+            Output:
+                'chennai'
 
-                text_detection.get_entity_from_text('Delhi', text)
+            text_detection.get_entity_from_text('Delhi', text)
 
-                Output:
-                    'delehi'
+            Output:
+                'delehi'
         """
         variant_token_list = tokenizer.tokenize(variant.lower())
         text_token_list = tokenizer.tokenize(text.lower())

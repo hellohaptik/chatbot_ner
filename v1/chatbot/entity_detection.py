@@ -11,7 +11,7 @@ from v1.entities.pattern.email.email_detection import EmailDetector
 from v1.entities.numeral.number.number_detection import NumberDetector
 from v1.entities.pattern.phone_number.phone_detection import PhoneDetector
 from v1.entities.pattern.pnr.pnr_detection import PNRDetector
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 from v1.entities.temporal.time.time_detection import TimeDetector
 
 """
@@ -101,7 +101,7 @@ The output is stored in a list of dictionary contains the following structure
 
 
 def get_text(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
-    """This functionality calls the TextDetection class to detect textual entities
+    """This functionality calls the TextDetector class to detect textual entities
 
     Attributes:
         NOTE: Explained above
@@ -155,7 +155,7 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
             >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': u'Inferno'}]
 
     """
-    text_detection = TextDetection(entity_name=entity_name)
+    text_detection = TextDetector(entity_name=entity_name)
     if structured_value:
         if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
@@ -180,9 +180,9 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
 
 
 def get_location(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
-    """This functionality calls the TextDetection class to detect location
+    """This functionality calls the TextDetector class to detect location
 
-    TODO: We can improve this by creating separate class for location detection instead of using TextDetection
+    TODO: We can improve this by creating separate class for location detection instead of using TextDetector
 
     Attributes:
         NOTE: Explained above
@@ -192,7 +192,7 @@ def get_location(message, entity_name, structured_value, structured_value_verifi
 
     """
 
-    text_detection = TextDetection(entity_name=entity_name)
+    text_detection = TextDetector(entity_name=entity_name)
     if structured_value:
         if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)

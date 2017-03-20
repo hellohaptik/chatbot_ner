@@ -1,4 +1,4 @@
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 
 
 class CityDetector(object):
@@ -11,7 +11,7 @@ class CityDetector(object):
         self.processed_text = ''
         self.city = []
         self.original_city_text = []
-        self.text_detection_object = TextDetection(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
         self.hs_city = None
         self.tag = '__' + self.entity_name + '__'
 

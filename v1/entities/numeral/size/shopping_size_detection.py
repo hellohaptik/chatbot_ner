@@ -1,6 +1,6 @@
 import re
 
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 
 
 class ShoppingSizeDetector(object):
@@ -8,7 +8,7 @@ class ShoppingSizeDetector(object):
 
     Detects the sizes from the text and replaces them by entity_name.
     This detection logic will first check if text contains size in textual format (i.e. Large, XL, X-Large, etc)
-    for this we call TextDetection class and then we have regex that will identify integer from the text
+    for this we call TextDetector class and then we have regex that will identify integer from the text
 
     For Example:
 
@@ -53,7 +53,7 @@ class ShoppingSizeDetector(object):
         self.processed_text = ''
         self.size = []
         self.original_size_text = []
-        self.text_detection_object = TextDetection(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text):
@@ -105,7 +105,7 @@ class ShoppingSizeDetector(object):
         return size_list, original_list
 
     def _detect_size_from_text(self, size_list=None, original_list=None):
-        """Detects any size  from text using text detection logic i.e.TextDetection
+        """Detects any size  from text using text detection logic i.e.TextDetector
         This is a function which will be called when we want to detect the size using text
 
         Returns:

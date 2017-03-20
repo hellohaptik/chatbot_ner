@@ -1,4 +1,3 @@
-
 # DATE IDENTIFICATION constant
 
 ENTITY_MONTH = 'month_list'
@@ -50,3 +49,28 @@ REPEAT_START_RANGE = 'repeat_start_range'
 REPEAT_END_RANGE = 'repeat_end_range'
 DATE_START_RANGE = 'date_start_range'
 DATE_END_RANGE = 'date_end_range'
+
+MONTH_DICT = {
+    u'1': [u'jan', u'january'],
+    u'10': [u'october', u'oct'],
+    u'11': [u'november', u'nov'],
+    u'12': [u'december', u'dec'],
+    u'2': [u'february', u'feb'],
+    u'3': [u'mar', u'march'],
+    u'4': [u'apr', u'april'],
+    u'5': [u'may'],
+    u'6': [u'jun', u'june'],
+    u'7': [u'july', u'jul'],
+    u'8': [u'august', u'aug'],
+    u'9': [u'september', u'sept']
+}
+
+DAY_DICT = {
+    u'1': [u'sun', u'sunday'],
+    u'2': [u'mon', u'monday'],
+    u'3': [u'tuesday', u'tue'],
+    u'4': [u'wednesday', u'wed'],
+    u'5': [u'thu', u'thursday'],
+    u'6': [u'fri', u'friday'],
+    u'7': [u'saturday', u'sat']
+}

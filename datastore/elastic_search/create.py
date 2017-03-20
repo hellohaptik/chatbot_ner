@@ -34,6 +34,7 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
     Args:
         connection: Elasticsearch client object
         index_name: The name of the index
+        doc_type:  The type of the documents that will be indexed
         logger: logging object to log at debug and exception level
         kwargs:
             master_timeout: Specify timeout for connection to master

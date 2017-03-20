@@ -24,7 +24,7 @@ class TimeDetector(object):
         form_check: boolean, set to True at initialization, used when passed text is a form type message
 
     SUPPORTED FORMAT                                            METHOD NAME
-
+    ------------------------------------------------------------------------------------------------------------
     1. 12 hour format                                           _detect_12_hour_format
     2. 12 hour format without minutes                           _detect_12_hour_without_min
     3. In X hours / minutes difference format                   _detect_time_with_difference

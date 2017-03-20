@@ -4,6 +4,7 @@ from lib.nlp.regex import Regex
 from v1.entities.temporal.date.date_detection import DateDetector
 
 
+# TODO add explanation for outbound message and its uses
 class DateAdvanceDetector(object):
     """
     Detects dates subject to conditions like "departure date" and "return date". These dates are returned in a
@@ -21,7 +22,7 @@ class DateAdvanceDetector(object):
         original_date_text: list to store substrings of the text detected as date entities
         tag: entity_name prepended and appended with '__'
         date_detector_object: DateDetector object used to detect dates in the given text
-        outbound_message: boolean, set as expert message on our systems
+        outbound_message: boolean, set as the outgoing bot text/message
     """
 
     def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
@@ -43,7 +44,6 @@ class DateAdvanceDetector(object):
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
-        # TODO outbound_message is Haptik specific ? remove relevant docs if this is removed
         self.outbound_message = None
 
     def detect_entity(self, text):
@@ -61,32 +61,44 @@ class DateAdvanceDetector(object):
 
         Examples:
             date_adv_detector = DateAdvanceDetector("date_advance")
-            text = 'find me a flight thats departs on 20/2/17 and one that returns on 21/2/17'
-
-            date_adv_detector.detect_entity()
-
-                Output:
-                ([
-                    {
-                        'date_departure': {'dd': 20, 'mm': 2, 'type': 'date', 'yy': 2017},
-                        'date_return': None
-                    },
-                    {
-                        'date_departure': {'dd': 20, 'mm': 2, 'type': 'date', 'yy': 2017},
-                        'date_return': {'dd': 21, 'mm': 2, 'type': 'date', 'yy': 2017}
-                    }
-                 ],
-                 ['20217', '20217'])
-
-            date_adv_detector.processed_text
-                ' find me a flight thats departs on 20/2/17 and one that returns on 21/2/17 '
-
-            date_adv_detector.tagged_text
-                ' find me a flight thats departs on 20/2/17 and one that returns on 21/2/17 '
-
+            text = 'find me a flight departing on 20/2/17 and one returning on 21/2/17'
+            date_adv_detector.detect_entity(text)
 
                 Output:
+                    ([
+                        {
+                            'date_departure': {'dd': 20, 'mm': 2, 'type': 'date', 'yy': 2017},
+                            'date_return': None
+                        },
+                        {
+                            'date_departure': None,
+                            'date_return': {'dd': 21, 'mm': 2, 'type': 'date', 'yy': 2017}
+                        }
+                    ],
+                    ['departing on 20/2/17', 'returning on 21/2/17'])
 
+            dd.tagged_text
+
+                Output:
+                    ' find me a flight __date_adv__ and one __date_adv__ '
+
+
+            text = 'I am not available from 3rd April, 2017 to 9/05/17'
+            date_adv_detector.detect_entity(text)
+
+                Output:
+                    ([
+                        {
+                            'date_departure': {'dd': 3, 'mm': 4, 'type': 'date', 'yy': 2017},
+                            'date_return': {'dd': 9, 'mm': 5, 'type': 'date', 'yy': 2017}
+                        }
+                    ],
+                    ['3rd april 2017', '9/05/17'])
+
+            dd.tagged_text
+
+                Output:
+                    ' find me a flight __date_adv__ and one __date_adv__ '
 
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
@@ -148,7 +160,6 @@ class DateAdvanceDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-
         patterns = re.findall(r'\b((.+)\s*(\-|to|2)\s*(.+))\b', self.processed_text.lower())
 
         for pattern in patterns:
@@ -158,14 +169,17 @@ class DateAdvanceDetector(object):
             }
             date_departure = None
             date_return = None
-            original = pattern[0]
             date_detect = self.date_detector_object.detect_entity(pattern[1])
             if date_detect[0]:
                 date_departure = date_detect[0][0]
+                original = date_detect[1][0] if date_detect[1] else None
+                original_list.append(original)
 
-            date_detect = self.date_detector_object.detect_entity(pattern[2])
+            date_detect = self.date_detector_object.detect_entity(pattern[3])
             if date_detect[0]:
                 date_return = date_detect[0][0]
+                original = date_detect[1][0] if date_detect[1] else None
+                original_list.append(original)
 
             if date_departure and date_return:
                 date['date_departure'] = date_departure
@@ -173,7 +187,6 @@ class DateAdvanceDetector(object):
 
                 date_list.append(date)
                 # original = self.regx_to_process.text_substitute(original)
-                original_list.append(original)
 
         return date_list, original_list
 
@@ -198,11 +211,10 @@ class DateAdvanceDetector(object):
         if original_list is None:
             original_list = []
         regex_string = r'\b((onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
-                       r'departing on|departing|going on|for)\s+(.+))\b'
+                       r'departing on|departing|going on|for|departs on)\s+(.+))\b'
         patterns = re.findall(regex_string, self.processed_text.lower())
 
         for pattern in patterns:
-            original = None
             date_departure = None
             date = {
                 'date_departure': None,
@@ -214,7 +226,11 @@ class DateAdvanceDetector(object):
                 date_departure = date_detect[0][0]
 
             if date_departure:
-                original = date_detect[1][0] if date_detect[1] else None
+                if date_detect[1] and date_detect[1][0] in pattern[0]:
+                    end_idx = pattern[0].find(date_detect[1][0]) + len(date_detect[1][0])
+                    original = pattern[0][:end_idx]
+                else:
+                    original = date_detect[1][0] if date_detect[1] else None
                 date['date_departure'] = date_departure
 
                 date_list.append(date)
@@ -244,7 +260,7 @@ class DateAdvanceDetector(object):
         if date_list is None:
             date_list = []
         regex_string = r'\b((coming back|back|return date\:?|return date -|returning on|' + \
-                       r'arriving|arrive|return|returning|at)\s+(.+))\b'
+                       r'arriving|arrive|return|returning|returns on|at)\s+(.+))\b'
         patterns = re.findall(regex_string, self.processed_text.lower())
 
         for pattern in patterns:
@@ -260,7 +276,11 @@ class DateAdvanceDetector(object):
                 date_return = date_detect[0][0]
 
             if date_return:
-                original = pattern[0]
+                if date_detect[1] and date_detect[1][0] in pattern[0]:
+                    end_idx = pattern[0].find(date_detect[1][0]) + len(date_detect[1][0])
+                    original = pattern[0][:end_idx]
+                else:
+                    original = date_detect[1][0] if date_detect[1] else None
                 date['date_return'] = date_return
 
                 date_list.append(date)
@@ -268,13 +288,13 @@ class DateAdvanceDetector(object):
 
         return date_list, original_list
 
-    # TODO this function works on outbound message, remove that part if Haptik specific
+    # TODO this function sets flag based on outbound message, needs testing
     def _detect_any_date(self, date_list=None, original_list=None):
         """
         Finds departure and return type dates in the given text. It detects 'departure' and 'return' and their synonyms
         and tags all the detected dates in the text accordingly. If both type synonyms are found, and more than one
         dates are detected, first date is marked as departure type and last as return type. If only one date is found,
-        it is marked as departure is 'departure' or both type synonyms are found and marked as 'return' type if 'return'
+        it is marked as departure if 'departure' or both type synonyms are found and marked as 'return' type if 'return'
         type synonyms were found in the given text
 
 

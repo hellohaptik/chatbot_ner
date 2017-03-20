@@ -1,6 +1,6 @@
 import re
 
-from v1.entities.textual.text.text_detection import TextDetection
+from v1.entities.textual.text.text_detection import TextDetector
 
 
 class CityAdvanceDetector(object):
@@ -12,10 +12,9 @@ class CityAdvanceDetector(object):
         self.original_date_text = []
         self.form_check = True
         self.entity_name = entity_name
-        self.text_detection_object = TextDetection(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
         self.outbound_message = None
         self.tag = '__' + entity_name + '__'
-
 
     def detect_entity(self, text, form_check=False):
         """
@@ -33,13 +32,12 @@ class CityAdvanceDetector(object):
         self.original_city_text = city_data[1]
         return city_data
 
-
     def detect_city(self):
         """
         Takes in a message string and returns a list of dictionary containing departure and arrival city along with the original text
         :return: tuple (list of city , original text)
         """
-        #print 'detection for default task'
+        # print 'detection for default task'
         city_list = []
         original_list = []
         city_list, original_list = self.detect_departure_arrival_city_prepositions(city_list, original_list)
@@ -57,7 +55,7 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_departure_arrival_city(self,city_list, original_list):
+    def detect_departure_arrival_city(self, city_list, original_list):
         """
         Detects departure and arrival city
         :param city_list:
@@ -87,14 +85,16 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_departure_arrival_city_prepositions(self,city_list, original_list):
+    def detect_departure_arrival_city_prepositions(self, city_list, original_list):
         """
         Identifies cities if prepositions are present
         :param city_list:
         :param original_list:
         :return:
         """
-        patterns = re.findall(r'\s((?:from|frm|departing|depart|leaving|leave)\s*([A-Za-z]+)\s*(?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s*([A-Za-z]+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(
+            r'\s((?:from|frm|departing|depart|leaving|leave)\s*([A-Za-z]+)\s*(?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s*([A-Za-z]+))\.?\b',
+            self.processed_text.lower())
 
         for pattern in patterns:
             original = None
@@ -116,7 +116,7 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_arrival_departure_city(self,city_list, original_list):
+    def detect_arrival_departure_city(self, city_list, original_list):
         """
         Detects arrival and departure city
         :param city_list:
@@ -124,7 +124,9 @@ class CityAdvanceDetector(object):
         :return:
         """
 
-        patterns = re.findall(r'\s((?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s*([A-Za-z]+)\s*(?:from|frm|departing|depart|leaving|leave)\s*([A-Za-z]+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(
+            r'\s((?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s*([A-Za-z]+)\s*(?:from|frm|departing|depart|leaving|leave)\s*([A-Za-z]+))\.?\b',
+            self.processed_text.lower())
 
         for pattern in patterns:
             original = None
@@ -146,7 +148,7 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_departure_city(self,city_list, original_list):
+    def detect_departure_city(self, city_list, original_list):
         """
         Detects departure city
         :param city_list:
@@ -154,7 +156,9 @@ class CityAdvanceDetector(object):
         :return:
         """
 
-        patterns = re.findall(r'\s((from|frm|departing|depart|leaving|leave|origin city\:|departure city\:)\s*([A-Za-z]+))\.?\s', self.processed_text.lower())
+        patterns = re.findall(
+            r'\s((from|frm|departing|depart|leaving|leave|origin city\:|departure city\:)\s*([A-Za-z]+))\.?\s',
+            self.processed_text.lower())
 
         for pattern in patterns:
             original = None
@@ -174,14 +178,16 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_arrival_city(self,city_list, original_list):
+    def detect_arrival_city(self, city_list, original_list):
         """
         detects arrival city
         :param city_list:
         :param original_list:
         :return:
         """
-        patterns = re.findall(r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)\s*([A-Za-z]+))\.?\s', self.processed_text.lower())
+        patterns = re.findall(
+            r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)\s*([A-Za-z]+))\.?\s',
+            self.processed_text.lower())
 
         for pattern in patterns:
             original = None
@@ -201,7 +207,7 @@ class CityAdvanceDetector(object):
 
         return city_list, original_list
 
-    def detect_any_city(self,city_list, original_list):
+    def detect_any_city(self, city_list, original_list):
         """
         detects city based on the outbound message
         :param city_list:
@@ -211,8 +217,10 @@ class CityAdvanceDetector(object):
         departure_city_flag = False
         arrival_city_flag = False
         if self.outbound_message:
-            departure_regexp = re.compile(r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from')
-            arrival_regexp = re.compile(r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to')
+            departure_regexp = re.compile(
+                r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from')
+            arrival_regexp = re.compile(
+                r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to')
             if departure_regexp.search(self.outbound_message) is not None:
                 departure_city_flag = True
             elif arrival_regexp.search(self.outbound_message) is not None:

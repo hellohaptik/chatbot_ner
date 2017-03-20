@@ -58,7 +58,6 @@ ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
 ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
 ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
 
-
 HAPTIK_NER_DATASTORE = {
     'engine': ENGINE,
     'elasticsearch': {
@@ -79,10 +78,8 @@ if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AW
     from requests_aws4auth import AWS4Auth
     from elasticsearch import RequestsHttpConnection
 
-    HAPTIK_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID,
-                                                                                         ES_AWS_SECRET_ACCESS_KEY,
-                                                                                         ES_AWS_REGION,
-                                                                                         ES_AWS_SERVICE)
+    HAPTIK_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,
+                                                                  ES_AWS_REGION, ES_AWS_SERVICE)
     HAPTIK_NER_DATASTORE['elasticsearch']['use_ssl'] = True
     HAPTIK_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     HAPTIK_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
