@@ -8,7 +8,7 @@ from v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRU
     PARAMETER_STRUCTURED_VALUE_VERIFICATION, PARAMETER_FALLBACK_VALUE, PARAMETER_EXPERT_MESSAGE
 from chatbot_ner.config import ner_logger
 from v1.chatbot.entity_detection import get_text, get_location, get_phone_number, get_email, get_city, get_pnr, \
-    get_numeric, get_shopping_size, get_time, get_date, get_budget, get_city_advance, \
+    get_number, get_shopping_size, get_time, get_date, get_budget, get_city_advance, \
     get_date_advance
 
 
@@ -21,7 +21,7 @@ def get_parameters_dictionary(request):
     parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
                        PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
                        PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
-                       PARAMETER_STRUCTURED_VALUE_VERIFICATION: request.GET.get('structured_value_verification'),
+                       PARAMETER_STRUCTURED_VALUE_VERIFICATION: int(request.GET.get('structured_value_verification', 0)),
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
                        PARAMETER_EXPERT_MESSAGE: request.GET.get('expert_message')}
 
@@ -196,7 +196,7 @@ def shopping_size(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
-def numeric(request):
+def number(request):
     """This functionality calls the get_numeric() functionality to detect numbers. It is called through api call
 
     Attributes:
@@ -207,7 +207,7 @@ def numeric(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % entity_name)
-        entity_output = get_numeric(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
+        entity_output = get_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                     parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                     parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                     parameters_dict[PARAMETER_FALLBACK_VALUE],

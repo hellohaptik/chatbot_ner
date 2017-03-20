@@ -474,7 +474,7 @@ def get_shopping_size(message, entity_name, structured_value, structured_value_v
     return None
 
 
-def get_numeric(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_number(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
     """This functionality calls the NumberDetector class to detect numerals
 
     Attributes:
