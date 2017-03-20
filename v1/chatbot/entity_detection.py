@@ -491,7 +491,7 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
         structured_value_verification = 0
         fallback_value = None
         expert_message = None
-        output = get_numeric(message=message, entity_name=entity_name, structured_value=structured_value,
+        output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
                           expert_message=expert_message)
         print output
@@ -506,7 +506,7 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
         structured_value_verification = 0
         fallback_value = None
         expert_message = None
-        output = get_numeric(message=message, entity_name=entity_name, structured_value=structured_value,
+        output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
                           expert_message=expert_message)
         print output

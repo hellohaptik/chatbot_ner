@@ -208,10 +208,10 @@ def number(request):
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % entity_name)
         entity_output = get_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                    parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
-                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                    parameters_dict[PARAMETER_EXPERT_MESSAGE])
+                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                   parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
+                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                   parameters_dict[PARAMETER_EXPERT_MESSAGE])
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for numeric: %s ' % e)
