@@ -100,7 +100,7 @@
     $ python initial_setup.py
 ```
 
-  You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](docs/adding_entities.md) section for more details.
+  You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](/docs/adding_entities.md) section for more details.
 
 
 ​        
