@@ -1,8 +1,3 @@
-# Stdlib imports
-
-# Following index is used for gogo entity detection
-ES_INDEX_TEXT_DETECTION = 'gogo_entity_data'
-ES_DOC_TYPE_TEXT_DETECTION = 'data_dictionary'
 
 # ************************ constant used for detection_method ************************
 
@@ -26,11 +21,11 @@ ORIGINAL_TEXT = 'original_text'
 
 # ************************ constants tell us what to do with structured_value ************************
 # This will execute entity detection on the structured_value.
-STRUCTURED_VALUE_DICTIONARY_VERIFICATION = 0
+STRUCTURED = 0
 # This will consider structured_value as an entity value without executing entity detection logic.
-STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION = 1
+UNCHANGED = 1
 # This will execute entity detection on structured_value, if it returns None then we consider structure_value as it is.
-STRUCTURED_VALUE_NORMAL_VERIFICATION = 2
+IF_POSSIBLE = 2
 # verifies with dictionary if match then it will return the value else it will take the same value
 
 # ************************ constants used as a key of request  ************************
@@ -41,4 +36,5 @@ PARAMETER_STRUCTURED_VALUE_VERIFICATION = 'structured_value_verification'
 PARAMETER_FALLBACK_VALUE = 'fallback_value'
 PARAMETER_EXPERT_MESSAGE = 'expert_message'
 
+# ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'

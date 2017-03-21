@@ -1,6 +1,6 @@
 from v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from v1.chatbot.entity_detection import get_text, get_city_advance, get_date_advance, get_date, get_time, get_email, \
-    get_phone_number, get_budget, get_numeric, get_pnr, get_shopping_size
+    get_phone_number, get_budget, get_number, get_pnr, get_shopping_size
 
 
 def run_ner(entities, message):
@@ -107,7 +107,7 @@ def get_entity_function(entity, message):
         'email': get_email,
         'phone_number': get_phone_number,
         'budget': get_budget,
-        'numeric': get_numeric,
+        'number': get_number,
         'city': get_city_advance,
         'date_advance': get_date_advance,
         'train_pnr': get_pnr,

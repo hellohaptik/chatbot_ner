@@ -344,11 +344,11 @@ class BudgetDetector(object):
         if original_list is None:
             original_list = []
 
-        budget_text_list, original_list = self.text_detection_object.detect_entity(self.text)
+        budget_text_list, original_text_list = self.text_detection_object.detect_entity(self.text)
         self.tagged_text = self.text_detection_object.tagged_text
         self.processed_text = self.text_detection_object.processed_text
         count = 0
-        while count < len(original_list):
+        while count < len(original_text_list):
             budget = {
                 'min_budget': 0,
                 'max_budget': 0,
@@ -357,7 +357,8 @@ class BudgetDetector(object):
 
             budget_list.append(budget)
             count += 1
-
+        if original_text_list:
+            original_list.extend(original_text_list)
         return budget_list, original_list
 
     def _update_processed_text(self, original_budget_strings):

@@ -2,8 +2,31 @@ from v1.entities.textual.text.text_detection import TextDetector
 
 
 class CityDetector(object):
+    """
+    CityDetector detects city from the text it similar to TextDetection and inherits TextDetection to perform its
+    operation.
+
+
+    Attributes:
+        text: string to extract entities from
+        entity_name: string by which the detected city entities would be replaced with on calling detect_entity()
+        text_dict: dictionary to store lemmas, stems, ngrams used during detection process
+        tagged_text: string with city entities replaced with tag defined by entity_name
+        text_entity: list to store detected entities from the text
+        original_city_entity: list of substrings of the text detected as entities
+        processed_text: string with detected time entities removed
+        tag: entity_name prepended and appended with '__'
+    """
 
     def __init__(self, entity_name):
+        """
+        Initializes a CityDetector object with given entity_name
+
+        Args:
+            entity_name: A string by which the detected substrings that correspond to text entities would be replaced
+                         with on calling detect_entity()
+        """
+
         self.entity_name = entity_name
         self.text = ''
         self.text_dict = {}
@@ -12,7 +35,6 @@ class CityDetector(object):
         self.city = []
         self.original_city_text = []
         self.text_detection_object = TextDetector(entity_name=entity_name)
-        self.hs_city = None
         self.tag = '__' + self.entity_name + '__'
 
     def detect_city(self):
@@ -27,15 +49,26 @@ class CityDetector(object):
         return city_list, original_list
 
     def detect_entity(self, text):
-        """
-        Take text and returns location details
-        :param text:
-        :return: tuple (list of location , original text)
+        """Detects city in the text string
+
+        Args:
+            text: string to extract entities from
+
+        Returns:
+            A tuple of two lists with first list containing the detected city and second list containing their
+            corresponding substrings in the given text.
+
+            For example:
+
+                (['Mumbai'], ['bombay'])
+
+            Additionally this function assigns these lists to self.city and self.original_city_text attributes
+            respectively.
+
         """
         self.text = ' ' + text + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-
 
         city_data = self.detect_city()
         self.city = city_data[0]
@@ -44,10 +77,22 @@ class CityDetector(object):
 
     def detect_city_format(self, city_list=[], original_list=[]):
         """
-        Detects city if it is present in the chat
-        :param city_list:
-        :param original_list:
-        :return:
+        Detects city from self.text conforming to formats defined by regex pattern.
+
+
+
+        Args:
+            city_list: Optional, list to store detected cities
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            cities
+
+        Returns:
+            A tuple of two lists with first list containing the detected cities and second list containing their
+            corresponding substrings in the given text. For example:
+
+            For example:
+
+                (['Mumbai'], ['bombay'])
         """
         city_list_from_text_entity, original_list = self.text_detection_object.detect_entity(self.text)
         self.tagged_text = self.text_detection_object.tagged_text
@@ -59,13 +104,14 @@ class CityDetector(object):
 
     def update_processed_text(self, original_list):
         """
-        This function updates text by replacing already detected entity
-        :return:
+        Replaces detected cities with tag generated from entity_name used to initialize the object with
+
+        A final string with all cities replaced will be stored in object's tagged_text attribute
+        A string with all cities removed will be stored in object's processed_text attribute
+
+        Args:
+            original_city_strings: list of substrings of original text to be replaced with tag created from entity_name
         """
         for detected_text in original_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
-
-    def set_hs_city(self, city):
-        self.hs_city = city
-
