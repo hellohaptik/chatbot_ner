@@ -679,7 +679,11 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
                           expert_message=expert_message)
         print output
 
-            >>
+            >> [{'detection': 'message', 'original_text': 'rs. 2000', 'entity_value':
+            {'max_budget': 2000, 'type': 'normal_budget', 'min_budget': 0}},
+            {'detection': 'message', 'original_text': 'rs. 3000', 'entity_value':
+            {'max_budget': 3000, 'type': 'normal_budget', 'min_budget': 0}}]
+
 
     """
     budget_detection = BudgetDetector(entity_name=entity_name)
