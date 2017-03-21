@@ -17,7 +17,7 @@ Following csv files are already included in the repository at `data/entity_data/
 | movie.csv      | Selected few Indian movie names          |
 | restaurant.csv | Selected Indian restaurant names         |
 
-#### Format
+### Format
 
 -----------
 
@@ -55,7 +55,7 @@ audio,mp3|aac|wav
 video,mp4|mkv|mov
 ```
 
-#### Adding new data from csv file to datastore
+### Adding new data from csv file to datastore
 
 --------
 
@@ -100,13 +100,17 @@ Now lets add the newly created csv file to the datastore.
   db.populate(entity_data_directory_path=csv_directory)
   ```
 
-#### Updating the DataStore after editing a csv file
+### Updating the DataStore after editing a csv file
 
 ---------
 
 After editing and saving your csv, you will need to update the datastore with new data. For this you need to call `repopulate()` on DataStore. It follows the same API as `populate()`
 
 > **Note:** The filename needs to be same as it was before editing the file. If the new data is saved under a different filename it would be populated as a new entity with the name same as new file name.
+
+> Make sure you are working in chatbotnervenv virtual environment and datastore engine is running. See above section
+
+On a `manage.py shell` run
 
 ```python
 from datastore import DataStore
@@ -124,13 +128,17 @@ db = DataStore()
 db.repopulate(entity_data_directory_path=csv_directory)
 ```
 
-#### Deleting entity data
+### Deleting entity data
 
 -----------
 
 To delete all data for entity, simply call `delete_entity()` on Datastore. It takes one argument- the name of the entity. This is the same as the name of the csv file used for this entity while populating its data.
 
-  ```python
+> Make sure you are working in chatbotnervenv virtual environment and datastore engine is running. See above section
+
+On a `manage.py shell` run
+
+```python
 from datastore import DataStore
 db = DataStore()
 db.delete_entity(entity_name='attachment_types')
