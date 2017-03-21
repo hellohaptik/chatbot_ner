@@ -19,6 +19,8 @@ DETECTION_METHOD = 'detection'
 # original_text is a key that will store actual value that was detected. For example, mcd
 ORIGINAL_TEXT = 'original_text'
 
+ENTITY_VALUE_DICT_KEY = 'value'
+
 # ************************ constants tell us what to do with structured_value ************************
 # This will execute entity detection on the structured_value.
 STRUCTURED = 0

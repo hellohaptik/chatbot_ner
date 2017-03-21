@@ -1,6 +1,6 @@
 from v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
     FROM_FALLBACK_VALUE, STRUCTURED, UNCHANGED, \
-    ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD
+    ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY
 from v1.entities.numeral.budget.budget_detection import BudgetDetector
 from v1.entities.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from v1.entities.textual.city.city_detection import CityDetector
@@ -94,7 +94,8 @@ The output is stored in a list of dictionary contains the following structure
     }
 ]
     - Consider this example for below explanation "I want to order from mcd"
-    - "entity_value": this will store value of entity (ie. entity value) which is detected. For example, McDonalds.
+    - "entity_value": this will store value of entity (ie. entity value) which is detected. It will be in dictionary
+                      format. For example, {"value": McDonalds}.
     - "detection": this will store how the entity is detected i.e. whether from message, structured_value or fallback.
     - "original_text": this will store the actual value that is detected. For example, mcd.
 """
@@ -873,6 +874,11 @@ def output_entity_dict_list(entity_value_list=None, original_text_list=None, det
     count = 0
     if entity_value_list:
         while count < len(entity_value_list):
+            if type(entity_value_list[count]) in [str, unicode]:
+                entity_value_list[count] = {
+                    ENTITY_VALUE_DICT_KEY: entity_value_list[count]
+                }
+
             entity_list.append(
                 {
                     ENTITY_VALUE: entity_value_list[count],
@@ -904,6 +910,10 @@ def output_entity_dict_value(entity_value=None, original_text=None, detection_me
             }
         ]
     """
+    if type(entity_value) in [str, unicode]:
+        entity_value = {
+            ENTITY_VALUE_DICT_KEY: entity_value
+        }
 
     entity_list = [
         {
