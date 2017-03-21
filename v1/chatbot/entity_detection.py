@@ -1,5 +1,5 @@
 from v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
-    FROM_FALLBACK_VALUE, STRUCTURED_VALUE_DICTIONARY_VERIFICATION, STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION, \
+    FROM_FALLBACK_VALUE, STRUCTURED, UNCHANGED, \
     ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD
 from v1.entities.numeral.budget.budget_detection import BudgetDetector
 from v1.entities.numeral.size.shopping_size_detection import ShoppingSizeDetector
@@ -45,8 +45,8 @@ Parameters:
 
     structured_value_verification: This parameter tells us what to do with structure_value. It is a verification method
     which either processes the structure_value or take it as it is. It takes these values: 0, 1 and 2.
-    0 (STRUCTURED_VALUE_DICTIONARY_VERIFICATION): This will execute entity detection on the structured_value.
-    1 (STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION): This will consider structured_value as an entity value
+    0 (STRUCTURED): This will execute entity detection on the structured_value.
+    1 (UNCHANGED): This will consider structured_value as an entity value
     without executing entity detection logic.
     2 (STRUCTURED_VALUE_NORMAL_VERIFICATION): This will execute entity detection on structured_value, if it returns None
     then we consider structure_value as entity value. (NOTE: this is used because sometimes, user may enter a value in
@@ -73,9 +73,9 @@ Format of entity detection functionality for a chatbot:
 The general architecture of executing any detection logic is as follows:
 1. We initialize the individual entity detection class by passing necessary parameters
 2. if structured_value is present then we check for a value in structured_value_verification
-    2.1. if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION i.e. 0  then we run entity
+    2.1. if structured_value_verification == STRUCTURED i.e. 0  then we run entity
     detection logic to extract necessary entity values and return it.
-    2.2. else if  structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION i.e. 1 then we
+    2.2. else if  structured_value_verification == UNCHANGED i.e. 1 then we
     consider the structured_value as entity value and return as it is.
     2.3. else it will take the structured_value process it on detection logic to extract entity values if it fails then
     we consider the structure value as entity value and return as it is.
@@ -157,11 +157,11 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
     """
     text_detection = TextDetection(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
             if text_entity_list:
                 return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
@@ -194,11 +194,11 @@ def get_location(message, entity_name, structured_value, structured_value_verifi
 
     text_detection = TextDetection(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
             if text_entity_list:
                 return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
@@ -259,11 +259,11 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
 
     phone_detection = PhoneDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = phone_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = phone_detection.detect_entity(text=structured_value)
@@ -324,11 +324,11 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
     """
     email_detection = EmailDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = email_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = email_detection.detect_entity(text=structured_value)
@@ -373,11 +373,11 @@ def get_city(message, entity_name, structured_value, structured_value_verificati
     """
     city_detection = CityDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
@@ -423,11 +423,11 @@ def get_pnr(message, entity_name, structured_value, structured_value_verificatio
 
     pnr_detection = PNRDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = pnr_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = pnr_detection.detect_entity(text=structured_value)
@@ -474,11 +474,11 @@ def get_shopping_size(message, entity_name, structured_value, structured_value_v
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
 
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = size_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = size_detection.detect_entity(text=structured_value)
@@ -540,11 +540,11 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
     number_detection = NumberDetector(entity_name=entity_name)
 
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = number_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = number_detection.detect_entity(text=structured_value)
@@ -592,11 +592,11 @@ def get_time(message, entity_name, structured_value, structured_value_verificati
 
     time_detection = TimeDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = time_detection.detect_entity(text=structured_value, form_check=True)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = time_detection.detect_entity(text=structured_value, form_check=True)
@@ -657,11 +657,11 @@ def get_date(message, entity_name, structured_value, structured_value_verificati
     """
     date_detection = DateDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
@@ -708,11 +708,11 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
     """
     budget_detection = BudgetDetector(entity_name=entity_name)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = budget_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = budget_detection.detect_entity(text=structured_value)
@@ -776,11 +776,11 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
     city_detection = CityAdvanceDetector(entity_name=entity_name)
     city_detection.set_outbound_message(outbound_message=expert_message)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
@@ -829,11 +829,11 @@ def get_date_advance(message, entity_name, structured_value, structured_value_ve
     date_detection = DateAdvanceDetector(entity_name=entity_name)
     date_detection.set_outbound_message(outbound_message=expert_message)
     if structured_value:
-        if structured_value_verification == STRUCTURED_VALUE_DICTIONARY_VERIFICATION:
+        if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
             if entity_list:
                 return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        elif structured_value_verification == STRUCTURED_VALUE_WITHOUT_DICTIONARY_VERIFICATION:
+        elif structured_value_verification == UNCHANGED:
                 return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
         else:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
