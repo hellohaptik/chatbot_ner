@@ -27,7 +27,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
                        PARAMETER_STRUCTURED_VALUE_VERIFICATION: structured_value_verification,
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
-                       PARAMETER_EXPERT_MESSAGE: request.GET.get('expert_message')}
+                       PARAMETER_EXPERT_MESSAGE: request.GET.get('bot_message')}
 
     return parameters_dict
 

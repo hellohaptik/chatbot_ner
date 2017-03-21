@@ -59,7 +59,7 @@ Parameters:
     example user has not provided any information about his location in the chat but, we can pass a fallback_value that
     will contain its location value from its profile or third party api (like geopy, etc)
 
-    expert_message: previous message from a bot/agent. This is an important parameter, many a times the entity value
+    bot_message: previous message from a bot/agent. This is an important parameter, many a times the entity value
     relies on the message from the bot/agent i.e. what bot saying or asking.
     For example: bot might ask for departure date to book a flight and user might reply with date.
     Now, it can not be disambiguated whether its departure date or arrival date unless  we know what bot is asking for?
@@ -101,7 +101,7 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_text(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the TextDetector class to detect textual entities
 
     Attributes:
@@ -117,10 +117,10 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
@@ -134,10 +134,10 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
         structured_value = 'inferno'
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
@@ -149,10 +149,10 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
         structured_value = 'delhi'
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
@@ -182,7 +182,7 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
     return None
 
 
-def get_location(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_location(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the TextDetector class to detect location
 
     TODO: We can improve this by creating separate class for location detection instead of using TextDetector
@@ -220,7 +220,7 @@ def get_location(message, entity_name, structured_value, structured_value_verifi
 
 
 def get_phone_number(message, entity_name, structured_value, structured_value_verification, fallback_value,
-                     expert_message):
+                     bot_message):
     """This functionality calls the PhoneDetector class to detect phone numbers
 
     Attributes:
@@ -236,10 +236,10 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '9049961794', 'entity_value': {'value': '9049961794'}}]
@@ -249,10 +249,10 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
         structured_value = None
         structured_value_verification = 0
         fallback_value = '9049961794'
-        expert_message = None
+        bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'fallback_value', 'original_text': '9049961794',
@@ -285,7 +285,7 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
     return None
 
 
-def get_email(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_email(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the EmailDetector class to detect email ids
 
     Attributes:
@@ -301,10 +301,10 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_email(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'apurv.nagvenkar@gmail.com',
@@ -317,10 +317,10 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
         structured_value = None
         structured_value_verification = 0
         fallback_value = 'apurv.nagvenkar@gmail.com'
-        expert_message = None
+        bot_message = None
         output = get_email(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'fallback_value', 'original_text': 'apurv.nagvenkar@gmail.com',
@@ -351,7 +351,7 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
     return None
 
 
-def get_city(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_city(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the CityDetector class to detect cities
 
     Attributes:
@@ -367,10 +367,10 @@ def get_city(message, entity_name, structured_value, structured_value_verificati
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': {'value': u'mumbai'}}]
@@ -400,7 +400,7 @@ def get_city(message, entity_name, structured_value, structured_value_verificati
     return None
 
 
-def get_pnr(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_pnr(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the PNRDetector class to detect pnr
 
     Attributes:
@@ -416,10 +416,10 @@ def get_pnr(message, entity_name, structured_value, structured_value_verificatio
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_pnr(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '2141215305', 'entity_value': {'value': '2141215305'}}]
@@ -451,7 +451,7 @@ def get_pnr(message, entity_name, structured_value, structured_value_verificatio
 
 
 def get_shopping_size(message, entity_name, structured_value, structured_value_verification, fallback_value,
-                      expert_message):
+                      bot_message):
     """This functionality calls the ShoppingSizeDetector class to detect cloth size
 
     Attributes:
@@ -467,13 +467,13 @@ def get_shopping_size(message, entity_name, structured_value, structured_value_v
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_shopping_size(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}},
+            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}}, 
             {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
 
     """
@@ -502,7 +502,7 @@ def get_shopping_size(message, entity_name, structured_value, structured_value_v
     return None
 
 
-def get_number(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_number(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the NumberDetector class to detect numerals
 
     Attributes:
@@ -518,10 +518,10 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
@@ -533,10 +533,10 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
@@ -568,7 +568,7 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
     return None
 
 
-def get_time(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_time(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the TimeDetector class to detect time
 
     Attributes:
@@ -585,10 +585,10 @@ def get_time(message, entity_name, structured_value, structured_value_verificati
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '12:30 pm', 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}},
@@ -620,7 +620,7 @@ def get_time(message, entity_name, structured_value, structured_value_verificati
     return None
 
 
-def get_date(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_date(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the DateDetector class to detect date
 
     Attributes:
@@ -636,10 +636,10 @@ def get_date(message, entity_name, structured_value, structured_value_verificati
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_date(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '23rd december',
@@ -651,10 +651,10 @@ def get_date(message, entity_name, structured_value, structured_value_verificati
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_date(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'day after tomorrow',
@@ -685,7 +685,7 @@ def get_date(message, entity_name, structured_value, structured_value_verificati
     return None
 
 
-def get_budget(message, entity_name, structured_value, structured_value_verification, fallback_value, expert_message):
+def get_budget(message, entity_name, structured_value, structured_value_verification, fallback_value, bot_message):
     """This functionality calls the BudgetDetector class to detect budget
 
     Attributes:
@@ -701,10 +701,10 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_budget(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '2000 to 3000', 'entity_value':
@@ -737,7 +737,7 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
 
 
 def get_city_advance(message, entity_name, structured_value, structured_value_verification, fallback_value,
-                     expert_message):
+                     bot_message):
     """This functionality calls the CityAdvanceDetector class to detect arrival city and departure_city.
     We can add different properties of city detection in this class
 
@@ -754,10 +754,10 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = None
+        bot_message = None
         output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'from delhhi to mumbai',
@@ -768,10 +768,10 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = "Please help me departure city?"
+        bot_message = "Please help me departure city?"
         output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'mummbai',
@@ -780,7 +780,7 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
 
     """
     city_detection = CityAdvanceDetector(entity_name=entity_name)
-    city_detection.set_outbound_message(outbound_message=expert_message)
+    city_detection.set_outbound_message(outbound_message=bot_message)
     if structured_value:
         if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
@@ -805,7 +805,7 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
 
 
 def get_date_advance(message, entity_name, structured_value, structured_value_verification, fallback_value,
-                     expert_message):
+                     bot_message):
     """This functionality calls the DateAdvanceDetector class to detect departure date and arrival date.
     We can add different properties of date detection in this class
 
@@ -822,10 +822,10 @@ def get_date_advance(message, entity_name, structured_value, structured_value_ve
         structured_value = None
         structured_value_verification = 0
         fallback_value = None
-        expert_message = 'Please help me with return date?'
+        bot_message = 'Please help me with return date?'
         output = get_date_advance(message=message, entity_name=entity_name, structured_value=structured_value,
                           structured_value_verification=structured_value_verification, fallback_value=fallback_value,
-                          expert_message=expert_message)
+                          bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '21/2/17',
@@ -833,7 +833,7 @@ def get_date_advance(message, entity_name, structured_value, structured_value_ve
 
     """
     date_detection = DateAdvanceDetector(entity_name=entity_name)
-    date_detection.set_outbound_message(outbound_message=expert_message)
+    date_detection.set_outbound_message(outbound_message=bot_message)
     if structured_value:
         if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
