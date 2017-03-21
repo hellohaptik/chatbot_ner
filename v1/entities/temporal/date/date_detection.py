@@ -854,7 +854,7 @@ class DateDetector(object):
                               self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern
             tommorow = self.date_object + timedelta(days=1)
             dd = tommorow.day
             mm = tommorow.month
@@ -1077,7 +1077,7 @@ class DateDetector(object):
         patterns = re.findall(r'\b((this|dis|coming|on|for|fr)*[\s\-]+([A-Za-z]+))\b', self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern[0].strip()
             probable_day = pattern[2]
             day = self.__get_day_index(probable_day)
             current_day = self.__get_day_index(self.date_object.strftime("%A"))
@@ -1631,13 +1631,9 @@ class DateDetector(object):
                 if val['type'] == TYPE_THIS_DAY:
                     val['type'] = TYPE_REPEAT_DAY
                     new_date_list.append(val)
-        elif self._check_current_day(date_list):
-            for index, val in enumerate(date_list):
-                if val['type'] == TYPE_THIS_DAY:
-                    new_date_list.append(val)
         if new_date_list:
-            date_list = new_date_list
-        original_list = original_list[:len(date_list)]
+            date_list.extend(new_date_list)
+            original_list = original_list[:len(date_list)]
         return date_list, original_list
 
     # TODO Doc
@@ -1668,7 +1664,7 @@ class DateDetector(object):
             if len(date_list) == 2:
                 date_list[0]['type'] = START_RANGE
                 date_list[1]['type'] = END_RANGE
-        original_list = original_list[:len(date_list)]
+            original_list = original_list[:len(date_list)]
         return date_list, original_list
 
     # TODO Doc
@@ -1691,7 +1687,7 @@ class DateDetector(object):
             if len(date_list) == 2:
                 date_list[0]['type'] = DATE_START_RANGE
                 date_list[1]['type'] = DATE_END_RANGE
-        original_list = original_list[:len(date_list)]
+            original_list = original_list[:len(date_list)]
         return date_list, original_list
 
     def __get_month_index(self, value):
