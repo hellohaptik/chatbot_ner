@@ -5,10 +5,10 @@
 
    - Ubuntu:
 
-        ```shell
+     ```shell
         $ sudo apt-get update
         $ sudo apt-get install -y python-dev python-pip build-essential curl
-        ```
+     ```
 
    - Mac OSX (or install Xcode):
 
@@ -56,26 +56,26 @@
 
 -  Ubuntu:
 
-     ```shell
+   ```shell
      $ sudo add-apt-repository -y ppa:webupd8team/java
      $ sudo apt-get update
      $ sudo apt-get -y install oracle-java8-installer
      $ sudo apt install oracle-java8-set-default
-     ```
+   ```
 
-- Mac OSX:
+-  Mac OSX:
 
-  Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
-  ​     
-  Setting up Elasticsearch
+   Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+   ​     
+   Setting up Elasticsearch
 
- ```shell
+```shell
  $ mkdir -p ~/chatbot_ner_elasticsearch
  $ cd /tmp/
  $ curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.4/elasticsearch-2.4.4.tar.gz
  $ tar -xzf elasticsearch-2.4.4.tar.gz -C ~/chatbot_ner_elasticsearch/
  $ ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
- ```
+```
 
  Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/`
  ​      
@@ -91,7 +91,7 @@
      $ cp config.example config
      ```
 
-- Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
+-    Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 
@@ -115,3 +115,83 @@ $ ./start_server.sh
 ```shell
 $ ./start_server.sh &
 ```
+
+Following isthe API call to test our service:
+
+```shell
+URL='localhost'
+PORT=8081
+curl -i 'http://'$URL':'$PORT'/v1/ner/?entities=\[%22date%22,%22time%22,%22restaurant%22\]&message=Reserve%20me%20a%20table%20today%20at%206:30pm%20at%20Mainland%20China%20and%20on%20Monday%20at%207:00pm%20at%20Barbeque%20Nation'
+```
+
+Output should be:
+
+```json
+{
+  "data": {
+    "tag": "reserve me a table __date__ at __time__ at __restaurant__ and on __date__ at __time__ at __restaurant__",
+    "entity_data": {
+      "date": [
+        {
+          "detection": "message",
+          "original_text": "monday",
+          "entity_value": {
+            "mm": 3,
+            "yy": 2017,
+            "dd": 27,
+            "type": "day_within_one_week"
+          }
+        },
+        {
+          "detection": "message",
+          "original_text": "today",
+          "entity_value": {
+            "mm": 3,
+            "yy": 2017,
+            "dd": 21,
+            "type": "today"
+          }
+        }
+      ],
+      "time": [
+        {
+          "detection": "message",
+          "original_text": "6:30pm",
+          "entity_value": {
+            "mm": 30,
+            "hh": 6,
+            "nn": "pm"
+          }
+        },
+        {
+          "detection": "message",
+          "original_text": "7:00pm",
+          "entity_value": {
+            "mm": 0,
+            "hh": 7,
+            "nn": "pm"
+          }
+        }
+      ],
+      "restaurant": [
+        {
+          "detection": "message",
+          "original_text": "barbeque nation",
+          "entity_value": {
+            "value": "Barbeque Nation"
+          }
+        },
+        {
+          "detection": "message",
+          "original_text": "mainland china",
+          "entity_value": {
+            "value": "Mainland China"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+You can also have a look at our [API call document](api_call.md) to test and use different NER functionalities.
