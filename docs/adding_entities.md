@@ -117,9 +117,21 @@ db.repopulate(csv_file_paths=[csv_file,])
 
  In case, you want to update multiple csv files at once, you can pass the directory path to `entity_data_directory_path` parameter of `populate` method as follows:
 
-  ```python
+```python
 from datastore import DataStore
 csv_directory = '~/my_csv_files/' # example directory path containing csv files
 db = DataStore()
 db.repopulate(entity_data_directory_path=csv_directory)
+```
+
+#### Deleting entity data
+
+-----------
+
+To delete all data for entity, simply call `delete_entity()` on Datastore. It takes one argument- the name of the entity. This is the same as the name of the csv file used for this entity while populating its data.
+
+  ```python
+from datastore import DataStore
+db = DataStore()
+db.delete_entity(entity_name='attachment_types')
   ```
