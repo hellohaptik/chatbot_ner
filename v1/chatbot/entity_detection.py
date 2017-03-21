@@ -447,7 +447,29 @@ def get_pnr(message, entity_name, structured_value, structured_value_verificatio
 
 def get_shopping_size(message, entity_name, structured_value, structured_value_verification, fallback_value,
                       expert_message):
-    """
+    """This functionality calls the ShoppingSizeDetector class to detect cloth size
+
+    Attributes:
+        NOTE: Explained above
+
+    Output:
+        NOTE: Explained above
+
+    For Example:
+
+        message = "I want to buy Large shirt and jeans of 36 waist"
+        entity_name = 'shopping_size'
+        structured_value = None
+        structured_value_verification = 0
+        fallback_value = None
+        expert_message = None
+        output = get_shopping_size(message=message, entity_name=entity_name, structured_value=structured_value,
+                          structured_value_verification=structured_value_verification, fallback_value=fallback_value,
+                          expert_message=expert_message)
+        print output
+
+            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': u'L'},
+            {'detection': 'message', 'original_text': '36', 'entity_value': '36'}]
     """
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
 
@@ -668,7 +690,7 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
 
     For Example:
 
-        message = "shirts between Rs. 2000 to Rs. 3000"
+        message = "shirts between 2000 to 3000"
         entity_name = 'budget'
         structured_value = None
         structured_value_verification = 0
@@ -679,10 +701,8 @@ def get_budget(message, entity_name, structured_value, structured_value_verifica
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'rs. 2000', 'entity_value':
-            {'max_budget': 2000, 'type': 'normal_budget', 'min_budget': 0}},
-            {'detection': 'message', 'original_text': 'rs. 3000', 'entity_value':
-            {'max_budget': 3000, 'type': 'normal_budget', 'min_budget': 0}}]
+            >> [{'detection': 'message', 'original_text': '2000 to 3000', 'entity_value':
+                {'max_budget': 3000, 'type': 'normal_budget', 'min_budget': 2000}}]
 
 
     """
