@@ -53,7 +53,7 @@ class ShoppingSizeDetector(object):
         self.processed_text = ''
         self.size = []
         self.original_size_text = []
-        self.text_detection_object = TextDetection(entity_name=entity_name)
+        self.text_detection_object = TextDetection(entity_name=dictionary_name)
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text):
