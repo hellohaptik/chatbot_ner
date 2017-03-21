@@ -123,8 +123,9 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value': u'Mainland China'},
-                {'detection': 'message', 'original_text': 'domminos', 'entity_value': u"Domino's Pizza"}]
+            >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
+            {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
+            'entity_value': {'value': u"Domino's Pizza"}}]
 
 
 
@@ -139,7 +140,8 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value': u'Inferno'}]
+            >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
+            {'value': u'Inferno'}}]
 
 
         message = 'i wanted to watch inferno'
@@ -153,7 +155,7 @@ def get_text(message, entity_name, structured_value, structured_value_verificati
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': u'Inferno'}]
+            >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
 
     """
     text_detection = TextDetector(entity_name=entity_name)
@@ -240,7 +242,7 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': '9049961794', 'entity_value': '9049961794'}]
+            >> [{'detection': 'message', 'original_text': '9049961794', 'entity_value': {'value': '9049961794'}}]
 
         message = 'Please call me'
         entity_name = 'phone_number'
@@ -253,7 +255,8 @@ def get_phone_number(message, entity_name, structured_value, structured_value_ve
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'fallback_value', 'original_text': '9049961794', 'entity_value': '9049961794'}]
+            >> [{'detection': 'fallback_value', 'original_text': '9049961794',
+            'entity_value': {'value': '9049961794'}}]
 
 
     """
@@ -305,7 +308,8 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
         print output
 
             >> [{'detection': 'message', 'original_text': 'apurv.nagvenkar@gmail.com',
-                                                            'entity_value': 'apurv.nagvenkar@gmail.com'}]
+            'entity_value': {'value': 'apurv.nagvenkar@gmail.com'}}]
+
 
 
         message = 'send me the email'
@@ -320,7 +324,7 @@ def get_email(message, entity_name, structured_value, structured_value_verificat
         print output
 
             >> [{'detection': 'fallback_value', 'original_text': 'apurv.nagvenkar@gmail.com',
-                                                                    'entity_value': 'apurv.nagvenkar@gmail.com'}]
+            'entity_value': {'value': 'apurv.nagvenkar@gmail.com'}}]
 
     """
     email_detection = EmailDetector(entity_name=entity_name)
@@ -369,7 +373,7 @@ def get_city(message, entity_name, structured_value, structured_value_verificati
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': u'Mumbai'}]
+            >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': {'value': u'mumbai'}}]
 
     """
     city_detection = CityDetector(entity_name=entity_name)
@@ -418,7 +422,7 @@ def get_pnr(message, entity_name, structured_value, structured_value_verificatio
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': '2141215305', 'entity_value': '2141215305'}]
+            >> [{'detection': 'message', 'original_text': '2141215305', 'entity_value': {'value': '2141215305'}}]
 
     """
 
@@ -469,8 +473,9 @@ def get_shopping_size(message, entity_name, structured_value, structured_value_v
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': u'L'},
-            {'detection': 'message', 'original_text': '36', 'entity_value': '36'}]
+            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}},
+            {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
+
     """
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
 
@@ -519,8 +524,8 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': '30', 'entity_value': '30'},
-                {'detection': 'message', 'original_text': '40', 'entity_value': '40'}]
+            >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
+            {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
 
 
         message = "I want to reserve a table for 3 people"
@@ -534,7 +539,7 @@ def get_number(message, entity_name, structured_value, structured_value_verifica
                           expert_message=expert_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': '3'}]
+            >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
 
     """
 
