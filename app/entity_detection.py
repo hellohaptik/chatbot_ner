@@ -18,10 +18,14 @@ def get_parameters_dictionary(request):
     :param request:
     :return:
     """
+    if request.GET.get('structured_value_verification') == '':
+        structured_value_verification = 0
+    else:
+        structured_value_verification = int(request.GET.get('structured_value_verification'))
     parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
                        PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
                        PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
-                       PARAMETER_STRUCTURED_VALUE_VERIFICATION: int(request.GET.get('structured_value_verification', 0)),
+                       PARAMETER_STRUCTURED_VALUE_VERIFICATION: structured_value_verification,
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
                        PARAMETER_EXPERT_MESSAGE: request.GET.get('expert_message')}
 
