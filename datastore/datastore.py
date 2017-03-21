@@ -98,12 +98,14 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, **kwargs):
+    def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
-        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path
+        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and from
+        csv files at file paths in csv_file_paths list
         Args:
-            entity_data_directory_path: Directory path containing CSV files to populate the datastore from.
+            entity_data_directory_path: Optional, Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs
+            csv_file_paths: Optional, list of absolute file paths to csv files
             kwargs:
                 For Elasticsearch:
                     Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
@@ -123,6 +125,7 @@ class DataStore(object):
                                                                doc_type=self._connection_settings[
                                                                    ELASTICSEARCH_DOC_TYPE],
                                                                entity_data_directory_path=entity_data_directory_path,
+                                                               csv_file_paths=csv_file_paths,
                                                                logger=ner_logger,
                                                                **kwargs)
 
@@ -198,7 +201,8 @@ class DataStore(object):
                                                                        index_name=self._store_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
-                                                                       entity_name=entity_name)
+                                                                       entity_name=entity_name,
+                                                                       **kwargs)
 
         return results_dictionary
 
@@ -248,25 +252,64 @@ class DataStore(object):
 
         return results_dictionary
 
-    def repopulate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, **kwargs):
+    def delete_entity(self, entity_name, **kwargs):
         """
-        Deletes everything from the datastore, recreates the structure and repopulates all the data
+        Deletes the entity data for entity named entity_named from the datastore
+
+        Args:
+            entity_name: name of the entity, this is same as the file name of the csv used for this entity while
+                         populating data for this entity
+            kwargs:
+                For Elasticsearch:
+                    Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+        """
+        if self._connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            elastic_search.populate.delete_entity_by_name(connection=self._connection,
+                                                          index_name=self._store_name,
+                                                          doc_type=self._connection_settings[
+                                                              ELASTICSEARCH_DOC_TYPE],
+                                                          entity_name=entity_name,
+                                                          logger=ner_logger,
+                                                          ignore=[400, 404],
+                                                          **kwargs)
+
+    def repopulate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
+        """
+        Deletes the existing data and repopulates it for entities from csv files stored in directory path indicated by
+        entity_data_directory_path and from csv files at file paths in csv_file_paths list
         
         Args:    
             entity_data_directory_path: Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs
+            csv_file_paths: Optional, list of absolute file paths to csv files
             kwargs:
                 For Elasticsearch:
-                    Same as those accepted by populate()
+                    Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
         
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
         """
-        self.delete()
-        self.create()
-        self.populate(entity_data_directory_path=entity_data_directory_path, **kwargs)
-    
+        if self._connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            elastic_search.populate.recreate_all_dictionary_data(connection=self._connection,
+                                                                 index_name=self._store_name,
+                                                                 doc_type=self._connection_settings[
+                                                                     ELASTICSEARCH_DOC_TYPE],
+                                                                 entity_data_directory_path=entity_data_directory_path,
+                                                                 csv_file_paths=csv_file_paths,
+                                                                 logger=ner_logger,
+                                                                 ignore=[400, 404],
+                                                                 **kwargs)
+
     def _check_doc_type_for_elasticsearch(self):
         """
         Checks if doc_type is present in connection settings, if not an exception is raised

@@ -1,4 +1,5 @@
 import re
+
 from ..constants import ELASTICSEARCH_SEARCH_SIZE
 
 log_prefix = 'datastore.elastic_search.query'
@@ -91,8 +92,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
         data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        if 'index' not in kwargs:
-            kwargs = dict(kwargs, index=index_name)
+        kwargs = dict(kwargs, index=index_name)
         kwargs = dict(kwargs, body=data)
         kwargs = dict(kwargs, doc_type=doc_type)
         ngram_results = _run_es_search(connection, **kwargs)

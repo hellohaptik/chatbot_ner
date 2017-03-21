@@ -1,13 +1,14 @@
-import os
 from elasticsearch import helpers
+
 from v1.constant import DICTIONARY_DATA_VARIANTS
-from ..utils import *
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+from ..utils import *
 
 log_prefix = 'datastore.elastic_search.populate'
 
 
-def create_all_dictionary_data(connection, index_name, doc_type, entity_data_directory_path, logger, **kwargs):
+def create_all_dictionary_data(connection, index_name, doc_type, logger, entity_data_directory_path=None,
+                               csv_file_paths=None, **kwargs):
     """
     Indexes all entity data from csv files stored at entity_data_directory_path, one file at a time
     Args:
@@ -15,7 +16,9 @@ def create_all_dictionary_data(connection, index_name, doc_type, entity_data_dir
         index_name: The name of the index
         doc_type: The type of the documents being indexed
         logger: logging object to log at debug and exception level
-        entity_data_directory_path: Path of the directory containing the entity data csv files
+        entity_data_directory_path: Optional, Path of the directory containing the entity data csv files.
+                                    Default is None
+        csv_file_paths: Optional, list of file paths to csv files. Default is None
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
@@ -23,10 +26,47 @@ def create_all_dictionary_data(connection, index_name, doc_type, entity_data_dir
     logger.debug('%s: +++ Started: create_all_dictionary_data() +++' % log_prefix)
     if entity_data_directory_path:
         logger.debug('%s: \t== Fetching from variants/ ==' % log_prefix)
-        create_dictionary_data_from_directory(connection=connection, index_name=index_name, doc_type=doc_type,
-                                              entity_data_directory_path=entity_data_directory_path, update=False,
-                                              logger=logger, **kwargs)
-        logger.debug('%s: +++ Finished: create_all_dictionary_data() +++' % log_prefix)
+        csv_files = get_files_from_directory(entity_data_directory_path)
+        for csv_file in csv_files:
+            csv_file_path = os.path.join(entity_data_directory_path, csv_file)
+            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                             csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
+    if csv_file_paths:
+        for csv_file_path in csv_file_paths:
+            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                             csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
+    logger.debug('%s: +++ Finished: create_all_dictionary_data() +++' % log_prefix)
+
+
+def recreate_all_dictionary_data(connection, index_name, doc_type, logger, entity_data_directory_path=None,
+                                 csv_file_paths=None, **kwargs):
+    """
+    Re-indexes all entity data from csv files stored at entity_data_directory_path, one file at a time
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents being indexed
+        logger: logging object to log at debug and exception level
+        entity_data_directory_path: Optional, Path of the directory containing the entity data csv files.
+                                    Default is None
+        csv_file_paths: Optional, list of file paths to csv files. Default is None
+        kwargs:
+            Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+    """
+    logger.debug('%s: +++ Started: recreate_all_dictionary_data() +++' % log_prefix)
+    if entity_data_directory_path:
+        logger.debug('%s: \t== Fetching from variants/ ==' % log_prefix)
+        csv_files = get_files_from_directory(entity_data_directory_path)
+        for csv_file in csv_files:
+            csv_file_path = os.path.join(entity_data_directory_path, csv_file)
+            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                             csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
+    if csv_file_paths:
+        for csv_file_path in csv_file_paths:
+            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                             csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
+    logger.debug('%s: +++ Finished: recreate_all_dictionary_data() +++' % log_prefix)
 
 
 def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger, **kwargs):
@@ -67,8 +107,7 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
     return dictionary_value
 
 
-def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, logger,
-                            update=False, **kwargs):
+def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, logger, **kwargs):
     """
     Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values of
     dictionary_value parameter generated from the csv file of this entity
@@ -104,10 +143,9 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
                       'dict_type': DICTIONARY_DATA_VARIANTS,
                       'value': value,
                       'variants': dictionary_value[value],
-                      '_type': doc_type
+                      '_type': doc_type,
+                      '_op_type': 'index'
                       }
-        if not update:
-            query_dict['_op_type'] = 'index'
         str_query.append(query_dict)
         if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
@@ -131,35 +169,55 @@ def create_dictionary_data_from_file(connection, index_name, doc_type, csv_file_
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
     """
-    dictionary_key = os.path.splitext(csv_file_path)[0]
+
+    base_file_name = os.path.basename(csv_file_path)
+    dictionary_key = os.path.splitext(base_file_name)[0]
+
+    if update:
+        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+                              entity_name=dictionary_key, logger=logger, **kwargs)
     dictionary_value = get_variants_dictionary_value_from_key(csv_file_path=csv_file_path,
                                                               dictionary_key=dictionary_key, logger=logger,
                                                               **kwargs)
     if dictionary_value:
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                 dictionary_key=dictionary_key,
-                                dictionary_value=remove_duplicate_data(dictionary_value),
-                                update=update, logger=logger, **kwargs)
+                                dictionary_value=remove_duplicate_data(dictionary_value), logger=logger, **kwargs)
     if os.path.exists(csv_file_path) and os.path.splitext(csv_file_path)[1] == '.csv':
         os.path.basename(csv_file_path)
 
 
-def create_dictionary_data_from_directory(connection, index_name, doc_type, entity_data_directory_path, update, logger,
-                                          **kwargs):
-    """
-    Wrapper function to call create_dictionary_data_from_file() for each csv file stored in entity_data_directory_path
-    Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type:  The type of the documents being indexed
-        entity_data_directory_path: Path of the directory containing the entity data csv files
-        update: boolean, True if this is a update type operation, False if create/index type operation
-        logger: logging object to log at debug and exception level
-        kwargs:
-            Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-    """
-    csv_files = get_files_from_directory(entity_data_directory_path)
-    for csv_file in csv_files:
-        csv_file_path = os.path.join(entity_data_directory_path, csv_file)
-        create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
-                                         csv_file_path=csv_file_path, update=update, logger=logger, **kwargs)
+def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger, **kwargs):
+    data = {
+        'query': {
+            'term': {
+                'entity_data': {
+                    'value': entity_name
+                }
+            }
+        },
+        "size": ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+    }
+    results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
+    sid = results['_scroll_id']
+    scroll_size = results['hits']['total']
+    while scroll_size > 0:
+        results = connection.scroll(scroll_id=sid, scroll='2m')
+        sid = results['_scroll_id']
+        scroll_size = len(results['hits']['hits'])
+        results = results['hits']['hits']
+        str_query = []
+        for eid in results:
+            delete_dict = {'_index': index_name,
+                           '_type': doc_type,
+                           '_id': eid["_id"],
+                           '_op_type': 'delete',
+                           }
+            str_query.append(delete_dict)
+            if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+                result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+                logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+                str_query = []
+        if str_query:
+            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+            logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
