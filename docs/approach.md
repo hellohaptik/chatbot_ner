@@ -36,7 +36,7 @@ The priority of detecting entity from various modes is shown in following figure
 
 
 
-1. Run entity detection on UI elements because this information is extracted from some structured format.
+1. Run entity detection on [UI elements](terminology.md#ui-elements) because this information is extracted from some structured format.
 2. If detection fails on UI element then run detection on a message and return the output.
 3. If  it is not able to detect anything from a given message then assign fallback value as an output. 
 
@@ -44,7 +44,7 @@ The priority of detecting entity from various modes is shown in following figure
 
 In chatbot, there are several entities that need to be identified and each entity has to be distinguished based on its type as a different entity has different detection logic. Following is the brief hierarchical representation of the entity classification.  
 
-![entity hierarchy](images/entity hierarchy.png)
+![entity hierarchy](images/entity_hierarchy.png)
 
 
 
