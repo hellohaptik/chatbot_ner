@@ -40,45 +40,47 @@
 
 4. Clone the repository
 
-   $ cd ~/
    ```shell
+   $ cd ~/
    $ git clone https://github.com/hellohaptik/chatbot_ner.git
    $ cd chatbot_ner
    ```
 
 5. Install the requirements with pip
 
+   ```shell
    $ pip install -r requirements.txt
+   ```
 
 6. Install Java and setup Elasticsearch
 
- You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
+    You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
 
--  Ubuntu:
+    -  Ubuntu:
 
-   ```shell
-     $ sudo add-apt-repository -y ppa:webupd8team/java
-     $ sudo apt-get update
-     $ sudo apt-get -y install oracle-java8-installer
-     $ sudo apt install oracle-java8-set-default
-   ```
+        ```shell
+        $ sudo add-apt-repository -y ppa:webupd8team/java
+        $ sudo apt-get update
+        $ sudo apt-get -y install oracle-java8-installer
+        $ sudo apt install oracle-java8-set-default
+        ```
 
--  Mac OSX:
+    - Mac OSX:
 
-   Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
-   ​     
-   Setting up Elasticsearch
+        Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
-```shell
- $ mkdir -p ~/chatbot_ner_elasticsearch
- $ cd /tmp/
- $ curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.4/elasticsearch-2.4.4.tar.gz
- $ tar -xzf elasticsearch-2.4.4.tar.gz -C ~/chatbot_ner_elasticsearch/
- $ ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
-```
+    Setting up Elasticsearch
 
- Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/`
- ​      
+    ```shell
+    $ mkdir -p ~/chatbot_ner_elasticsearch
+    $ cd /tmp/
+    $ curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.4/elasticsearch-2.4.4.tar.gz
+    $ tar -xzf elasticsearch-2.4.4.tar.gz -C ~/chatbot_ner_elasticsearch/
+    $ ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
+    ```
+
+     Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/`
+
 
 7. Copy config.example to config and configure the settings for datastore
 
@@ -91,30 +93,30 @@
      $ cp config.example config
      ```
 
--    Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
+- Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 
 
-```shell
-    $ python initial_setup.py
-```
+   ```shell
+   $ python initial_setup.py
+   ```
 
-  You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](/docs/adding_entities.md) section for more details.
+You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](/docs/adding_entities.md) section for more details.
 
 
 ​        
 ## Starting the NER
 
-```shell
-$ ./start_server.sh
-```
+   ```shell
+   $ ./start_server.sh
+   ```
 
    Or if you wish to run it in background
 
-```shell
-$ ./start_server.sh &
-```
+   ```shell
+   $ ./start_server.sh &
+   ```
 
 Following isthe API call to test our service:
 
