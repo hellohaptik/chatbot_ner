@@ -1,6 +1,6 @@
 
 
-# Approach
+# Approach used to build
 
 ### **Introduction**
 
@@ -127,8 +127,9 @@ There are several paramters thats needs to be consider while executing detection
 Following is the pseudo-code of any entity detection logic:
 
 ```python
-def func():
-  detection_object= detection_logic(entity_name=entity_name)
+def func(entity_name, message, structured_value, structured_value_verification, fallback_value, bot_message):
+  detection_object = detection_logic(entity_name=entity_name)
+  detection_object.set_bot_message(bot_message)
   if structured_value:
       if structured_value_verification == STRUCTURED:
           return detection_object.detect_entity(text=structured_value)
@@ -163,7 +164,7 @@ The output of entities detected will be stored in a list of dictionary containin
 ]
 ```
 
-Consider the  following example for detailed explaination:
+Consider the  following example for detailed explanation:
 
 ```latex
 "I want to order from mcd"
