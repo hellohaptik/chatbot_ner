@@ -118,7 +118,7 @@ You can add your own entities using such csv files. See [CSV file structure and 
    $ ./start_server.sh &
    ```
 
-Following isthe API call to test our service:
+Following is the API call to test our service:
 
 ```shell
 URL='localhost'

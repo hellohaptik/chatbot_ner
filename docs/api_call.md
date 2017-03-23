@@ -1,6 +1,7 @@
-[TOC]
 
 # API calls
+
+[TOC]
 
 ## List of entity types
 
@@ -39,7 +40,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/text/?message=i%20want%20to%20order%20chinese%20from%20%20mainland%20china%20and%20pizza%20from%20domminos&entity_name=restaurant&structured_value=&structured_value_verification=&fallback_value=None&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20want%20to%20order%20chinese%20from%20%20mainland%20china%20and%20pizza%20from%20domminos&entity_name=restaurant&structured_value=&structured_value_verification=&fallback_value=None&bot_message='
       ```
 
     - *CURL Output:*
@@ -92,7 +93,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/text/?message=i%20wanted%20to%20watch%20movie&entity_name=movie&structured_value=inferno&structured_value_verification=0&fallback_value=None&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20wanted%20to%20watch%20movie&entity_name=movie&structured_value=inferno&structured_value_verification=0&fallback_value=None&bot_message='
       ```
 
     - *CURL Output*:
@@ -138,7 +139,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/text/?message=i%20wanted%20to%20watch%20inferno&entity_name=movie&structured_value=delhi&structured_value_verification=0&fallback_value=None&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20wanted%20to%20watch%20inferno&entity_name=movie&structured_value=delhi&structured_value_verification=0&fallback_value=None&bot_message='
       ```
 
     - *CURL Output:*
@@ -193,7 +194,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/phone_number/?message=my%20contact%20number%20is%209049961794&entity_name=phone_number&structured_value=&structured_value_verification=0&fallback_value=None&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/phone_number/?message=my%20contact%20number%20is%209049961794&entity_name=phone_number&structured_value=&structured_value_verification=0&fallback_value=None&bot_message='
       ```
 
     - *CURL Output:*
@@ -241,7 +242,7 @@ Following are the list of different entity types along with its API call:
       ​
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/phone_number/?message=Please%20call%20me&entity_name=phone_number&structured_value=&structured_value_verification=&fallback_value=9049961794&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/phone_number/?message=Please%20call%20me&entity_name=phone_number&structured_value=&structured_value_verification=&fallback_value=9049961794&bot_message='
       ```
 
     - *CURL Output:*
@@ -293,7 +294,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/email/?message=my%20email%20id%20is%20apurv.nagvenkar%40gmail.com&entity_name=email&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/email/?message=my%20email%20id%20is%20apurv.nagvenkar%40gmail.com&entity_name=email&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -339,7 +340,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/email/?message=send%20me%20the%20email&entity_name=email&structured_value=&structured_value_verification=&fallback_value=apurv.nagvenkar@gmail.com&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/email/?message=send%20me%20the%20email&entity_name=email&structured_value=&structured_value_verification=&fallback_value=apurv.nagvenkar@gmail.com&bot_message='
       ```
 
     - *CURL Output:*
@@ -392,7 +393,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/city/?message=i%20want%20to%20go%20to%20mummbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/city/?message=i%20want%20to%20go%20to%20mummbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -444,7 +445,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/pnr/?message=check%20my%20pnr%20status%20for%202141215305.&entity_name=pnr&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/pnr/?message=check%20my%20pnr%20status%20for%202141215305.&entity_name=pnr&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -496,7 +497,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20purchase%2030%20units%20of%20mobile%20and%2040%20units%20of%20Television&entity_name=number_of_unit&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20purchase%2030%20units%20of%20mobile%20and%2040%20units%20of%20Television&entity_name=number_of_unit&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -549,7 +550,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20reserve%20a%20table%20for%203%20people&entity_name=number_of_people&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20reserve%20a%20table%20for%203%20people&entity_name=number_of_people&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -602,7 +603,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -674,7 +675,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20on%2023rd%20december&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20on%2023rd%20december&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -716,7 +717,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20day%20after%20tomorrow&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20day%20after%20tomorrow&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -771,7 +772,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/budget/?message=shirts%20between%202000%20to%203000&entity_name=budget&structured_value=&structured_value_verification=0&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/budget/?message=shirts%20between%202000%20to%203000&entity_name=budget&structured_value=&structured_value_verification=0&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -826,7 +827,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=budget&structured_value=&structured_value_verification=0&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=budget&structured_value=&structured_value_verification=0&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -885,7 +886,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/city_advance/?message=I%20want%20to%20book%20a%20flight%20from%20delhhi%20to%20mumbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/city_advance/?message=I%20want%20to%20book%20a%20flight%20from%20delhhi%20to%20mumbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -925,7 +926,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/city_advance/?message=mummbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message=Please%20help%20me%20departure%20city%3F'
+      curl -i 'http://'$URL':'$PORT'/v1/city_advance/?message=mummbai&entity_name=city&structured_value=&structured_value_verification=&fallback_value=&bot_message=Please%20help%20me%20departure%20city%3F'
       ```
 
     - *CURL Output:*
@@ -979,7 +980,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/date_advance/?message=21st%20dec&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message=Please%20help%20me%20with%20return%20date%3F'
+      curl -i 'http://'$URL':'$PORT'/v1/date_advance/?message=21st%20dec&entity_name=date&structured_value=&structured_value_verification=&fallback_value=&bot_message=Please%20help%20me%20with%20return%20date%3F'
       ```
 
     - *CURL Output:*
@@ -1025,7 +1026,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'shell://'$URL':'$PORT'/v1/ner/?entities=\[%22date%22,%22time%22,%22restaurant%22\]&message=Reserve%20me%20a%20table%20today%20at%206:30pm%20at%20Mainland%20China%20and%20on%20Monday%20at%207:00pm%20at%20Barbeque%20Nation'
+      curl -i 'http://'$URL':'$PORT'/v1/ner/?entities=\[%22date%22,%22time%22,%22restaurant%22\]&message=Reserve%20me%20a%20table%20today%20at%206:30pm%20at%20Mainland%20China%20and%20on%20Monday%20at%207:00pm%20at%20Barbeque%20Nation'
       ```
 
     - *CURL Output:*
