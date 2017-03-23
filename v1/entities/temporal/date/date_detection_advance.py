@@ -4,7 +4,6 @@ from lib.nlp.regex import Regex
 from v1.entities.temporal.date.date_detection import DateDetector
 
 
-# TODO add explanation for outbound message and its uses
 class DateAdvanceDetector(object):
     """
     Detects dates subject to conditions like "departure date" and "return date". These dates are returned in a
@@ -22,7 +21,7 @@ class DateAdvanceDetector(object):
         original_date_text: list to store substrings of the text detected as date entities
         tag: entity_name prepended and appended with '__'
         date_detector_object: DateDetector object used to detect dates in the given text
-        outbound_message: boolean, set as the outgoing bot text/message
+        bot_message: boolean, set as the outgoing bot text/message
     """
 
     def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
@@ -44,7 +43,7 @@ class DateAdvanceDetector(object):
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
-        self.outbound_message = None
+        self.bot_message = None
 
     def detect_entity(self, text):
         """
@@ -288,7 +287,6 @@ class DateAdvanceDetector(object):
 
         return date_list, original_list
 
-    # TODO this function sets flag based on outbound message, needs testing
     def _detect_any_date(self, date_list=None, original_list=None):
         """
         Finds departure and return type dates in the given text. It detects 'departure' and 'return' and their synonyms
@@ -314,16 +312,16 @@ class DateAdvanceDetector(object):
             original_list = []
         departure_date_flag = False
         return_date_flag = False
-        if self.outbound_message:
+        if self.bot_message:
             departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
                                      r'check in date|check-in date|date of check-in|date of departure\.'
             arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
                                    r'|arrival date|check out date|check-out date|date of check-out|check out'
             departure_regexp = re.compile(departure_regex_string)
             arrival_regexp = re.compile(arrival_regex_string)
-            if departure_regexp.search(self.outbound_message) is not None:
+            if departure_regexp.search(self.bot_message) is not None:
                 departure_date_flag = True
-            elif arrival_regexp.search(self.outbound_message) is not None:
+            elif arrival_regexp.search(self.bot_message) is not None:
                 return_date_flag = True
 
         patterns = re.findall(r'\s((.+))\.?\b', self.processed_text.lower())
@@ -373,14 +371,14 @@ class DateAdvanceDetector(object):
                 self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
                 self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def set_outbound_message(self, outbound_message):
+    def set_bot_message(self, bot_message):
         """
-        Sets the object's outbound_message attribute
+        Sets the object's bot_message attribute
 
         Args:
-            outbound_message: string
+            bot_message: string
         """
-        self.outbound_message = outbound_message
+        self.bot_message = bot_message
 
     def _sort_date_list(self, date_list, original_list):
         """

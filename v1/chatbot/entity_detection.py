@@ -780,7 +780,7 @@ def get_city_advance(message, entity_name, structured_value, structured_value_ve
 
     """
     city_detection = CityAdvanceDetector(entity_name=entity_name)
-    city_detection.set_outbound_message(outbound_message=bot_message)
+    city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
@@ -833,7 +833,7 @@ def get_date_advance(message, entity_name, structured_value, structured_value_ve
 
     """
     date_detection = DateAdvanceDetector(entity_name=entity_name)
-    date_detection.set_outbound_message(outbound_message=bot_message)
+    date_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         if structured_value_verification == STRUCTURED:
             entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
