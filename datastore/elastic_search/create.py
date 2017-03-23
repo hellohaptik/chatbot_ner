@@ -81,7 +81,7 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
         connection.indices.create(index=index_name, body=body, **create_kwargs)
 
         mapping_body = {
-            'data_dictionary': {
+            doc_type: {
                 'properties': {
                     'variants': {
                         'type': 'string',
