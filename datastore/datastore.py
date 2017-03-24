@@ -320,3 +320,17 @@ class DataStore(object):
         if ELASTICSEARCH_DOC_TYPE not in self._connection_settings:
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
+
+    def exists(self):
+        """
+        Checks if DataStore is already created
+        Returns:
+             boolean, True if DataStore structure exists, False otherwise
+        """
+        if self._connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            return elastic_search.create.exists(connection=self._connection, index_name=self._store_name)
+
+        return False

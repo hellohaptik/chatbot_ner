@@ -47,7 +47,7 @@ ES_URL = os.environ.get('ES_URL')
 ES_HOST = os.environ.get('ES_HOST')
 ES_PORT = os.environ.get('ES_PORT')
 ES_INDEX_NAME = os.environ.get('ES_INDEX_NAME')
-ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE', 'data_dictionary')
+ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE')
 ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
@@ -60,7 +60,7 @@ except ValueError:
 ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
 ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
-ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE', 'es')
+ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
 
 CHATBOT_NER_DATASTORE = {
     'engine': ENGINE,
@@ -76,6 +76,11 @@ CHATBOT_NER_DATASTORE = {
 
 if ES_DOC_TYPE:
     CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = ES_DOC_TYPE
+else:
+    CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = 'data_dictionary'
+
+if not ES_AWS_SERVICE:
+    ES_AWS_SERVICE = 'es'
 
 if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AWS_SERVICE:
     CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,

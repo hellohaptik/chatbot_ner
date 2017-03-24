@@ -1,7 +1,7 @@
 from elasticsearch import helpers
 
 from v1.constant import DICTIONARY_DATA_VARIANTS
-from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
 
 log_prefix = 'datastore.elastic_search.populate'
@@ -196,17 +196,15 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                 }
             }
         },
-        "size": ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+        "size": ELASTICSEARCH_SEARCH_SIZE
     }
     results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
     sid = results['_scroll_id']
     scroll_size = results['hits']['total']
+    delete_bulk_queries = []
+    str_query = []
     while scroll_size > 0:
-        results = connection.scroll(scroll_id=sid, scroll='2m')
-        sid = results['_scroll_id']
-        scroll_size = len(results['hits']['hits'])
         results = results['hits']['hits']
-        str_query = []
         for eid in results:
             delete_dict = {'_index': index_name,
                            '_type': doc_type,
@@ -215,9 +213,13 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                            }
             str_query.append(delete_dict)
             if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-                result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-                logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+                delete_bulk_queries.append(str_query)
                 str_query = []
-        if str_query:
-            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-            logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+        results = connection.scroll(scroll_id=sid, scroll='2m')
+        sid = results['_scroll_id']
+        scroll_size = len(results['hits']['hits'])
+    if str_query:
+        delete_bulk_queries.append(str_query)
+    for delete_query in delete_bulk_queries:
+        result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
