@@ -1,21 +1,20 @@
 ## DataStore Environment Variables Description
 
-A `config.example` file is provided at the root of the repository. It is an example file containing all variables that Chatbot NER sets in the environment for future use when connecting to the underlying engine
+A `config.example` file is provided at the root of the repository. It is an example file containing all variables that Chatbot NER sets in the environment for future use when connecting to the underlying engine.
 
-Copy it to a file called `config` at the root of the repository. Chatbot NER will read and set variables from this file into the environment
+Copy it to a file called `config` at the root of the repository and edit it to configure your settings. Chatbot NER will read and set variables from this file into the environment.
 
 > **Note**: Do not use quotes while specifying values for variables. Do not put spaces around the '=' sign.
 >
 > Invalid Example:
 >
-> ​		ENGINE='elasticsearch'
-> ​		ES_HOST = YOURHOST.us-east-1.es.amazonaws.com
+>     ENGINE='elasticsearch'
+>     ES_HOST = YOURHOST.us-east-1.es.amazonaws.com
 >
 > Valid Example:
 >
-> ​		ENGINE=elasticsearch
-> ​		ES_HOST=YOURHOST.us-east-1.es.amazonaws.com
-
+>     ENGINE=elasticsearch
+>     ES_HOST=YOURHOST.us-east-1.es.amazonaws.com
 
 
 **Structure**
@@ -59,10 +58,10 @@ SETTINGS = {
 
   | Variable Name      | Description                              |
   | ------------------ | ---------------------------------------- |
-  | `ES_URL`           | The complete connection url, containing protocol, host and port and optionally username and password for basic authentication. When provided, this will override values for `ES_HOST`, `ES_PORT`, `ES_AUTH_NAME` and `ES_AUTH_PASSWORD` <br/>E.g. `https://user:secret@localhost:443`<br/>`http://user:secret@localhost:9200/development/` |
-  | `ES_HOST`          | Elasticsearch host address <br/>E.g. `localhost`<br/>`127.0.0.1`<br/>`YOURHOST.us-east-1.es.amazonaws.com` |
-  | `ES_PORT`          | Elasticsearch service port, (usually http service) E.g. `9200` <br/> `443` |
-  | `ES_INDEX_NAME`    | Index name for Elasticsearch. E.g. `chatbot_ner_index` |
+  | `ES_URL`           | The complete connection url, containing protocol, host and port and optionally username and password for basic authentication. When provided, this will override values for `ES_HOST`, `ES_PORT`, `ES_AUTH_NAME` and `ES_AUTH_PASSWORD` <br/>E.g.<br/>`https://user:secret@localhost:443`,<br/>`http://user:secret@localhost:9200/development/` |
+  | `ES_HOST`          | Elasticsearch host address<br/>E.g.<br/>`localhost`,<br/>`127.0.0.1`,<br/>`YOURHOST.us-east-1.es.amazonaws.com` |
+  | `ES_PORT`          | Elasticsearch service port, (usually http service)<br/>E.g.<br/>`9200`,<br/> `443` |
+  | `ES_INDEX_NAME`    | Index name for Elasticsearch.<br/>E.g.<br/>`chatbot_ner_index` |
   | `ES_DOC_TYPE`      | Document type for elasticsearch. If not provided defaults to `data_dictionary`. |
   | `ES_AUTH_NAME`     | Name for basic http authentication. Optional if http authentication is not needed. |
   | `ES_AUTH_PASSWORD` | Password/Secret for basic http authentication. Optional if http authentication is not needed. |
@@ -71,6 +70,7 @@ SETTINGS = {
   ***For AWS Elasticsearch Authentication***
 
   To use IAM based authentication on AWS, provide the following variables in the `config` file. These variables make up a `http_auth` object.
+  
   | Variable Name              | Description                        |
   | -------------------------- | ---------------------------------- |
   | `ES_AWS_SECRET_ACCESS_KEY` | AWS Secret Key                     |
