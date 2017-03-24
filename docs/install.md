@@ -93,7 +93,7 @@
      $ cp config.example config
      ```
 
-- Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](#dseve) section for details on these variables.
+- Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](docs/datastore_variables.md) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 

@@ -1,4 +1,4 @@
-# This is configexample file for chatbot_ner module similar to .envexample file to hold settings
+# This is config.example file for chatbot_ner module similar to .env.example file to hold settings
 # Copy it to a file named config and fill in all the values.
 # Never push your personal keys and passwords to any public repository!
 # Make sure the variables in this file are in the environment. Example:

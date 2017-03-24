@@ -7,7 +7,7 @@ To know more about our NER repository please go through the following documentat
 
 1. [Installation and setup](docs/install.md): *Detailed document on how to install and setup the chatbot NER on your system*
 
-2. [CSV file structure and adding new entities to DataStore](docs/adding_entities.md): *Document on how to create your own entity and store it to DataStore*
+2. [CSV file structure and adding/removing entities to DataStore](docs/adding_entities.md): *Document on how to create your own entity and store it to DataStore*
 
 3. [Approach used](docs/approach.md): *Document on the architecture along with different detection logics (entity types) and built-in entities*
 

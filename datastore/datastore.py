@@ -1,5 +1,5 @@
 import elastic_search
-from chatbot_ner.config import ner_logger, HAPTIK_NER_DATASTORE
+from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from .constants import ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY, \
     ELASTICSEARCH_DOC_TYPE
 from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException
@@ -33,10 +33,10 @@ class DataStore(object):
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
         """
-        self._engine = HAPTIK_NER_DATASTORE.get(ENGINE)
+        self._engine = CHATBOT_NER_DATASTORE.get(ENGINE)
         if self._engine is None:
             raise DataStoreSettingsImproperlyConfiguredException()
-        self._connection_settings = HAPTIK_NER_DATASTORE.get(self._engine)
+        self._connection_settings = CHATBOT_NER_DATASTORE.get(self._engine)
         if self._connection_settings is None:
             raise DataStoreSettingsImproperlyConfiguredException()
         # This can be index name for elastic search, table name for SQL,
