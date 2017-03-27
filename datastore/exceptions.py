@@ -23,3 +23,14 @@ class EngineNotImplementedException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+class EngineConnectionException(Exception):
+    def __init__(self, message=None, engine='the configured engine'):
+        self.value = "Chatbot NER datastore was unable to connect to " + engine + \
+                     ". Please make sure the " + engine  + " service is reachable."
+        if message:
+            self.value = message
+
+    def __str__(self):
+        return repr(self.value)

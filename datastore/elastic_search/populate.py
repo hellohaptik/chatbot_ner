@@ -33,8 +33,9 @@ def create_all_dictionary_data(connection, index_name, doc_type, logger, entity_
                                              csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
     if csv_file_paths:
         for csv_file_path in csv_file_paths:
-            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
-                                             csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
+            if csv_file_path and csv_file_path.endswith('.csv'):
+                create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                                 csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
     logger.debug('%s: +++ Finished: create_all_dictionary_data() +++' % log_prefix)
 
 
@@ -64,8 +65,9 @@ def recreate_all_dictionary_data(connection, index_name, doc_type, logger, entit
                                              csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
     if csv_file_paths:
         for csv_file_path in csv_file_paths:
-            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
-                                             csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
+            if csv_file_path and csv_file_path.endswith('.csv'):
+                create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                                 csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
     logger.debug('%s: +++ Finished: recreate_all_dictionary_data() +++' % log_prefix)
 
 
@@ -92,6 +94,8 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
         for data_row in csv_reader:
             try:
                 data = map(str.strip, data_row[1].split('|'))
+                # remove empty strings
+                data = [variant for variant in data if variant]
                 dictionary_value[data_row[0].strip().replace('.', ' ')].extend(data)
 
             except Exception, e:

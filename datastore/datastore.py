@@ -2,7 +2,8 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from .constants import ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY, \
     ELASTICSEARCH_DOC_TYPE
-from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException
+from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException, \
+    EngineConnectionException
 
 
 class DataStore(object):
@@ -50,6 +51,7 @@ class DataStore(object):
 
         Raises:
             EngineNotImplementedException if the ENGINE for DataStore setting is not supported or has unexpected value
+            EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
         if self._engine == ELASTICSEARCH:
@@ -58,6 +60,9 @@ class DataStore(object):
         else:
             self._connection = None
             raise EngineNotImplementedException()
+
+        if self._connection is None:
+            raise EngineConnectionException(engine=self._engine)
 
     def create(self, **kwargs):
         """

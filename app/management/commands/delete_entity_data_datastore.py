@@ -13,7 +13,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options['entity_name']:
+        if 'entity_name' in options and options['entity_name']:
             entity_name = options['entity_name']
             db = DataStore()
             db.delete_entity(entity_name=entity_name)
