@@ -1,7 +1,7 @@
 from elasticsearch import helpers
 
 from v1.constant import DICTIONARY_DATA_VARIANTS
-from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
 
 log_prefix = 'datastore.elastic_search.populate'
@@ -33,8 +33,9 @@ def create_all_dictionary_data(connection, index_name, doc_type, logger, entity_
                                              csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
     if csv_file_paths:
         for csv_file_path in csv_file_paths:
-            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
-                                             csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
+            if csv_file_path and csv_file_path.endswith('.csv'):
+                create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                                 csv_file_path=csv_file_path, update=False, logger=logger, **kwargs)
     logger.debug('%s: +++ Finished: create_all_dictionary_data() +++' % log_prefix)
 
 
@@ -64,8 +65,9 @@ def recreate_all_dictionary_data(connection, index_name, doc_type, logger, entit
                                              csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
     if csv_file_paths:
         for csv_file_path in csv_file_paths:
-            create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
-                                             csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
+            if csv_file_path and csv_file_path.endswith('.csv'):
+                create_dictionary_data_from_file(connection=connection, index_name=index_name, doc_type=doc_type,
+                                                 csv_file_path=csv_file_path, update=True, logger=logger, **kwargs)
     logger.debug('%s: +++ Finished: recreate_all_dictionary_data() +++' % log_prefix)
 
 
@@ -92,6 +94,8 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
         for data_row in csv_reader:
             try:
                 data = map(str.strip, data_row[1].split('|'))
+                # remove empty strings
+                data = [variant for variant in data if variant]
                 dictionary_value[data_row[0].strip().replace('.', ' ')].extend(data)
 
             except Exception, e:
@@ -196,17 +200,15 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                 }
             }
         },
-        "size": ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+        "size": ELASTICSEARCH_SEARCH_SIZE
     }
     results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
     sid = results['_scroll_id']
     scroll_size = results['hits']['total']
+    delete_bulk_queries = []
+    str_query = []
     while scroll_size > 0:
-        results = connection.scroll(scroll_id=sid, scroll='2m')
-        sid = results['_scroll_id']
-        scroll_size = len(results['hits']['hits'])
         results = results['hits']['hits']
-        str_query = []
         for eid in results:
             delete_dict = {'_index': index_name,
                            '_type': doc_type,
@@ -215,9 +217,13 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                            }
             str_query.append(delete_dict)
             if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-                result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-                logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+                delete_bulk_queries.append(str_query)
                 str_query = []
-        if str_query:
-            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-            logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+        results = connection.scroll(scroll_id=sid, scroll='2m')
+        sid = results['_scroll_id']
+        scroll_size = len(results['hits']['hits'])
+    if str_query:
+        delete_bulk_queries.append(str_query)
+    for delete_query in delete_bulk_queries:
+        result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))

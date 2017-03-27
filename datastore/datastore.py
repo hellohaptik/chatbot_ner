@@ -1,8 +1,9 @@
 import elastic_search
-from chatbot_ner.config import ner_logger, HAPTIK_NER_DATASTORE
+from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from .constants import ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY, \
     ELASTICSEARCH_DOC_TYPE
-from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException
+from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException, \
+    EngineConnectionException
 
 
 class DataStore(object):
@@ -33,10 +34,10 @@ class DataStore(object):
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
         """
-        self._engine = HAPTIK_NER_DATASTORE.get(ENGINE)
+        self._engine = CHATBOT_NER_DATASTORE.get(ENGINE)
         if self._engine is None:
             raise DataStoreSettingsImproperlyConfiguredException()
-        self._connection_settings = HAPTIK_NER_DATASTORE.get(self._engine)
+        self._connection_settings = CHATBOT_NER_DATASTORE.get(self._engine)
         if self._connection_settings is None:
             raise DataStoreSettingsImproperlyConfiguredException()
         # This can be index name for elastic search, table name for SQL,
@@ -50,6 +51,7 @@ class DataStore(object):
 
         Raises:
             EngineNotImplementedException if the ENGINE for DataStore setting is not supported or has unexpected value
+            EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
         if self._engine == ELASTICSEARCH:
@@ -58,6 +60,9 @@ class DataStore(object):
         else:
             self._connection = None
             raise EngineNotImplementedException()
+
+        if self._connection is None:
+            raise EngineConnectionException(engine=self._engine)
 
     def create(self, **kwargs):
         """
@@ -320,3 +325,17 @@ class DataStore(object):
         if ELASTICSEARCH_DOC_TYPE not in self._connection_settings:
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
+
+    def exists(self):
+        """
+        Checks if DataStore is already created
+        Returns:
+             boolean, True if DataStore structure exists, False otherwise
+        """
+        if self._connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            return elastic_search.create.exists(connection=self._connection, index_name=self._store_name)
+
+        return False

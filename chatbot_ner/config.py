@@ -1,6 +1,8 @@
 import os
 import dotenv
 import logging.handlers
+from requests_aws4auth import AWS4Auth
+from elasticsearch import RequestsHttpConnection
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, 'config')
@@ -39,6 +41,8 @@ else:
 # TODO lot of others too which may conflict in name. Example user is already using some another instance of
 # TODO Elasticsearch for other purposes
 ENGINE = os.environ.get('ENGINE')
+if ENGINE:
+    ENGINE = ENGINE.lower()
 ES_URL = os.environ.get('ES_URL')
 ES_HOST = os.environ.get('ES_HOST')
 ES_PORT = os.environ.get('ES_PORT')
@@ -46,19 +50,19 @@ ES_INDEX_NAME = os.environ.get('ES_INDEX_NAME')
 ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE')
 ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
-ES_BULK_MSG_SIZE = os.environ.get('ES_AUTH_PASSWORD')
+ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
 except ValueError:
-    ES_BULK_MSG_SIZE = None
+    ES_BULK_MSG_SIZE = 10000
 
 ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
 ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
 ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
 
-HAPTIK_NER_DATASTORE = {
+CHATBOT_NER_DATASTORE = {
     'engine': ENGINE,
     'elasticsearch': {
         'connection_url': ES_URL,
@@ -71,17 +75,18 @@ HAPTIK_NER_DATASTORE = {
 }
 
 if ES_DOC_TYPE:
-    HAPTIK_NER_DATASTORE['elasticsearch']['doc_type'] = ES_DOC_TYPE
+    CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = ES_DOC_TYPE
+else:
+    CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = 'data_dictionary'
+
+if not ES_AWS_SERVICE:
+    ES_AWS_SERVICE = 'es'
 
 if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AWS_SERVICE:
-
-    from requests_aws4auth import AWS4Auth
-    from elasticsearch import RequestsHttpConnection
-
-    HAPTIK_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,
-                                                                  ES_AWS_REGION, ES_AWS_SERVICE)
-    HAPTIK_NER_DATASTORE['elasticsearch']['use_ssl'] = True
-    HAPTIK_NER_DATASTORE['elasticsearch']['verify_certs'] = True
-    HAPTIK_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
+    CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,
+                                                                   ES_AWS_REGION, ES_AWS_SERVICE)
+    CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
+    CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
+    CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
 else:
     ner_logger.debug('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')

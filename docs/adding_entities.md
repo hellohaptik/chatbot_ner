@@ -119,7 +119,7 @@ db = DataStore()
 db.repopulate(csv_file_paths=[csv_file,])
 ```
 
- In case, you want to update multiple csv files at once, you can pass the directory path to `entity_data_directory_path` parameter of `populate` method as follows:
+ In case, you want to update multiple csv files at once, you can pass the directory path to `entity_data_directory_path` parameter of `repopulate` method as follows:
 
 ```python
 from datastore import DataStore
@@ -142,4 +142,4 @@ On a `manage.py shell` run
 from datastore import DataStore
 db = DataStore()
 db.delete_entity(entity_name='attachment_types')
-  ```
+```

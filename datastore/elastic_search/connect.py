@@ -23,11 +23,16 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
         Elasticsearch client connection object
 
     """
+    connection = None
     if user and password:
         kwargs = dict(kwargs, http_auth=(user, password))
     if connection_url:
-        return Elasticsearch(hosts=[connection_url], **kwargs)
+        connection = Elasticsearch(hosts=[connection_url], **kwargs)
+        if connection and not connection.ping():
+            connection = None
     elif host and port:
-        return Elasticsearch(hosts=[{'host': host, 'port': int(port)}], **kwargs)
-    else:
-        return None
+        connection = Elasticsearch(hosts=[{'host': host, 'port': int(port)}], **kwargs)
+        if connection and not connection.ping():
+            connection = None
+
+    return connection

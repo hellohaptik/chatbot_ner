@@ -51,5 +51,7 @@ def get_files_from_directory(directory_path):
     Returns:
         A list of path of all csv files in the directory_path
     """
+    if not directory_path or not os.path.exists(directory_path):
+        return []
     return [f for f in os.listdir(directory_path) if
             os.path.isfile(os.path.join(directory_path, f)) and f.endswith('.csv')]

@@ -104,3 +104,17 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
     except Exception, e:
         logger.exception('%s:Exception: while creating index, Rolling back \n %s' % (log_prefix, e))
         delete_index(connection=connection, index_name=index_name, logger=logger)
+
+
+def exists(connection, index_name):
+    """
+    Checks if index_name exists
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+
+    Returns:
+        boolean, True if index exists , False otherwise
+    """
+    return connection.indices.exists(index_name)
