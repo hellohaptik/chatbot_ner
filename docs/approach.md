@@ -44,7 +44,7 @@ The priority of detecting entity from various modes is shown in following figure
 
 In chatbot, there are several entities that need to be identified and each entity has to be distinguished based on its type as a different entity has different detection logic. Following is the brief hierarchical representation of the entity classification.  
 
-![entity hierarchy](images/entity hierarchy.png)
+![entity hierarchy](images/entity_hierarchy.png)
 
 
 
