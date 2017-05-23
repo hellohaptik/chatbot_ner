@@ -98,22 +98,11 @@ There are several paramters thats needs to be consider while executing detection
 3. **structured_value**: It is a value which is obtained from the structured text. For example, UI elements like form,
    payload, etc.
 
-4. **structured_value_verification**: This parameter tells us what to do with *structure_value*. It is a verification method
-   which either processes the *structure_value* or take it as it is an entity value. It takes these values: 0, 1 and 2.
-
-   - 0 (STRUCTURED): This will execute entity detection on the *structured_value*.
-
-   - 1 (UNCHANGED): This will consider *structured_value* as an entity value without executing entity detection logic.
-
-   - 2 (IF_POSSIBLE): This will execute entity detection on *structured_value*, if it returns *None* then we consider *structured_value* as entity value.
-
-     > **NOTE**: this is used because sometimes, user may enter a value in *structured_value* which might not be able to detect from entity detection but since it is coming from *structured_value* we assume that this should get high preference and select it as it is.
-
-5. **fallback_value**: it is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* as an output. This value is derived from third party api or from users profile. 
+4. **fallback_value**: it is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* as an output. This value is derived from third party api or from users profile. 
 
    For example, if user says *"Nearby ATMs"*. In this example user has not provided any information about his location in the chat but, we can pass a *fallback_value* that will contain its location that can be obtained from its profile or third party apis (like geopy, etc).
 
-6. **bot_message**: previous message from a bot/agent. This is an important parameter, many times the entity value relies on the message from the bot/agent i.e. what is bot saying? or asking? 
+5. **bot_message**: previous message from a bot/agent. This is an important parameter, many times the entity value relies on the message from the bot/agent i.e. what is bot saying? or asking? 
 
    For example, bot might ask for departure date to book a flight and user might reply with a date. Now, it is difficult to disambiguate whether its departure date or arrival date unless, we know what bot is asking for?
 
@@ -127,28 +116,28 @@ There are several paramters thats needs to be consider while executing detection
 Following is the pseudo-code of any entity detection logic:
 
 ```python
-def func(entity_name, message, structured_value, structured_value_verification, fallback_value, bot_message):
-  detection_object = detection_logic(entity_name=entity_name)
-  detection_object.set_bot_message(bot_message)
-  if structured_value:
-      if structured_value_verification == STRUCTURED:
-          return detection_object.detect_entity(text=structured_value)
-      elif structured_value_verification == UNCHANGED:
-          return structured_value
-      else:
-          output = detection_object.detect_entity(text=structured_value)
-          if output:
-              return output:
-          else:
-              return structured_value
-  output = detection_object.detect_entity(text=message)
-  if output:
-      return output
-  elif fallback_value
-      return fallback_value
+def func(entity_name, message, structured_value, fallback_value, bot_message):
+    detection_object = detection_logic(entity_name=entity_name)
+    detection_object.set_bot_message(bot_message)
+    if structured_value:
+        output = detection_object.detect_entity(text=structured_value)
+        if output:
+            return output:
+        else:
+        	return structured_value
+    else:
+        output = detection_object.detect_entity(text=message)
+        if output:
+      		return output
+        elif fallback_value
+      		return fallback_value
+    return None
 ```
 
-First, we initialize the individual entity detection class by passing necessary paramters. Next, we check if *structured_value* is present, if it does then we check for its verification value (i.e. UNCHANGED) based on that we either run the detection logic on *strucutred_value* or assign *structured_value* as an output. Once, it fails to detect anything from *structured_value* or if *structured_value* is empty then we execute detection logic on the *message* (i.e. unstructured text) and returns the output if the detection is successful else it will return the fallback_value if exisits.
+First, we initialize the individual entity detection class by passing necessary paramters and do the following: 
+
+1. if *structured_value* is present, then we run the detection logic to extract the necessary information from *structured_value* and return the detected information but, if it fails then we return *stuructured_value* as the output 
+2. if *structured_value* is empty then we execute detection logic on the *message* (i.e. unstructured text) and returns the detected output however, if it fails then we return the fallback_value if exisit.
 
 ### **Output Format**
 
