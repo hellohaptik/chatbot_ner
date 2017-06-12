@@ -46,6 +46,7 @@ We will go ahead and make a csv called `attachment_types.csv`
 Then we will fill in our data as follows:
 
 ```
+values,variants
 pdf,pdf|pdfs
 doc,doc|docx|word document|rtf|word documents
 image,png|jpeg|jpg|png|bmp|gif|image|images
