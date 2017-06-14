@@ -3,7 +3,7 @@ import csv
 import json
 import os, os.path
 import nltk
-# import CRFPP
+import CRFPP
 from lib.nlp.const import tokenizer
 from models.constants import city_model_path, CITY_ENTITY_TYPE
 from models.utils import get_current_timestamp, create_directory
@@ -19,7 +19,7 @@ We have used seven types of labels to tag our data for ENTITYE='city'.
 class PredictCRF(object):
 
     def __init__(self):
-        # self.tagger = None
+        self.tagger = None
         self._model_path = None
 
     def get_crf_output(self, bot_message, user_message):
