@@ -113,8 +113,9 @@ class PredictCRF(object):
             user_message: message from user
 
         for Example:
-            bot_message = 'none'
-            user_message = 'flights from delhi to goa'
+            Args:
+                bot_message = 'none'
+                user_message = 'flights from delhi to goa'
 
             Then this functions tokenize the bot and user messages, gets the POS tags, tags them as outbound or
             inbound as per the sender and adds it to the tagger object.
@@ -209,10 +210,11 @@ class PredictCRF(object):
         This function return json of the value found in function check_label
 
         for Example:
-            city_value = 'delhi'
-            from_bool = 1
-            to_bool = 0
-            via_bool = 0
+            Args:
+                city_value = 'delhi'
+                from_bool = 1
+                to_bool = 0
+                via_bool = 0
 
             then calling this function with ab ove parameters will give:
                 {'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}
@@ -225,13 +227,14 @@ class PredictCRF(object):
         this function checks if a particular word has been given a particular label
 
         for Example:
-            reader_list = list returned by run_crf
-            reader_pointer = 3
-            begin_label = CITY_FROM_B
-            inner_label = VITY_FROM_I
-            from_bool = 1
-            to_bool = 0
-            via_bool = 0
+            Args:
+                reader_list = list returned by run_crf
+                reader_pointer = 3
+                begin_label = CITY_FROM_B
+                inner_label = VITY_FROM_I
+                from_bool = 1
+                to_bool = 0
+                via_bool = 0
 
             When check_label is called with above parameters, it checks if the word has been given CITY_FROM_B label
             and its following words
