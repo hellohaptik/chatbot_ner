@@ -73,9 +73,10 @@ class CityDetector(object):
         self.text = ' ' + text + ' '
         self.processed_text = self.text.lower()
         self.tagged_text = self.text.lower()
+        city_data = []
         if flag_model_run:
             city_data = self.city_model_detection()
-        else:
+        if not city_data[0]:
             city_data = self.detect_city()
         self.city = city_data[0]
         self.original_city_text = city_data[1]
@@ -124,8 +125,9 @@ class CityDetector(object):
                 city_list.extend(city_list_from_text_entity)
                 original_list.extend(original_list_from_text_entity)
             else:
-                city_list.extend(city_dict[CITY_VALUE])
-                original_list.extend(city_dict[CITY_VALUE])
+                city_list.append(city_dict[CITY_VALUE])
+                original_list.append(city_dict[CITY_VALUE])
+        self.update_processed_text(original_list)
 
         return city_list, original_list
 
