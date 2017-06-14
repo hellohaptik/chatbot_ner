@@ -147,8 +147,7 @@ class PredictCRF(object):
     def run_crf(self):
         """
         This function runs CRF on data added to tagger and stores the [word    predicted_label] in output list and
-        returns it. This list
-        is then passed to generate_crf_output() to get the json list of data tagged.
+        returns it. This list is then passed to generate_crf_output() to get the json list of data tagged.
 
         """
         output = []
