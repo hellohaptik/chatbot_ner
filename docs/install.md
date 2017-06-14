@@ -29,45 +29,45 @@
      ```
 
 
-3. Install virtualenvwrapper and setup a virtual python environment
+3.  Install virtualenvwrapper and setup a virtual python environment
 
-   ```shell
-    $ sudo pip install -U virtualenvwrapper
-    $ source /usr/local/bin/virtualenvwrapper.sh
-    $ mkvirtualenv chatbotnervenv
-    $ workon chatbotnervenv
-   ```
+    ```shell
+     $ sudo pip install -U virtualenvwrapper
+     $ source /usr/local/bin/virtualenvwrapper.sh
+     $ mkvirtualenv chatbotnervenv
+     $ workon chatbotnervenv
+    ```
 
-4. Clone the repository
+4.  Clone the repository
 
-   ```shell
-   $ cd ~/
-   $ git clone https://github.com/hellohaptik/chatbot_ner.git
-   $ cd chatbot_ner
-   ```
+    ```shell
+    $ cd ~/
+    $ git clone https://github.com/hellohaptik/chatbot_ner.git
+    $ cd chatbot_ner
+    ```
 
-5. Install the requirements with pip
+5.  Install the requirements with pip
 
-   ```shell
-   $ pip install -r requirements.txt
-   ```
+    ```shell
+    $ pip install -r requirements.txt
+    ```
 
-6. Install Java and setup Elasticsearch
+6.  Install Java and setup Elasticsearch
 
-    You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
+     You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
 
     -  Ubuntu:
 
-        ```shell
+       ```shell
         $ sudo add-apt-repository -y ppa:webupd8team/java
         $ sudo apt-get update
         $ sudo apt-get -y install oracle-java8-installer
         $ sudo apt install oracle-java8-set-default
-        ```
+       ```
 
-    - Mac OSX:
+    -  Mac OSX:
 
-        Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+         Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
     Setting up Elasticsearch
 
@@ -93,14 +93,14 @@
      $ cp config.example config
      ```
 
-- Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section for details on these variables.
+-    Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 
 
-   ```shell
+```shell
    $ python initial_setup.py
-   ```
+```
 
 You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](/docs/adding_entities.md) section for more details.
 
@@ -108,17 +108,22 @@ You can add your own entities using such csv files. See [CSV file structure and 
 ​        
 ## Starting the NER
 
-   ```shell
+```shell
    $ ./start_server.sh
-   ```
+```
 
    Or if you wish to run it in background
 
-   ```shell
+```shell
    $ ./start_server.sh &
-   ```
+```
 
 Following is the API call to test our service:
+
+```python
+entities = ['date','time','restaurant']
+message = "Reserve me a table today at 6:30pm at Mainland China and on Monday at 7:00pm at Barbeque Nation" 
+```
 
 ```shell
 URL='localhost'
