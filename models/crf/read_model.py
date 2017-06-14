@@ -3,7 +3,7 @@ import nltk
 from lib.nlp.const import tokenizer
 from models.constants import CITY_MODEL_PATH, CITY_ENTITY_TYPE
 from models.constants import CITY_FROM_B, CITY_TO_B, CITY_VIA_B, CITY_FROM_I, CITY_TO_I, CITY_VIA_I, INBOUND, \
-    OUTBOUND, FROM, TO, VIA, ENTITY
+    OUTBOUND, FROM, TO, VIA, CITY_VALUE
 from chatbot_ner.config import ner_logger
 
 try:
@@ -171,7 +171,7 @@ class PredictCRF(object):
             then calling this function with ab ove parameters will give:
                 {'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}
         """
-        python_dict = {ENTITY: city_value, FROM: from_bool, TO: to_bool, VIA: via_bool}
+        python_dict = {CITY_VALUE: city_value, FROM: from_bool, TO: to_bool, VIA: via_bool}
         return python_dict
 
     def check_label(self, reader_list, reader_pointer, begin_label, inner_label, from_bool, to_bool, via_bool):

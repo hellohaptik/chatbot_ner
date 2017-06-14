@@ -74,3 +74,6 @@ DAY_DICT = {
     u'6': [u'fri', u'friday'],
     u'7': [u'saturday', u'sat']
 }
+
+
+flag_model_run = True

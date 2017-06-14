@@ -1,3 +1,6 @@
+from models.constants import CITY_ENTITY_TYPE, CITY_VALUE
+from models.crf.read_model import PredictCRF
+from v1.entities.constant import flag_model_run
 from v1.entities.textual.text.text_detection import TextDetector
 
 
@@ -29,6 +32,7 @@ class CityDetector(object):
 
         self.entity_name = entity_name
         self.text = ''
+        self.bot_message = ''
         self.text_dict = {}
         self.tagged_text = ''
         self.processed_text = ''
@@ -67,10 +71,12 @@ class CityDetector(object):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
-        self.tagged_text = self.text
-
-        city_data = self.detect_city()
+        self.processed_text = self.text.lower()
+        self.tagged_text = self.text.lower()
+        if flag_model_run:
+            city_data = self.city_model_detection()
+        else:
+            city_data = self.detect_city()
         self.city = city_data[0]
         self.original_city_text = city_data[1]
         return city_data
@@ -102,6 +108,27 @@ class CityDetector(object):
 
         return city_list, original_list
 
+    def city_model_detection(self):
+        """
+
+        :return:
+        """
+        predict_crf = PredictCRF()
+        model_output = predict_crf.get_model_output(entity_type=CITY_ENTITY_TYPE, bot_message=self.bot_message,
+                                                    user_message=self.text)
+        city_list, original_list = [], []
+        for city_dict in model_output:
+            city_list_from_text_entity, original_list_from_text_entity = \
+                self.text_detection_object.detect_entity(city_dict[CITY_VALUE])
+            if city_list_from_text_entity:
+                city_list.extend(city_list_from_text_entity)
+                original_list.extend(original_list_from_text_entity)
+            else:
+                city_list.extend(city_dict[CITY_VALUE])
+                original_list.extend(city_dict[CITY_VALUE])
+
+        return city_list, original_list
+
     def update_processed_text(self, original_list):
         """
         Replaces detected cities with tag generated from entity_name used to initialize the object with
@@ -115,3 +142,13 @@ class CityDetector(object):
         for detected_text in original_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: string
+        """
+
+        self.bot_message = bot_message

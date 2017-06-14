@@ -19,7 +19,7 @@ CITY_FROM_I = 'from-I'
 CITY_TO_I = 'to-I'
 CITY_VIA_I = 'via-I'
 
-ENTITY = 'city'
+CITY_VALUE = 'city'
 FROM = 'from'
 TO = 'to'
 VIA = 'via'
