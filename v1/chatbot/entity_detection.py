@@ -323,8 +323,10 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         else:
             return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_list, original_text_list = city_detection.detect_entity(text=message)
+        entity_list, original_text_list, model_detection_type = city_detection.detect_entity(text=message)
         if entity_list:
+            if model_detection_type:
+                return output_entity_dict_from_model(entity_list, original_text_list, model_detection_type)
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
@@ -778,4 +780,43 @@ def output_entity_dict_value(entity_value=None, original_text=None, detection_me
             ORIGINAL_TEXT: original_text
         }
     ]
+    return entity_list
+
+
+def output_entity_dict_from_model(entity_value_list=None, original_text_list=None, detection_method_list=None):
+    """This function will return the list of dictionary as an output.
+    It similar to output_entity_dict_list() except the parameters/attributes i.e. detection_method is list
+
+    Attributes:
+        entity_value_list: list of entity values which are identified from given detection logic
+        original_text_list: list original values or actual values from message/structured_value which are identified
+        detection_method_list: this will store how the entity is detected i.e. whether its verified from model or not.
+
+    Output:
+        [
+            {
+                "entity_value": entity_value,
+                "detection": detection_method,
+                "original_text": original_text
+            }
+        ]
+    """
+    entity_list = []
+    count = 0
+    if entity_value_list:
+        while count < len(entity_value_list):
+            if type(entity_value_list[count]) in [str, unicode]:
+                entity_value_list[count] = {
+                    ENTITY_VALUE_DICT_KEY: entity_value_list[count]
+                }
+
+            entity_list.append(
+                {
+                    ENTITY_VALUE: entity_value_list[count],
+                    DETECTION_METHOD: detection_method_list[count],
+                    ORIGINAL_TEXT: original_text_list[count]
+                }
+            )
+            count += 1
+
     return entity_list
