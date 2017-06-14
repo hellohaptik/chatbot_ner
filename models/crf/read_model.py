@@ -134,6 +134,8 @@ class PredictCRF(object):
             to TO i
             goa VB i
         """
+        if bot_message is None:
+            bot_message = ''
 
         tokens_bot_message = tokenizer.tokenize(bot_message)
         tokens_user_message = tokenizer.tokenize(user_message)

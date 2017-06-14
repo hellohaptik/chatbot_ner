@@ -70,7 +70,7 @@ class CityAdvanceDetector(object):
         self.tagged_text = self.text
         city_data = []
         if run_model:
-            city_data = self._city_model_detection
+            city_data = self._city_model_detection()
         if not run_model or not city_data[0]:
             city_data = self._detect_city()
             city_data = city_data + ([],)
@@ -401,7 +401,6 @@ class CityAdvanceDetector(object):
         else:
             return None, None
 
-    @property
     def _city_model_detection(self):
         """
 
@@ -427,7 +426,7 @@ class CityAdvanceDetector(object):
                 else:
                     city['departure_city'] = city_list_from_text_entity[0]
 
-                city_list.extend(city)
+                city_list.append(city)
                 original_list.extend(original_list_from_text_entity)
                 model_detection_type.append(MODEL_VERIFIED)
             else:
@@ -438,7 +437,7 @@ class CityAdvanceDetector(object):
                 else:
                     city['departure_city'] = city_dict[CITY_VALUE]
 
-                city_list.extend(city)
+                city_list.append(city)
                 original_list.append(city_dict[CITY_VALUE])
                 model_detection_type.append(MODEL_NOT_VERIFIED)
         self._update_processed_text(original_list)
