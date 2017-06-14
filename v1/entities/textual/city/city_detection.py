@@ -1,7 +1,6 @@
 from models.constants import CITY_ENTITY_TYPE, CITY_VALUE
 from models.crf.read_model import PredictCRF
 from v1.constant import MODEL_VERIFIED, MODEL_NOT_VERIFIED
-from v1.entities.constant import flag_model_run
 from v1.entities.textual.text.text_detection import TextDetector
 
 
@@ -53,12 +52,12 @@ class CityDetector(object):
         self.update_processed_text(original_list)
         return city_list, original_list
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, run_model=True):
         """Detects city in the text string
 
         Args:
             text: string to extract entities from
-
+            run_model: Boolean True if model needs to run else False
         Returns:
             A tuple of two lists with first list containing the detected city and second list containing their
             corresponding substrings in the given text.
@@ -75,7 +74,7 @@ class CityDetector(object):
         self.processed_text = self.text.lower()
         self.tagged_text = self.text.lower()
         city_data = []
-        if flag_model_run:
+        if run_model:
             city_data = self.city_model_detection()
         if not city_data[0]:
             city_data = self.detect_city()
