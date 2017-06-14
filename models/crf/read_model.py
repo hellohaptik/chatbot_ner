@@ -16,7 +16,52 @@ except ImportError:
 The class PredictCRF uses context random fields to establish relationship between words in the sentence
 You have been given a template which it follows to achieve this.
 
-We have used seven types of labels to tag our data for ENTITY='city'.
+We have used seven types of labels to tag our data for ENTITY='city':
+
+    Begining of departure city name is marked with label----- 'from-B'
+    All other words in departure city name if marked with label----- 'from-I'
+
+    Begining of arrivale city name is marked with label----- 'to-B'
+    All other words in arrival city name if marked with label----- 'to-I'
+
+    Begining of via city name is marked with label----- 'via-B'
+    All other words in via city name if marked with label----- 'via-I'
+
+    All the other words are marked with label----- 'O'
+
+    A simple example is given below to explain out CRF labels:
+
+        Args:
+            bot_message = 'please help me with you departure city and arrival city'
+            user_message = 'flights from new delhi to new york via dubai'
+
+        Note*: bot messages get a feature as 'o'(outbound/sent by bot) and user message get a feature as
+            'i'(inbound/sent by user) So the final tagged data will look like
+
+        Corresponding CRF input data and corresponding output label:
+            please NN o-------> O
+            help VB o---------> O
+            me NNS o----------> O
+            with AD o---------> O
+            your AJ o---------> O
+            departure NN o----> O
+            city PN o---------> O
+            and NNS o---------> O
+            arrival NN o------> O
+            city PN o---------> O
+            flights NNS i-----> O
+            from VBP i--------> O 
+            new NN i----------> from-B
+            delhi NN i--------> from-I
+            to TO i-----------> O
+            new NN i----------> to-B
+            york NN i---------> to-I
+            via VB i----------> O
+            dubai NN i--------> via-B
+
+    We have provided you with a model in chatbot_ner/data/models/crf/city. you can replace it with your own model and use this class to run
+    CRF. You will get a json list of all tagged data.
+
 """
 
 
@@ -27,8 +72,7 @@ class PredictCRF(object):
 
     def get_model_output(self, entity_type, bot_message, user_message):
         """
-        Thus function is a calls all other in order get final json_list of tagged data
-
+        This function is a calls all other in order get final json list of tagged data
 
         """
         output_list = []
@@ -69,8 +113,9 @@ class PredictCRF(object):
             user_message: message from user
 
         for Example:
-            bot_message = 'none'
-            user_message = 'flights from delhi to goa'
+            Args:
+                bot_message = 'none'
+                user_message = 'flights from delhi to goa'
 
             Then this functions tokenize the bot and user messages, gets the POS tags, tags them as outbound or
             inbound as per the sender and adds it to the tagger object.
@@ -79,9 +124,6 @@ class PredictCRF(object):
             tokens_user_message = ['flights', 'from', 'delhi', 'goa']
             pos_bot_message = [['none', 'NN']]
             pos_user_message = [['flights','NNS'], ['from', 'VBP'], ['delhi', 'NN'], ['to', 'TO'], ['goa', 'VB']]
-
-            Note* bot messages get a feature as 'o'(outbound/sent by bot) and user message get a feature as
-            'i'(inbound/sent by user) So the final tagged data will look like
 
             none NN o
             flights NNS i
@@ -103,6 +145,11 @@ class PredictCRF(object):
             self.tagger.add(token[0] + ' ' + token[1] + ' ' + INBOUND)
 
     def run_crf(self):
+        """
+        This function runs CRF on data added to tagger and stores the [word    predicted_label] in output list and returns it. This list
+        is then passed to generate_crf_output() to get the json list of data tagged.
+
+        """
         output = []
         self.tagger.parse()
 
@@ -163,10 +210,11 @@ class PredictCRF(object):
         This function return json of the value found in function check_label
 
         for Example:
-            city_value = 'delhi'
-            from_bool = 1
-            to_bool = 0
-            via_bool = 0
+            Args:
+                city_value = 'delhi'
+                from_bool = 1
+                to_bool = 0
+                via_bool = 0
 
             then calling this function with ab ove parameters will give:
                 {'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}
@@ -179,13 +227,14 @@ class PredictCRF(object):
         this function checks if a particular word has been given a particular label
 
         for Example:
-            reader_list = list returned by run_crf
-            reader_pointer = 3
-            begin_label = CITY_FROM_B
-            inner_label = VITY_FROM_I
-            from_bool = 1
-            to_bool = 0
-            via_bool = 0
+            Args:
+                reader_list = list returned by run_crf
+                reader_pointer = 3
+                begin_label = CITY_FROM_B
+                inner_label = VITY_FROM_I
+                from_bool = 1
+                to_bool = 0
+                via_bool = 0
 
             When check_label is called with above parameters, it checks if the word has been given CITY_FROM_B label
             and its following words
@@ -195,20 +244,20 @@ class PredictCRF(object):
         """
         list_json = []
         if reader_list[reader_pointer][1] == begin_label:
-            xyz_city = reader_list[reader_pointer][0]
+            entity_value = reader_list[reader_pointer][0]
             if reader_pointer == (len(reader_list) - 1):
-                return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
+                return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
 
             else:
                 check_pointer = reader_pointer + 1
                 while check_pointer < (len(reader_list)):
                     if reader_list[check_pointer][1] != inner_label:
-                        return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool,
+                        return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool,
                                               via_bool=via_bool)
                     else:
-                        xyz_city = xyz_city + ' ' + reader_list[check_pointer][0]
+                        entity_value = entity_value + ' ' + reader_list[check_pointer][0]
                         check_pointer += 1
                         if check_pointer == (len(reader_list) - 1):
-                            return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool,
+                            return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool,
                                                   via_bool=via_bool)
         return list_json
