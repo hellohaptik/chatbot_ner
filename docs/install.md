@@ -41,20 +41,20 @@
 4.  Clone the repository
 
     ```shell
-    $ cd ~/
-    $ git clone https://github.com/hellohaptik/chatbot_ner.git
-    $ cd chatbot_ner
+     $ cd ~/
+     $ git clone https://github.com/hellohaptik/chatbot_ner.git
+     $ cd chatbot_ner
     ```
 
 5.  Install the requirements with pip
 
     ```shell
-    $ pip install -r requirements.txt
+     $ pip install -r requirements.txt
     ```
 
 6.  Install Java and setup Elasticsearch
 
-     You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
+      You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
 
     -  Ubuntu:
 
@@ -67,7 +67,7 @@
 
     -  Mac OSX:
 
-         Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+          Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
     Setting up Elasticsearch
 
@@ -104,8 +104,28 @@
 
 You can add your own entities using such csv files. See [CSV file structure and adding new entities to DataStore](/docs/adding_entities.md) section for more details.
 
+9. Installing CRF++ package `NOTE: Currently, we have included CRF model for detection of cities. `
 
-​        
+   ```shell
+   $ mkdir -p ~/model_lib
+   $ cd /tmp/
+   $ wget ftp://ftp.netbsd.org/pub/pkgsrc/distfiles/CRF++-0.58.tar.gz
+   $ tar -xzf CRF++-0.58.tar.gz -C ~/model_lib/
+   $ cd ~/model_lib/CRF++-0.58/
+   $ ./configure
+   $ make
+   $ sudo make install
+
+   $ export LD_LIBRARY_PATH=/usr/local/lib
+
+   $ cd python
+   $ python setup.py build
+   $ python python/setup.py install
+
+   ```
+
+> Incase, there are any issues please have a look at https://taku910.github.io/crfpp/#install . Also you can add `export LD_LIBRARY_PATH=/usr/local/lib`to ~/.bashrc
+
 ## Starting the NER
 
 ```shell
