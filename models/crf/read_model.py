@@ -63,7 +63,15 @@ class PredictCRF(object):
             pos_bot_message = [['none', 'NN']]
             pos_user_message = [['flights','NNS'], ['from', 'VBP'], ['delhi', 'NN'], ['to', 'TO'], ['goa', 'VB']]
 
-            Note* bot messages get a feature of 
+            Note* bot messages get a feature as 'o'(outbound/sent by bot) and user message get a feature as 'i'(inbound/sent by user)
+            So the final tagged data will look like
+
+            none NN o
+            flights NNS i
+            from VBP i
+            delhi NN i
+            to TO i
+            goa VB i
         """
 
         tokens_bot_message = tokenizer.tokenize(bot_message)
