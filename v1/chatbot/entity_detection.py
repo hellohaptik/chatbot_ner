@@ -658,8 +658,10 @@ def get_city_advance(message, entity_name, structured_value, fallback_value, bot
         else:
             return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_list, original_text_list = city_detection.detect_entity(text=message)
+        entity_list, original_text_list, model_detection_type = city_detection.detect_entity(text=message)
         if entity_list:
+            if model_detection_type:
+                return output_entity_dict_from_model(entity_list, original_text_list, model_detection_type)
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)

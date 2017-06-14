@@ -71,6 +71,7 @@ class CityDetector(object):
 
         """
         self.text = ' ' + text + ' '
+        self.text = self.text.lower()
         self.processed_text = self.text.lower()
         self.tagged_text = self.text.lower()
         city_data = []

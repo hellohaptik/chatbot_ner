@@ -1,4 +1,7 @@
 import re
+from models.constants import CITY_ENTITY_TYPE, CITY_VALUE, FROM, TO
+from models.crf.read_model import PredictCRF
+from v1.constant import MODEL_VERIFIED, MODEL_NOT_VERIFIED
 
 from v1.entities.textual.text.text_detection import TextDetector
 
@@ -37,20 +40,19 @@ class CityAdvanceDetector(object):
         self.processed_text = ''
         self.city = []
         self.original_city_text = []
-        self.form_check = True
         self.entity_name = entity_name
         self.text_detection_object = TextDetector(entity_name=entity_name)
         self.bot_message = None
         self.tag = '__' + entity_name + '__'
 
-    def detect_entity(self, text, form_check=False):
+    def detect_entity(self, text, run_model=True):
         """
         Detects all city strings in text and returns two lists of detected city entities and their corresponding
         original substrings in text respectively.
 
         Args:
             text: string to extract city entities from
-
+            run_model: Boolean True if model needs to run else False
         Returns:
             Tuple containing two lists, first containing dictionaries, each containing 'arrival_city'
             and 'departure_city' keys and dictionaries returned form TextDetector as their values,
@@ -63,10 +65,15 @@ class CityAdvanceDetector(object):
 
         """
         self.text = ' ' + text + ' '
+        self.text = self.text.lower()
         self.processed_text = self.text
         self.tagged_text = self.text
-        self.form_check = form_check
-        city_data = self._detect_city()
+        city_data = []
+        if run_model:
+            city_data = self._city_model_detection
+        if not run_model or not city_data[0]:
+            city_data = self._detect_city()
+            city_data = city_data + ([],)
         self.city = city_data[0]
         self.original_city_text = city_data[1]
         return city_data
@@ -393,6 +400,50 @@ class CityAdvanceDetector(object):
             return city_list, original_list
         else:
             return None, None
+
+    @property
+    def _city_model_detection(self):
+        """
+
+        :return:
+        """
+        predict_crf = PredictCRF()
+        model_output = predict_crf.get_model_output(entity_type=CITY_ENTITY_TYPE, bot_message=self.bot_message,
+                                                    user_message=self.text)
+        city_list, original_list, model_detection_type = [], [], []
+        for city_dict in model_output:
+            city_list_from_text_entity, original_list_from_text_entity = \
+                self.text_detection_object.detect_entity(city_dict[CITY_VALUE])
+            city = {
+                'departure_city': None,
+                'arrival_city': None
+            }
+
+            if city_list_from_text_entity:
+                if city_dict[FROM] == 1:
+                    city['departure_city'] = city_list_from_text_entity[0]
+                elif city_dict[TO] == 1:
+                    city['arrival_city'] = city_list_from_text_entity[0]
+                else:
+                    city['departure_city'] = city_list_from_text_entity[0]
+
+                city_list.extend(city)
+                original_list.extend(original_list_from_text_entity)
+                model_detection_type.append(MODEL_VERIFIED)
+            else:
+                if city_dict[FROM] == 1:
+                    city['departure_city'] = city_dict[CITY_VALUE]
+                elif city_dict[TO] == 1:
+                    city['arrival_city'] = city_dict[CITY_VALUE]
+                else:
+                    city['departure_city'] = city_dict[CITY_VALUE]
+
+                city_list.extend(city)
+                original_list.append(city_dict[CITY_VALUE])
+                model_detection_type.append(MODEL_NOT_VERIFIED)
+        self._update_processed_text(original_list)
+
+        return city_list, original_list, model_detection_type
 
     def _update_processed_text(self, original_city_strings):
         """
