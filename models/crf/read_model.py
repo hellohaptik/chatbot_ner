@@ -72,8 +72,10 @@ class PredictCRF(object):
 
     def get_model_output(self, entity_type, bot_message, user_message):
         """
-        This function is a calls all other in order get final json list of tagged data
-
+        This function is a calls all other in order get final json list of tagged data.
+        
+        If model has been loaded then it calls initialize_files(), add_data_to_tagger and run_crf to get the 
+        tagged data otherwise it will throw an error message
         """
         output_list = []
         if MODEL_RUN:
