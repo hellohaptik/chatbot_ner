@@ -59,8 +59,8 @@ We have used seven types of labels to tag our data for ENTITY='city':
             via VB i----------> O
             dubai NN i--------> via-B
 
-    We have provided you with a model in chatbot_ner/data/models/crf/city. you can replace it with your own model and use this class to run
-    CRF. You will get a json list of all tagged data.
+    We have provided you with a model in chatbot_ner/data/models/crf/city. you can replace it with your own model and
+    use this class to run CRF. You will get a json list of all tagged data.
 
 """
 
@@ -146,7 +146,8 @@ class PredictCRF(object):
 
     def run_crf(self):
         """
-        This function runs CRF on data added to tagger and stores the [word    predicted_label] in output list and returns it. This list
+        This function runs CRF on data added to tagger and stores the [word    predicted_label] in output list and
+        returns it. This list
         is then passed to generate_crf_output() to get the json list of data tagged.
 
         """
