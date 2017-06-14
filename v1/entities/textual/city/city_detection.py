@@ -76,9 +76,9 @@ class CityDetector(object):
         city_data = []
         if run_model:
             city_data = self.city_model_detection()
-        if not city_data[0]:
+        if not run_model or not city_data[0]:
             city_data = self.detect_city()
-            city_data[2] = []
+            city_data = city_data + ([],)
         self.city = city_data[0]
         self.original_city_text = city_data[1]
         return city_data
