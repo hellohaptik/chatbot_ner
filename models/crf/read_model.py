@@ -3,7 +3,7 @@ import csv
 import json
 import os, os.path
 import nltk
-import CRFPP
+# import CRFPP
 from lib.nlp.const import tokenizer
 from models.constants import city_model_path, CITY_ENTITY_TYPE
 from models.utils import get_current_timestamp, create_directory
@@ -19,14 +19,14 @@ We have used seven types of labels to tag our data for ENTITYE='city'.
 class PredictCRF(object):
 
     def __init__(self):
-        self.tagger = None
+        # self.tagger = None
         self._model_path = None
 
     def get_crf_output(self, bot_message, user_message):
         """
         Thus function is a calls all other in order get final json_list of tagged data
 
-        
+
         """
 
         self.initialize_files(CITY_ENTITY_TYPE)
@@ -37,23 +37,45 @@ class PredictCRF(object):
 
     def initialize_files(self, entity_type):
         """
-
+        This function checks the type of entity. We have currently done it for ENTITY='city'.
+        If the input parameter is entity type city, it will run CRF model loaded for city and initialize the 
+        tagger and model_path accordingly
         """
+
         if entity_type == CITY_ENTITY_TYPE:
             self._model_path = city_model_path
             self.tagger = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
 
     def add_data_to_tagger(self, bot_message, user_message):
+        """
+        As explained, CRF need data in a particular format, this function converts the bot_message and user_message into
+        that format and add it to the tagger. 
+
+        for Example:
+            bot_message = 'none'
+            user_message = 'flights from delhi to goa'
+
+            Then this functions tokenize the bot and user messages, gets the POS tags, tags them as outbound or inbound as per the
+            sender and adds it to the tagger object.
+
+            tokens_bot_message = ['none']
+            tokens_user_message = ['flights', 'from', 'delhi', 'goa']
+            pos_bot_message = [['none', 'NN']]
+            pos_user_message = [['flights','NNS'], ['from', 'VBP'], ['delhi', 'NN'], ['to', 'TO'], ['goa', 'VB']]
+
+            Note* bot messages get a feature of 
+        """
+
         tokens_bot_message = tokenizer.tokenize(bot_message)
         tokens_user_message = tokenizer.tokenize(user_message)
 
         pos_bot_message = nltk.pos_tag(tokens_bot_message)
         pos_user_message = nltk.pos_tag(tokens_user_message)
         for token in pos_bot_message:
-            self.tagger.add(token[0]+' '+token[1]+' '+'o')
+            self.tagger.add(token[0]+' '+token[1]+' '+OUTBOUND)
 
         for token in pos_user_message:
-            self.tagger.add(token[0]+' '+token[1]+' '+'o')
+            self.tagger.add(token[0]+' '+token[1]+' '+INBOUND)
 
     def run_crf(self):
         output = []
@@ -152,19 +174,16 @@ class PredictCRF(object):
         if reader_list[reader_pointer][1]==begin_label:
             xyz_city = reader_list[reader_pointer][0]
             if reader_pointer==(len(reader_list)-1):
-                list_json.append(self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool))
-                return list_json
+                return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
 
             else:
                 check_pointer = reader_pointer+1
                 while check_pointer < (len(reader_list)):
                     if reader_list[check_pointer][1]!=inner_label:
-                        list_json.append(self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool))
-                        return list_json
+                        return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
                     else:
                         xyz_city = xyz_city +' '+ reader_list[check_pointer][0]
                         check_pointer+=1
                         if check_pointer==(len(reader_list)-1):
-                            list_json.append(self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool))
-                            return list_json
+                            return self.make_json(city_value=xyz_city, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
         return list_json
