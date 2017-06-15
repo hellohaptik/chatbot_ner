@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from v1.chatbot.tag_message import run_ner
 from v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
-    PARAMETER_STRUCTURED_VALUE_VERIFICATION, PARAMETER_FALLBACK_VALUE, PARAMETER_EXPERT_MESSAGE
+    PARAMETER_FALLBACK_VALUE, PARAMETER_EXPERT_MESSAGE
 from chatbot_ner.config import ner_logger
 from v1.chatbot.entity_detection import get_text, get_location, get_phone_number, get_email, get_city, get_pnr, \
     get_number, get_shopping_size, get_time, get_date, get_budget, get_city_advance, \
@@ -18,14 +18,9 @@ def get_parameters_dictionary(request):
     :param request:
     :return:
     """
-    if request.GET.get('structured_value_verification') == '':
-        structured_value_verification = 0
-    else:
-        structured_value_verification = int(request.GET.get('structured_value_verification'))
     parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
                        PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
                        PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
-                       PARAMETER_STRUCTURED_VALUE_VERIFICATION: structured_value_verification,
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
                        PARAMETER_EXPERT_MESSAGE: request.GET.get('bot_message')}
 
@@ -39,20 +34,18 @@ def text(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_text(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for text_synonym: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -63,20 +56,18 @@ def location(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_location(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                     parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
                                      parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for location: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -87,20 +78,18 @@ def phone_number(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_phone_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                          parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
                                          parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for phone_number: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -111,20 +100,18 @@ def email(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_email(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                  parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
                                   parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for email: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -135,20 +122,18 @@ def city(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_city(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for city: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -159,20 +144,18 @@ def pnr(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_pnr(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                 parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                 parameters_dict[PARAMETER_FALLBACK_VALUE],
                                 parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for pnr: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -183,20 +166,18 @@ def shopping_size(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_shopping_size(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                           parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                          parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                           parameters_dict[PARAMETER_FALLBACK_VALUE],
                                           parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for shopping_size: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -207,20 +188,18 @@ def number(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                   parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
                                    parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for numeric: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -231,20 +210,18 @@ def time(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_time(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for time: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -255,20 +232,18 @@ def date(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_date(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for date: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -279,20 +254,18 @@ def budget(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_budget(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                   parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
                                    parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for budget: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -304,20 +277,18 @@ def city_advance(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_city_advance(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                          parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
                                          parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for departure city: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -329,20 +300,18 @@ def date_advance(request):
         request: url parameters
 
     """
-    entity_name = None
     try:
         parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % entity_name)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_date_advance(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                          parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE_VERIFICATION],
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
                                          parameters_dict[PARAMETER_EXPERT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception, e:
         entity_output = {}
         ner_logger.debug('Exception for date departure: %s ' % e)
 
-    ner_logger.debug('Finished %s : %s ' % (entity_name, entity_output))
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -379,4 +348,3 @@ def combine_output(request):
     output = combine_output_of_detection_logic_and_tag(entity_data=entity_data_json, text=message)
     ner_logger.debug('Finished %s : %s ' % (message, output))
     return HttpResponse(json.dumps({'data': output}), content_type='application/json')
-
