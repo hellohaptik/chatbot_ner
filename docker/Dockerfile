@@ -10,6 +10,9 @@ RUN /root/java.sh && /root/elasticsearch.sh
 RUN cp /root/chatbot_ner/config.example /root/chatbot_ner/config ; ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -Des.insecure.allow.root=true -d && sleep 10 && python ~/chatbot_ner/initial_setup.py
 ###WONT LET YOU RUN IT AS ROOT ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
 
+COPY install_CRF.sh /root/
+RUN install_CRF.sh
+
 ##FOR Non virtualenv 
 ADD start.sh /root/start.sh
 CMD bash /root/start.sh
