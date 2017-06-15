@@ -1,7 +1,7 @@
 from collections import defaultdict
 from lib.nlp.const import tokenizer
 from lib.nlp.regex import Regex
-from v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE
+from v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, MODEL_VERIFIED, MODEL_NOT_VERIFIED
 
 
 def combine_output_of_detection_logic_and_tag(entity_data, text):
@@ -80,7 +80,9 @@ def combine_output_of_detection_logic_and_tag(entity_data, text):
     for entity, entity_list in entity_data.iteritems():
         if entity_list:
             for entity_identified in entity_list:
-                if entity_identified[ORIGINAL_TEXT] and entity_identified[DETECTION_METHOD] in [FROM_MESSAGE]:
+                if entity_identified[ORIGINAL_TEXT] and entity_identified[DETECTION_METHOD] in [FROM_MESSAGE,
+                                                                                                MODEL_VERIFIED,
+                                                                                                MODEL_NOT_VERIFIED]:
                     tag_preprocess_dict[entity_identified[ORIGINAL_TEXT].lower()].append([entity_identified, entity])
                 else:
                     tag_preprocess_dict['NA'].append([entity_identified, entity])
