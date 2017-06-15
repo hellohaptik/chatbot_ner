@@ -143,10 +143,10 @@ class PredictCRF(object):
         pos_bot_message = nltk.pos_tag(tokens_bot_message)
         pos_user_message = nltk.pos_tag(tokens_user_message)
         for token in pos_bot_message:
-            self.tagger.add(token[0] + ' ' + token[1] + ' ' + OUTBOUND)
+            self.tagger.add(str(token[0]) + ' ' + str(token[1]) + ' ' + OUTBOUND)
 
         for token in pos_user_message:
-            self.tagger.add(token[0] + ' ' + token[1] + ' ' + INBOUND)
+            self.tagger.add(str(token[0]) + ' ' + str(token[1]) + ' ' + INBOUND)
 
     def run_crf(self):
         """
