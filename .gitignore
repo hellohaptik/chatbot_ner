@@ -94,5 +94,5 @@ ENV/
 
 
 .DS_Store
-
-output/
+# Log path
+logs/

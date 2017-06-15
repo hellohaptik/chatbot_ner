@@ -13,9 +13,11 @@ from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_nu
 
 
 def get_parameters_dictionary(request):
-    """
-    Returns the list of parameters require for NER
-    :param request:
+    """ Returns the list of parameters require for NER
+
+    Attributes:
+        request: url parameters
+
     :return:
     """
     parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
