@@ -113,8 +113,42 @@ class CityDetector(object):
 
     def city_model_detection(self):
         """
+        This function calls get_model_output() method of PredictCRF class and verifies the values returned by it.
 
-        :return:
+
+        If the cities provided by crf are present in the datastore, it sets the value MODEL_VERIFIED
+        else MODEL_NOT_VERFIED is set.
+
+        And returns the final list of all detected items with each value containing a field to show whether the value if verified or 
+        not
+
+        For Example:
+            Note*:  before calling this method you need to call set_bot_message() to set a bot message.
+
+            
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'mummbai'
+
+            final values of all lists:
+                model_output = [{'city':'mummbai', 'from': 1, 'to': 0, 'via': 0}]
+
+                The for loop verifies each city in model_output list by checking whether it exists in datastore or not(by running elastic search).
+                If not then sets the value MODEL_NOT_VERIFIED else MODEL_VERIFIED
+
+                finally it returns ['Mumbai'], ['mummbai'], [MODEL_VERIFIED]
+
+        For Example:
+        
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'dehradun'
+
+            final values of all lists:
+                model_output = [{'city':'dehradun', 'from': 1, 'to': 0, 'via': 0}]
+
+                Note*: Dehradun is not present in out datastore so it will take original value as entity value.
+
+                finally it returns ['dehradun'], ['dehradun'], [MODEL_NOT_VERIFIED]
+
         """
         predict_crf = PredictCRF()
         model_output = predict_crf.get_model_output(entity_type=CITY_ENTITY_TYPE, bot_message=self.bot_message,
