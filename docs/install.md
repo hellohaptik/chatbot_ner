@@ -121,6 +121,7 @@ You can add your own entities using such csv files. See [CSV file structure and 
    $ cd python
    $ python setup.py build
    $ python python/setup.py install
+   $ cd ~/chatbot_ner
 
    ```
 
