@@ -135,7 +135,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from v1.chatbot.entity_detection import get_phone_number
-      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,bot_message=bot_message)
+      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
 
@@ -267,7 +267,7 @@ Following are the list of different entity types along with its API call:
   - Example 2: 
 
     - ```python
-      message = 'send me the email'
+      message = 'send me to my email'
       entity_name = 'email'
       structured_value = None
       fallback_value = 'apurv.nagvenkar@gmail.com'
@@ -290,7 +290,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/email/?message=send%20me%20the%20email&entity_name=email&structured_value=&fallback_value=apurv.nagvenkar@gmail.com&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/email/?message=send%20me%20to%20my%20email&entity_name=email&structured_value=&fallback_value=apurv.nagvenkar@gmail.com&bot_message='
       ```
 
     - *CURL Output:*
