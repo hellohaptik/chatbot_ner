@@ -118,10 +118,7 @@ def get_entity_function(entity, message):
 
     if entity in entity_function_dictionary:
         return entity_function_dictionary.get(entity)(message=message, entity_name=entity, structured_value=None,
-                                                      structured_value_verification=None, fallback_value=None,
-                                                      bot_message=None)
+                                                      fallback_value=None, bot_message=None)
     else:
-        return get_text(message=message, entity_name=entity, structured_value=None, structured_value_verification=None,
-                        fallback_value=None, bot_message=None)
-
-
+        return get_text(message=message, entity_name=entity, structured_value=None, fallback_value=None,
+                        bot_message=None)

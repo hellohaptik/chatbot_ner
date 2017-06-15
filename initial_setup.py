@@ -14,6 +14,11 @@ status = nltk.download('wordnet')
 if not status:
     print "wordnet Download was unsucessful"
 
+print "Downloading nltk corpus: POS ..."
+status = nltk.download('maxent_treebank_pos_tagger')
+if not status:
+    print "POS Download was unsucessful"
+
 from datastore import DataStore
 
 db = DataStore()
