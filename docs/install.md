@@ -10,22 +10,12 @@
         $ sudo apt-get install -y python-dev python-pip build-essential curl
      ```
 
-   - Mac OSX (or install Xcode):
-
-     ```shell
-     $ xcode-select --install
-     ```
-
-     Accept the Xcode license, scroll to bottom and type 'agree' and hit Enter
-
-     ```shell
-     $ sudo xcodebuild -license
-     ```
+   - Mac OSX:
 
      Install pip if you don't have it already
 
      ```shell
-     $ curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+     $ sudo easy_install pip
      ```
 
 
