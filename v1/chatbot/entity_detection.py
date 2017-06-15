@@ -311,8 +311,11 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
+            //output without model
+            >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': {'value': u'Mumbai'}}]
 
-            >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': {'value': u'mumbai'}}]
+            //output with model
+            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'mummbai', 'entity_value': {'value': u'Mumbai'}}]
 
     """
     city_detection = CityDetector(entity_name=entity_name)
@@ -548,7 +551,6 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
 
-            //output without model
             >> [{'detection': 'message', 'original_text': 'day after tomorrow',
                 'entity_value': {'mm': 3, 'yy': 2017, 'dd': 13, 'type': 'day_after'}}]
 
