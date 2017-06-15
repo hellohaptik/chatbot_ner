@@ -1,3 +1,6 @@
+from models.constants import CITY_ENTITY_TYPE, CITY_VALUE
+from models.crf.read_model import PredictCRF
+from v1.constant import MODEL_VERIFIED, MODEL_NOT_VERIFIED
 from v1.entities.textual.text.text_detection import TextDetector
 
 
@@ -29,6 +32,7 @@ class CityDetector(object):
 
         self.entity_name = entity_name
         self.text = ''
+        self.bot_message = ''
         self.text_dict = {}
         self.tagged_text = ''
         self.processed_text = ''
@@ -48,12 +52,12 @@ class CityDetector(object):
         self.update_processed_text(original_list)
         return city_list, original_list
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, run_model=True):
         """Detects city in the text string
 
         Args:
             text: string to extract entities from
-
+            run_model: Boolean True if model needs to run else False
         Returns:
             A tuple of two lists with first list containing the detected city and second list containing their
             corresponding substrings in the given text.
@@ -67,10 +71,15 @@ class CityDetector(object):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
-        self.tagged_text = self.text
-
-        city_data = self.detect_city()
+        self.text = self.text.lower()
+        self.processed_text = self.text.lower()
+        self.tagged_text = self.text.lower()
+        city_data = []
+        if run_model:
+            city_data = self.city_model_detection()
+        if not run_model or not city_data[0]:
+            city_data = self.detect_city()
+            city_data = city_data + ([],)
         self.city = city_data[0]
         self.original_city_text = city_data[1]
         return city_data
@@ -102,6 +111,64 @@ class CityDetector(object):
 
         return city_list, original_list
 
+    def city_model_detection(self):
+        """
+        This function calls get_model_output() method of PredictCRF class and verifies the values returned by it.
+
+
+        If the cities provided by crf are present in the datastore, it sets the value MODEL_VERIFIED
+        else MODEL_NOT_VERFIED is set.
+
+        And returns the final list of all detected items with each value containing a field to show whether the value if verified or 
+        not
+
+        For Example:
+            Note*:  before calling this method you need to call set_bot_message() to set a bot message.
+
+            
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'mummbai'
+
+            final values of all lists:
+                model_output = [{'city':'mummbai', 'from': 1, 'to': 0, 'via': 0}]
+
+                The for loop verifies each city in model_output list by checking whether it exists in datastore or not(by running elastic search).
+                If not then sets the value MODEL_NOT_VERIFIED else MODEL_VERIFIED
+
+                finally it returns ['Mumbai'], ['mummbai'], [MODEL_VERIFIED]
+
+        For Example:
+        
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'dehradun'
+
+            final values of all lists:
+                model_output = [{'city':'dehradun', 'from': 1, 'to': 0, 'via': 0}]
+
+                Note*: Dehradun is not present in out datastore so it will take original value as entity value.
+
+                finally it returns ['dehradun'], ['dehradun'], [MODEL_NOT_VERIFIED]
+
+        """
+        predict_crf = PredictCRF()
+        model_output = predict_crf.get_model_output(entity_type=CITY_ENTITY_TYPE, bot_message=self.bot_message,
+                                                    user_message=self.text)
+        city_list, original_list, model_detection_type = [], [], []
+        for city_dict in model_output:
+            city_list_from_text_entity, original_list_from_text_entity = \
+                self.text_detection_object.detect_entity(city_dict[CITY_VALUE])
+            if city_list_from_text_entity:
+                city_list.extend(city_list_from_text_entity)
+                original_list.extend(original_list_from_text_entity)
+                model_detection_type.append(MODEL_VERIFIED)
+            else:
+                city_list.append(city_dict[CITY_VALUE])
+                original_list.append(city_dict[CITY_VALUE])
+                model_detection_type.append(MODEL_NOT_VERIFIED)
+        self.update_processed_text(original_list)
+
+        return city_list, original_list, model_detection_type
+
     def update_processed_text(self, original_list):
         """
         Replaces detected cities with tag generated from entity_name used to initialize the object with
@@ -115,3 +182,13 @@ class CityDetector(object):
         for detected_text in original_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: string
+        """
+
+        self.bot_message = bot_message
