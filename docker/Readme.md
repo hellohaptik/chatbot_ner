@@ -33,3 +33,6 @@ The above will give you bash shell access to the container.
 
 To access chatbot_ner:
 `curl localhost:80/YOUR_QUERY`
+
+
+
