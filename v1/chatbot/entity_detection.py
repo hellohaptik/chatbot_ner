@@ -548,6 +548,7 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
 
+            //output without model
             >> [{'detection': 'message', 'original_text': 'day after tomorrow',
                 'entity_value': {'mm': 3, 'yy': 2017, 'dd': 13, 'type': 'day_after'}}]
 
@@ -631,9 +632,14 @@ def get_city_advance(message, entity_name, structured_value, fallback_value, bot
         output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
-
+            //output without model
             >> [{'detection': 'message', 'original_text': 'from delhhi to mumbai',
             'entity_value': {'departure_city': u'New Delhi', 'arrival_city': u'Mumbai'}}]
+
+            //output with model
+            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'delhhi',
+            'entity_value': {'departure_city': u'Delhi', 'arrival_city': None}}, {'detection': 'MODEL_VERIFIED', 
+            'original_text': 'mumbai','entity_value': {'departure_city': None, 'arrival_city': u'Mumbai'}}]
 
         message = "mummbai"
         entity_name = 'city'
@@ -644,9 +650,13 @@ def get_city_advance(message, entity_name, structured_value, fallback_value, bot
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
 
+            //output without model
             >> [{'detection': 'message', 'original_text': 'mummbai',
             'entity_value': {'departure_city': u'Mumbai', 'arrival_city': None}}]
-
+            
+            //output with model
+            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'mummbai',
+            'entity_value': {'departure_city': u'Mumbai', 'arrival_city': None}}]
 
     """
     city_detection = CityAdvanceDetector(entity_name=entity_name)
