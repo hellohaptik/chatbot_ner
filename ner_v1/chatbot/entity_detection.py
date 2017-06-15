@@ -1,17 +1,17 @@
-from v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
+from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
     FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY
-from v1.entities.numeral.budget.budget_detection import BudgetDetector
-from v1.entities.numeral.size.shopping_size_detection import ShoppingSizeDetector
-from v1.entities.textual.city.city_detection import CityDetector
-from v1.entities.textual.city.city_detection_advance import CityAdvanceDetector
-from v1.entities.temporal.date.date_detection import DateDetector
-from v1.entities.temporal.date.date_detection_advance import DateAdvanceDetector
-from v1.entities.pattern.email.email_detection import EmailDetector
-from v1.entities.numeral.number.number_detection import NumberDetector
-from v1.entities.pattern.phone_number.phone_detection import PhoneDetector
-from v1.entities.pattern.pnr.pnr_detection import PNRDetector
-from v1.entities.textual.text.text_detection import TextDetector
-from v1.entities.temporal.time.time_detection import TimeDetector
+from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
+from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
+from ner_v1.detectors.textual.city.city_detection import CityDetector
+from ner_v1.detectors.textual.city.city_detection_advance import CityAdvanceDetector
+from ner_v1.detectors.temporal.date.date_detection import DateDetector
+from ner_v1.detectors.temporal.date.date_detection_advance import DateAdvanceDetector
+from ner_v1.detectors.pattern.email.email_detection import EmailDetector
+from ner_v1.detectors.numeral.number.number_detection import NumberDetector
+from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
+from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
+from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 
 """
 This file contains functionality that performs entity detection over a chatbot.

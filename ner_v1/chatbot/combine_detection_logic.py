@@ -1,7 +1,7 @@
 from collections import defaultdict
 from lib.nlp.const import tokenizer
 from lib.nlp.regex import Regex
-from v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, MODEL_VERIFIED, MODEL_NOT_VERIFIED
+from ner_v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, MODEL_VERIFIED, MODEL_NOT_VERIFIED
 
 
 def combine_output_of_detection_logic_and_tag(entity_data, text):
