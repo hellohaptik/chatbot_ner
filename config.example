@@ -8,21 +8,21 @@
 # This is the primary engine to use. Valid values are one of the following:
 #     elasticsearch
 
-ENGINE=
+ENGINE=elasticsearch
 
 # ES prefixed values correspond to settings for elasticsearch.
 # ES_URL is the complete url with auth name and password required to connect. If provided, this will override ES_HOST,
 # ES_PORT, ES_AUTH_NAME, ES_AUTH_PASSWORD
 ES_URL=
-ES_HOST=
-ES_PORT=
-ES_INDEX_NAME=
-ES_DOC_TYPE=
+ES_HOST=127.0.0.1
+ES_PORT=9200
+ES_INDEX_NAME=chatbot_ner_index
+ES_DOC_TYPE=data_dictionary
 ES_AUTH_NAME=
 ES_AUTH_PASSWORD=
 
 # ES_BULK_MSG_SIZE is an integer value
-ES_BULK_MSG_SIZE=
+ES_BULK_MSG_SIZE=1000
 
 # Provide the following values if you need AWS authentication
 
