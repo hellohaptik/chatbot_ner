@@ -13,4 +13,7 @@ To know more about our NER repository please go through the following documentat
 
 4. [API calls](docs/api_call.md): *A brief document on the api calls for different detection logics along with its necessary output*
 
+5. [Install it using Docker image:](docs/docker.md) *Trouble in installing the Chatbot NER? install it using our Docker image* 
+
    ​
+
