@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import re
 
-from v1.entities.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM
+from ner_v1.detectors.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM
 import pytz
 
 

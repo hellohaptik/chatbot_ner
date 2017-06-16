@@ -1,7 +1,7 @@
 import re
 import pytz
 from lib.nlp.regex import Regex
-from v1.entities.temporal.date.date_detection import DateDetector
+from ner_v1.detectors.temporal.date.date_detection import DateDetector
 
 
 class DateAdvanceDetector(object):

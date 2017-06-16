@@ -26,7 +26,7 @@ Following are the list of different entity types along with its API call:
     - *Python:* 
 
       ```python
-      from v1.chatbot.entity_detection import get_text
+      from ner_v1.chatbot.entity_detection import get_text
       output = get_text(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -78,7 +78,7 @@ Following are the list of different entity types along with its API call:
     - *Python:* 
 
       ```python
-      from v1.chatbot.entity_detection import get_text
+      from ner_v1.chatbot.entity_detection import get_text
       output = get_text(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -134,7 +134,7 @@ Following are the list of different entity types along with its API call:
     - *Python:* 
 
       ```python
-      from v1.chatbot.entity_detection import get_phone_number
+      from ner_v1.chatbot.entity_detection import get_phone_number
       output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -179,7 +179,7 @@ Following are the list of different entity types along with its API call:
     - *Python:* 
 
       ```python
-      from v1.chatbot.entity_detection import get_phone_number
+      from ner_v1.chatbot.entity_detection import get_phone_number
       output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -232,7 +232,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_email
+      from ner_v1.chatbot.entity_detection import get_email
       output = get_email(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -277,7 +277,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_email
+      from ner_v1.chatbot.entity_detection import get_email
       output = get_email(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -328,7 +328,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_city
+      from ner_v1.chatbot.entity_detection import get_city
       output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -379,7 +379,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_pnr
+      from ner_v1.chatbot.entity_detection import get_pnr
       output = get_pnr(message=message, entity_name=entity_name,structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -430,7 +430,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_number
+      from ner_v1.chatbot.entity_detection import get_number
       output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -482,7 +482,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_number
+      from ner_v1.chatbot.entity_detection import get_number
       output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -534,7 +534,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_time
+      from ner_v1.chatbot.entity_detection import get_time
       output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -605,7 +605,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_date
+      from ner_v1.chatbot.entity_detection import get_date
       output = get_date(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -699,7 +699,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_budget
+      from ner_v1.chatbot.entity_detection import get_budget
       output = get_budget(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -753,7 +753,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_shopping_size
+      from ner_v1.chatbot.entity_detection import get_shopping_size
       output = get_shopping_size(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
@@ -811,7 +811,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_city_advance
+      from ner_v1.chatbot.entity_detection import get_city_advance
       output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
       print output
       ```
@@ -901,7 +901,7 @@ Following are the list of different entity types along with its API call:
     - *Python:*
 
       ```python
-      from v1.chatbot.entity_detection import get_date_advance
+      from ner_v1.chatbot.entity_detection import get_date_advance
       output = get_date_advance(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```

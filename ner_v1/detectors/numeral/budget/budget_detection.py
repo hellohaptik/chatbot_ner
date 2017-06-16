@@ -1,8 +1,8 @@
 import re
 
-from v1.entities.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
+from ner_v1.detectors.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
 from lib.nlp.regex import Regex
-from v1.entities.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class BudgetDetector(object):

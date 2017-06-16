@@ -9,6 +9,9 @@ CONFIG_PATH = os.path.join(BASE_DIR, 'config')
 
 LOG_PATH = BASE_DIR + '/logs/'
 # SET UP NER LOGGING
+if not os.path.exists(LOG_PATH):
+    os.makedirs(LOG_PATH)
+
 NER_LOG_FILENAME = LOG_PATH + 'ner_log.log'
 # Set up a specific logger with our desired output level
 ner_logger = logging.getLogger('NERLogger')

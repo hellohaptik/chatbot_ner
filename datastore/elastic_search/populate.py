@@ -1,6 +1,6 @@
 from elasticsearch import helpers
 
-from v1.constant import DICTIONARY_DATA_VARIANTS
+from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
 

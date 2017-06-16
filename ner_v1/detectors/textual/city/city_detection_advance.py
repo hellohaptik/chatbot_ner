@@ -1,9 +1,9 @@
 import re
 from models.constants import CITY_ENTITY_TYPE, CITY_VALUE, FROM, TO
 from models.crf.read_model import PredictCRF
-from v1.constant import MODEL_VERIFIED, MODEL_NOT_VERIFIED
+from ner_v1.constant import MODEL_VERIFIED, MODEL_NOT_VERIFIED
 
-from v1.entities.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class CityAdvanceDetector(object):
