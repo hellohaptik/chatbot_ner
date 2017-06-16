@@ -1,6 +1,6 @@
 import re
 
-from v1.entities.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class ShoppingSizeDetector(object):

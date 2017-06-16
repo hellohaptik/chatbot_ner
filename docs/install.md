@@ -31,20 +31,20 @@
 4.  Clone the repository
 
     ```shell
-     $ cd ~/
-     $ git clone https://github.com/hellohaptik/chatbot_ner.git
-     $ cd chatbot_ner
+      $ cd ~/
+      $ git clone https://github.com/hellohaptik/chatbot_ner.git
+      $ cd chatbot_ner
     ```
 
 5.  Install the requirements with pip
 
     ```shell
-     $ pip install -r requirements.txt
+      $ pip install -r requirements.txt
     ```
 
 6.  Install Java and setup Elasticsearch
 
-      You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
+       You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
 
     -  Ubuntu:
 
@@ -57,7 +57,7 @@
 
     -  Mac OSX:
 
-          Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+           Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
     Setting up Elasticsearch
 
@@ -112,10 +112,13 @@ You can add your own entities using such csv files. See [CSV file structure and 
    $ python setup.py build
    $ python setup.py install
    $ cd ~/chatbot_ner
-
    ```
 
 > Incase, there are any issues please have a look at https://taku910.github.io/crfpp/#install . Also you can add `export LD_LIBRARY_PATH=/usr/local/lib`to ~/.bashrc
+>
+> **NOTE:** If there is an error in building python package of CRF++ for Mac OSX install the following:
+>
+>    `xcode-select --install`
 
 ## Starting the NER
 

@@ -1,5 +1,5 @@
-from v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
-from v1.chatbot.entity_detection import get_text, get_city_advance, get_date_advance, get_date, get_time, get_email, \
+from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
+from ner_v1.chatbot.entity_detection import get_text, get_city_advance, get_date_advance, get_date, get_time, get_email, \
     get_phone_number, get_budget, get_number, get_pnr, get_shopping_size
 
 
