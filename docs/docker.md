@@ -10,7 +10,7 @@ Following are the steps to create the Docker image and run NER via Docker.
      $ wget get.docker.com
      $ bash index.html
      # add your current user to Docker group
-     $ sudo usermode -aG docker $USER
+     $ sudo usermod -aG docker $USER
      ```
 
    - Mac OSX:
