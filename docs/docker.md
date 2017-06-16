@@ -42,7 +42,7 @@ Following are the steps to create the Docker image and run NER via Docker.
 4. Start the Chatbot NER inside the container
 
    ```shell
-   $ ~/chatbot_ner
+   $ cd ~/chatbot_ner
    $ ./start_server.sh &
    ```
 
@@ -141,7 +141,7 @@ Following are the steps to create the Docker image and run NER via Docker.
 
 ## To Create Custom Docker Images
 
-If you want to create a custom Docker image execute the following commands
+If you want to create a custom Docker image execute the following commands after making changes to Dockerfile and scripts.
 
 ```shell
 $ cd chatbot_ner
