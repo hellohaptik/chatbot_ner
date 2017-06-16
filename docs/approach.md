@@ -77,7 +77,7 @@ We have classified entities into four main types i.e. *numeral*, *pattern*, *tem
 | number        | NumberDetector       | Detects number from the text.            | for 3 people, 30 units               |
 | shopping_size | ShoppingSizeDetector | Detects size which are used for shopping. | XL, large, 34 size                   |
 
-> **NOTE**:  path to the above entity_types -> `v1/entities/`
+> **NOTE**:  path to the above entity_types -> `ner_v1/entities/`
 
 ### Parameters for entity detection
 

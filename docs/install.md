@@ -6,8 +6,8 @@
    - Ubuntu:
 
      ```shell
-        $ sudo apt-get update
-        $ sudo apt-get install -y python-dev python-pip build-essential curl
+     $ sudo apt-get update
+     $ sudo apt-get install -y python-dev python-pip build-essential curl
      ```
 
    - Mac OSX:
@@ -31,20 +31,21 @@
 4.  Clone the repository
 
     ```shell
-      $ cd ~/
-      $ git clone https://github.com/hellohaptik/chatbot_ner.git
-      $ cd chatbot_ner
+       $ cd ~/
+       $ git clone https://github.com/hellohaptik/chatbot_ner.git
+       $ cd chatbot_ner
     ```
 
 5.  Install the requirements with pip
 
     ```shell
-      $ pip install -r requirements.txt
+       $ pip install -r requirements.txt
     ```
 
 6.  Install Java and setup Elasticsearch
 
-       You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally
+        You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally.
+        NOTE: If you have >= JDK 1.7.x then you can setup elasticsearch directly.   
 
     -  Ubuntu:
 
@@ -57,7 +58,7 @@
 
     -  Mac OSX:
 
-           Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+            Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
     Setting up Elasticsearch
 
@@ -74,16 +75,18 @@
 
 7. Copy config.example to config and configure the settings for datastore
 
- > **<span style="color:black"> IMPORTANT NOTE:</span> Chatbot NER reads the required connection settings to connect to the DataStore engine from a file called <span style="color:red">`config`</span> located at the root of the repository and exports them in the working environment for further use. In case you don't want to provide this <span style="color:red">`config`</span> file, make sure the required connection settings variables as described in the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section are somehow set in the environment. Failing to do so will throw a <span style="color:red">`DataStoreSettingsImproperlyConfiguredException`</span> exception while trying to connect to the underlying engine.**
+ > **<span style="color:black"> IMPORTANT NOTE:</span>**
+ >
+ > ** Chatbot NER reads the required connection settings to connect to the DataStore engine from a file called <span style="color:red">`config`</span> located at the root of the repository and exports them in the working environment for further use. In case you don't want to provide this <span style="color:red">`config`</span> file, make sure the required connection settings variables as described in the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section are somehow set in the environment. Failing to do so will throw a <span style="color:red">`DataStoreSettingsImproperlyConfiguredException`</span> exception while trying to connect to the underlying engine.**
 
 -    Copy `config.example` located in the root of the repository to a separate file named `config`
 
      ```shell
      $ cd ~/chatbot_ner/
-     $ cp config.example config
+     $ cp config.example config 
      ```
 
--    Open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section for details on these variables.
+-    We have added the necessary information in configuration file. If you want change the configuration settings open and edit the `config` file (with your favorite text editor) and fill in the required settings to connect to the datastore (elasticsearch). See the [DataStore Settings Environment Variables](/docs/datastore_variables.md) section for details on these variables.
 
 8. Run initial_setup.py to install required nltk corpora and populate DataStore with data from csv files present at `data/entity_data/`.
 
