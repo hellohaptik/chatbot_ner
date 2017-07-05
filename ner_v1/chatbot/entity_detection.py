@@ -3,7 +3,6 @@ from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
-from ner_v1.detectors.textual.city.city_detection_advance import CityAdvanceDetector
 from ner_v1.detectors.temporal.date.date_detection import DateDetector
 from ner_v1.detectors.temporal.date.date_detection_advance import DateAdvanceDetector
 from ner_v1.detectors.pattern.email.email_detection import EmailDetector
@@ -319,20 +318,27 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
     """
     city_detection = CityDetector(entity_name=entity_name)
+    city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
-        entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
+        entity_dict_list = city_detection.detect_entity(text=structured_value)
+        entity_list, original_text_list, detection_method_list = \
+            city_detection.convert_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
+            return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
+                                           detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_value(entity_value=structured_value, original_text=structured_value,
+                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_list, original_text_list, model_detection_type = city_detection.detect_entity(text=message)
+        entity_dict_list = city_detection.detect_entity(text=message)
+        entity_list, original_text_list, detection_method_list = \
+            city_detection.convert_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
-            if model_detection_type:
-                return output_entity_dict_from_model(entity_list, original_text_list, model_detection_type)
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
+            return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
+                                           detection_method_list=detection_method_list)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_value(entity_value=fallback_value, original_text=fallback_value,
+                                            detection_method=FROM_FALLBACK_VALUE)
 
     return None
 
@@ -614,73 +620,6 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
     return None
 
 
-def get_city_advance(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the CityAdvanceDetector class to detect arrival city and departure_city.
-    We can add different properties of city detection in this class
-
-    Attributes:
-        NOTE: Explained above
-
-    Output:
-        NOTE: Explained above
-
-    For Example:
-
-        message = "I want to book a flight from delhhi to mumbai"
-        entity_name = 'city'
-        structured_value = None
-        fallback_value = None
-        bot_message = None
-        output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-            //output without model
-            >> [{'detection': 'message', 'original_text': 'from delhhi to mumbai',
-            'entity_value': {'departure_city': u'New Delhi', 'arrival_city': u'Mumbai'}}]
-
-            //output with model
-            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'delhhi',
-            'entity_value': {'departure_city': u'Delhi', 'arrival_city': None}}, {'detection': 'MODEL_VERIFIED', 
-            'original_text': 'mumbai','entity_value': {'departure_city': None, 'arrival_city': u'Mumbai'}}]
-
-        message = "mummbai"
-        entity_name = 'city'
-        structured_value = None
-        fallback_value = None
-        bot_message = "Please help me departure city?"
-        output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-
-            //output without model
-            >> [{'detection': 'message', 'original_text': 'mummbai',
-            'entity_value': {'departure_city': u'Mumbai', 'arrival_city': None}}]
-            
-            //output with model
-            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'mummbai',
-            'entity_value': {'departure_city': u'Mumbai', 'arrival_city': None}}]
-
-    """
-    city_detection = CityAdvanceDetector(entity_name=entity_name)
-    city_detection.set_bot_message(bot_message=bot_message)
-    if structured_value:
-        entity_list, original_text_list = city_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list, model_detection_type = city_detection.detect_entity(text=message)
-        if entity_list:
-            if model_detection_type:
-                return output_entity_dict_from_model(entity_list, original_text_list, model_detection_type)
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
-
-    return None
-
-
 def get_date_advance(message, entity_name, structured_value, fallback_value, bot_message):
     """This functionality calls the DateAdvanceDetector class to detect departure date and arrival date.
     We can add different properties of date detection in this class
@@ -724,14 +663,16 @@ def get_date_advance(message, entity_name, structured_value, fallback_value, bot
     return None
 
 
-def output_entity_dict_list(entity_value_list=None, original_text_list=None, detection_method=None):
+def output_entity_dict_list(entity_value_list=None, original_text_list=None, detection_method=None,
+                            detection_method_list=None):
     """This function will return the list of dictionary as an output.
 
     Attributes:
         entity_value_list: list of entity values which are identified from given detection logic
         original_text_list: list original values or actual values from message/structured_value which are identified
         detection_method: this will store how the entity is detected i.e. whether from message, structured_value or
-        fallback.
+        fallback, verified from model or not.
+        detection_method_list: this will store how the entity is detected in the list format.
 
     Output:
         [
@@ -742,6 +683,9 @@ def output_entity_dict_list(entity_value_list=None, original_text_list=None, det
             }
         ]
     """
+    if detection_method_list is None:
+        detection_method_list = []
+
     entity_list = []
     count = 0
     if entity_value_list:
@@ -750,14 +694,23 @@ def output_entity_dict_list(entity_value_list=None, original_text_list=None, det
                 entity_value_list[count] = {
                     ENTITY_VALUE_DICT_KEY: entity_value_list[count]
                 }
+            if detection_method_list:
+                entity_list.append(
+                    {
+                        ENTITY_VALUE: entity_value_list[count],
+                        DETECTION_METHOD: detection_method_list[count],
+                        ORIGINAL_TEXT: original_text_list[count]
+                    }
+                )
+            else:
+                entity_list.append(
+                    {
+                        ENTITY_VALUE: entity_value_list[count],
+                        DETECTION_METHOD: detection_method,
+                        ORIGINAL_TEXT: original_text_list[count]
+                    }
+                )
 
-            entity_list.append(
-                {
-                    ENTITY_VALUE: entity_value_list[count],
-                    DETECTION_METHOD: detection_method,
-                    ORIGINAL_TEXT: original_text_list[count]
-                }
-            )
             count += 1
 
     return entity_list
@@ -794,43 +747,4 @@ def output_entity_dict_value(entity_value=None, original_text=None, detection_me
             ORIGINAL_TEXT: original_text
         }
     ]
-    return entity_list
-
-
-def output_entity_dict_from_model(entity_value_list=None, original_text_list=None, detection_method_list=None):
-    """This function will return the list of dictionary as an output.
-    It similar to output_entity_dict_list() except the parameters/attributes i.e. detection_method is list
-
-    Attributes:
-        entity_value_list: list of entity values which are identified from given detection logic
-        original_text_list: list original values or actual values from message/structured_value which are identified
-        detection_method_list: this will store how the entity is detected i.e. whether its verified from model or not.
-
-    Output:
-        [
-            {
-                "entity_value": entity_value,
-                "detection": detection_method,
-                "original_text": original_text
-            }
-        ]
-    """
-    entity_list = []
-    count = 0
-    if entity_value_list:
-        while count < len(entity_value_list):
-            if type(entity_value_list[count]) in [str, unicode]:
-                entity_value_list[count] = {
-                    ENTITY_VALUE_DICT_KEY: entity_value_list[count]
-                }
-
-            entity_list.append(
-                {
-                    ENTITY_VALUE: entity_value_list[count],
-                    DETECTION_METHOD: detection_method_list[count],
-                    ORIGINAL_TEXT: original_text_list[count]
-                }
-            )
-            count += 1
-
     return entity_list

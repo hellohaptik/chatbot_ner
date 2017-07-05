@@ -74,3 +74,12 @@ DAY_DICT = {
     u'6': [u'fri', u'friday'],
     u'7': [u'saturday', u'sat']
 }
+
+# CONSTANTS USED FOR CITY DETECTION
+CITY_FROM_PROPERTY = 'from'
+CITY_TO_PROPERTY = 'to'
+CITY_VIA_PROPERTY = 'via'
+CITY_NORMAL_PROPERTY = 'normal'
+CITY_VALUE = 'city_value'
+ORIGINAL_CITY_TEXT = 'text'
+CITY_DETECTION_METHOD = 'detection_method'
