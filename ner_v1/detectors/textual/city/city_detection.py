@@ -46,15 +46,25 @@ class CityDetector(object):
             text: string to extract entities from
             run_model: Boolean True if model needs to run else False
         Returns:
-            A tuple of two lists with first list containing the detected city and second list containing their
-            corresponding substrings in the given text.
+            It returns the list of dictionary containing the fields like detection_method, from, normal, to,
+            text, value, via
 
             For example:
 
-                (['Mumbai'], ['bombay'])
+                [
+                    {
+                      'detection_method': 'message',
+                      'from': False,
+                      'normal': True,
+                      'text': 'mumbai',
+                      'to': False,
+                      'value': u'BOM',
+                      'via': False
+                    }
+                ]
 
-            Additionally this function assigns these lists to self.city and self.original_city_text attributes
-            respectively.
+
+            Additionally this function assigns this list to self.city
 
         """
         self.text = ' ' + text + ' '
@@ -65,20 +75,14 @@ class CityDetector(object):
         self.city = city_data
         return city_data
 
-    def detect_city(self):
-        """
-        Takes a message and writtens the list of city present in the text
-        :return: tuple (list of location , original text)
-        """
-
     def _detect_city(self):
         """
-        Detects "departure" and "arrival" from the object's text attribute
+        Detects a city and categorises it into "from", "to", "via" and "normal" attributes
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
+            It returns the list of dictionary containing the fields like detection_method, from, normal, to,
+            text, value, via
+
 
         """
         # print 'detection for default task'
@@ -112,6 +116,7 @@ class CityDetector(object):
     def _detect_city_format(self):
         """
 
+
         """
         return self._city_dict_from_text(text=self.processed_text, normal_property=True)
 
@@ -122,14 +127,12 @@ class CityDetector(object):
         and detects the departure city in the first (left) part and detects arrival city in the second (right) part
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as departure_city and city
+            that got detected as arrival_city. For departure city the key "from" will be set to True.
+            Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
         patterns = re.findall(r'\s(([A-Za-z]+)\s*(\-|to|2|and)\s*([A-Za-z\s]+))\.?\b', self.processed_text.lower())
@@ -153,14 +156,12 @@ class CityDetector(object):
         and detects the departure city in the first (left) part and detects arrival city in the second (right) part
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as departure_city and city
+            that got detected as arrival_city. For departure city the key "from" will be set to True.
+            Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
         patterns = re.findall(
@@ -186,14 +187,13 @@ class CityDetector(object):
         and detects the arrival city in the first (left) part and detects departure city in the second (right) part
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as departure_city and city
+            that got detected as arrival_city. For departure city the key "from" will be set to True.
+            Whereas for arrival city the key "to" will be set to True.
+
         """
         city_dict_list = []
         patterns = re.findall(
@@ -218,14 +218,12 @@ class CityDetector(object):
         keywords.
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as departure_city.
+            For departure city the key "from" will be set to True.
+
         """
         city_dict_list = []
         patterns = re.findall(
@@ -246,14 +244,12 @@ class CityDetector(object):
         to these keywords.
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as arrival_city.
+            for arrival city the key "to" will be set to True.
+
         """
         city_dict_list = []
         patterns = re.findall(
@@ -278,14 +274,13 @@ class CityDetector(object):
 
 
         Args:
-            city_list: Optional, list to store dictionaries of detected cities
-            original_list: Optional, list to store corresponding original substrings of text which were detected as
-                            departure and arrival type city entities
+            None
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'departure_city'
-            and 'arrival_city' keys and dictionaries returned form TextDetector as their values,
-            for each detected city, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for city which is detected as departure_city and city
+            that got detected as arrival_city. For departure city the key "from" will be set to True.
+            Whereas for arrival city the key "to" will be set to True.
+
         """
         city_dict_list = []
         departure_city_flag = False
@@ -321,9 +316,35 @@ class CityDetector(object):
     def _city_dict_from_text(self, text, from_property=False, to_property=False, via_property=False,
                              normal_property=False, detection_method=FROM_MESSAGE):
         """
+        Takes the text and the property values and creates a list of dictionaries based on number of cities detected
 
-        :param text:
-        :return:
+        Attributes:
+            text: Text on which TextDetection needs to run on
+            from_property: True if the text is belonging to "from" property". for example, From Mumbai
+            to_property: True if the text is belonging to "to" property". for example, To Mumbai
+            via_property: True if the text is belonging to "via" property". for example, via Mumbai
+            normal_property: True if the text is belonging to "normal" property". for example, atms in Mumbai
+            detection_method: method through which it got detected whether its through message or model
+
+        Returns:
+
+            It returns the list of dictionary containing the fields like detection_method, from, normal, to,
+            text, value, via
+
+            For example:
+
+                [
+                    {
+                      'detection_method': 'message',
+                      'from': False,
+                      'normal': True,
+                      'text': 'mumbai',
+                      'to': False,
+                      'value': u'BOM',
+                      'via': False
+                    }
+                ]
+
         """
         city_dict_list = []
         city_list, original_list = self._city_value(text=text)
@@ -386,9 +407,21 @@ class CityDetector(object):
 
     def convert_dict_in_tuple(self, entity_dict_list):
         """
+        This function takes the input as a list of dictionary and converts it into tuple which is
+        for now the standard format  of individual detector function
 
-        :param entity_dict_list:
-        :return:
+        Attributes:
+            entity_dict_list: List of dictionary containing the detected cities from text. It contains all the
+            necessary information like original_text, value, how its detected and properties like from, to, via and
+            normal
+
+        Returns:
+            Returns the tuple containing list of entity_values, original_text and detection method
+
+            For example:
+
+                (['Mumbai'], ['bombay'], ['message'])
+
         """
         entity_list, original_list, detection_list = [], [], []
         for entity_dict in entity_dict_list:

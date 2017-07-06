@@ -311,10 +311,40 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
             //output without model
-            >> [{'detection': 'message', 'original_text': 'mummbai', 'entity_value': {'value': u'Mumbai'}}]
+            >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
-            //output with model
-            >> [{'detection': 'MODEL_VERIFIED', 'original_text': 'mummbai', 'entity_value': {'value': u'Mumbai'}}]
+
+
+        message = "I want to book a flight from delhhi to mumbai"
+        entity_name = 'city'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [
+            {'detection': 'message', 'original_text': 'delhhi',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
+            {'detection': 'message', 'original_text': 'mumbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+
+
+        message = "mummbai"
+        entity_name = 'city'
+        structured_value = None
+        fallback_value = None
+        bot_message = "Please help me departure city?"
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
+
 
     """
     city_detection = CityDetector(entity_name=entity_name)
