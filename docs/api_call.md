@@ -311,7 +311,7 @@ Following are the list of different entity types along with its API call:
 
 ### city
 
-- This functionality calls the CityDetector class to detect cities.
+- This functionality calls the CityDetector class to detect cities along with its attributes.
 
 - Example:
 
@@ -353,7 +353,112 @@ Following are the list of different entity types along with its API call:
             "detection": "message",
             "original_text": "mummbai",
             "entity_value": {
-              "value": "mumbai"
+              "to": true,
+              "via": false,
+              "from": false,
+              "value": "Mumbai",
+              "normal": false
+            }
+          }
+        ]
+      }
+      ```
+
+  - Example 2:
+
+    - ```python
+      message = "I want to book a flight from delhhi to mumbai"
+      entity_name = 'city'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_city
+      output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      print output
+      ```
+
+    - CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/city/?message=I%20want%20to%20book%20a%20flight%20from%20delhhi%20to%20mumbai&entity_name=city&structured_value=&fallback_value=&bot_message='
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message",
+            "original_text": "delhhi",
+            "entity_value": {
+              "to": false,
+              "via": false,
+              "from": true,
+              "value": "New Delhi",
+              "normal": false
+            }
+          },
+          {
+            "detection": "message",
+            "original_text": "mumbai",
+            "entity_value": {
+              "to": true,
+              "via": false,
+              "from": false,
+              "value": "Mumbai",
+              "normal": false
+            }
+          }
+        ]
+      }
+      ```
+
+  - Example 3:
+
+    - ```python
+      message = "mummbai"
+      entity_name = 'city'
+      structured_value = None
+      fallback_value = None
+      bot_message = "Please help me departure city?"
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/city/?message=mummbai&entity_name=city&structured_value=&fallback_value=&bot_message=Please%20help%20me%20departure%20city%3F'
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message",
+            "original_text": "mummbai",
+            "entity_value": {
+              "to": false,
+              "via": false,
+              "from": true,
+              "value": "Mumbai",
+              "normal": false
             }
           }
         ]
@@ -786,96 +891,6 @@ Following are the list of different entity types along with its API call:
             "original_text": "36",
             "entity_value": {
               "value": "36"
-            }
-          }
-        ]
-      }
-      ```
-
-### city_advance
-
-- This functionality calls the CityAdvanceDetector class to detect arrival city and departure_city.
-
-- Example:
-
-  - Example 1:
-
-    - ```python
-      message = "I want to book a flight from delhhi to mumbai"
-      entity_name = 'city'
-      structured_value = None
-      fallback_value = None
-      bot_message = None
-      ```
-
-    - *Python:*
-
-      ```python
-      from ner_v1.chatbot.entity_detection import get_city_advance
-      output = get_city_advance(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
-      print output
-      ```
-
-    - CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      ```
-
-      ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/city_advance/?message=I%20want%20to%20book%20a%20flight%20from%20delhhi%20to%20mumbai&entity_name=city&structured_value=&fallback_value=&bot_message='
-      ```
-
-    - *CURL Output:*
-
-      ```json
-      {
-        "data": [
-          {
-            "detection": "message",
-            "original_text": "from delhhi to mumbai",
-            "entity_value": {
-              "departure_city": "New Delhi",
-              "arrival_city": "Mumbai"
-            }
-          }
-        ]
-      }
-      ```
-
-  - Example 2:
-
-    - ```python
-      message = "mummbai"
-      entity_name = 'city'
-      structured_value = None
-      fallback_value = None
-      bot_message = "Please help me departure city?"
-      ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      ```
-
-      ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/city_advance/?message=mummbai&entity_name=city&structured_value=&fallback_value=&bot_message=Please%20help%20me%20departure%20city%3F'
-      ```
-
-    - *CURL Output:*
-
-      ```json
-      {
-        "data": [
-          {
-            "detection": "message",
-            "original_text": "mummbai",
-            "entity_value": {
-              "departure_city": "Mumbai",
-              "arrival_city": null
             }
           }
         ]

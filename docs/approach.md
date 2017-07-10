@@ -61,21 +61,20 @@ We have classified entities into four main types i.e. *numeral*, *pattern*, *tem
 
   Following are the different detection logics used in detecting entities:
 
-| Entity type   | Class Name           | Description                              | example                              |
-| :------------ | -------------------- | :--------------------------------------- | ------------------------------------ |
-| text          | TextDetector         | Detects custom entities in text string by performing similarity searches against a list fetched from datastore. | Mainland china, Sneakers, La La Land |
-| email         | EmailDetector        | Detects email addresses in given text.   | apurva.n@haptik.ai                   |
-| phone_number  | PhoneDetector        | Detects phone numbers in given text.     | +919222222222                        |
-| pnr           | PNRDetector          | Detects PNR (serial) codes  in given text. | 4SGX3E, 9876543210                   |
-| date          | DateDetector         | Detects date in various formats from given text. | 28-12-2096, 09th Nov 2014, Tomorrow  |
-| date_advance  | DateAdvanceDetector  | Detects dates subject to conditions like "departure date" and "return date". | on 21st January, to 22nd Jan         |
-| city          | CityDetector         | Similar to TextDetection. It detects citites from the text. | Delhi, Mumbai, Andheri               |
-| city_advance  | CityAdvanceDetector  | Detects city with some advance properties like departure city and arrival city that is used in travelling purpose. | from mumbai, mumbai to pune          |
-| location      | LocationDetector     | Detects location from the text. It is similar to TextDetection but we are trying to improve it with better version. | Andheri, Goregaon                    |
-| time          | TimeDetector         | Detects time in various formats from given text. | in 15 mins,  12:30pm, 4:30           |
-| budget        | BudgetDetector       | Detects the budget from the text.        | less than 3000, 3-4k,  less than 2k  |
-| number        | NumberDetector       | Detects number from the text.            | for 3 people, 30 units               |
-| shopping_size | ShoppingSizeDetector | Detects size which are used for shopping. | XL, large, 34 size                   |
+| Entity type   | Class Name           | Description                              | example                                  |
+| :------------ | -------------------- | :--------------------------------------- | ---------------------------------------- |
+| text          | TextDetector         | Detects custom entities in text string by performing similarity searches against a list fetched from datastore. | Mainland china, Sneakers, La La Land     |
+| email         | EmailDetector        | Detects email addresses in given text.   | apurva.n@haptik.ai                       |
+| phone_number  | PhoneDetector        | Detects phone numbers in given text.     | +919222222222                            |
+| pnr           | PNRDetector          | Detects PNR (serial) codes  in given text. | 4SGX3E, 9876543210                       |
+| date          | DateDetector         | Detects date in various formats from given text. | 28-12-2096, 09th Nov 2014, Tomorrow      |
+| date_advance  | DateAdvanceDetector  | Detects dates subject to conditions like "departure date" and "return date". | on 21st January, to 22nd Jan             |
+| city          | CityDetector         | Identifies the city from the text along with its properties | Delhi, Mumbai, from mumbai, mumbai to pune |
+| location      | LocationDetector     | Detects location from the text. It is similar to TextDetection but we are trying to improve it with better version. | Andheri, Goregaon                        |
+| time          | TimeDetector         | Detects time in various formats from given text. | in 15 mins,  12:30pm, 4:30               |
+| budget        | BudgetDetector       | Detects the budget from the text.        | less than 3000, 3-4k,  less than 2k      |
+| number        | NumberDetector       | Detects number from the text.            | for 3 people, 30 units                   |
+| shopping_size | ShoppingSizeDetector | Detects size which are used for shopping. | XL, large, 34 size                       |
 
 > **NOTE**:  path to the above entity_types -> `ner_v1/entities/`
 
@@ -214,25 +213,25 @@ output:
 Following are the list of entities which we have provided for detection purpose:
 
 
-| entity_name      | type                     | description                              |
-| ---------------- | ------------------------ | ---------------------------------------- |
-| restaurant       | text                     | Detection of restaurant names from India |
-| movie            | text                     | Detction of movie names. Mostly, Indian  |
-| dish             | text                     | Dish detection                           |
-| cuisine          | text                     | Cuisine detection. For example, pizza, italian, chinese |
-| footwear         | text                     | Footwear detection. For example, shoes, sandals, |
-| date             | date, date advance       | Date detection, also detection of additional properties using date_advance |
-| time             | time                     | Time detection                           |
-| city             | city, text, city_advance | City detection, also detection of additional properties using city_advance |
-| locality         | location, text           | Detection of indian localities           |
-| train_pnr        | pnr                      | PNR identification for trains            |
-| flight_pnr       | pnr                      | PNR identification for flights           |
-| number_of_people | number                   | Detection of number of people from text  |
-| number_of_units  | number                   | Detection of numberof units              |
-| budget           | budget                   | Detection of budget                      |
-| shopping_size    | size                     | Detects size which are used for shopping. |
-| phone_number     | phone_number             | Phone number detection                   |
-| brand            | text                     | Brand detection of apparels. For example, adidas, nike |
-| email            | email                    | Email detection                          |
+| entity_name      | type               | description                              |
+| ---------------- | ------------------ | ---------------------------------------- |
+| restaurant       | text               | Detection of restaurant names from India |
+| movie            | text               | Detction of movie names. Mostly, Indian  |
+| dish             | text               | Dish detection                           |
+| cuisine          | text               | Cuisine detection. For example, pizza, italian, chinese |
+| footwear         | text               | Footwear detection. For example, shoes, sandals, |
+| date             | date, date advance | Date detection, also detection of additional properties using date_advance |
+| time             | time               | Time detection                           |
+| city             | city               | City detection                           |
+| locality         | location, text     | Detection of indian localities           |
+| train_pnr        | pnr                | PNR identification for trains            |
+| flight_pnr       | pnr                | PNR identification for flights           |
+| number_of_people | number             | Detection of number of people from text  |
+| number_of_units  | number             | Detection of numberof units              |
+| budget           | budget             | Detection of budget                      |
+| shopping_size    | size               | Detects size which are used for shopping. |
+| phone_number     | phone_number       | Phone number detection                   |
+| brand            | text               | Brand detection of apparels. For example, adidas, nike |
+| email            | email              | Email detection                          |
 
 > **NOTE:** To run and check the above entities please have a look at [API call example documentation](api_call.md).
