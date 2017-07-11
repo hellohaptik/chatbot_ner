@@ -91,5 +91,9 @@ if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AW
     CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
+elif ES_AWS_REGION and ES_AWS_SERVICE:
+    CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
+    CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
+    CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
 else:
     ner_logger.debug('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
