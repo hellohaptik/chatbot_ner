@@ -1,4 +1,6 @@
 import re
+from models.constants import CITY_ENTITY_TYPE, CITY_VALUE
+from models.models import Models
 from ner_v1.constant import FROM_MESSAGE
 import ner_v1.detectors.constant as detector_constant
 from ner_v1.detectors.textual.text.text_detection import TextDetector
@@ -39,7 +41,7 @@ class CityDetector(object):
         self.text_detection_object = TextDetector(entity_name=entity_name)
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, run_model=False):
         """Detects city in the text string
 
         Args:
@@ -71,7 +73,10 @@ class CityDetector(object):
         self.text = self.text.lower()
         self.processed_text = self.text
         self.tagged_text = self.text
-        city_data = self._detect_city()
+        if run_model:
+             city_data = self._city_model_detection()
+        if not run_model or not city_data:
+            city_data = self._detect_city()
         self.city = city_data
         return city_data
 
@@ -438,3 +443,47 @@ class CityDetector(object):
             original_list.append(entity_dict[detector_constant.ORIGINAL_CITY_TEXT])
             detection_list.append(entity_dict[detector_constant.CITY_DETECTION_METHOD])
         return entity_list, original_list, detection_list
+
+    def city_model_detection(self):
+        """
+        This function calls get_model_output() method of PredictCRF class and verifies the values returned by it.
+        If the cities provided by crf are present in the datastore, it sets the value MODEL_VERIFIED
+        else MODEL_NOT_VERFIED is set.
+        And returns the final list of all detected items with each value containing a field to show whether the value
+        if verified or not
+
+        For Example:
+            Note:  before calling this method you need to call set_bot_message() to set a bot message.
+
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'mummbai
+
+            final values of all lists:
+                model_output = [{'city':'mummbai', 'from': 1, 'to': 0, 'via': 0}]
+
+                The for loop verifies each city in model_output list by checking whether it exists in datastore
+                or not(by running elastic search).
+                If not then sets the value MODEL_NOT_VERIFIED else MODEL_VERIFIED
+                finally it returns ['Mumbai'], ['mummbai'], [MODEL_VERIFIED]
+
+        For Example:
+
+            self.bot_message = 'Please help me with your departure city?'
+            self.text = 'dehradun'
+
+            final values of all lists:
+                 model_output = [{'city':'dehradun', 'from': 1, 'to': 0, 'via': 0}]
+
+                 Note: Dehradun is not present in out datastore so it will take original value as entity value.
+
+                finally it returns ['dehradun'], ['dehradun'], [MODEL_NOT_VERIFIED]
+        """
+        city_dict_list = []
+        model_object = Models()
+        model_output = model_object.run_model(entity_type=CITY_ENTITY_TYPE, bot_message=self.bot_message,
+                                              user_message=self.text)
+        for output in model_output:
+            city_dict_list.append(
+            self._city_dict_from_text(text=model_output[])
+            )
+
