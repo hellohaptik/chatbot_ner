@@ -77,7 +77,7 @@ def make_json(city_value, from_bool, to_bool, via_bool, normal_bool):
         constants.CITY_VALUE: city_value,
         constants.FROM: from_bool,
         constants.TO: to_bool,
-        constants.VIA: via_bool
+        constants.VIA: via_bool,
         constants.NORMAL: normal_bool
     }
     return python_dict
@@ -116,8 +116,8 @@ def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool
                     return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool, normal_bool=normal_bool)
                 else:
                     entity_value = entity_value + ' ' + reader_list[check_pointer][0]
-                    check_pointer += 1
                     if check_pointer == (len(reader_list) - 1):
                         return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool,
                                          via_bool=via_bool, normal_bool=normal_bool)
+                    check_pointer += 1
     return list_json
