@@ -1,5 +1,5 @@
 import re
-import models.constants as model_constant
+import models.constant as model_constant
 from models.models import Models
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 import ner_v1.detectors.constant as detector_constant

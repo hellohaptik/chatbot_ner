@@ -1,5 +1,5 @@
 from chatbot_ner.config import CITY_MODEL_TYPE
-import models.constants as model_constant
+import models.constant as model_constant
 from models.crf.test import PredictCRF
 
 

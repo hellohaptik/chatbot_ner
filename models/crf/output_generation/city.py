@@ -1,4 +1,4 @@
-from models import constants
+import models.constant as model_constant
 
 
 def generate_city_output(crf_data):
@@ -28,29 +28,31 @@ def generate_city_output(crf_data):
             pass
         else:
             temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
-                                    begin_label=constants.CITY_FROM_B, inner_label=constants.CITY_FROM_I,
+                                    begin_label=model_constant.CITY_FROM_B, inner_label=model_constant.CITY_FROM_I,
                                     from_bool=True, to_bool=False, via_bool=False, normal_bool=False)
             if len(temp_list) is not 0:
                 list_json.append(temp_list)
 
             else:
                 temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
-                                        begin_label=constants.CITY_TO_B, inner_label=constants.CITY_TO_I,
+                                        begin_label=model_constant.CITY_TO_B, inner_label=model_constant.CITY_TO_I,
                                         from_bool=False, to_bool=True, via_bool=False, normal_bool=False)
                 if len(temp_list) is not 0:
                     list_json.append(temp_list)
 
                 else:
                     temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
-                                            begin_label=constants.CITY_VIA_B, inner_label=constants.CITY_VIA_I,
-                                            from_bool=False, to_bool=False, via_bool=True, normal_bool=False)
+                                            begin_label=model_constant.CITY_VIA_B,
+                                            inner_label=model_constant.CITY_VIA_I, from_bool=False, to_bool=False,
+                                            via_bool=True, normal_bool=False)
                     if len(temp_list) is not 0:
                         list_json.append(temp_list)
 
                     else:
                         temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
-                                                begin_label=constants.CITY_NORMAL_B, inner_label=constants.CITY_NORMAL_I,
-                                                from_bool=False, to_bool=False, via_bool=False, normal_bool=True)
+                                                begin_label=model_constant.CITY_NORMAL_B,
+                                                inner_label=model_constant.CITY_NORMAL_I, from_bool=False,
+                                                to_bool=False, via_bool=False, normal_bool=True)
 
                         if len(temp_list) is not 0:
                             list_json.append(temp_list)
@@ -74,11 +76,11 @@ def make_json(city_value, from_bool, to_bool, via_bool, normal_bool):
             {'city': 'delhi', 'via': False, 'from': True, 'to': False, 'normal': False}
     """
     python_dict = {
-        constants.CITY_VALUE: city_value,
-        constants.FROM: from_bool,
-        constants.TO: to_bool,
-        constants.VIA: via_bool,
-        constants.NORMAL: normal_bool
+        model_constant.MODEL_CITY_VALUE: city_value,
+        model_constant.MODEL_CITY_FROM: from_bool,
+        model_constant.MODEL_CITY_TO: to_bool,
+        model_constant.MODEL_CITY_VIA: via_bool,
+        model_constant.MODEL_CITY_NORMAL: normal_bool
     }
     return python_dict
 
@@ -108,12 +110,14 @@ def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool
     if reader_list[reader_pointer][1] == begin_label:
         entity_value = reader_list[reader_pointer][0]
         if reader_pointer == (len(reader_list) - 1):
-            return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool, normal_bool=normal_bool)
+            return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool,
+                             normal_bool=normal_bool)
         else:
             check_pointer = reader_pointer + 1
             while check_pointer < (len(reader_list)):
                 if reader_list[check_pointer][1] != inner_label:
-                    return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool, normal_bool=normal_bool)
+                    return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool,
+                                     normal_bool=normal_bool)
                 else:
                     entity_value = entity_value + ' ' + reader_list[check_pointer][0]
                     if check_pointer == (len(reader_list) - 1):
