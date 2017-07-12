@@ -107,5 +107,5 @@ else:
 
 CITY_MODEL_TYPE = os.environ.get('CITY_MODEL_TYPE')
 CITY_MODEL_PATH = os.environ.get('CITY_MODEL_PATH')
-if not CITY_MODEL_TYPE:
+if not CITY_MODEL_PATH:
     CITY_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'city', 'model_13062017.crf')

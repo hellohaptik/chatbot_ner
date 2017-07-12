@@ -1,6 +1,6 @@
 from chatbot_ner.config import CITY_MODEL_TYPE
-import models.constant as model_constant
-from models.crf.test import PredictCRF
+from .constant import CRF_MODEL_TYPE, CITY_ENTITY_TYPE
+from .crf.test import PredictCRF
 
 
 class Models(object):
@@ -25,8 +25,8 @@ class Models(object):
              The output detected from the respective model
         """
         output_list = []
-        if entity_type == model_constant.CITY_ENTITY_TYPE:
-            if CITY_MODEL_TYPE == model_constant.CRF_MODEL_TYPE:
+        if entity_type == CITY_ENTITY_TYPE:
+            if CITY_MODEL_TYPE == CRF_MODEL_TYPE:
                 crf_object = PredictCRF()
                 output_list = crf_object.get_model_output(entity_type=entity_type, bot_message=bot_message,
                                                           user_message=user_message)

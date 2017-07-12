@@ -107,7 +107,7 @@ def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool
         [{'city': 'delhi', 'via': False, 'from': True, 'to': False, 'normal': False}]
     """
     list_json = []
-    if reader_list[reader_pointer][1] == begin_label:
+    if reader_list[reader_pointer][1].upper() == begin_label:
         entity_value = reader_list[reader_pointer][0]
         if reader_pointer == (len(reader_list) - 1):
             return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool,
@@ -115,7 +115,7 @@ def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool
         else:
             check_pointer = reader_pointer + 1
             while check_pointer < (len(reader_list)):
-                if reader_list[check_pointer][1] != inner_label:
+                if reader_list[check_pointer][1].upper() != inner_label:
                     return make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool,
                                      normal_bool=normal_bool)
                 else:
