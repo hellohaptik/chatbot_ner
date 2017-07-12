@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
-from models.constant import CITY_ENTITY_TYPE
+from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT
 from models.constant import INBOUND, OUTBOUND
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH
 from models.crf.output_generation.city import generate_city_output
@@ -101,10 +101,12 @@ class PredictCRF(object):
             entity_type: type of entity
 
         """
-
+        global CITY_MODEL_OBJECT
         if entity_type == CITY_ENTITY_TYPE:
             self._model_path = CITY_MODEL_PATH
-            self.tagger = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+            if not CITY_MODEL_OBJECT:
+                CITY_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+            self.tagger = CITY_MODEL_OBJECT
 
     def add_data_to_tagger(self, bot_message, user_message):
         """
