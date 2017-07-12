@@ -24,7 +24,7 @@ def generate_city_output(crf_data):
     list_json = []
     read_line = 0
     while read_line < (len(crf_data)):
-        if crf_data[read_line][1] == 'O':
+        if crf_data[read_line][1] == model_constant.CITY_O:
             pass
         else:
             temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,

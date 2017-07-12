@@ -3,6 +3,7 @@ CRF_MODEL_TYPE = 'crf'
 # Entity types for models
 CITY_ENTITY_TYPE = 'city'
 # city tags for crf
+CITY_O = 'O'
 CITY_FROM_B = 'FROM-B'
 CITY_TO_B = 'TO-B'
 CITY_VIA_B = 'VIA-B'
@@ -22,5 +23,3 @@ MODEL_CITY_NORMAL = 'normal'
 # Tags for inbound and outbound message in crf
 INBOUND = 'i'
 OUTBOUND = 'o'
-
-CITY_MODEL_OBJECT = None  # stores the model object for city
