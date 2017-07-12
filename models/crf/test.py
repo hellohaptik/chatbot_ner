@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
-from models.constant import CITY_ENTITY_TYPE
+from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT
 from models.constant import INBOUND, OUTBOUND
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH
 from models.crf.output_generation.city import generate_city_output

@@ -23,3 +23,5 @@ MODEL_CITY_NORMAL = 'normal'
 # Tags for inbound and outbound message in crf
 INBOUND = 'i'
 OUTBOUND = 'o'
+
+CITY_MODEL_OBJECT = None  # store city model object
