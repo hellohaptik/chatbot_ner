@@ -85,7 +85,6 @@ class PredictCRF(object):
             crf_output = self.run_crf()
             if entity_type == CITY_ENTITY_TYPE:
                 output_list = generate_city_output(crf_data=crf_output)
-                ner_logger.debug('CITY CRF model loaded')
         else:
             ner_logger.debug('MODEL IS NOT RUNNING: CRFPP not installed')
 
@@ -107,6 +106,8 @@ class PredictCRF(object):
             self._model_path = CITY_MODEL_PATH
             if not CITY_MODEL_OBJECT:
                 CITY_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+                ner_logger.debug('CITY CRF model loaded')
+
             self.tagger = CITY_MODEL_OBJECT
 
     def add_data_to_tagger(self, bot_message, user_message):
