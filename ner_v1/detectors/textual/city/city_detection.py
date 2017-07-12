@@ -41,11 +41,12 @@ class CityDetector(object):
         self.text_detection_object = TextDetector(entity_name=entity_name)
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, run_model=False):
         """Detects city in the text string
 
         Args:
             text: string to extract entities from
+            run_model: True if model needs to be run else False
         Returns:
             It returns the list of dictionary containing the fields like detection_method, from, normal, to,
             text, value, via
@@ -72,8 +73,10 @@ class CityDetector(object):
         self.text = self.text.lower()
         self.processed_text = self.text
         self.tagged_text = self.text
-        city_data = self._city_model_detection()
-        if not city_data:
+        city_data = []
+        if run_model:
+            city_data = self._city_model_detection()
+        if not run_model or not city_data:
             city_data = self._detect_city()
         self.city = city_data
         return city_data
