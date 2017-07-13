@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
-from models.constants import CITY_MODEL_PATH, CITY_ENTITY_TYPE
-from models.constants import CITY_FROM_B, CITY_TO_B, CITY_VIA_B, CITY_FROM_I, CITY_TO_I, CITY_VIA_I, INBOUND, \
-    OUTBOUND, FROM, TO, VIA, CITY_VALUE
-from chatbot_ner.config import ner_logger
+from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT
+from models.constant import INBOUND, OUTBOUND
+from chatbot_ner.config import ner_logger, CITY_MODEL_PATH
+from models.crf.output_generation.city import generate_city_output
 
 try:
     import CRFPP
@@ -16,6 +16,7 @@ except ImportError:
 The class PredictCRF uses context random fields to establish relationship between words in the sentence
 You have been given a template which it follows to achieve this.
 
+This is explanation wrt. city detection
 We have used seven types of labels to tag our data for ENTITY='city':
 
     Begining of departure city name is marked with label----- 'from-B'
@@ -79,11 +80,11 @@ class PredictCRF(object):
         """
         output_list = []
         if MODEL_RUN:
-            self.initialize_files(CITY_ENTITY_TYPE)
+            self.initialize_files(entity_type=entity_type)
             self.add_data_to_tagger(bot_message, user_message)
             crf_output = self.run_crf()
             if entity_type == CITY_ENTITY_TYPE:
-                output_list = self.generate_city_output(crf_data=crf_output)
+                output_list = generate_city_output(crf_data=crf_output)
         else:
             ner_logger.debug('MODEL IS NOT RUNNING: CRFPP not installed')
 
@@ -100,10 +101,14 @@ class PredictCRF(object):
             entity_type: type of entity
 
         """
-
+        global CITY_MODEL_OBJECT
         if entity_type == CITY_ENTITY_TYPE:
             self._model_path = CITY_MODEL_PATH
-            self.tagger = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+            if not CITY_MODEL_OBJECT:
+                CITY_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+                ner_logger.debug('CITY CRF model loaded %s' % self._model_path)
+
+            self.tagger = CITY_MODEL_OBJECT
 
     def add_data_to_tagger(self, bot_message, user_message):
         """
@@ -161,107 +166,3 @@ class PredictCRF(object):
         for i in range(0, size):
             output.append([self.tagger.x(i, 0), self.tagger.y2(i)])
         return output
-
-    def generate_city_output(self, crf_data):
-        """
-        This function takes a list of crf output as input and returns a json with proper tags of the entity
-
-        for Example:
-            bot_message = 'none'
-            user_message = 'flights for delhi to goa'
-
-            Then run_crf will give the following output:
-                crf_data = [['none','O'], ['flights', 'O'], ['from', 'O'], ['delhi', 'from-B'], ['to', 'O'],
-                ['goa', 'to-B']]
-
-            Calling generate_city_output with crf_output_list will extract required text and return a json in the
-            following form:
-                [[{'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}], [{'city': 'goa', 'via': 0, 'from': 0, 'to': 1}]]
-
-        This functions iterates over the list and calls the check_label which will return a json list of tagged words.
-
-        """
-        list_json = []
-        read_line = 0
-        while read_line < (len(crf_data)):
-            if crf_data[read_line][1] == 'O':
-                pass
-            else:
-                temp_list = self.check_label(reader_list=crf_data, reader_pointer=read_line,
-                                             begin_label=CITY_FROM_B, inner_label=CITY_FROM_I, from_bool=1, to_bool=0,
-                                             via_bool=0)
-                if len(temp_list) is not 0:
-                    list_json.append(temp_list)
-
-                else:
-                    temp_list = self.check_label(reader_list=crf_data, reader_pointer=read_line,
-                                                 begin_label=CITY_TO_B, inner_label=CITY_TO_I, from_bool=0, to_bool=1,
-                                                 via_bool=0)
-                    if len(temp_list) is not 0:
-                        list_json.append(temp_list)
-
-                    else:
-                        temp_list = self.check_label(reader_list=crf_data, reader_pointer=read_line,
-                                                     begin_label=CITY_VIA_B, inner_label=CITY_VIA_I,
-                                                     from_bool=0, to_bool=0, via_bool=1)
-                        if len(temp_list) is not 0:
-                            list_json.append(temp_list)
-            read_line += 1
-        return list_json
-
-    def make_json(self, city_value, from_bool, to_bool, via_bool):
-        """
-        This function return json of the value found in function check_label
-
-        for Example:
-            Args:
-                city_value = 'delhi'
-                from_bool = 1
-                to_bool = 0
-                via_bool = 0
-
-            then calling this function with ab ove parameters will give:
-                {'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}
-        """
-        python_dict = {CITY_VALUE: city_value, FROM: from_bool, TO: to_bool, VIA: via_bool}
-        return python_dict
-
-    def check_label(self, reader_list, reader_pointer, begin_label, inner_label, from_bool, to_bool, via_bool):
-        """
-        this function checks if a particular word has been given a particular label
-
-        for Example:
-            Args:
-                reader_list = list returned by run_crf
-                reader_pointer = 3
-                begin_label = CITY_FROM_B
-                inner_label = VITY_FROM_I
-                from_bool = 1
-                to_bool = 0
-                via_bool = 0
-
-            When check_label is called with above parameters, it checks if the word has been given CITY_FROM_B label
-            and its following words
-            have CITY_FROM_I label. I so it returns the proper json.
-            For above inputs it will return
-            [{'city': 'delhi', 'via': 0, 'from': 1, 'to': 0}]
-        """
-        list_json = []
-        if reader_list[reader_pointer][1] == begin_label:
-            entity_value = reader_list[reader_pointer][0]
-            if reader_pointer == (len(reader_list) - 1):
-                return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool, via_bool=via_bool)
-
-            else:
-                check_pointer = reader_pointer + 1
-                while check_pointer < (len(reader_list)):
-                    if reader_list[check_pointer][1] != inner_label:
-                        return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool,
-                                              via_bool=via_bool)
-                    else:
-                        entity_value = entity_value + ' ' + reader_list[check_pointer][0]
-                        check_pointer += 1
-                        if check_pointer == (len(reader_list) - 1):
-                            return self.make_json(city_value=entity_value, from_bool=from_bool, to_bool=to_bool,
-                                                  via_bool=via_bool)
-        return list_json

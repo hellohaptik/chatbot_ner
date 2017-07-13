@@ -10,9 +10,9 @@ FROM_STRUCTURE_VALUE_NOT_VERIFIED = 'structure_value_not_verified'
 # entity is detected from fallback_value
 FROM_FALLBACK_VALUE = 'fallback_value'
 # entity is detected from a message, through model and verified from the dictionary
-MODEL_VERIFIED = 'model_verified'
+FROM_MODEL_VERIFIED = 'model_verified'
 # entity is detected from a message, through model and but not verified from the dictionary
-MODEL_NOT_VERIFIED = 'model_not_verified'
+FROM_MODEL_NOT_VERIFIED = 'model_not_verified'
 
 # ************************ constant used as key of output dictionary in entity detection ************************
 # Consider this example for below reference 'I want to order from mcd'

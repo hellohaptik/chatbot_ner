@@ -6,6 +6,7 @@ from elasticsearch import RequestsHttpConnection
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, 'config')
+MODEL_CONFIG_PATH = os.path.join(BASE_DIR, 'model_config')
 
 LOG_PATH = BASE_DIR + '/logs/'
 # SET UP NER LOGGING
@@ -97,3 +98,14 @@ elif ES_AWS_REGION and ES_AWS_SERVICE:
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
 else:
     ner_logger.debug('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
+
+if os.path.exists(MODEL_CONFIG_PATH):
+    dotenv.read_dotenv(MODEL_CONFIG_PATH)
+else:
+    ner_logger.debug('Warning: no file named "model_config" found at %s. This is not a problem if you '
+                     'dont want to run NER with ML models', MODEL_CONFIG_PATH)
+
+CITY_MODEL_TYPE = os.environ.get('CITY_MODEL_TYPE')
+CITY_MODEL_PATH = os.environ.get('CITY_MODEL_PATH')
+if not CITY_MODEL_PATH:
+    CITY_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'city', 'model_13062017.crf')

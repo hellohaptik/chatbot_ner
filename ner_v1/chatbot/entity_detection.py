@@ -314,6 +314,11 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             >> [{'detection': 'message', 'original_text': 'mummbai',
             'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
+            //output with model
+            >>[{'detection': 'model_verified', 'original_text': 'mummbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+
 
 
         message = "I want to book a flight from delhhi to mumbai"
@@ -331,6 +336,12 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             {'detection': 'message', 'original_text': 'mumbai',
             'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
+            //output with model
+            >> [
+            {'detection': 'model_verified', 'original_text': 'delhhi',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
+            {'detection': 'model_verified', 'original_text': 'mumbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
 
         message = "mummbai"
@@ -343,6 +354,10 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         print output
             //output without model
             >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
+
+            //output with model
+            >> [{'detection': 'model_verified', 'original_text': 'mummbai',
             'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
 
 
@@ -360,7 +375,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             return output_entity_dict_value(entity_value=structured_value, original_text=structured_value,
                                             detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_dict_list = city_detection.detect_entity(text=message)
+        entity_dict_list = city_detection.detect_entity(text=message, run_model=True)
         entity_list, original_text_list, detection_method_list = \
             city_detection.convert_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
