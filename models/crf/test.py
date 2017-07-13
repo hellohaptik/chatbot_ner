@@ -106,7 +106,7 @@ class PredictCRF(object):
             self._model_path = CITY_MODEL_PATH
             if not CITY_MODEL_OBJECT:
                 CITY_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
-                ner_logger.debug('CITY CRF model loaded')
+                ner_logger.debug('CITY CRF model loaded %s' % self._model_path)
 
             self.tagger = CITY_MODEL_OBJECT
 

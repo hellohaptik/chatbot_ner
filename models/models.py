@@ -11,6 +11,7 @@ class Models(object):
         """
         Initalises the object
         """
+        pass
 
     def run_model(self, entity_type, bot_message, user_message):
         """

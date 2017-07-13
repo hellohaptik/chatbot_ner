@@ -30,14 +30,14 @@ def generate_city_output(crf_data):
             temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
                                     begin_label=model_constant.CITY_FROM_B, inner_label=model_constant.CITY_FROM_I,
                                     from_bool=True, to_bool=False, via_bool=False, normal_bool=False)
-            if len(temp_list) is not 0:
+            if temp_list:
                 list_json.append(temp_list)
 
             else:
                 temp_list = check_label(reader_list=crf_data, reader_pointer=read_line,
                                         begin_label=model_constant.CITY_TO_B, inner_label=model_constant.CITY_TO_I,
                                         from_bool=False, to_bool=True, via_bool=False, normal_bool=False)
-                if len(temp_list) is not 0:
+                if temp_list:
                     list_json.append(temp_list)
 
                 else:
@@ -45,7 +45,7 @@ def generate_city_output(crf_data):
                                             begin_label=model_constant.CITY_VIA_B,
                                             inner_label=model_constant.CITY_VIA_I, from_bool=False, to_bool=False,
                                             via_bool=True, normal_bool=False)
-                    if len(temp_list) is not 0:
+                    if temp_list:
                         list_json.append(temp_list)
 
                     else:
@@ -54,7 +54,7 @@ def generate_city_output(crf_data):
                                                 inner_label=model_constant.CITY_NORMAL_I, from_bool=False,
                                                 to_bool=False, via_bool=False, normal_bool=True)
 
-                        if len(temp_list) is not 0:
+                        if temp_list:
                             list_json.append(temp_list)
         read_line += 1
     return list_json
