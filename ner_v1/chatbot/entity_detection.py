@@ -314,6 +314,11 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             >> [{'detection': 'message', 'original_text': 'mummbai',
             'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
+            //output with model
+            >>[{'detection': 'model_verified', 'original_text': 'mummbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+
 
 
         message = "I want to book a flight from delhhi to mumbai"
@@ -331,6 +336,12 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             {'detection': 'message', 'original_text': 'mumbai',
             'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
+            //output with model
+            >> [
+            {'detection': 'model_verified', 'original_text': 'delhhi',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
+            {'detection': 'model_verified', 'original_text': 'mumbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
 
 
         message = "mummbai"
@@ -343,6 +354,10 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         print output
             //output without model
             >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
+
+            //output with model
+            >> [{'detection': 'model_verified', 'original_text': 'mummbai',
             'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
 
 
