@@ -85,6 +85,7 @@ class PredictCRF(object):
             crf_output = self.run_crf()
             if entity_type == CITY_ENTITY_TYPE:
                 output_list = generate_city_output(crf_data=crf_output)
+                ner_logger.debug('NER MODEL OUTPUT: %s' % output_list)
         else:
             ner_logger.debug('MODEL IS NOT RUNNING: CRFPP not installed')
 
@@ -165,4 +166,5 @@ class PredictCRF(object):
         size = self.tagger.size()
         for i in range(0, size):
             output.append([self.tagger.x(i, 0), self.tagger.y2(i)])
+        self.tagger.clear()
         return output
