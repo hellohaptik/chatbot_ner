@@ -31,21 +31,21 @@
 4.  Clone the repository
 
     ```shell
-       $ cd ~/
-       $ git clone https://github.com/hellohaptik/chatbot_ner.git
-       $ cd chatbot_ner
+        $ cd ~/
+        $ git clone https://github.com/hellohaptik/chatbot_ner.git
+        $ cd chatbot_ner
     ```
 
 5.  Install the requirements with pip
 
     ```shell
-       $ pip install -r requirements.txt
+        $ pip install -r requirements.txt
     ```
 
 6.  Install Java and setup Elasticsearch
 
-        You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally.
-        NOTE: If you have >= JDK 1.7.x then you can setup elasticsearch directly.   
+         You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally.
+         NOTE: If you have >= JDK 1.7.x then you can setup elasticsearch directly.   
 
     -  Ubuntu:
 
@@ -58,7 +58,7 @@
 
     -  Mac OSX:
 
-            Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
+             Please refer to https://docs.oracle.com/javase/8/docs/technotes/guides/install/mac_jdk.html#A1096855 to install Oracle JDK 1.8.x on OSX
 
     Setting up Elasticsearch
 
@@ -121,7 +121,16 @@ You can add your own entities using such csv files. See [CSV file structure and 
 >
 > **NOTE:** If there is an error in building python package of CRF++ for Mac OSX install the following:
 >
->    `xcode-select --install`
+>    `xcode-select --install` 
+
+10. Copy `model_config.example` located in the root of the repository to a separate file named `model_config`
+
+    ```shell
+    $ cd ~/chatbot_ner/
+    $ cp model_config.example model_config 
+    ```
+
+    This is configuration file used to detect entities using ML modules 
 
 ## Starting the NER
 
