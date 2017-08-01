@@ -7,7 +7,7 @@ from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
     TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
     TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
     DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, \
-    TYPE_N_DAYS
+    TYPE_N_DAYS_LATER,TYPE_N_DAYS_AFTER
 
 
 # TODO add code examples
@@ -951,10 +951,17 @@ class DateDetector(object):
 
     def _date_days_after(self, date_list=None, original_list=None):
         """
-        Get date for phrases like after X days
-        :param date_list:
-        :param original_list:
-        :return:
+        Detects "date after n number of days" and returns the date after n days
+    
+        Matches "after" followed by the number of days provided
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                               date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and type followed by the 
+            second list containing their corresponding substrings in the given text.
+
         """
         if date_list is None:
             date_list = []
@@ -975,7 +982,7 @@ class DateDetector(object):
                 'dd': int(dd),
                 'mm': int(mm),
                 'yy': int(yy),
-                'type': TYPE_N_DAYS
+                'type': TYPE_N_DAYS_AFTER
             }
             date_list.append(date_dict)
             original_list.append(original)
@@ -983,10 +990,17 @@ class DateDetector(object):
 
     def _date_days_later(self, date_list=None, original_list=None):
         """
-        Get date for phrases like X days later
-        :param date_list:
-        :param original_list:
-        :return:
+        Detects "date n days later" and returns the date for n days later
+    
+        Matches "digit" followed by "days" and iterations of "later"
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                               date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and type followed by the 
+            second list containing their corresponding substrings in the given text.
+
         """
         if date_list is None:
             date_list = []
@@ -1007,7 +1021,7 @@ class DateDetector(object):
                 'dd': int(dd),
                 'mm': int(mm),
                 'yy': int(yy),
-                'type': TYPE_N_DAYS
+                'type': TYPE_N_DAYS_LATER
             }
             date_list.append(date_dict)
             original_list.append(original)

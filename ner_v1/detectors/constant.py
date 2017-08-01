@@ -10,8 +10,8 @@ TYPE_TOMORROW = 'tomorrow'
 TYPE_YESTERDAY = 'yesterday'
 TYPE_DAY_AFTER = 'day_after'
 TYPE_DAY_BEFORE = 'day_before'
-TYPE_N_DAYS = 'after_n_days'
-
+TYPE_N_DAYS_AFTER = 'after_n_days'
+TYPE_N_DAYS_LATER = 'n_days_later'
 # Note constant values have changed, haptik_api would break at
 # haptik_api/ares/entities/constant.py
 # haptik_api/ares/lib/external_api_response/cron.py
