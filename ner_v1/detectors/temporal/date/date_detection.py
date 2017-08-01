@@ -6,7 +6,8 @@ from lib.nlp.regex import Regex
 from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
     TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
     TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
-    DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT
+    DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, \
+    TYPE_N_DAYS
 
 
 # TODO add code examples
@@ -185,6 +186,10 @@ class DateDetector(object):
         self._update_processed_text(original_list)
 
         date_list, original_list = self._day_after_tomorrow(date_list, original_list)
+        self._update_processed_text(original_list)
+        date_list, original_list = self._date_days_after(date_list, original_list)
+        self._update_processed_text(original_list)
+        date_list, original_list = self._date_days_later(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._day_before_yesterday(date_list, original_list)
         self._update_processed_text(original_list)
@@ -844,7 +849,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b(tomorrow|2morow|2mrw|2mrow|next day|tommorr?ow|tomm?orow)\b',
+        patterns = re.findall(r'\b((tomorrow|2morow|2mrw|2mrow|next day|tommorr?ow|tomm?orow|tmrw|tmrrw|tomorw|tomro|tomorow|afte?r\s+1\s+da?y))\b',
                               self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
@@ -939,6 +944,70 @@ class DateDetector(object):
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_DAY_AFTER
+            }
+            date_list.append(date_dict)
+            original_list.append(original)
+        return date_list, original_list
+
+    def _date_days_after(self, date_list=None, original_list=None):
+        """
+        Get date for phrases like after X days
+        :param date_list:
+        :param original_list:
+        :return:
+        """
+        if date_list is None:
+            date_list = []
+        if original_list is None:
+            original_list = []
+        patterns = re.findall(
+            r'\b(afte?r\s+(\d+)\s+(da?y|da?ys))\b',
+            self.processed_text.lower())
+        # print 'pattern : ', patterns
+        for pattern in patterns:
+            original = pattern[0]
+            days = int(pattern[1])
+            day_after = self.date_object + datetime.timedelta(days=days)
+            dd = day_after.day
+            mm = day_after.month
+            yy = day_after.year
+            date_dict = {
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_N_DAYS
+            }
+            date_list.append(date_dict)
+            original_list.append(original)
+        return date_list, original_list
+
+    def _date_days_later(self, date_list=None, original_list=None):
+        """
+        Get date for phrases like X days later
+        :param date_list:
+        :param original_list:
+        :return:
+        """
+        if date_list is None:
+            date_list = []
+        if original_list is None:
+            original_list = []
+        patterns = re.findall(
+            r'\b((\d+)\s+(da?y|da?ys)\s?(later|ltr|latr|lter)s?)\b',
+            self.processed_text.lower())
+        # print 'pattern : ', patterns
+        for pattern in patterns:
+            original = pattern[0]
+            days = int(pattern[1])
+            day_after = self.date_object + datetime.timedelta(days=days)
+            dd = day_after.day
+            mm = day_after.month
+            yy = day_after.year
+            date_dict = {
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_N_DAYS
             }
             date_list.append(date_dict)
             original_list.append(original)

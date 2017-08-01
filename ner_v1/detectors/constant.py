@@ -10,6 +10,7 @@ TYPE_TOMORROW = 'tomorrow'
 TYPE_YESTERDAY = 'yesterday'
 TYPE_DAY_AFTER = 'day_after'
 TYPE_DAY_BEFORE = 'day_before'
+TYPE_N_DAYS = 'after_n_days'
 
 # Note constant values have changed, haptik_api would break at
 # haptik_api/ares/entities/constant.py
