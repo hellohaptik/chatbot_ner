@@ -369,7 +369,7 @@ class DateDetector(object):
                 'type': TYPE_EXACT
             }
             date_list.append(date)
-            original = self.regx_to_process.text_substitute(original)
+            #original = self.regx_to_process.text_substitute(original)
             original_list.append(original)
         return date_list, original_list
 
