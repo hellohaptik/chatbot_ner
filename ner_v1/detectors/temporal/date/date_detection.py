@@ -335,7 +335,7 @@ class DateDetector(object):
         Only years between 1900 to 2099 are detected
 
         Few valid examples:
-            "31/1/31", "97/2/21", "2517/12/01"
+            "31/1/31", "97/2/21", "2017/12/01"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -508,7 +508,7 @@ class DateDetector(object):
         Only years between 1900 to 2099 are detected
 
         Few valid examples:
-            "2199 Nov 21", "1972 january 2", "2014 November 6", "2014-Nov-09", "2015/Nov/94"
+            "2099 Nov 21", "1972 january 2", "2014 November 6", "2014-Nov-09", "2015/Nov/94"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -563,7 +563,7 @@ class DateDetector(object):
         Only years between 1900 to 2099 are detected
 
         Few valid examples:
-            "2199 21st Nov", "1972, 2 january", "14,November,6"
+            "2099 21st Nov", "1972, 2 january", "14,November,6"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -619,7 +619,7 @@ class DateDetector(object):
         Only years between 1900 to 2099 are detected
 
         Few valid examples:
-            "Nov 21st 2199", "january, 2 1972", "12,November,13"
+            "Nov 21st 2099", "january, 2 1972", "12,November,13"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -1151,7 +1151,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        patterns = re.findall(r'\b((this|dis|coming|on|for|fr)*[\s\-]*([A-Za-z]+))\b', self.processed_text.lower())
+        patterns = re.findall(r'\b((this|dis|coming|on|for)*[\s\-]*([A-Za-z]+))\b', self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0].strip()
