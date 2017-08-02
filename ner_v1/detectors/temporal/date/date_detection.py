@@ -358,9 +358,9 @@ class DateDetector(object):
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
-            dd = pattern[1]
+            dd = pattern[3]
             mm = pattern[2]
-            yy = pattern[3]
+            yy = pattern[1]
 
             date = {
                 'dd': int(dd),
@@ -369,7 +369,7 @@ class DateDetector(object):
                 'type': TYPE_EXACT
             }
             date_list.append(date)
-            # original = self.regx_to_process.text_substitute(original)
+            original = self.regx_to_process.text_substitute(original)
             original_list.append(original)
         return date_list, original_list
 
@@ -1151,7 +1151,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        patterns = re.findall(r'\b((this|dis|coming|on|for|fr)*[\s\-]+([A-Za-z]+))\b', self.processed_text.lower())
+        patterns = re.findall(r'\b((this|dis|coming|on|for|fr)*[\s\-]*([A-Za-z]+))\b', self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0].strip()
@@ -1359,7 +1359,7 @@ class DateDetector(object):
             original_list = []
         now = datetime.datetime.now()
         end = now + datetime.timedelta(days=n_days)
-        patterns = re.findall(r'\b((everyday|daily|every\s{0,3}day|all\sdays?))\b', self.processed_text.lower())
+        patterns = re.findall(r'\b\s*((everyday|daily|every\s{0,3}day|all\sday|all\sdays))\s*\b', self.processed_text.lower())
         # print 'pattern : ', patterns
         if patterns:
             pattern = patterns[0]
@@ -1699,6 +1699,7 @@ class DateDetector(object):
             date_list = []
         new_date_list = []
         new_text = self.text.lower().replace(',', '')
+        new_text = self.text.lower().replace('-', 'to')
         is_everyday = self._is_everyday_present(new_text)
 
         if self._check_current_day(date_list) and is_everyday:
@@ -1725,6 +1726,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         new_text = self.text.lower().replace(',', '')
+        new_text = self.text.lower().replace('-', 'to')
         is_everyday = self._is_everyday_present(new_text)
         is_range = self._is_range_present(new_text)
         if is_range and is_everyday and len(date_list) <= 4 and self._check_current_day(date_list):
