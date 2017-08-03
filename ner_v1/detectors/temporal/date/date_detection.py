@@ -297,7 +297,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         patterns = re.findall(
-            r'\b((0?[1-9]|[12][0-9]|3[01])\s?[/\-\.]\s?(0?[1-9]|1[0-2])\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))\b',
+            r'\b((0?[1-9]|[12][0-9]|3[01])\s?[/\-\.]\s?(0?[1-9]|1[0-2])\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))(\s|$)',
             self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
@@ -353,7 +353,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         patterns = re.findall(
-            r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?(0?[1-9]|1[0-2])\s?[/\-\.]\s?(0?[1-9]|[12][0-9]|3[01]))\b',
+            r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?(0?[1-9]|1[0-2])\s?[/\-\.]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)',
             self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
@@ -407,11 +407,11 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         patterns = re.findall(
-            r'\b((0?[1-9]|[12][0-9]|3[01])\s?[/ -\.]\s?([A-Za-z]+)\s?[/ -\.]\s?((?:20|19)?[0-9]{2}))\b',
+            r'\b((0?[1-9]|[12][0-9]|3[01])\s?[/ -\.]\s?([A-Za-z]+)\s?[/ -\.]\s?((?:20|19)?[0-9]{2}))(\s|$)',
             self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern[0].strip()
             dd = pattern[1]
             probable_mm = pattern[2]
             yy = pattern[3]
@@ -467,12 +467,10 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?([A-Za-z]+)[\s\,]\s?' + \
-                        r'((?:20|19)?[0-9]{2}))\b'
-        patterns = re.findall(regex_pattern, self.processed_text.lower())
+        patterns = re.findall(r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?([A-Za-z]+)[\s\,]\s?((?:20|19)?[0-9]{2}))(\s|$)', self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern[0].strip()
             dd = pattern[1]
             probable_mm = pattern[2]
             yy = pattern[3]
@@ -525,7 +523,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        patterns = re.findall(r'\b(((?:20|19)[0-9]{2})\s?[/ \-]\s?([A-Za-z]+)\s?[/ \-]\s?(0?[1-9]|[12][0-9]|3[01]))\b',
+        patterns = re.findall(r'\b(((?:20|19)[0-9]{2})\s?[/ \-]\s?([A-Za-z]+)\s?[/ \-]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)',
                               self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
@@ -637,7 +635,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         patterns = re.findall(
-            r'\b(([A-Za-z]+)[\ \,]\s?(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?((?:20|19)?[0-9]{2}))\b',
+            r'\b(([A-Za-z]+)[\ \,]\s?(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?((?:20|19)?[0-9]{2}))(\s|$)',
             self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
