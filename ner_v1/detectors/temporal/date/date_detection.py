@@ -1293,7 +1293,7 @@ class DateDetector(object):
         Optional "of" is allowed after ordinal indicator, example "dd th of this next month"
 
         Few valid examples:
-            "3rd this month", "2 of this month", "05 of this current month" 
+            "3rd of next month", "2 of next month", "05 of next month" 
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -1700,7 +1700,6 @@ class DateDetector(object):
             date_list = []
         new_date_list = []
         new_text = self.text.lower().replace(',', '')
-        new_text = self.text.lower().replace('-', 'to')
         is_everyday = self._is_everyday_present(new_text)
 
         if self._check_current_day(date_list) and is_everyday:
@@ -1727,7 +1726,6 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         new_text = self.text.lower().replace(',', '')
-        new_text = self.text.lower().replace('-', 'to')
         is_everyday = self._is_everyday_present(new_text)
         is_range = self._is_range_present(new_text)
         if is_range and is_everyday and len(date_list) <= 4 and self._check_current_day(date_list):
