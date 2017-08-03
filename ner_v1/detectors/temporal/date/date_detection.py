@@ -843,7 +843,7 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
-        # print '-- calling tommorows_date() ---'
+        # print '-- calling tomorrows_date() ---'
         # print 'processed text : ', self.processed_text
         if date_list is None:
             date_list = []
@@ -853,11 +853,11 @@ class DateDetector(object):
                               self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
-            original = pattern
-            tommorow = self.date_object + datetime.timedelta(days=1)
-            dd = tommorow.day
-            mm = tommorow.month
-            yy = tommorow.year
+            original = pattern[0]
+            tomorrow = self.date_object + datetime.timedelta(days=1)
+            dd = tomorrow.day
+            mm = tomorrow.month
+            yy = tomorrow.year
             date_dict = {
                 'dd': int(dd),
                 'mm': int(mm),
@@ -1359,7 +1359,8 @@ class DateDetector(object):
             original_list = []
         now = datetime.datetime.now()
         end = now + datetime.timedelta(days=n_days)
-        patterns = re.findall(r'\b\s*((everyday|daily|every\s{0,3}day|all\sday|all\sdays))\s*\b', self.processed_text.lower())
+        patterns = re.findall(r'\b\s*((everyday|daily|every\s{0,3}day|all\sday|all\sdays))\s*\b',
+                              self.processed_text.lower())
         # print 'pattern : ', patterns
         if patterns:
             pattern = patterns[0]
