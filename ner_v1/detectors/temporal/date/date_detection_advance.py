@@ -1,7 +1,7 @@
 import re
 import pytz
 from lib.nlp.regex import Regex
-from ner_v1.detectors.temporal.date.date_detection import DateDetector
+from ner_v1.detectors.temporal.date.date_detection import DateOnlyDetectorDetector
 
 
 class DateAdvanceDetector(object):
@@ -42,7 +42,7 @@ class DateAdvanceDetector(object):
         self.regx_to_process_text = Regex([(r'[\,]', r'')])
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
+        self.date_detector_object = DateOnlyDetector(entity_name=self.entity_name, timezone=timezone)
         self.bot_message = None
 
     def detect_entity(self, text):

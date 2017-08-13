@@ -3,6 +3,10 @@ import copy
 import datetime
 import pytz
 from lib.nlp.regex import Regex
+from models.models import Models
+import models.constant as model_constant
+from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+import ner_v1.detectors.constant as detector_constant
 from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
     TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
     TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
@@ -11,7 +15,7 @@ from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
 
 
 # TODO add code examples
-class DateDetector(object):
+class DateOnlyDetector(object):
     """
     Detects date in various formats from given text and tags them.
 
@@ -32,21 +36,21 @@ class DateDetector(object):
         regx_to_process_text: regex to remove forward slash while before detecting entities
         date_object: datetime object holding timestamp while DateDetector instantiation
         month_dictionary: dictonary mapping month indexes to month spellings and 
-                            fuzzy variants(spell errors, abbreviations)
+                            fuzzy variants(spell errors, abbrerangetions)
         day_dictionary: dictonary mapping day indexes to day of week spellings and 
-                            fuzzy variants(spell errors, abbreviations)
+                            fuzzy variants(spell errors, abbrerangetions)
 
         SUPPORTED_FORMAT                                            METHOD_NAME
         ------------------------------------------------------------------------------------------------------------
         1. day/month/year                                           _gregorian_day_month_year_format
         2. year/month/day                                           _gregorian_year_month_day_format
-        3. day/month/year (Month in abbreviation or full)           _gregorian_advanced_day_month_year_format
-        4. Xth month year (Month in abbreviation or full)           _gregorian_day_with_ordinals_month_year_format
-        5. year month Xth (Month in abbreviation or full)           _gregorian_advanced_year_month_day_format
-        6. year Xth month (Month in abbreviation or full)           _gregorian_year_day_month_format
-        7. month Xth year (Month in abbreviation or full)           _gregorian_month_day_year_format
-        8. month Xth      (Month in abbreviation or full)           _gregorian_month_day_format
-        9. Xth month      (Month in abbreviation or full)           _gregorian_day_month_format
+        3. day/month/year (Month in abbrerangetion or full)           _gregorian_advanced_day_month_year_format
+        4. Xth month year (Month in abbrerangetion or full)           _gregorian_day_with_ordinals_month_year_format
+        5. year month Xth (Month in abbrerangetion or full)           _gregorian_advanced_year_month_day_format
+        6. year Xth month (Month in abbrerangetion or full)           _gregorian_year_day_month_format
+        7. month Xth year (Month in abbrerangetion or full)           _gregorian_month_day_year_format
+        8. month Xth      (Month in abbrerangetion or full)           _gregorian_month_day_format
+        9. Xth month      (Month in abbrerangetion or full)           _gregorian_day_month_format
         10. "today" variants                                        _todays_date
         11. "tomorrow" variants                                     _tomorrows_date
         12. "yesterday" variants                                    _yesterdays_date
@@ -380,7 +384,7 @@ class DateDetector(object):
         format: <day><separator><month><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             year: yy, yyyy
             separator: "/", "-", ".", space
 
@@ -441,7 +445,7 @@ class DateDetector(object):
         format: <day><Optional ordinal inidicator><Optional "of"><separator><month><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             year: yy, yyyy
             oridinal indicator: "st", "nd", "rd", "th", space
             separator: ",", space
@@ -498,7 +502,7 @@ class DateDetector(object):
         format: <year><separator><month><separator><day>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             year: yy, yyyy
             separator: "/", "-", space
 
@@ -552,7 +556,7 @@ class DateDetector(object):
         format: <year><separator><day><Optional oridinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             year: yy, yyyy
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
@@ -608,7 +612,7 @@ class DateDetector(object):
         format: <month><separator><day><Optional oridinal indicator><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             year: yy, yyyy
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
@@ -666,7 +670,7 @@ class DateDetector(object):
         format: <month><separator><day><Optional oridinal indicator>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
 
@@ -730,7 +734,7 @@ class DateDetector(object):
         format: <day><Optional oridinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
 
@@ -1073,7 +1077,7 @@ class DateDetector(object):
         with Sunday and ends with Saturday
 
         Matches "next" or "nxt" followed by day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
-        or their abbreviations. NOTE: Day of the week and their variants are fetched from the data store
+        or their abbrerangetions. NOTE: Day of the week and their variants are fetched from the data store
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
@@ -1125,7 +1129,7 @@ class DateDetector(object):
         current date.
 
         Matches one of "this", "dis", "coming", "on", "for", "fr" followed by
-        day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday or their abbreviations.
+        day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday or their abbrerangetions.
         NOTE: Day of the week and their variants are fetched from the data store
 
         Example:
@@ -1545,7 +1549,7 @@ class DateDetector(object):
         format: <day><ordinal inidicator><range separator><day><ordinal inidicator><separator><Optional "of"><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             separator: ",", space
             range separator: "to", "-", "till"
 
@@ -1625,8 +1629,8 @@ class DateDetector(object):
         Detects if there is a "A to B" type range present in the text
         Detects format: <day of week><separator><day of week> OR <month><separator><month>
         where each part is in of one of the formats given against them
-            day of week: seven days of the week, in abbreviation or spelled out in full
-            month: mmm, mmmm (abbreviation or spelled out in full)
+            day of week: seven days of the week, in abbrerangetion or spelled out in full
+            month: mmm, mmmm (abbrerangetion or spelled out in full)
             separator: "to", "-", " - "
 
         Args:
@@ -1706,7 +1710,7 @@ class DateDetector(object):
                     val['type'] = TYPE_REPEAT_DAY
                     new_date_list.append(val)
         if new_date_list:
-            date_list.extend(new_date_list)
+            date_list = new_date_list
             original_list = original_list[:len(date_list)]
         return date_list, original_list
 
@@ -1795,3 +1799,441 @@ class DateDetector(object):
             if value.lower() in self.day_dictionary[day]:
                 return day
         return None
+
+class DateDetector(object):
+    """
+    DateDetector detects dates from the text. It Detects date with the properties like "from", "to", "range" and
+    "normal". These dates are returned in a dictionary form that contains relevant text, its actual value
+    and its attribute in boolean field i.e. "from", "to", "range", "normal".
+    This class uses DateOnlyDetector to detect the entity values. It also has model integrated to it that can be used to
+    extract relevant dates from the text
+
+    Attributes:
+        text: string to extract entities from
+        entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
+        tagged_text: string with date entities replaced with tag defined by entity name
+        processed_text: string with detected date entities removed
+        date: list of date entities detected
+        original_date_text: list to store substrings of the date detected as date entities
+        tag: entity_name prepended and appended with '__'
+        date_detector_object: DateDetector object used to detect dates in the given text
+        bot_message: boolean, set as the outgoing bot text/message
+    """
+
+    def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
+        """
+        Initializes the DateDetector object with given entity_name and pytz timezone object
+
+        Args:
+            entity_name: A string by which the detected date entity substrings would be replaced with on calling
+                        detect_entity()
+            timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+        """
+        self.text = ''
+        self.tagged_text = ''
+        self.processed_text = ''
+        self.date = []
+        self.original_date_text = []
+        self.regx_to_process = Regex([(r'[\/]', r'')])
+        self.regx_to_process_text = Regex([(r'[\,]', r'')])
+        self.entity_name = entity_name
+        self.tag = '__' + entity_name + '__'
+        self.date_detector_object = DateOnlyDetector(entity_name=self.entity_name, timezone=timezone)
+        self.bot_message = None
+
+    def detect_entity(self, text, run_model=False):
+        """
+        Detects all date strings in text and returns two lists of detected date entities and their corresponding
+        original substrings in text respectively.
+
+        Args:
+            text: string to extract date entities from
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+
+        Examples:
+            obj = DateDetector('date')
+            text = '16th august to 27th august'
+            obj.detect_entity(text)
+
+                Output:
+                    [{'detection_method': 'message',
+                          'from': True,
+                          'normal': False,
+                          'range': False,
+                          'text': '16th august',
+                          'to': False,
+                          'value': {'dd': 16, 'mm': 8, 'type': 'date', 'yy': 2017}},
+                    {'detection_method': 'message',
+                          'from': False,
+                          'normal': False,
+                          'range': False,
+                          'text': '27th august',
+                          'to': True,
+                          'value': {'dd': 27, 'mm': 8, 'type': 'date', 'yy': 2017}}]
+
+        Additionally this function assigns these lists to self.date and self.original_date_text attributes
+        respectively.
+        :param text: 
+        :param run_model: 
+        """
+        self.text = ' ' + text.lower() + ' '
+        self.text = self.regx_to_process_text.text_substitute(self.text)
+        self.processed_text = self.text
+        self.tagged_text = self.text
+        date_data = []
+        if run_model:
+            date_data = self._date_model_detection()
+        if not run_model or not date_data:
+            date_data = self._detect_date()
+        return date_data
+
+    def _detect_date(self):
+        """
+        Detects "departure" and "return" from the object's text attribute
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+
+        """
+        # print 'detection for default task'
+        final_date_dict_list = []
+        date_dict_list = self._detect_return_date()
+        final_date_dict_list.extend(date_dict_list)
+        self._update_processed_text(date_dict_list)
+        date_dict_list = self._detect_departure_date()
+        final_date_dict_list.extend(date_dict_list)
+        self._update_processed_text(date_dict_list)
+        date_dict_list = self._detect_departure_return_date()
+        final_date_dict_list.extend(date_dict_list)
+        self._update_processed_text(date_dict_list)
+        date_dict_list = self._detect_any_date()
+        final_date_dict_list.extend(date_dict_list)
+        self._update_processed_text(date_dict_list)
+
+        return final_date_dict_list
+
+    def _detect_departure_return_date(self):
+        """
+        Finds <any text><space(s)><'-' or 'to' or '2'><space(s)><any text> in the given text.
+        It  splits the text into two parts on '-' or 'to' or '2'
+        and detects the departure date in the first (left) part and detects return date in the second (right) part
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+        """
+        date_dict_list = []
+        patterns = re.findall(r'\b((.+)\s*(\-|to)\s*(.+))\b', self.processed_text.lower())
+        for pattern in patterns:
+            date_dict_list.extend(
+                self._date_dict_from_text(text=pattern[1], from_property=True)
+            )
+
+            date_dict_list.extend(
+                self._date_dict_from_text(text=pattern[3], to_property=True)
+            )
+        return date_dict_list
+
+    def _detect_departure_date(self):
+        """
+        Finds departure type dates in the given text by matching few keywords like 'onward date', 'departure date',
+        'leaving on', 'starting from', 'departing', 'going on' . It detects dates in the part of text right to these
+        keywords.
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+        """
+        date_dict_list = []
+        regex_string = r'\b((onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
+                       r'departing on|departing|going on|for|departs on)\s+(.+))\b'
+        patterns = re.findall(regex_string, self.processed_text.lower())
+
+        for pattern in patterns:
+
+            date_dict_list.extend(
+                self._date_dict_from_text(text=pattern[2], from_property=True)
+            )
+        return date_dict_list
+
+    def _detect_return_date(self):
+        """
+        Finds return type dates in the given text by matching few keywords like 'coming back', 'return date',
+        'leaving on', 'returning on', 'returning at', 'arriving', 'arrive' . It detects dates in the part of text right
+        to these keywords.
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding original substrings of text which were detected as
+                            return type date entities
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+        """
+
+        date_dict_list = []
+        regex_string = r'\s?((coming back|back|return date\:?|return date -|returning on|' \
+                       r'arriving|arrive|return|returning at)\s+(.+))\.?\s?'
+        patterns = re.findall(regex_string, self.processed_text.lower())
+        for pattern in patterns:
+            date_dict_list.extend(
+                self._date_dict_from_text(text=pattern[2], to_property=True)
+            )
+        return date_dict_list
+
+    def _detect_any_date(self):
+        """
+        Finds departure and return type dates in the given text. It detects 'departure' and 'return' and their synonyms
+        and tags all the detected dates in the text accordingly. If both type synonyms are found, and more than one
+        dates are detected, first date is marked as departure type and last as return type. If only one date is found,
+        it is marked as departure if 'departure' or both type synonyms are found and marked as 'return' type if 'return'
+        type synonyms were found in the given text
+
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding original substrings of text which were detected as
+                            return type date entities
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
+            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
+            for each detected date, and second list containing corresponding original substrings in text
+        """
+        date_dict_list = []
+        departure_date_flag = False
+        return_date_flag = False
+        if self.bot_message:
+            departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
+                                     r'check in date|check-in date|date of check-in|date of departure\.'
+            arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
+                                   r'|arrival date|check out date|check-out date|date of check-out|check out'
+            departure_regexp = re.compile(departure_regex_string)
+            arrival_regexp = re.compile(arrival_regex_string)
+            if departure_regexp.search(self.bot_message) is not None:
+                departure_date_flag = True
+            elif arrival_regexp.search(self.bot_message) is not None:
+                return_date_flag = True
+
+        patterns = re.findall(r'\s((.+))\.?\b', self.processed_text.lower())
+
+        for pattern in patterns:
+            pattern = list(pattern)
+            date_dict_list = self._date_dict_from_text(text=pattern[1])
+            if date_dict_list:
+                if len(date_dict_list) > 1:
+                    for i in xrange(len(date_dict_list)):
+                        date_dict_list[i][detector_constant.DATE_NORMAL_PROPERTY] = True
+                else:
+                    if departure_date_flag:
+                        date_dict_list[0][detector_constant.DATE_FROM_PROPERTY] = True
+                    elif return_date_flag:
+                        date_dict_list[0][detector_constant.DATE_TO_PROPERTY] = True
+                    else:
+                        date_dict_list[0][detector_constant.DATE_NORMAL_PROPERTY] = True
+        return date_dict_list
+
+    def _update_processed_text(self, date_dict_list):
+        """
+        Replaces detected date entities with tag generated from entity_name used to initialize the object with
+
+        A final string with all date entities replaced will be stored in object's tagged_text attribute
+        A string with all date entities removed will be stored in object's processed_text attribute
+
+        Args:
+            date_dict_list: list of substrings of original text to be replaced with tag created from entity_name
+        """
+        for date_dict in date_dict_list:
+                self.tagged_text = self.tagged_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], self.tag)
+                self.processed_text = self.processed_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], '')
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: string
+        """
+        self.bot_message = bot_message
+
+    def _sort_date_list(self, date_list, original_list):
+        """
+        Sorts the date_list and original_list according to date value in chronological order
+
+        Args:
+            date_list: List of dictionaries of date values for detected dates in the text
+            original_list: List of substrings of the given text to DateDetector that correspond to the
+                            detected dates in the date_list
+
+        Returns:
+            Tuple containing two lists, first containing dictionaries of detected dates sorted in chronological order
+            and second list containing their corresponding substrings of text
+
+        Example:
+
+
+        """
+        sorted_original_list = []
+        if len(date_list) > 1:
+            dates_zip = zip(date_list, original_list)
+            sorted_dates_zip = sorted(dates_zip, key=lambda d: d[0].values())
+            sorted_date_list, sorted_original_list = map(list, zip(*sorted_dates_zip))
+        else:
+            sorted_date_list = date_list
+            sorted_original_list = original_list
+        return sorted_date_list, sorted_original_list
+
+    def _date_dict_from_text(self, text, from_property=False, to_property=False, range_property=False,
+                             normal_property=False, detection_method=FROM_MESSAGE):
+        """
+        Takes the text and the property values and creates a list of dictionaries based on number of dates detected
+
+        Attributes:
+            text: Text on which TextDetection needs to run on
+            from_property: True if the text is belonging to "from" property". for example, From Mumbai
+            to_property: True if the text is belonging to "to" property". for example, To Mumbai
+            range_property: True if the text is belonging to "range" property". for example, range Mumbai
+            normal_property: True if the text is belonging to "normal" property". for example, atms in Mumbai
+            detection_method: method through which it got detected whether its through message or model
+
+        Returns:
+
+            It returns the list of dictionary containing the fields like detection_method, from, normal, to,
+            text, value, range
+
+            For example:
+
+                [
+                    {
+                      'detection_method': 'message',
+                      'from': False,
+                      'normal': True,
+                      'text': 'mumbai',
+                      'to': False,
+                      'value': u'BOM',
+                      'range': False
+                    }
+                ]
+
+        """
+        date_dict_list = []
+        date_list, original_list = self._date_value(text=text)
+        index = 0
+        for date in date_list:
+            date_dict_list.append(
+                {
+                    detector_constant.DATE_VALUE: date,
+                    detector_constant.ORIGINAL_DATE_TEXT: original_list[index],
+                    detector_constant.DATE_FROM_PROPERTY: from_property,
+                    detector_constant.DATE_TO_PROPERTY: to_property,
+                    detector_constant.DATE_RANGE_PROPERTY: range_property,
+                    detector_constant.DATE_NORMAL_PROPERTY: normal_property,
+                    detector_constant.DATE_DETECTION_METHOD: detection_method
+                }
+            )
+            index += 1
+        return date_dict_list
+
+    def _date_value(self, text):
+        """
+        Detects date from text by running TextDetection class.
+
+        Args:
+            text: message to process
+        Returns:
+            A tuple of two lists with first list containing the detected dates and second list containing their
+            corresponding substrings in the given text. For example:
+
+            For example:
+
+                (['Mumbai'], ['bombay'])
+        """
+        date_list, original_list = self.date_detector_object.detect_entity(text)
+        return date_list, original_list
+
+    def _date_model_detection(self):
+        """
+        This function calls run_model functionality from class Models() and verifies the values returned by it through
+        datastore.
+        If the dates provided by the model are present in the datastore, it sets the value to FROM_MODEL_VERIFIED
+        else FROM_MODEL_NOT_VERFIED is set.
+
+        For Example:
+            Note:  before calling this method you need to call set_bot_message() to set a bot message.
+
+            self.bot_message = 'Please help me with your departure date?'
+            self.text = 'mummbai
+
+            Output:
+                [
+                    {
+                        'date':'mumbai',
+                        'original_text': 'mummbai',
+                        'from': true,
+                        'to': false,
+                        'range': false,
+                        'normal': false
+                        'detection_method': model_verified
+                    }
+                ]
+
+
+        For Example:
+
+            self.bot_message = 'Please help me with your departure date?'
+            self.text = 'dehradun'
+
+            Output:
+                 [
+                    {
+                        'date':'dehradun',
+                        'original_text': 'dehradun',
+                        'from': true,
+                        'to': false,
+                        'range': false,
+                        'normal': false
+                        'detection_method': model_not_verified
+
+                    }
+                ]
+
+                 Note: Dehradun is not present in out datastore so it will take original value as entity value.
+
+        """
+        date_dict_list = []
+        model_object = Models()
+        model_output = model_object.run_model(entity_type=model_constant.DATE_ENTITY_TYPE,
+                                              bot_message=self.bot_message, user_message=self.text)
+        for output in model_output:
+            entity_value_list, original_text_list = self._date_value(text=output[model_constant.MODEL_DATE_VALUE])
+            if entity_value_list:
+                date_value = entity_value_list[0]
+                detection_method = FROM_MODEL_VERIFIED
+            else:
+                date_value = output[model_constant.MODEL_date_VALUE]
+                detection_method = FROM_MODEL_NOT_VERIFIED
+
+            date_dict_list.append(
+                {
+                    detector_constant.DATE_VALUE: date_value,
+                    detector_constant.ORIGINAL_DATE_TEXT: output[model_constant.MODEL_DATE_VALUE],
+                    detector_constant.DATE_FROM_PROPERTY: output[model_constant.MODEL_DATE_FROM],
+                    detector_constant.DATE_TO_PROPERTY: output[model_constant.MODEL_DATE_TO],
+                    detector_constant.DATE_RANGE_PROPERTY: output[model_constant.MODEL_DATE_RANGE],
+                    detector_constant.DATE_NORMAL_PROPERTY: output[model_constant.MODEL_DATE_NORMAL],
+                    detector_constant.DATE_DETECTION_METHOD: detection_method
+                }
+
+            )
+        return date_dict_list
+

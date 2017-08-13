@@ -20,6 +20,12 @@ MODEL_CITY_TO = 'to'  # Dictionary key of model output that stores whether prope
 MODEL_CITY_VIA = 'via'  # Dictionary key of model output that stores whether property is Via
 MODEL_CITY_NORMAL = 'normal'  # Dictionary key of model output that stores whether property is Normal
 
+MODEL_DATE_VALUE = 'date'  # Dictionary key of model output that stores the value
+MODEL_DATE_FROM = 'from'  # Dictionary key of model output that stores whether property is From
+MODEL_DATE_TO = 'to'  # Dictionary key of model output that stores whether property is To
+MODEL_DATE_RANGE = 'range'  # Dictionary key of model output that stores whether property is Via
+MODEL_DATE_NORMAL = 'normal'  # Dictionary key of model output that stores whether property is Normal
+
 # Tags for inbound and outbound message in crf
 INBOUND = 'i'
 OUTBOUND = 'o'
