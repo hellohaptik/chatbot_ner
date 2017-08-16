@@ -3,8 +3,7 @@ from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
-from ner_v1.detectors.temporal.date.date_detection import DateDetector
-from ner_v1.detectors.temporal.date.date_detection_advance import DateAdvanceDetector
+from ner_v1.detectors.temporal.date.date_detection import DateAdvanceDetector
 from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
@@ -367,7 +366,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
     if structured_value:
         entity_dict_list = city_detection.detect_entity(text=structured_value)
         entity_list, original_text_list, detection_method_list = \
-            city_detection.convert_dict_in_tuple(entity_dict_list=entity_dict_list)
+            city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
@@ -377,7 +376,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
     else:
         entity_dict_list = city_detection.detect_entity(text=message, run_model=True)
         entity_list, original_text_list, detection_method_list = \
-            city_detection.convert_dict_in_tuple(entity_dict_list=entity_dict_list)
+            city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method_list=detection_method_list)
@@ -606,19 +605,28 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
                 'entity_value': {'mm': 3, 'yy': 2017, 'dd': 13, 'type': 'day_after'}}]
 
     """
-    date_detection = DateDetector(entity_name=entity_name)
+    date_detection = DateAdvanceDetector(entity_name=entity_name)
+    date_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
-        entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
+        entity_dict_list = date_detection.detect_entity(text=structured_value)
+        entity_list, original_text_list, detection_method_list = \
+            date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
+            return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
+                                           detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_value(entity_value=structured_value, original_text=structured_value,
+                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_list, original_text_list = date_detection.detect_entity(text=message)
+        entity_dict_list = date_detection.detect_entity(text=message, run_model=True)
+        entity_list, original_text_list, detection_method_list = \
+            date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
+            return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
+                                           detection_method_list=detection_method_list)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_value(entity_value=fallback_value, original_text=fallback_value,
+                                            detection_method=FROM_FALLBACK_VALUE)
 
     return None
 

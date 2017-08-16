@@ -11,11 +11,12 @@ from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
     TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
     TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, START_RANGE, END_RANGE, REPEAT_START_RANGE, REPEAT_END_RANGE, \
     DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, \
-    TYPE_N_DAYS_LATER,TYPE_N_DAYS_AFTER
+    TYPE_N_DAYS_LATER, TYPE_N_DAYS_AFTER, DATE_VALUE, DATE_FROM_PROPERTY, DATE_TO_PROPERTY, DATE_TYPE_PROPERTY,\
+    DATE_START_RANGE_PROPERTY, DATE_END_RANGE_PROPERTY
 
 
 # TODO add code examples
-class DateOnlyDetector(object):
+class DateDetector(object):
     """
     Detects date in various formats from given text and tags them.
 
@@ -36,21 +37,21 @@ class DateOnlyDetector(object):
         regx_to_process_text: regex to remove forward slash while before detecting entities
         date_object: datetime object holding timestamp while DateDetector instantiation
         month_dictionary: dictonary mapping month indexes to month spellings and 
-                            fuzzy variants(spell errors, abbrerangetions)
+                            fuzzy variants(spell errors, abbreviations)
         day_dictionary: dictonary mapping day indexes to day of week spellings and 
-                            fuzzy variants(spell errors, abbrerangetions)
+                            fuzzy variants(spell errors, abbreviations)
 
         SUPPORTED_FORMAT                                            METHOD_NAME
         ------------------------------------------------------------------------------------------------------------
         1. day/month/year                                           _gregorian_day_month_year_format
         2. year/month/day                                           _gregorian_year_month_day_format
-        3. day/month/year (Month in abbrerangetion or full)           _gregorian_advanced_day_month_year_format
-        4. Xth month year (Month in abbrerangetion or full)           _gregorian_day_with_ordinals_month_year_format
-        5. year month Xth (Month in abbrerangetion or full)           _gregorian_advanced_year_month_day_format
-        6. year Xth month (Month in abbrerangetion or full)           _gregorian_year_day_month_format
-        7. month Xth year (Month in abbrerangetion or full)           _gregorian_month_day_year_format
-        8. month Xth      (Month in abbrerangetion or full)           _gregorian_month_day_format
-        9. Xth month      (Month in abbrerangetion or full)           _gregorian_day_month_format
+        3. day/month/year (Month in abbreviation or full)           _gregorian_advanced_day_month_year_format
+        4. Xth month year (Month in abbreviation or full)           _gregorian_day_with_ordinals_month_year_format
+        5. year month Xth (Month in abbreviation or full)           _gregorian_advanced_year_month_day_format
+        6. year Xth month (Month in abbreviation or full)           _gregorian_year_day_month_format
+        7. month Xth year (Month in abbreviation or full)           _gregorian_month_day_year_format
+        8. month Xth      (Month in abbreviation or full)           _gregorian_month_day_format
+        9. Xth month      (Month in abbreviation or full)           _gregorian_day_month_format
         10. "today" variants                                        _todays_date
         11. "tomorrow" variants                                     _tomorrows_date
         12. "yesterday" variants                                    _yesterdays_date
@@ -176,6 +177,8 @@ class DateOnlyDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
+        date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
@@ -249,10 +252,10 @@ class DateOnlyDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._weeks_identification(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._weeks_range_identification(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._dates_range_identification(date_list, original_list)
-        self._update_processed_text(original_list)
+        # date_list, original_list = self._weeks_range_identification(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._dates_range_identification(date_list, original_list)
+        # self._update_processed_text(original_list)
 
         return date_list, original_list
 
@@ -373,7 +376,7 @@ class DateOnlyDetector(object):
                 'type': TYPE_EXACT
             }
             date_list.append(date)
-            #original = self.regx_to_process.text_substitute(original)
+            # original = self.regx_to_process.text_substitute(original)
             original_list.append(original)
         return date_list, original_list
 
@@ -384,7 +387,7 @@ class DateOnlyDetector(object):
         format: <day><separator><month><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: "/", "-", ".", space
 
@@ -445,7 +448,7 @@ class DateOnlyDetector(object):
         format: <day><Optional ordinal inidicator><Optional "of"><separator><month><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             oridinal indicator: "st", "nd", "rd", "th", space
             separator: ",", space
@@ -471,7 +474,9 @@ class DateOnlyDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?([A-Za-z]+)[\s\,]\s?((?:20|19)?[0-9]{2}))(\s|$)', self.processed_text.lower())
+        patterns = re.findall(
+            r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?([A-Za-z]+)[\s\,]\s?((?:20|19)?[0-9]{2}))(\s|$)',
+            self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0].strip()
@@ -502,7 +507,7 @@ class DateOnlyDetector(object):
         format: <year><separator><month><separator><day>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: "/", "-", space
 
@@ -527,8 +532,9 @@ class DateOnlyDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        patterns = re.findall(r'\b(((?:20|19)[0-9]{2})\s?[/ \-]\s?([A-Za-z]+)\s?[/ \-]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)',
-                              self.processed_text.lower())
+        patterns = re.findall(
+            r'\b(((?:20|19)[0-9]{2})\s?[/ \-]\s?([A-Za-z]+)\s?[/ \-]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)',
+            self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
@@ -556,7 +562,7 @@ class DateOnlyDetector(object):
         format: <year><separator><day><Optional oridinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
@@ -612,7 +618,7 @@ class DateOnlyDetector(object):
         format: <month><separator><day><Optional oridinal indicator><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
@@ -670,7 +676,7 @@ class DateOnlyDetector(object):
         format: <month><separator><day><Optional oridinal indicator>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
 
@@ -734,7 +740,7 @@ class DateOnlyDetector(object):
         format: <day><Optional oridinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             separator: ",", space
             oridinal indicator: "st", "nd", "rd", "th", space
 
@@ -851,8 +857,9 @@ class DateOnlyDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((tomorrow|2morow|2mrw|2mrow|next day|tommorr?ow|tomm?orow|tmrw|tmrrw|tomorw|tomro|tomorow|afte?r\s+1\s+da?y))\b',
-                              self.processed_text.lower())
+        patterns = re.findall(
+            r'\b((tomorrow|2morow|2mrw|2mrow|next day|tommorr?ow|tomm?orow|tmrw|tmrrw|tomorw|tomro|tomorow|afte?r\s+1\s+da?y))\b',
+            self.processed_text.lower())
         # print 'pattern : ', patterns
         for pattern in patterns:
             original = pattern[0]
@@ -1077,7 +1084,7 @@ class DateOnlyDetector(object):
         with Sunday and ends with Saturday
 
         Matches "next" or "nxt" followed by day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
-        or their abbrerangetions. NOTE: Day of the week and their variants are fetched from the data store
+        or their abbreviations. NOTE: Day of the week and their variants are fetched from the data store
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
@@ -1129,7 +1136,7 @@ class DateOnlyDetector(object):
         current date.
 
         Matches one of "this", "dis", "coming", "on", "for", "fr" followed by
-        day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday or their abbrerangetions.
+        day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday or their abbreviations.
         NOTE: Day of the week and their variants are fetched from the data store
 
         Example:
@@ -1549,7 +1556,7 @@ class DateOnlyDetector(object):
         format: <day><ordinal inidicator><range separator><day><ordinal inidicator><separator><Optional "of"><month>
         where each part is in of one of the formats given against them
             day: d, dd
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
+            month: mmm, mmmm (abbreviation or spelled out in full)
             separator: ",", space
             range separator: "to", "-", "till"
 
@@ -1624,32 +1631,32 @@ class DateOnlyDetector(object):
         else:
             return False
 
-    def _is_range_present(self, text):
-        """
-        Detects if there is a "A to B" type range present in the text
-        Detects format: <day of week><separator><day of week> OR <month><separator><month>
-        where each part is in of one of the formats given against them
-            day of week: seven days of the week, in abbrerangetion or spelled out in full
-            month: mmm, mmmm (abbrerangetion or spelled out in full)
-            separator: "to", "-", " - "
-
-        Args:
-            text: string to recognize date entities from
-
-        Few valid examples:
-            "Jan to Sep", "February to Nov", "December to January", "Mon to Wed", "Sat to Friday"
-
-        Returns:
-            Boolean, True if any range is matched according to the format above, False otherwise
-
-        """
-        pattern = re.compile(
-            r'([a-z]{3,9}\s* to\s* [a-z]{3,9}\s* |\s* [a-z]{3,9}\s* \-\s* [a-z]{3,9} | [a-z]{3,9}-[a-z]{3,9})')
-        data = pattern.findall(text)
-        if data:
-            return True
-        else:
-            return False
+    # def _is_range_present(self, text):
+    #     """
+    #     Detects if there is a "A to B" type range present in the text
+    #     Detects format: <day of week><separator><day of week> OR <month><separator><month>
+    #     where each part is in of one of the formats given against them
+    #         day of week: seven days of the week, in abbreviation or spelled out in full
+    #         month: mmm, mmmm (abbreviation or spelled out in full)
+    #         separator: "to", "-", " - "
+    #
+    #     Args:
+    #         text: string to recognize date entities from
+    #
+    #     Few valid examples:
+    #         "Jan to Sep", "February to Nov", "December to January", "Mon to Wed", "Sat to Friday"
+    #
+    #     Returns:
+    #         Boolean, True if any range is matched according to the format above, False otherwise
+    #
+    #     """
+    #     pattern = re.compile(
+    #         r'([a-z]{3,9}\s* to\s* [a-z]{3,9}\s* |\s* [a-z]{3,9}\s* \-\s* [a-z]{3,9} | [a-z]{3,9}-[a-z]{3,9})')
+    #     data = pattern.findall(text)
+    #     if data:
+    #         return True
+    #     else:
+    #         return False
 
     def _check_current_day(self, date_list):
         """
@@ -1715,58 +1722,58 @@ class DateOnlyDetector(object):
         return date_list, original_list
 
     # TODO Doc
-    def _weeks_range_identification(self, date_list=None, original_list=None):
-        """
-        :param date_list:
-        :param original_list:
-        :return:
-
-        identify a week range
-        """
-        if original_list is None:
-            original_list = []
-        if date_list is None:
-            date_list = []
-        new_text = self.text.lower().replace(',', '')
-        is_everyday = self._is_everyday_present(new_text)
-        is_range = self._is_range_present(new_text)
-        if is_range and is_everyday and len(date_list) <= 4 and self._check_current_day(date_list):
-            date_list = date_list[:2]
-            if len(date_list) == 2:
-                date_list.sort()
-                date_list[0]['type'] = REPEAT_START_RANGE
-                date_list[1]['type'] = REPEAT_END_RANGE
-        elif is_range and len(date_list) <= 4 and self._check_current_day(date_list):
-            date_list = date_list[:2]
-            date_list.sort()
-            if len(date_list) == 2:
-                date_list[0]['type'] = START_RANGE
-                date_list[1]['type'] = END_RANGE
-            original_list = original_list[:len(date_list)]
-        return date_list, original_list
-
-    # TODO Doc
-    def _dates_range_identification(self, date_list=None, original_list=None):
-        """
-        :param date_list:
-        :param original_list:
-        :return:
-        """
-        if date_list is None:
-            date_list = []
-        if original_list is None:
-            original_list = []
-        new_text = self.text.lower().replace(',', '')
-        # Changed to single function because of removal of duplicate function
-        is_range = self._is_range_present(new_text)
-        if is_range and self._check_date_presence(date_list):
-            date_list = date_list[:2]
-            date_list.sort()
-            if len(date_list) == 2:
-                date_list[0]['type'] = DATE_START_RANGE
-                date_list[1]['type'] = DATE_END_RANGE
-            original_list = original_list[:len(date_list)]
-        return date_list, original_list
+    # def _weeks_range_identification(self, date_list=None, original_list=None):
+    #     """
+    #     :param date_list:
+    #     :param original_list:
+    #     :return:
+    #
+    #     identify a week range
+    #     """
+    #     if original_list is None:
+    #         original_list = []
+    #     if date_list is None:
+    #         date_list = []
+    #     new_text = self.text.lower().replace(',', '')
+    #     is_everyday = self._is_everyday_present(new_text)
+    #     is_range = self._is_range_present(new_text)
+    #     if is_range and is_everyday and len(date_list) <= 4 and self._check_current_day(date_list):
+    #         date_list = date_list[:2]
+    #         if len(date_list) == 2:
+    #             date_list.sort()
+    #             date_list[0]['type'] = REPEAT_START_RANGE
+    #             date_list[1]['type'] = REPEAT_END_RANGE
+    #     elif is_range and len(date_list) <= 4 and self._check_current_day(date_list):
+    #         date_list = date_list[:2]
+    #         date_list.sort()
+    #         if len(date_list) == 2:
+    #             date_list[0]['type'] = START_RANGE
+    #             date_list[1]['type'] = END_RANGE
+    #         original_list = original_list[:len(date_list)]
+    #     return date_list, original_list
+    #
+    # # TODO Doc
+    # def _dates_range_identification(self, date_list=None, original_list=None):
+    #     """
+    #     :param date_list:
+    #     :param original_list:
+    #     :return:
+    #     """
+    #     if date_list is None:
+    #         date_list = []
+    #     if original_list is None:
+    #         original_list = []
+    #     new_text = self.text.lower().replace(',', '')
+    #     # Changed to single function because of removal of duplicate function
+    #     is_range = self._is_range_present(new_text)
+    #     if is_range and self._check_date_presence(date_list):
+    #         date_list = date_list[:2]
+    #         date_list.sort()
+    #         if len(date_list) == 2:
+    #             date_list[0]['type'] = DATE_START_RANGE
+    #             date_list[1]['type'] = DATE_END_RANGE
+    #         original_list = original_list[:len(date_list)]
+    #     return date_list, original_list
 
     def __get_month_index(self, value):
         """
@@ -1800,7 +1807,8 @@ class DateOnlyDetector(object):
                 return day
         return None
 
-class DateDetector(object):
+
+class DateAdvanceDetector(object):
     """
     DateDetector detects dates from the text. It Detects date with the properties like "from", "to", "range" and
     "normal". These dates are returned in a dictionary form that contains relevant text, its actual value
@@ -1838,7 +1846,7 @@ class DateDetector(object):
         self.regx_to_process_text = Regex([(r'[\,]', r'')])
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateOnlyDetector(entity_name=self.entity_name, timezone=timezone)
+        self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
         self.bot_message = None
 
     def detect_entity(self, text, run_model=False):
@@ -1903,13 +1911,13 @@ class DateDetector(object):
         """
         # print 'detection for default task'
         final_date_dict_list = []
+        date_dict_list = self._detect_range()
+        final_date_dict_list.extend(date_dict_list)
+        self._update_processed_text(date_dict_list)
         date_dict_list = self._detect_return_date()
         final_date_dict_list.extend(date_dict_list)
         self._update_processed_text(date_dict_list)
         date_dict_list = self._detect_departure_date()
-        final_date_dict_list.extend(date_dict_list)
-        self._update_processed_text(date_dict_list)
-        date_dict_list = self._detect_departure_return_date()
         final_date_dict_list.extend(date_dict_list)
         self._update_processed_text(date_dict_list)
         date_dict_list = self._detect_any_date()
@@ -1918,7 +1926,7 @@ class DateDetector(object):
 
         return final_date_dict_list
 
-    def _detect_departure_return_date(self):
+    def _detect_range(self):
         """
         Finds <any text><space(s)><'-' or 'to' or '2'><space(s)><any text> in the given text.
         It  splits the text into two parts on '-' or 'to' or '2'
@@ -1930,15 +1938,27 @@ class DateDetector(object):
             for each detected date, and second list containing corresponding original substrings in text
         """
         date_dict_list = []
-        patterns = re.findall(r'\b((.+)\s*(\-|to)\s*(.+))\b', self.processed_text.lower())
-        for pattern in patterns:
-            date_dict_list.extend(
-                self._date_dict_from_text(text=pattern[1], from_property=True)
-            )
+        regex_pattern = r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?' + \
+                        r'(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b'
+        patterns = re.findall(regex_pattern, self.processed_text.lower())
+        if patterns:
+            for pattern in patterns:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[0])
+                )
+            date_dict_list[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
+            date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
 
-            date_dict_list.extend(
-                self._date_dict_from_text(text=pattern[3], to_property=True)
-            )
+        else:
+            patterns = re.findall(r'\b((.+)\s*(\-|to)\s*(.+))\b', self.processed_text.lower())
+            for pattern in patterns:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[1], start_range_property=True)
+                )
+
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[3], end_range_property=True)
+                )
         return date_dict_list
 
     def _detect_departure_date(self):
@@ -1953,12 +1973,11 @@ class DateDetector(object):
             for each detected date, and second list containing corresponding original substrings in text
         """
         date_dict_list = []
-        regex_string = r'\b((onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
+        regex_string = r'\b((this|from|onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
                        r'departing on|departing|going on|for|departs on)\s+(.+))\b'
         patterns = re.findall(regex_string, self.processed_text.lower())
 
         for pattern in patterns:
-
             date_dict_list.extend(
                 self._date_dict_from_text(text=pattern[2], from_property=True)
             )
@@ -2054,8 +2073,8 @@ class DateDetector(object):
             date_dict_list: list of substrings of original text to be replaced with tag created from entity_name
         """
         for date_dict in date_dict_list:
-                self.tagged_text = self.tagged_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], self.tag)
-                self.processed_text = self.processed_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], '')
+            self.tagged_text = self.tagged_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], self.tag)
+            self.processed_text = self.processed_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], '')
 
     def set_bot_message(self, bot_message):
         """
@@ -2093,8 +2112,8 @@ class DateDetector(object):
             sorted_original_list = original_list
         return sorted_date_list, sorted_original_list
 
-    def _date_dict_from_text(self, text, from_property=False, to_property=False, range_property=False,
-                             normal_property=False, detection_method=FROM_MESSAGE):
+    def _date_dict_from_text(self, text, from_property=False, to_property=False, start_range_property=False,
+                             end_range_property=False, normal_property=False, detection_method=FROM_MESSAGE):
         """
         Takes the text and the property values and creates a list of dictionaries based on number of dates detected
 
@@ -2136,7 +2155,8 @@ class DateDetector(object):
                     detector_constant.ORIGINAL_DATE_TEXT: original_list[index],
                     detector_constant.DATE_FROM_PROPERTY: from_property,
                     detector_constant.DATE_TO_PROPERTY: to_property,
-                    detector_constant.DATE_RANGE_PROPERTY: range_property,
+                    detector_constant.DATE_START_RANGE_PROPERTY: start_range_property,
+                    detector_constant.DATE_END_RANGE_PROPERTY: end_range_property,
                     detector_constant.DATE_NORMAL_PROPERTY: normal_property,
                     detector_constant.DATE_DETECTION_METHOD: detection_method
                 }
@@ -2156,10 +2176,46 @@ class DateDetector(object):
 
             For example:
 
-                (['Mumbai'], ['bombay'])
+                (['friday'], ['friday'])
         """
         date_list, original_list = self.date_detector_object.detect_entity(text)
         return date_list, original_list
+
+    def convert_date_dict_in_tuple(self, entity_dict_list):
+        """
+        This function takes the input as a list of dictionary and converts it into tuple which is
+        for now the standard format  of individual detector function
+
+        Attributes:
+            entity_dict_list: List of dictionary containing the detected date from text. It contains all the
+            necessary information like original_text, value, how its detected and properties like from, to, range and
+            normal
+
+        Returns:
+            Returns the tuple containing list of entity_values, original_text and detection method
+
+            For example:
+
+                (['friday'], ['friday'], ['message'])
+
+        """
+        entity_list, original_list, detection_list = [], [], []
+        for entity_dict in entity_dict_list:
+            entity_list.append(
+                {
+                    detector_constant.DATE_VALUE: entity_dict[detector_constant.DATE_VALUE],
+                    detector_constant.DATE_FROM_PROPERTY: entity_dict[detector_constant.DATE_FROM_PROPERTY],
+                    detector_constant.DATE_TO_PROPERTY: entity_dict[detector_constant.DATE_TO_PROPERTY],
+                    detector_constant.DATE_START_RANGE_PROPERTY: entity_dict[
+                        detector_constant.DATE_START_RANGE_PROPERTY],
+                    detector_constant.DATE_END_RANGE_PROPERTY: entity_dict[detector_constant.DATE_END_RANGE_PROPERTY],
+                    detector_constant.DATE_NORMAL_PROPERTY: entity_dict[detector_constant.DATE_NORMAL_PROPERTY],
+
+                }
+            )
+            original_list.append(entity_dict[detector_constant.ORIGINAL_DATE_TEXT])
+            detection_list.append(entity_dict[detector_constant.DATE_DETECTION_METHOD])
+        return entity_list, original_list, detection_list
 
     def _date_model_detection(self):
         """
@@ -2172,13 +2228,13 @@ class DateDetector(object):
             Note:  before calling this method you need to call set_bot_message() to set a bot message.
 
             self.bot_message = 'Please help me with your departure date?'
-            self.text = 'mummbai
+            self.text = 'monday
 
             Output:
                 [
                     {
-                        'date':'mumbai',
-                        'original_text': 'mummbai',
+                        'date':'monday',
+                        'original_text': 'monday',
                         'from': true,
                         'to': false,
                         'range': false,
@@ -2220,7 +2276,7 @@ class DateDetector(object):
                 date_value = entity_value_list[0]
                 detection_method = FROM_MODEL_VERIFIED
             else:
-                date_value = output[model_constant.MODEL_date_VALUE]
+                date_value = output[model_constant.MODEL_DATE_VALUE]
                 detection_method = FROM_MODEL_NOT_VERIFIED
 
             date_dict_list.append(
@@ -2229,11 +2285,11 @@ class DateDetector(object):
                     detector_constant.ORIGINAL_DATE_TEXT: output[model_constant.MODEL_DATE_VALUE],
                     detector_constant.DATE_FROM_PROPERTY: output[model_constant.MODEL_DATE_FROM],
                     detector_constant.DATE_TO_PROPERTY: output[model_constant.MODEL_DATE_TO],
-                    detector_constant.DATE_RANGE_PROPERTY: output[model_constant.MODEL_DATE_RANGE],
+                    detector_constant.DATE_START_RANGE_PROPERTY: output[model_constant.MODEL_START_DATE_RANGE],
+                    detector_constant.DATE_END_RANGE_PROPERTY: output[model_constant.MODEL_END_DATE_RANGE],
                     detector_constant.DATE_NORMAL_PROPERTY: output[model_constant.MODEL_DATE_NORMAL],
                     detector_constant.DATE_DETECTION_METHOD: detection_method
                 }
 
             )
         return date_dict_list
-
