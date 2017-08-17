@@ -672,50 +672,6 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
 
     return None
 
-
-def get_date_advance(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the DateAdvanceDetector class to detect departure date and arrival date.
-    We can add different properties of date detection in this class
-
-    Attributes:
-        NOTE: Explained above
-
-    Output:
-        NOTE: Explained above
-
-    For Example:
-
-        message = "21/2/17"
-        entity_name = 'date'
-        structured_value = None
-        fallback_value = None
-        bot_message = 'Please help me with return date?'
-        output = get_date_advance(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-
-            >> [{'detection': 'message', 'original_text': '21/2/17',
-            'entity_value': {'date_return': {'mm': 2, 'yy': 2017, 'dd': 21, 'type': 'date'}, 'date_departure': None}}]
-
-    """
-    date_detection = DateAdvanceDetector(entity_name=entity_name)
-    date_detection.set_bot_message(bot_message=bot_message)
-    if structured_value:
-        entity_list, original_text_list = date_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = date_detection.detect_entity(text=message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
-
-    return None
-
-
 def output_entity_dict_list(entity_value_list=None, original_text_list=None, detection_method=None,
                             detection_method_list=None):
     """This function will return the list of dictionary as an output.

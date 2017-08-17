@@ -61,7 +61,7 @@ class DateDetector(object):
         19.probable date from only Xth next month                   _date_identification_given_day_and_next_month
         20."everyday" variants                                      _date_identification_everyday
         21."everyday except weekends" variants                      _date_identification_everyday_except_weekends
-        22."everday except weekdays" variants                       _date_identification_everyday_except_weekdays
+        22."everyday except weekdays" variants                       _date_identification_everyday_except_weekdays
         23."every monday" variants                                  _weeks_identification
         24."after n days" variants                                  _date_days_after
         25."n days later" variants                                  _date_days_later
@@ -1471,7 +1471,7 @@ class DateDetector(object):
         """
         Detects probable "start_date to/till/- end_date of month" format and its variants and returns both start date
         and end date
-        format: <day><ordinal inidicator><range separator><day><ordinal inidicator><separator><Optional "of"><month>
+        format: <day><ordinal indicator><range separator><day><ordinal indicator><separator><Optional "of"><month>
         where each part is in of one of the formats given against them
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
@@ -1650,19 +1650,20 @@ class DateDetector(object):
 
 class DateAdvanceDetector(object):
     """
-    DateDetector detects dates from the text. It Detects date with the properties like "from", "to", "range" and
-    "normal". These dates are returned in a dictionary form that contains relevant text, its actual value
-    and its attribute in boolean field i.e. "from", "to", "range", "normal".
-    This class uses DateOnlyDetector to detect the entity values. It also has model integrated to it that can be used to
+    DateAdvanceDetector detects dates from the text. It Detects date with the properties like "from", "to","start_range"
+    ,"end_range"and "normal". These dates are returned in a dictionary form that contains relevant text, 
+    its actual value and its attribute in boolean field i.e. "from", "to", "start_range", "end_range" and "normal".
+    This class uses DateDetector to detect the entity values. It also has model integrated to it that can be used to
     extract relevant dates from the text
 
     Attributes:
         text: string to extract entities from
-        entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tagged_text: string with date entities replaced with tag defined by entity name
         processed_text: string with detected date entities removed
         date: list of date entities detected
         original_date_text: list to store substrings of the date detected as date entities
+        regex_to_process_text: Replaces ',' with empty strings ''
+        entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tag: entity_name prepended and appended with '__'
         date_detector_object: DateDetector object used to detect dates in the given text
         bot_message: boolean, set as the outgoing bot text/message
@@ -1682,8 +1683,7 @@ class DateAdvanceDetector(object):
         self.processed_text = ''
         self.date = []
         self.original_date_text = []
-        self.regx_to_process = Regex([(r'[\/]', r'')])
-        self.regx_to_process_text = Regex([(r'[\,]', r'')])
+        self.regex_to_process_text = Regex([(r'[\,]', r'')])
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
@@ -1696,7 +1696,8 @@ class DateAdvanceDetector(object):
 
         Args:
             text: string to extract date entities from
-
+            run_model: if set true will run the crf model otherwise default value is set to False
+            
         Returns:
             Tuple containing two lists, first containing dictionaries, each containing 'date_return'
             and 'date_departure' keys and dictionaries returned form DateDetector as their values,
@@ -1711,25 +1712,26 @@ class DateAdvanceDetector(object):
                     [{'detection_method': 'message',
                           'from': True,
                           'normal': False,
-                          'range': False,
+                          'start_range': False,
+                          'end_range': False
                           'text': '16th august',
                           'to': False,
                           'value': {'dd': 16, 'mm': 8, 'type': 'date', 'yy': 2017}},
+                          
                     {'detection_method': 'message',
                           'from': False,
                           'normal': False,
-                          'range': False,
+                          'start_range': False,
+                          'end_range': False
                           'text': '27th august',
                           'to': True,
                           'value': {'dd': 27, 'mm': 8, 'type': 'date', 'yy': 2017}}]
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
-        respectively.
-        :param text: 
-        :param run_model: 
+        respectively. 
         """
         self.text = ' ' + text.lower() + ' '
-        self.text = self.regx_to_process_text.text_substitute(self.text)
+        self.text = self.regex_to_process_text.text_substitute(self.text)
         self.processed_text = self.text
         self.tagged_text = self.text
         date_data = []
@@ -1741,13 +1743,11 @@ class DateAdvanceDetector(object):
 
     def _detect_date(self):
         """
-        Detects "departure" and "return" from the object's text attribute
+        Detects a date and categorises it into "from", "to", "start_range", "end_range" and "normal" attributes
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
-            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
-
+            It returns the list of dictionary containing the fields like detection_method, from, normal, to,
+            text, value, start_range, end_range
         """
         final_date_dict_list = []
         date_dict_list = self._detect_range()
@@ -1767,14 +1767,14 @@ class DateAdvanceDetector(object):
 
     def _detect_range(self):
         """
-        Finds <any text><space(s)><'-' or 'to' or '2'><space(s)><any text> in the given text.
-        It  splits the text into two parts on '-' or 'to' or '2'
-        and detects the departure date in the first (left) part and detects return date in the second (right) part
+        Finds <any text><space(s)><'-' or 'to'><space(s)><any text> in the given text.
+        It  splits the text into two parts on '-' or 'to'
+        and detects the start range in the first (left) part and detects end range in the second (right) part
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
-            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for date which is detected as start_range and date
+            that got detected as end_range. For start range the key "start_range" will be set to True.
+            Whereas for end range the key "end_range" will be set to True.
         """
         date_dict_list = []
         regex_pattern = r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?' + \
@@ -1807,9 +1807,8 @@ class DateAdvanceDetector(object):
         keywords.
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
-            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for date which is detected as departure date.
+            For departure date the key "From" will be set to True.
         """
         date_dict_list = []
         regex_string = r'\b((this|from|onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
@@ -1831,9 +1830,8 @@ class DateAdvanceDetector(object):
         Args:
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
-            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for date which is detected as return date.
+            For departure date the key "to" will be set to True.
         """
 
         date_dict_list = []
@@ -1858,9 +1856,11 @@ class DateAdvanceDetector(object):
         Args:
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, each containing 'date_return'
-            and 'date_departure' keys and dictionaries returned form DateDetector as their values,
-            for each detected date, and second list containing corresponding original substrings in text
+            The list of dictionary containing the dictionary for date which is detected as departure date and date
+            that got detected as arrival date or the date that got detected as normal date. For departure date
+            the key "from" will be set to True.
+            Whereas for arrival date the key "to" will be set to True.
+            Otherwise the normal date with the key 'normal' will be set to True
         """
         date_dict_list = []
         departure_date_flag = False
@@ -1897,10 +1897,10 @@ class DateAdvanceDetector(object):
 
     def _update_processed_text(self, date_dict_list):
         """
-        Replaces detected date entities with tag generated from entity_name used to initialize the object with
+         Replaces detected date with tag generated from entity_name used to initialize the object with
 
-        A final string with all date entities replaced will be stored in object's tagged_text attribute
-        A string with all date entities removed will be stored in object's processed_text attribute
+        A final string with all dates replaced will be stored in object's tagged_text attribute
+        A string with all dates removed will be stored in object's processed_text attribute
 
         Args:
             date_dict_list: list of substrings of original text to be replaced with tag created from entity_name
@@ -1914,7 +1914,7 @@ class DateAdvanceDetector(object):
         Sets the object's bot_message attribute
 
         Args:
-            bot_message: string
+            bot_message: is the previous message that is sent by the bot
         """
         self.bot_message = bot_message
 
@@ -1952,11 +1952,11 @@ class DateAdvanceDetector(object):
 
         Attributes:
             text: Text on which TextDetection needs to run on
-            from_property: True if the text is belonging to "from" property". for example, From Mumbai
-            to_property: True if the text is belonging to "to" property". for example, To Mumbai
-            start_range_property: True if the text is belonging to "range" property". for example, range Mumbai
-            end_range_property: True if the text is belonging to "range" property". for example, range Mumbai
-            normal_property: True if the text is belonging to "normal" property". for example, atms in Mumbai
+            from_property: True if the text is belonging to "from" property". for example, From monday
+            to_property: True if the text is belonging to "to" property". for example, To monday
+            start_range_property: True if the text is belonging to "start_range" property". for example, starting from monday
+            end_range_property: True if the text is belonging to "end_range" property". for example, to monday
+            normal_property: True if the text is belonging to "normal" property". for example, every monday
             detection_method: method through which it got detected whether its through message or model
 
         Returns:
@@ -1964,19 +1964,26 @@ class DateAdvanceDetector(object):
             It returns the list of dictionary containing the fields like detection_method, from, normal, to,
             text, value, range
 
-            For example:
+            Examples:
 
-                [
-                    {
-                      'detection_method': 'message',
-                      'from': False,
-                      'normal': True,
-                      'text': 'mumbai',
-                      'to': False,
-                      'value': u'BOM',
-                      'range': False
-                    }
-                ]
+                Output:
+                    [{'detection_method': 'message',
+                          'from': True,
+                          'normal': False,
+                          'start_range': False,
+                          'end_range': False
+                          'text': '16th august',
+                          'to': False,
+                          'value': {'dd': 16, 'mm': 8, 'type': 'date', 'yy': 2017}},
+                          
+                    {'detection_method': 'message',
+                          'from': False,
+                          'normal': False,
+                          'start_range': False,
+                          'end_range': False
+                          'text': '27th august',
+                          'to': True,
+                          'value': {'dd': 27, 'mm': 8, 'type': 'date', 'yy': 2017}}]
 
         """
         date_dict_list = []
@@ -2000,13 +2007,14 @@ class DateAdvanceDetector(object):
 
     def _date_value(self, text):
         """
-        Detects date from text by running TextDetection class.
+        Detects date from text by running DateDetector class.
 
         Args:
-            text: message to process
+            text: date to process
+            
         Returns:
             A tuple of two lists with first list containing the detected dates and second list containing their
-            corresponding substrings in the given text. For example:
+            corresponding substrings in the given date. For example:
 
             For example:
 
@@ -2057,42 +2065,48 @@ class DateAdvanceDetector(object):
             Note:  before calling this method you need to call set_bot_message() to set a bot message.
 
             self.bot_message = 'Please help me with your departure date?'
-            self.text = 'monday
+            self.text = '26th november'
 
             Output:
-                [
-                    {
-                        'date':'monday',
-                        'original_text': 'monday',
-                        'from': true,
-                        'to': false,
-                        'range': false,
-                        'normal': false
-                        'detection_method': model_verified
-                    }
-                ]
+               [
+                 {
+                 
+                  'detection_method': 'message',
+                  'end_range': False,
+                  'from': False,
+                  'normal': True,
+                  'start_range': False,
+                  'text': '26th november',
+                  'to': False,
+                  'value': {'dd': 26, 'mm': 11, 'type': 'date', 'yy': 2017}
+                  'detection_method': model_verified
+                  
+                  }
+               ]
+
 
 
         For Example:
 
             self.bot_message = 'Please help me with your departure date?'
-            self.text = 'dehradun'
+            self.text = 'monday'
 
             Output:
                  [
                     {
-                        'date':'dehradun',
-                        'original_text': 'dehradun',
-                        'from': true,
-                        'to': false,
-                        'range': false,
-                        'normal': false
-                        'detection_method': model_not_verified
-
+                  
+                      'detection_method': 'message',
+                      'end_range': False,
+                      'from': False,
+                      'normal': True,
+                      'start_range': False,
+                      'text': 'monday',
+                      'to': False,
+                      'value': {'dd': 21, 'mm': 8, 'type': 'day_within_one_week', 'yy': 2017}
+                      'detection_method': model_not_verified
+                      
                     }
-                ]
-
-                 Note: Dehradun is not present in out datastore so it will take original value as entity value.
+                 ]
 
         """
         date_dict_list = []
