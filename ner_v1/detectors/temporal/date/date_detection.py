@@ -176,7 +176,7 @@ class DateAdvanceDetector(object):
             For departure date the key "From" will be set to True.
         """
         date_dict_list = []
-        regex_string = r'\b((this|from|onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
+        regex_string = r'\b((onward date\:|onward date -|on|departure date|leaving on|starting from|' + \
                        r'departing on|departing|going on|for|departs on)\s+(.+))\b'
         patterns = re.findall(regex_string, self.processed_text.lower())
 
@@ -262,7 +262,7 @@ class DateAdvanceDetector(object):
 
     def _update_processed_text(self, date_dict_list):
         """
-         Replaces detected date with tag generated from entity_name used to initialize the object with
+        Replaces detected date with tag generated from entity_name used to initialize the object with
 
         A final string with all dates replaced will be stored in object's tagged_text attribute
         A string with all dates removed will be stored in object's processed_text attribute
@@ -282,30 +282,6 @@ class DateAdvanceDetector(object):
             bot_message: is the previous message that is sent by the bot
         """
         self.bot_message = bot_message
-
-    def _sort_date_list(self, date_list, original_list):
-        """
-        Sorts the date_list and original_list according to date value in chronological order
-
-        Args:
-            date_list: List of dictionaries of date values for detected dates in the text
-            original_list: List of substrings of the given text to DateDetector that correspond to the
-                            detected dates in the date_list
-
-        Returns:
-            Tuple containing two lists, first containing dictionaries of detected dates sorted in chronological order
-            and second list containing their corresponding substrings of text
-
-        Example:
-        """
-        if len(date_list) > 1:
-            dates_zip = zip(date_list, original_list)
-            sorted_dates_zip = sorted(dates_zip, key=lambda d: d[0].values())
-            sorted_date_list, sorted_original_list = map(list, zip(*sorted_dates_zip))
-        else:
-            sorted_date_list = date_list
-            sorted_original_list = original_list
-        return sorted_date_list, sorted_original_list
 
     def _date_dict_from_text(self, text, from_property=False, to_property=False, start_range_property=False,
                              end_range_property=False, normal_property=False, detection_method=FROM_MESSAGE):
@@ -498,6 +474,7 @@ class DateAdvanceDetector(object):
 
             )
         return date_dict_list
+
 
 class DateDetector(object):
     """
@@ -918,7 +895,7 @@ class DateDetector(object):
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
-            oridinal indicator: "st", "nd", "rd", "th", space
+            ordinal indicator: "st", "nd", "rd", "th", space
             separator: ",", space
 
         Two character years are assumed to be belong to 21st century - 20xx.
@@ -1019,13 +996,13 @@ class DateDetector(object):
         """
         Detects date in the following format
 
-        format: <year><separator><day><Optional oridinal indicator><separator><month>
+        format: <year><separator><day><Optional ordinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: ",", space
-            oridinal indicator: "st", "nd", "rd", "th", space
+            ordinal indicator: "st", "nd", "rd", "th", space
 
         Two character years are assumed to be belong to 21st century - 20xx.
         Only years between 1900 to 2099 are detected
@@ -1070,13 +1047,13 @@ class DateDetector(object):
         """
         Detects date in the following format
 
-        format: <month><separator><day><Optional oridinal indicator><separator><year>
+        format: <month><separator><day><Optional ordinal indicator><separator><year>
         where each part is in of one of the formats given against them
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
             year: yy, yyyy
             separator: ",", space
-            oridinal indicator: "st", "nd", "rd", "th", space
+            ordinal indicator: "st", "nd", "rd", "th", space
 
         Two character years are assumed to be belong to 21st century - 20xx.
         Only years between 1900 to 2099 are detected
@@ -1124,12 +1101,12 @@ class DateDetector(object):
         """
         Detects date in the following format
 
-        format: <month><separator><day><Optional oridinal indicator>
+        format: <month><separator><day><Optional ordinal indicator>
         where each part is in of one of the formats given against them
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
             separator: ",", space
-            oridinal indicator: "st", "nd", "rd", "th", space
+            ordinal indicator: "st", "nd", "rd", "th", space
 
         Two character years are assumed to be belong to 21st century - 20xx.
         Only years between 1900 to 2099 are detected
@@ -1182,12 +1159,12 @@ class DateDetector(object):
         """
         Detects date in the following format
 
-        format: <day><Optional oridinal indicator><separator><month>
+        format: <day><Optional ordinal indicator><separator><month>
         where each part is in of one of the formats given against them
             day: d, dd
             month: mmm, mmmm (abbreviation or spelled out in full)
             separator: ",", space
-            oridinal indicator: "st", "nd", "rd", "th", space
+            ordinal indicator: "st", "nd", "rd", "th", space
 
         Optional "of" is allowed after ordinal indicator, example "dd th of this current month"
 
@@ -1607,10 +1584,10 @@ class DateDetector(object):
         Detects probable date given only day part. The month and year are assumed to be current month and current year
         respectively. Consider checking if the returned detected date is valid.
 
-        format: <day><Optional space><oridnal indicator>
+        format: <day><Optional space><ordinal indicator>
         where each part is in of one of the formats given against them
             day: d, dd
-            oridinal indicator: "st", "nd", "rd", "th"
+            ordinal indicator: "st", "nd", "rd", "th"
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
@@ -1654,10 +1631,10 @@ class DateDetector(object):
         Detects probable date given day part and . The year is assumed to be current year
         Consider checking if the returned detected date is valid.
 
-        Matches <day><Optional oridnal indicator><"this" or "dis"><Optional "current" or "curent"><"mnth" or "month">
+        Matches <day><Optional ordinal indicator><"this" or "dis"><Optional "current" or "curent"><"mnth" or "month">
         where each part is in of one of the formats given against them
             day: d, dd
-            oridinal indicator: "st", "nd", "rd", "th"
+            ordinal indicator: "st", "nd", "rd", "th"
         
         Optional "of" is allowed after ordinal indicator, example "dd th of this current month"
 
@@ -1702,10 +1679,10 @@ class DateDetector(object):
         Detects probable date given day part and "next month" synonyms. The year is assumed to be current year
         Consider checking if the returned detected date is valid.
 
-        Matches <day><Optional oridnal indicator><"this" or "dis"><"next" variants><"mnth" or "month">
+        Matches <day><Optional ordinal indicator><"this" or "dis"><"next" variants><"mnth" or "month">
         where each part is in of one of the formats given against them
             day: d, dd
-            oridinal indicator: "st", "nd", "rd", "th"
+            ordinal indicator: "st", "nd", "rd", "th"
             "next" variants: "next", "nxt", "comming", "coming", "commin", "following", "folowin", "followin",
                              "folowing"
         
@@ -1752,7 +1729,7 @@ class DateDetector(object):
 
     def _date_identification_everyday(self, date_list=None, original_list=None, n_days=30):
         """
-        Detects "everday" and its variants and returns all the dates of the next n_days from current date.
+        Detects "everyday" and its variants and returns all the dates of the next n_days from current date.
         Matches "everyday", "daily", "every day", "all day", "all days"
 
         Args:
