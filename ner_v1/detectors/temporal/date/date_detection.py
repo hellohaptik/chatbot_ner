@@ -1748,7 +1748,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        now = datetime.datetime.now()
+        now = self.date_object
         end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b\s*((everyday|daily|every\s{0,3}day|all\sday|all\sdays))\s*\b',
                               self.processed_text.lower())
@@ -1799,7 +1799,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        now = datetime.datetime.now()
+        now = self.date_object
         end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b(([eE]veryday|[dD]aily)|all\sdays[\s]?except[\s]?([wW]eekend|[wW]eekends))\b',
                               self.processed_text.lower())
@@ -1813,7 +1813,7 @@ class DateDetector(object):
         today = now.weekday()
         count = 0
         weekend = []
-        date_day = datetime.datetime.now()
+        date_day = self.date_object
         while count < 15:
             if today > 6:
                 today = 0
@@ -1877,7 +1877,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        now = datetime.datetime.now()
+        now = self.date_object
         end = now + datetime.timedelta(days=n_days)
         patterns = re.findall(r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?([wW]eekday|[wW]eekdays))\b'
                               , self.processed_text.lower())
@@ -1892,7 +1892,7 @@ class DateDetector(object):
         today = now.weekday()
         count = 0
         weekend = []
-        date_day = datetime.datetime.now()
+        date_day = self.date_object
         while count < 50:
             if today > 6:
                 today = 0
