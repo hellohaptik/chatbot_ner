@@ -1432,7 +1432,7 @@ class DateDetector(object):
                 'dd': int(dd),
                 'mm': int(mm),
                 'yy': int(yy),
-                'type': TYPE_N_DAYS_LATER
+                'type': TYPE_N_DAYS_AFTER
             }
             date_list.append(date_dict)
             original_list.append(original)
