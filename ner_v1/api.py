@@ -8,7 +8,7 @@ from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE
 from chatbot_ner.config import ner_logger
 from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_number, get_email, get_city, get_pnr, \
-    get_number, get_shopping_size, get_time, get_date, get_budget, get_date_advance
+    get_number, get_shopping_size, get_time, get_date, get_budget
 
 
 def get_parameters_dictionary(request):
@@ -265,29 +265,6 @@ def budget(request):
     except TypeError, e:
         entity_output = {}
         ner_logger.debug('Exception for budget: %s ' % e)
-        return HttpResponse(status=400)
-
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
-
-
-def date_advance(request):
-    """This functionality calls the get_date_advance() functionality to detect advance date attributes .
-    It is called through api call
-
-    Attributes:
-        request: url parameters
-
-    """
-    try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        entity_output = get_date_advance(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                         parameters_dict[PARAMETER_BOT_MESSAGE])
-        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for date departure: %s ' % e)
         return HttpResponse(status=400)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
