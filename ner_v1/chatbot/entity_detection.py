@@ -568,7 +568,7 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_date(message, entity_name, structured_value, fallback_value, bot_message):
+def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone):
     """This functionality calls the DateDetector class to detect date
 
     Attributes:
@@ -605,7 +605,9 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
                 'entity_value': {'mm': 3, 'yy': 2017, 'dd': 13, 'type': 'day_after'}}]
 
     """
-    date_detection = DateAdvanceDetector(entity_name=entity_name)
+    if timezone is None:
+        timezone = 'UTC'
+    date_detection = DateAdvanceDetector(entity_name=entity_name, timezone=timezone)
     date_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         entity_dict_list = date_detection.detect_entity(text=structured_value)

@@ -2,6 +2,8 @@ import re
 import copy
 import datetime
 import pytz
+
+from chatbot_ner.config import ner_logger
 from lib.nlp.regex import Regex
 from models.models import Models
 import models.constant as model_constant
@@ -51,8 +53,13 @@ class DateAdvanceDetector(object):
         self.regex_to_process_text = Regex([(r'[\,]', r'')])
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=self.entity_name, timezone=timezone)
         self.bot_message = None
+        try:
+                self.date_detector_object = datetime.datetime.now(pytz.timezone(timezone))
+        except Exception, e:
+                ner_logger.debug('Timezone error: %s ' % e)
+                self.date_detector_object = datetime.datetime.now(pytz.timezone('UTC'))
+                ner_logger.debug('Default timezone passed as "UTC"')
 
     def detect_entity(self, text, run_model=False):
         """
