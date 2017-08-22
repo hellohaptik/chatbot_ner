@@ -581,11 +581,12 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
 
         message = "set me reminder on 23rd december"
         entity_name = 'date'
+        timezone = 'UTC'
         structured_value = None
         fallback_value = None
         bot_message = None
         output = get_date(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                          fallback_value=fallback_value, bot_message=bot_message, timezone = timezone)
         print output
 
             >> [{'detection': 'message', 'original_text': '23rd december',
@@ -597,8 +598,9 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
         structured_value = None
         fallback_value = None
         bot_message = None
+        timezone = 'UTC'
         output = get_date(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                          fallback_value=fallback_value, bot_message=bot_message, timezone = timezone)
         print output
 
             >> [{'detection': 'message', 'original_text': 'day after tomorrow',

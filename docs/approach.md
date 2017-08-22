@@ -67,8 +67,7 @@ We have classified entities into four main types i.e. *numeral*, *pattern*, *tem
 | email         | EmailDetector        | Detects email addresses in given text.   | apurva.n@haptik.ai                       |
 | phone_number  | PhoneDetector        | Detects phone numbers in given text.     | +919222222222                            |
 | pnr           | PNRDetector          | Detects PNR (serial) codes  in given text. | 4SGX3E, 9876543210                       |
-| date          | DateDetector         | Detects date in various formats from given text. | 28-12-2096, 09th Nov 2014, Tomorrow      |
-| date_advance  | DateAdvanceDetector  | Detects dates subject to conditions like "departure date" and "return date". | on 21st January, to 22nd Jan             |
+| date          | DateAdvancedDetector | Detects date in various formats from given text. | 28-12-2096, 09th Nov 2014, Tomorrow      |
 | city          | CityDetector         | Identifies the city from the text along with its properties | Delhi, Mumbai, from mumbai, mumbai to pune |
 | location      | LocationDetector     | Detects location from the text. It is similar to TextDetection but we are trying to improve it with better version. | Andheri, Goregaon                        |
 | time          | TimeDetector         | Detects time in various formats from given text. | in 15 mins,  12:30pm, 4:30               |

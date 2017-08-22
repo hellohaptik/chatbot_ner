@@ -53,13 +53,8 @@ class DateAdvanceDetector(object):
         self.regex_to_process_text = Regex([(r'[\,]', r'')])
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
+        self.date_detector_object = DateDetector(entity_name=entity_name, timezone=timezone)
         self.bot_message = None
-        try:
-                self.date_detector_object = datetime.datetime.now(pytz.timezone(timezone))
-        except Exception, e:
-                ner_logger.debug('Timezone error: %s ' % e)
-                self.date_detector_object = datetime.datetime.now(pytz.timezone('UTC'))
-                ner_logger.debug('Default timezone passed as "UTC"')
 
     def detect_entity(self, text, run_model=False):
         """
@@ -567,7 +562,12 @@ class DateDetector(object):
         self.regx_to_process_text = Regex([(r'[\,]', r'')])
         self.tag = '__' + entity_name + '__'
         self.timezone = timezone
-        self.date_object = datetime.datetime.now(self.timezone)
+        try:
+                self.date_object = datetime.datetime.now(pytz.timezone(timezone))
+        except Exception, e:
+                ner_logger.debug('Timezone error: %s ' % e)
+                self.date_object = datetime.datetime.now(pytz.timezone('UTC'))
+                ner_logger.debug('Default timezone passed as "UTC"')
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
 
