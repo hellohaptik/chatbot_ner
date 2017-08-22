@@ -628,8 +628,8 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
             entity_dict_list = date_detection.detect_entity(text=fallback_value, run_model=False)
             entity_list, original_text_list, detection_method_list = \
                 date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
-            return output_entity_dict_list(entity_value=entity_list, original_text=original_text_list,
-                                            detection_method=FROM_FALLBACK_VALUE)
+            return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
+                                           detection_method=FROM_FALLBACK_VALUE)
 
     return None
 
