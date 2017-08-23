@@ -568,7 +568,7 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone):
+def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC'):
     """This functionality calls the DateDetector class to detect date
 
     Attributes:
