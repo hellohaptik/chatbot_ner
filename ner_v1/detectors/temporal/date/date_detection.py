@@ -158,17 +158,11 @@ class DateAdvanceDetector(object):
         else:
             patterns = re.findall(r'\b((.+)\s*(\-|to)\s*(.+))\b', self.processed_text.lower())
             for pattern in patterns:
-                date_dict_list.extend(
-                    self._date_dict_from_text(text=pattern[1], start_range_property=True)
-                )
-
-                date_dict_list.extend(
-                    self._date_dict_from_text(text=pattern[3], end_range_property=True)
-                )
-            if len(date_dict_list) == 1:
-                date_dict_list[0][detector_constant.DATE_START_RANGE_PROPERTY] = False
-                date_dict_list[0][detector_constant.DATE_END_RANGE_PROPERTY] = False
-                date_dict_list[0][detector_constant.DATE_NORMAL_PROPERTY] = True
+                start_date_list = self._date_dict_from_text(text=pattern[1], start_range_property=True)
+                end_date_list = self._date_dict_from_text(text=pattern[3], end_range_property=True)
+                if start_date_list and end_date_list:
+                    date_dict_list.extend(start_date_list)
+                    date_dict_list.extend(end_date_list)
         return date_dict_list
 
     def _detect_departure_date(self):
