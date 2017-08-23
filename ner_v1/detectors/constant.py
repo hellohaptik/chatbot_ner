@@ -10,7 +10,7 @@ TYPE_TOMORROW = 'tomorrow'
 TYPE_YESTERDAY = 'yesterday'
 TYPE_DAY_AFTER = 'day_after'
 TYPE_DAY_BEFORE = 'day_before'
-
+TYPE_N_DAYS_AFTER = 'after_n_days'
 # Note constant values have changed, haptik_api would break at
 # haptik_api/ares/entities/constant.py
 # haptik_api/ares/lib/external_api_response/cron.py
@@ -83,3 +83,14 @@ CITY_NORMAL_PROPERTY = 'normal'
 CITY_VALUE = 'value'
 ORIGINAL_CITY_TEXT = 'text'
 CITY_DETECTION_METHOD = 'detection_method'
+
+# CONSTANTS USED FOR DATE DETECTION
+DATE_FROM_PROPERTY = 'from'
+DATE_TO_PROPERTY = 'to'
+DATE_START_RANGE_PROPERTY = 'start_range'
+DATE_END_RANGE_PROPERTY = 'end_range'
+DATE_NORMAL_PROPERTY = 'normal'
+DATE_TYPE_PROPERTY = 'type'
+DATE_VALUE = 'value'
+ORIGINAL_DATE_TEXT = 'text'
+DATE_DETECTION_METHOD = 'detection_method'
