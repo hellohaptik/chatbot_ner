@@ -699,7 +699,7 @@ Following are the list of different entity types along with its API call:
 
   - Example 1:
      
-    - Use the**timezone**parameter to pass your current timezone to date detection
+    - Use the **timezone** parameter to pass your current timezone to date detection
     
     - ```python
       message = "set me reminder on 23rd december"
