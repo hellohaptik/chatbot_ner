@@ -156,7 +156,7 @@ class DateAdvanceDetector(object):
             date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
 
         else:
-            patterns = re.findall(r'\b((.+)\s*(\-|to)\s*(.+))\b', self.processed_text.lower())
+            patterns = re.findall(r'\b(([A-Za-z]+)\s*(\-|to)\s*([A-Za-z]+))\b', self.processed_text.lower())
             for pattern in patterns:
                 start_date_list = self._date_dict_from_text(text=pattern[1], start_range_property=True)
                 end_date_list = self._date_dict_from_text(text=pattern[3], end_range_property=True)
