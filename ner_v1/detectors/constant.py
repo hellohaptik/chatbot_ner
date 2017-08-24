@@ -62,7 +62,7 @@ MONTH_DICT = {
     u'6': [u'jun', u'june'],
     u'7': [u'july', u'jul'],
     u'8': [u'august', u'aug'],
-    u'9': [u'september', u'sept']
+    u'9': [u'september', u'sept', u'sep']
 }
 
 DAY_DICT = {
