@@ -70,7 +70,7 @@ DAY_DICT = {
     u'2': [u'mon', u'monday'],
     u'3': [u'tuesday', u'tue'],
     u'4': [u'wednesday', u'wed'],
-    u'5': [u'thu', u'thursday'],
+    u'5': [u'thu', u'thursday', u'thurs', u'thur'],
     u'6': [u'fri', u'friday'],
     u'7': [u'saturday', u'sat']
 }
