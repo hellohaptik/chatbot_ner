@@ -219,7 +219,7 @@ Following are the list of entities which we have provided for detection purpose:
 | dish             | text               | Dish detection                           |
 | cuisine          | text               | Cuisine detection. For example, pizza, italian, chinese |
 | footwear         | text               | Footwear detection. For example, shoes, sandals, |
-| date             | date, date advance | Date detection, also detection of additional properties using date_advance |
+| date             | date               | Date detection, also detection of additional properties using date_advance |
 | time             | time               | Time detection                           |
 | city             | city               | City detection                           |
 | locality         | location, text     | Detection of indian localities           |
