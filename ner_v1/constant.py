@@ -41,6 +41,6 @@ PARAMETER_STRUCTURED_VALUE = 'structured_value'
 PARAMETER_STRUCTURED_VALUE_VERIFICATION = 'structured_value_verification'
 PARAMETER_FALLBACK_VALUE = 'fallback_value'
 PARAMETER_BOT_MESSAGE = 'bot_message'
-
+PARAMETER_TIMEZONE = 'timezone'
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'

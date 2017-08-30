@@ -15,8 +15,6 @@ urlpatterns = patterns('',
     url(r'^v1/time/$', 'ner_v1.api.time'),
     url(r'^v1/date/$', 'ner_v1.api.date'),
     url(r'^v1/budget/$', 'ner_v1.api.budget'),
-    url(r'^v1/city_advance/$', 'ner_v1.api.city_advance'),
-    url(r'^v1/date_advance/$', 'ner_v1.api.date_advance'),
     url(r'^v1/ner/$', 'ner_v1.api.ner'),
     url(r'^v1/combine_output/$', 'ner_v1.api.combine_output'),
 )

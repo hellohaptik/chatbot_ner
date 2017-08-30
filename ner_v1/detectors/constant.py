@@ -10,7 +10,7 @@ TYPE_TOMORROW = 'tomorrow'
 TYPE_YESTERDAY = 'yesterday'
 TYPE_DAY_AFTER = 'day_after'
 TYPE_DAY_BEFORE = 'day_before'
-
+TYPE_N_DAYS_AFTER = 'after_n_days'
 # Note constant values have changed, haptik_api would break at
 # haptik_api/ares/entities/constant.py
 # haptik_api/ares/lib/external_api_response/cron.py
@@ -62,7 +62,7 @@ MONTH_DICT = {
     u'6': [u'jun', u'june'],
     u'7': [u'july', u'jul'],
     u'8': [u'august', u'aug'],
-    u'9': [u'september', u'sept']
+    u'9': [u'september', u'sept', u'sep']
 }
 
 DAY_DICT = {
@@ -70,7 +70,7 @@ DAY_DICT = {
     u'2': [u'mon', u'monday'],
     u'3': [u'tuesday', u'tue'],
     u'4': [u'wednesday', u'wed'],
-    u'5': [u'thu', u'thursday'],
+    u'5': [u'thu', u'thursday', u'thurs', u'thur'],
     u'6': [u'fri', u'friday'],
     u'7': [u'saturday', u'sat']
 }
@@ -83,3 +83,14 @@ CITY_NORMAL_PROPERTY = 'normal'
 CITY_VALUE = 'value'
 ORIGINAL_CITY_TEXT = 'text'
 CITY_DETECTION_METHOD = 'detection_method'
+
+# CONSTANTS USED FOR DATE DETECTION
+DATE_FROM_PROPERTY = 'from'
+DATE_TO_PROPERTY = 'to'
+DATE_START_RANGE_PROPERTY = 'start_range'
+DATE_END_RANGE_PROPERTY = 'end_range'
+DATE_NORMAL_PROPERTY = 'normal'
+DATE_TYPE_PROPERTY = 'type'
+DATE_VALUE = 'value'
+ORIGINAL_DATE_TEXT = 'text'
+DATE_DETECTION_METHOD = 'detection_method'

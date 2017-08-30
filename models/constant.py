@@ -2,6 +2,7 @@ CRF_MODEL_TYPE = 'crf'  # constant value for CRF model
 
 # Entity types for models
 CITY_ENTITY_TYPE = 'city'
+DATE_ENTITY_TYPE = 'date'
 # city tags for crf
 CITY_O = 'O'  # Outer tag for BIO tag set
 CITY_FROM_B = 'FROM-B'  # Begin tag for property FROM
@@ -19,6 +20,13 @@ MODEL_CITY_FROM = 'from'  # Dictionary key of model output that stores whether p
 MODEL_CITY_TO = 'to'  # Dictionary key of model output that stores whether property is To
 MODEL_CITY_VIA = 'via'  # Dictionary key of model output that stores whether property is Via
 MODEL_CITY_NORMAL = 'normal'  # Dictionary key of model output that stores whether property is Normal
+
+MODEL_DATE_VALUE = 'date'  # Dictionary key of model output that stores the value
+MODEL_DATE_FROM = 'from'  # Dictionary key of model output that stores whether property is From
+MODEL_DATE_TO = 'to'  # Dictionary key of model output that stores whether property is To
+MODEL_START_DATE_RANGE = 'start_range'  # Dictionary key of model output that stores whether property is Via
+MODEL_END_DATE_RANGE = 'end_range'
+MODEL_DATE_NORMAL = 'normal'  # Dictionary key of model output that stores whether property is Normal
 
 # Tags for inbound and outbound message in crf
 INBOUND = 'i'

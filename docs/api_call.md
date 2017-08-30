@@ -56,7 +56,7 @@ Following are the list of different entity types along with its API call:
           },
           {
             "detection": "message",
-            "original_text": "domminos",
+            "original_text": "dominos",
             "entity_value": {
               "value": "Domino's Pizza"
             }
@@ -698,20 +698,23 @@ Following are the list of different entity types along with its API call:
 - Example:
 
   - Example 1:
-
+     
+    - Use the **timezone** parameter to pass your current timezone to date detection
+    
     - ```python
       message = "set me reminder on 23rd december"
       entity_name = 'date'
       structured_value = None
       fallback_value = None
       bot_message = None
+      timezone='UTC'
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_date
-      output = get_date(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value,bot_message=bot_message)
+      output = get_date(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value,bot_message=bot_message, timezone=timezone)
       print output
       ```
 
@@ -723,26 +726,33 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20on%2023rd%20december&entity_name=date&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20on%2023rd%20december&entity_name=date&structured_value=&fallback_value=&bot_message=%timezone=UTC'
       ```
 
     - *CURL Output:*
 
       ```json
       {
-        "data": [
-          {
-            "detection": "message",
-            "original_text": "23rd december",
-            "entity_value": {
-              "mm": 12,
-              "yy": 2017,
-              "dd": 23,
-              "type": "date"
+          "data": [
+            {
+              "detection": "message",
+              "original_text": "23rd december",
+              "entity_value": {
+                "end_range": false,
+                "from": false,
+                "normal": true,
+                "value": {
+                  "mm": 12,
+                  "yy": 2017,
+                  "dd": 23,
+                  "type": "date"
+                },
+                "to": false,
+                "start_range": false
+              }
             }
-          }
-        ]
-      }
+          ]
+       }
       ```
 
   - Example 2:
@@ -753,6 +763,7 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = None
+      timezone='UTC'
       ```
 
     - *CURL command:*
@@ -763,26 +774,33 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20day%20after%20tomorrow&entity_name=date&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20day%20after%20tomorrow&entity_name=date&structured_value=&fallback_value=&bot_message=&timezone=UTC'
       ```
 
     - *CURL Output:*
 
       ```json
       {
-        "data": [
-          {
-            "detection": "message",
-            "original_text": "day after tomorrow",
-            "entity_value": {
-              "mm": 3,
-              "yy": 2017,
-              "dd": 22,
-              "type": "day_after"
+          "data": [
+            {
+              "detection": "message",
+              "original_text": "day after tomorrow",
+              "entity_value": {
+                "end_range": false,
+                "from": false,
+                "normal": true,
+                "value": {
+                  "mm": 8,
+                  "yy": 2017,
+                  "dd": 24,
+                  "type": "day_after"
+                },
+                "to": false,
+                "start_range": false
+              }
             }
-          }
-        ]
-      }
+          ]
+        }
       ```
 
 ### budget
@@ -891,63 +909,6 @@ Following are the list of different entity types along with its API call:
             "original_text": "36",
             "entity_value": {
               "value": "36"
-            }
-          }
-        ]
-      }
-      ```
-
-### date_advance
-
-- This functionality calls the DateAdvanceDetector class to detect departure date and arrival date.
-
-- Example:
-
-  - Example 1:
-
-    - ```python
-      message = "21st dec"
-      entity_name = 'date'
-      structured_value = None
-      fallback_value = None
-      bot_message = 'Please help me with return date?'
-      ```
-
-    - *Python:*
-
-      ```python
-      from ner_v1.chatbot.entity_detection import get_date_advance
-      output = get_date_advance(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
-      print output
-      ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      ```
-
-      ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/date_advance/?message=21st%20dec&entity_name=date&structured_value=&fallback_value=&bot_message=Please%20help%20me%20with%20return%20date%3F'
-      ```
-
-    - *CURL Output:*
-
-      ```json
-      {
-        "data": [
-          {
-            "detection": "message",
-            "original_text": "21st dec",
-            "entity_value": {
-              "date_return": {
-                "mm": 12,
-                "yy": 2017,
-                "dd": 21,
-                "type": "date"
-              },
-              "date_departure": null
             }
           }
         ]

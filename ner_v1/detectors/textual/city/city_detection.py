@@ -411,7 +411,7 @@ class CityDetector(object):
 
         self.bot_message = bot_message
 
-    def convert_dict_in_tuple(self, entity_dict_list):
+    def convert_city_dict_in_tuple(self, entity_dict_list):
         """
         This function takes the input as a list of dictionary and converts it into tuple which is
         for now the standard format  of individual detector function

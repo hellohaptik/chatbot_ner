@@ -64,52 +64,66 @@ Following are the steps to create the Docker image and run NER via Docker.
    Output should be:
 
    ```json
-   {
-     "data": {
-       "tag": "reserve me a table __date__ at __time__ at __restaurant__ and on __date__ at __time__ at __restaurant__",
-       "entity_data": {
-         "date": [
-           {
-             "detection": "message",
-             "original_text": "monday",
-             "entity_value": {
-               "mm": 3,
-               "yy": 2017,
-               "dd": 27,
-               "type": "day_within_one_week"
-             }
-           },
-           {
-             "detection": "message",
-             "original_text": "today",
-             "entity_value": {
-               "mm": 3,
-               "yy": 2017,
-               "dd": 21,
-               "type": "today"
-             }
-           }
-         ],
-         "time": [
-           {
-             "detection": "message",
-             "original_text": "6:30pm",
-             "entity_value": {
-               "mm": 30,
-               "hh": 6,
-               "nn": "pm"
-             }
-           },
-           {
-             "detection": "message",
-             "original_text": "7:00pm",
-             "entity_value": {
-               "mm": 0,
-               "hh": 7,
-               "nn": "pm"
-             }
-           }
-         ],
+       {
+      "data": {
+        "tag": "reserve me a table __date__ at __time__ at mainland china and on __date__ at __time__ at barbeque nation",
+        "entity_data": {
+          "date": [
+            {
+              "detection": "message",
+              "original_text": "monday",
+              "entity_value": {
+                "end_range": false,
+                "from": false,
+                "normal": true,
+                "value": {
+                  "mm": 8,
+                  "yy": 2017,
+                  "dd": 28,
+                  "type": "day_within_one_week"
+                },
+                "to": false,
+                "start_range": false
+              }
+            },
+            {
+              "detection": "message",
+              "original_text": "today",
+              "entity_value": {
+                "end_range": false,
+                "from": false,
+                "normal": true,
+                "value": {
+                  "mm": 8,
+                  "yy": 2017,
+                  "dd": 23,
+                  "type": "today"
+                },
+                "to": false,
+                "start_range": false
+              }
+            }
+          ],
+          "time": [
+            {
+              "detection": "message",
+              "original_text": "6:30pm",
+              "entity_value": {
+                "mm": 30,
+                "hh": 6,
+                "nn": "pm"
+              }
+            },
+            {
+              "detection": "message",
+              "original_text": "7:00pm",
+              "entity_value": {
+                "mm": 0,
+                "hh": 7,
+                "nn": "pm"
+              }
+            }
+          ],
          "restaurant": [
            {
              "detection": "message",
