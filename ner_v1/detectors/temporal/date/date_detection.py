@@ -33,7 +33,7 @@ class DateAdvanceDetector(object):
         entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tag: entity_name prepended and appended with '__'
         date_detector_object: DateDetector object used to detect dates in the given text
-        bot_message: boolean, set as the outgoing bot text/message
+        bot_message: str, set as the outgoing bot text/message
     """
 
     def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
@@ -282,6 +282,7 @@ class DateAdvanceDetector(object):
             bot_message: is the previous message that is sent by the bot
         """
         self.bot_message = bot_message
+        self.date_detector_object.set_bot_message(self.bot_message)
 
     def _date_dict_from_text(self, text, from_property=False, to_property=False, start_range_property=False,
                              end_range_property=False, normal_property=False, detection_method=FROM_MESSAGE):
@@ -500,6 +501,7 @@ class DateDetector(object):
                             fuzzy variants(spell errors, abbreviations)
         day_dictionary: dictonary mapping day indexes to day of week spellings and 
                             fuzzy variants(spell errors, abbreviations)
+        bot_message: str, set as the outgoing bot text/message
 
         SUPPORTED_FORMAT                                            METHOD_NAME
         ------------------------------------------------------------------------------------------------------------
@@ -564,6 +566,7 @@ class DateDetector(object):
                 ner_logger.debug('Default timezone passed as "UTC"')
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
+        self.bot_message = None
 
     def detect_entity(self, text):
         """
@@ -770,10 +773,7 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[1]
             mm = pattern[2]
-            yy = pattern[3]
-
-            if len(yy) == 2:
-                yy = '20' + yy
+            yy = self.normalize_year(pattern[3])
 
             date = {
                 'dd': int(dd),
@@ -823,7 +823,7 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[3]
             mm = pattern[2]
-            yy = pattern[1]
+            yy = self.normalize_year(pattern[1])
 
             date = {
                 'dd': int(dd),
@@ -872,10 +872,7 @@ class DateDetector(object):
             original = pattern[0].strip()
             dd = pattern[1]
             probable_mm = pattern[2]
-            yy = pattern[3]
-
-            if len(yy) == 2:
-                yy = '20' + yy
+            yy = self.normalize_year(pattern[3])
 
             mm = self.__get_month_index(probable_mm)
             if mm:
@@ -929,10 +926,7 @@ class DateDetector(object):
             original = pattern[0].strip()
             dd = pattern[1]
             probable_mm = pattern[2]
-            yy = pattern[3]
-
-            if len(yy) == 2:
-                yy = '20' + yy
+            yy = self.normalize_year(pattern[3])
 
             mm = self.__get_month_index(probable_mm)
             if mm:
@@ -983,7 +977,7 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[3]
             probable_mm = pattern[2]
-            yy = pattern[1]
+            yy = self.normalize_year(pattern[1])
             mm = self.__get_month_index(probable_mm)
             if mm:
                 date = {
@@ -1035,7 +1029,7 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[2]
             probable_mm = pattern[3]
-            yy = pattern[1]
+            yy = self.normalize_year(pattern[1])
             mm = self.__get_month_index(probable_mm)
             if mm:
                 date = {
@@ -1086,11 +1080,9 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[2]
             probable_mm = pattern[1]
-            yy = pattern[3]
+            yy = self.normalize_year(pattern[3])
             mm = self.__get_month_index(probable_mm)
 
-            if len(yy) == 2:
-                yy = '20' + yy
             if mm:
                 date = {
                     'dd': int(dd),
@@ -2114,3 +2106,43 @@ class DateDetector(object):
             if value.lower() in self.day_dictionary[day]:
                 return day
         return None
+
+    def normalize_year(self, year):
+        """
+        Normalize two digit year to four digits by taking into consideration the bot message. Useful in cases like
+        date of birth where past century is preferred than current. If no bot message is given it falls back to
+        current century
+
+        Args:
+            year (str): Year string to normalize
+
+        Returns:
+            str: year in four digits
+        """
+        past_regex = re.compile(r'birth|bday|dob|born')
+        present_regex = None
+        future_regex = None
+        this_century = int(str(self.date_object.year)[:2])
+        if len(year) == 2:
+            if self.bot_message:
+                if past_regex and past_regex.search(self.bot_message):
+                    return str(this_century - 1) + year
+                elif present_regex and present_regex.search(self.bot_message):
+                    return str(this_century) + year
+                elif future_regex and future_regex.search(self.bot_message):
+                    return str(this_century + 1) + year
+
+        # if patterns didn't match or no bot message set, fallback to current century
+        if len(year) == 2:
+            return str(this_century) + year
+
+        return year
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: is the previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
