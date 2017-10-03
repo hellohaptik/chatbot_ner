@@ -614,7 +614,7 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     if structured_value:
         entity_dict_list = date_detection.detect_entity(text=structured_value)
         entity_list, original_text_list, detection_method_list = \
-            date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
+            date_detection.unzip_convert_date_dictionaries(entity_dict_list=entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
@@ -624,14 +624,14 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     else:
         entity_dict_list = date_detection.detect_entity(text=message, run_model=False)
         entity_list, original_text_list, detection_method_list = \
-            date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
+            date_detection.unzip_convert_date_dictionaries(entity_dict_list=entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method_list=detection_method_list)
         elif fallback_value:
             entity_dict_list = date_detection.detect_entity(text=fallback_value, run_model=False)
             entity_list, original_text_list, detection_method_list = \
-                date_detection.convert_date_dict_in_tuple(entity_dict_list=entity_dict_list)
+                date_detection.unzip_convert_date_dictionaries(entity_dict_list=entity_dict_list)
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_FALLBACK_VALUE)
 
