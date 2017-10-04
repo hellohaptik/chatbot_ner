@@ -1,18 +1,21 @@
-import re
 import copy
 import datetime
+import re
+
 import pytz
 
+import models.constant as model_constant
+import ner_v1.detectors.constant as detector_constant
 from chatbot_ner.config import ner_logger
 from lib.nlp.regex import Regex
 from models.models import Models
-import models.constant as model_constant
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
-import ner_v1.detectors.constant as detector_constant
-from ner_v1.detectors.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, \
-    TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY, TYPE_THIS_DAY, \
-    TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, \
-    TYPE_N_DAYS_AFTER
+from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
+                                       TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
+                                       TYPE_THIS_DAY,
+                                       TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
+                                       REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT,
+                                       TYPE_N_DAYS_AFTER)
 
 
 class DateAdvanceDetector(object):
@@ -36,14 +39,15 @@ class DateAdvanceDetector(object):
         bot_message: str, set as the outgoing bot text/message
     """
 
-    def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
+    def __init__(self, entity_name, timezone='UTC'):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
         Args:
-            entity_name: A string by which the detected date entity substrings would be replaced with on calling
-                        detect_entity()
-            timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+            entity_name (str): A string by which the detected date entity substrings would be replaced with on calling
+                               detect_entity()
+            timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
+                                      default is UTC
         """
         self.text = ''
         self.tagged_text = ''
@@ -161,9 +165,49 @@ class DateAdvanceDetector(object):
                 start_date_list = self._date_dict_from_text(text=pattern[1], start_range_property=True)
                 end_date_list = self._date_dict_from_text(text=pattern[3], end_range_property=True)
                 if start_date_list and end_date_list:
+                    start_date_list, end_date_list = self._generate_range(start_date_dict=start_date_list[0],
+                                                                          end_date_dict=end_date_list[-1])
                     date_dict_list.extend(start_date_list)
                     date_dict_list.extend(end_date_list)
         return date_dict_list
+
+    def _generate_range(self, start_date_dict, end_date_dict):
+        """
+        If today is between the detected range, generate two day ranges - range for current week and the same range
+        for next week, other wise both start date and end date dicts are returned as only elements of start date list
+        and end date list respectively.
+
+        For example, querying "Monday to Friday" on Wednesday would yield dates for Monday (in the past) to Friday
+        and next Monday to next Friday
+
+        Args:
+            start_date_dict (dict): Dict containing the date value marked as start of the range
+            end_date_dict (dict): Dict containing the date value marked as end of the range
+
+        Returns:
+            tuple containing
+                list containing dictionaries of start of range dates
+                list containing dictionaries of end of range dates
+
+        """
+        start_date_list, end_date_list = [start_date_dict], [end_date_dict]
+        start_date = self.date_detector_object.to_datetime_object(start_date_dict[detector_constant.DATE_VALUE])
+        end_date = self.date_detector_object.to_datetime_object(end_date_dict[detector_constant.DATE_VALUE])
+        if end_date < start_date:
+            current_range_start_date = start_date - datetime.timedelta(days=7)
+            current_range_start_dict = self.date_detector_object.to_date_dict(current_range_start_date,
+                                                                              date_type=TYPE_THIS_DAY)
+            output_dict = copy.copy(start_date_dict)
+            output_dict[detector_constant.DATE_VALUE] = current_range_start_dict
+            start_date_list.insert(0, output_dict)
+
+            next_range_end_date = end_date + datetime.timedelta(days=7)
+            next_range_end_dict = self.date_detector_object.to_date_dict(next_range_end_date, date_type=TYPE_NEXT_DAY)
+            output_dict = copy.copy(end_date_dict)
+            output_dict[detector_constant.DATE_VALUE] = next_range_end_dict
+            end_date_list.append(output_dict)
+
+        return start_date_list, end_date_list
 
     def _detect_departure_date(self):
         """
@@ -249,7 +293,7 @@ class DateAdvanceDetector(object):
             date_dict_list = self._date_dict_from_text(text=pattern[1])
             if date_dict_list:
                 if len(date_dict_list) > 1:
-                    for i in xrange(len(date_dict_list)):
+                    for i in range(len(date_dict_list)):
                         date_dict_list[i][detector_constant.DATE_NORMAL_PROPERTY] = True
                 else:
                     if departure_date_flag:
@@ -290,10 +334,11 @@ class DateAdvanceDetector(object):
         Takes the text and the property values and creates a list of dictionaries based on number of dates detected
 
         Attributes:
-            text: Text on which TextDetection needs to run on
+            text: Text on which DateDetection needs to run on
             from_property: True if the text is belonging to "from" property". for example, From monday
             to_property: True if the text is belonging to "to" property". for example, To monday
-            start_range_property: True if the text is belonging to "start_range" property". for example, starting from monday
+            start_range_property: True if the text is belonging to "start_range" property". for example, starting from
+                                  monday
             end_range_property: True if the text is belonging to "end_range" property". for example, to monday
             normal_property: True if the text is belonging to "normal" property". for example, every monday
             detection_method: method through which it got detected whether its through message or model
@@ -303,45 +348,39 @@ class DateAdvanceDetector(object):
             It returns the list of dictionary containing the fields like detection_method, from, normal, to,
             text, value, range
 
-            Examples:
+        Examples:
 
-                Output:
-                    [{'detection_method': 'message',
-                          'from': True,
-                          'normal': False,
-                          'start_range': False,
-                          'end_range': False
-                          'text': '16th august',
-                          'to': False,
-                          'value': {'dd': 16, 'mm': 8, 'type': 'date', 'yy': 2017}},
+            Output:
+                [{'detection_method': 'message',
+                      'from': True,
+                      'normal': False,
+                      'start_range': False,
+                      'end_range': False
+                      'text': '16th august',
+                      'to': False,
+                      'value': {'dd': 16, 'mm': 8, 'type': 'date', 'yy': 2017}},
 
-                    {'detection_method': 'message',
-                          'from': False,
-                          'normal': False,
-                          'start_range': False,
-                          'end_range': False
-                          'text': '27th august',
-                          'to': True,
-                          'value': {'dd': 27, 'mm': 8, 'type': 'date', 'yy': 2017}}]
+                {'detection_method': 'message',
+                      'from': False,
+                      'normal': False,
+                      'start_range': False,
+                      'end_range': False
+                      'text': '27th august',
+                      'to': True,
+                      'value': {'dd': 27, 'mm': 8, 'type': 'date', 'yy': 2017}}]
 
         """
         date_dict_list = []
         date_list, original_list = self._date_value(text=text)
-        index = 0
-        for date in date_list:
-            date_dict_list.append(
-                {
-                    detector_constant.DATE_VALUE: date,
-                    detector_constant.ORIGINAL_DATE_TEXT: original_list[index],
-                    detector_constant.DATE_FROM_PROPERTY: from_property,
-                    detector_constant.DATE_TO_PROPERTY: to_property,
-                    detector_constant.DATE_START_RANGE_PROPERTY: start_range_property,
-                    detector_constant.DATE_END_RANGE_PROPERTY: end_range_property,
-                    detector_constant.DATE_NORMAL_PROPERTY: normal_property,
-                    detector_constant.DATE_DETECTION_METHOD: detection_method
-                }
-            )
-            index += 1
+        for index, date in enumerate(date_list):
+            date_dict_list.append(self._to_output_dict(date_dict=date,
+                                                       original_text=original_list[index],
+                                                       from_property=from_property,
+                                                       to_property=to_property,
+                                                       start_range_property=start_range_property,
+                                                       end_range_property=end_range_property,
+                                                       normal_property=normal_property,
+                                                       detection_method=detection_method))
         return date_dict_list
 
     def _date_value(self, text):
@@ -362,17 +401,19 @@ class DateAdvanceDetector(object):
         date_list, original_list = self.date_detector_object.detect_entity(text)
         return date_list, original_list
 
-    def convert_date_dict_in_tuple(self, entity_dict_list):
+    def unzip_convert_date_dictionaries(self, entity_dict_list):
         """
-        This function takes the input as a list of dictionary and converts it into tuple which is
-        for now the standard format  of individual detector function
+        Separate out date dictionaries into list of dictionaries of date values, corresponding list of substrings in
+        the original text for each date dictionary and corresponding list of detection method for each date dictionary
+
+        Args:
+            entity_dict_list (list of dict): list containing dictionaries containing detected date values and metadata
 
         Returns:
-            Returns the tuple containing list of entity_values, original_text and detection method
-
-            For example:
-
-                (['friday'], ['friday'], ['message'])
+            Returns the tuple containing three lists of equal length
+             list containing dictionaries of date values,
+             list containing original text for each detected date value
+             list containing detection method for each detected date value
 
         """
         entity_list, original_list, detection_list = [], [], []
@@ -392,6 +433,36 @@ class DateAdvanceDetector(object):
             original_list.append(entity_dict[detector_constant.ORIGINAL_DATE_TEXT])
             detection_list.append(entity_dict[detector_constant.DATE_DETECTION_METHOD])
         return entity_list, original_list, detection_list
+
+    def _to_output_dict(self, date_dict, original_text, from_property, to_property, start_range_property,
+                        end_range_property, normal_property, detection_method):
+        """
+        Generate output dict for the detected date value with extra metadata
+
+        Args:
+             date_dict (dict): dict containing dd, mm, yy of the detected date value
+             original_text (str): substring which was detected as a date value
+             from_property (bool): boolean indicating if this date was detected as a 'from start' date
+             to_property (bool): boolean indicating if this date was detected as a 'to end' date
+             start_range_property (bool): boolean indicating if this date marks the start of a range
+             end_range_property (bool): boolean indicating if this date marks the end of a range
+             normal_property (bool):  boolean indicating if this date is singular date and not associated with any
+                                      range
+             detection_method (str): detection method - pattern from message or using model
+        Returns:
+            dict: dictionary containing, detected date value and additional metadata like 'from', 'to', 'start',
+                  'end', 'normal'
+        """
+        return {
+            detector_constant.DATE_VALUE: date_dict,
+            detector_constant.ORIGINAL_DATE_TEXT: original_text,
+            detector_constant.DATE_FROM_PROPERTY: from_property,
+            detector_constant.DATE_TO_PROPERTY: to_property,
+            detector_constant.DATE_START_RANGE_PROPERTY: start_range_property,
+            detector_constant.DATE_END_RANGE_PROPERTY: end_range_property,
+            detector_constant.DATE_NORMAL_PROPERTY: normal_property,
+            detector_constant.DATE_DETECTION_METHOD: detection_method
+        }
 
     def _date_model_detection(self):
         """
@@ -506,30 +577,31 @@ class DateDetector(object):
         SUPPORTED_FORMAT                                            METHOD_NAME
         ------------------------------------------------------------------------------------------------------------
         1. day/month/year                                           _gregorian_day_month_year_format
-        2. year/month/day                                           _gregorian_year_month_day_format
-        3. day/month/year (Month in abbreviation or full)           _gregorian_advanced_day_month_year_format
-        4. Xth month year (Month in abbreviation or full)           _gregorian_day_with_ordinals_month_year_format
-        5. year month Xth (Month in abbreviation or full)           _gregorian_advanced_year_month_day_format
-        6. year Xth month (Month in abbreviation or full)           _gregorian_year_day_month_format
-        7. month Xth year (Month in abbreviation or full)           _gregorian_month_day_year_format
-        8. month Xth      (Month in abbreviation or full)           _gregorian_month_day_format
-        9. Xth month      (Month in abbreviation or full)           _gregorian_day_month_format
-        10."today" variants                                         _todays_date
-        11."tomorrow" variants                                      _tomorrows_date
-        12."yesterday" variants                                     _yesterdays_date
-        13."_day_after_tomorrow" variants                           _day_after_tomorrow
-        14."_day_before_yesterday" variants                         _day_before_yesterday
-        15."next <day of week>" variants                            _day_in_next_week
-        16."this <day of week>" variants                            _day_within_one_week
-        17.probable date from only Xth                              _date_identification_given_day
-        18.probable date from only Xth this month                   _date_identification_given_day_and_current_month
-        19.probable date from only Xth next month                   _date_identification_given_day_and_next_month
-        20."everyday" variants                                      _date_identification_everyday
-        21."everyday except weekends" variants                      _date_identification_everyday_except_weekends
-        22."everyday except weekdays" variants                       _date_identification_everyday_except_weekdays
-        23."every monday" variants                                  _weeks_identification
-        24."after n days" variants                                  _date_days_after
-        25."n days later" variants                                  _date_days_later
+        2. month/day/year                                           _gregorian_month_day_year_format
+        3. year/month/day                                           _gregorian_year_month_day_format
+        4. day/month/year (Month in abbreviation or full)           _gregorian_advanced_day_month_year_format
+        5. Xth month year (Month in abbreviation or full)           _gregorian_day_with_ordinals_month_year_format
+        6. year month Xth (Month in abbreviation or full)           _gregorian_advanced_year_month_day_format
+        7. year Xth month (Month in abbreviation or full)           _gregorian_year_day_month_format
+        8. month Xth year (Month in abbreviation or full)           _gregorian_month_day_with_ordinals_year_format
+        9. month Xth      (Month in abbreviation or full)           _gregorian_month_day_format
+        10. Xth month      (Month in abbreviation or full)          _gregorian_day_month_format
+        11."today" variants                                         _todays_date
+        12."tomorrow" variants                                      _tomorrows_date
+        13."yesterday" variants                                     _yesterdays_date
+        14."_day_after_tomorrow" variants                           _day_after_tomorrow
+        15."_day_before_yesterday" variants                         _day_before_yesterday
+        16."next <day of week>" variants                            _day_in_next_week
+        17."this <day of week>" variants                            _day_within_one_week
+        18.probable date from only Xth                              _date_identification_given_day
+        19.probable date from only Xth this month                   _date_identification_given_day_and_current_month
+        20.probable date from only Xth next month                   _date_identification_given_day_and_next_month
+        21."everyday" variants                                      _date_identification_everyday
+        22."everyday except weekends" variants                      _date_identification_everyday_except_weekends
+        23."everyday except weekdays" variants                       _date_identification_everyday_except_weekdays
+        24."every monday" variants                                  _weeks_identification
+        25."after n days" variants                                  _date_days_after
+        26."n days later" variants                                  _date_days_later
         
         Not all separator are listed above. See respective methods for detail on structures of these formats
 
@@ -537,13 +609,14 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
+    def __init__(self, entity_name, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
             entity_name: A string by which the detected date entity substrings would be replaced with on calling
                         detect_entity()
-            timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+            timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
+                                      default is UTC
 
         """
         self.text = ''
@@ -557,13 +630,13 @@ class DateDetector(object):
         self.regx_to_process = Regex([(r'[\/]', r'')])
         self.regx_to_process_text = Regex([(r'[\,]', r'')])
         self.tag = '__' + entity_name + '__'
-        self.timezone = timezone
         try:
-                self.date_object = datetime.datetime.now(pytz.timezone(timezone))
-        except Exception, e:
-                ner_logger.debug('Timezone error: %s ' % e)
-                self.date_object = datetime.datetime.now(pytz.timezone('UTC'))
-                ner_logger.debug('Default timezone passed as "UTC"')
+            self.timezone = pytz.timezone(timezone)
+        except Exception as e:
+            ner_logger.debug('Timezone error: %s ' % e)
+            self.timezone = pytz.timezone('UTC')
+            ner_logger.debug('Default timezone passed as "UTC"')
+        self.date_object = datetime.datetime.now(tz=self.timezone)
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
         self.bot_message = None
@@ -640,6 +713,8 @@ class DateDetector(object):
         """
         date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
+        date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_year_month_day_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
@@ -652,7 +727,7 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_year_day_month_format(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+        date_list, original_list = self._gregorian_month_day_with_ordinals_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_day_month_format(date_list, original_list)
         self._update_processed_text(original_list)
@@ -773,6 +848,56 @@ class DateDetector(object):
             original = pattern[0]
             dd = pattern[1]
             mm = pattern[2]
+            yy = self.normalize_year(pattern[3])
+
+            date = {
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_EXACT
+            }
+            date_list.append(date)
+            # original = self.regx_to_process.text_substitute(original)
+            original_list.append(original)
+        return date_list, original_list
+
+    def _gregorian_month_day_year_format(self, date_list=None, original_list=None):
+        """
+        Detects date in the following format
+
+        format: <month><separator><day><separator><year>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: m, mm
+            year: yy, yyyy
+            separator: "/", "-", "."
+
+        Two character years are assumed to be belong to 21st century - 20xx.
+        Only years between 1900 to 2099 are detected
+
+        Few valid examples:
+            "6/2/39", "7/01/1997", "12-28-2096"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        regex_pattern = r'\b((0?[1-9]|1[0-2])\s?[/\-\.]\s?(0?[1-9]|[12][0-9]|3[01])\s?[/\-\.]' \
+                        r'\s?((?:20|19)?[0-9]{2}))(\s|$)'
+        patterns = re.findall(regex_pattern, self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd = pattern[2]
+            mm = pattern[1]
             yy = self.normalize_year(pattern[3])
 
             date = {
@@ -1042,7 +1167,7 @@ class DateDetector(object):
                 original_list.append(original)
         return date_list, original_list
 
-    def _gregorian_month_day_year_format(self, date_list=None, original_list=None):
+    def _gregorian_month_day_with_ordinals_year_format(self, date_list=None, original_list=None):
         """
         Detects date in the following format
 
@@ -1876,8 +2001,9 @@ class DateDetector(object):
             original_list = []
         now = self.date_object
         end = now + datetime.timedelta(days=n_days)
-        patterns = re.findall(r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?([wW]eekday|[wW]eekdays))\b'
-                              , self.processed_text.lower())
+        patterns = re.findall(
+            r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?([wW]eekday|[wW]eekdays))\b'
+            , self.processed_text.lower())
 
         if not patterns:
             patterns = re.findall(r'\b((weekends|weekend|week end|week ends | all weekends))\b',
@@ -2106,6 +2232,40 @@ class DateDetector(object):
             if value.lower() in self.day_dictionary[day]:
                 return day
         return None
+
+    def to_date_dict(self, datetime_object, date_type=TYPE_EXACT):
+        """
+        Convert the given datetime object to a dictionary containing dd, mm, yy
+
+        Args:
+            datetime_object (datetime.datetime): datetime object
+            date_type (str, optional, default TYPE_EXACT): 'type' metdata for this detected date
+
+        Returns:
+            dict: dictionary containing day, month, year in keys dd, mm, yy respectively with date type as additional
+            metadata.
+        """
+        return {
+            'dd': datetime_object.day,
+            'mm': datetime_object.month,
+            'yy': datetime_object.year,
+            'type': date_type,
+        }
+
+    def to_datetime_object(self, base_date_value_dict):
+        """
+        Convert the given date value dict to a timezone localised datetime object
+
+        Args:
+            base_date_value_dict (dict): dict containing dd, mm, yy
+
+        Returns:
+            datetime object: datetime object localised with the timezone given on initialisation
+        """
+        datetime_object = datetime.datetime(year=base_date_value_dict['yy'],
+                                            month=base_date_value_dict['mm'],
+                                            day=base_date_value_dict['dd'], )
+        return self.timezone.localize(datetime_object)
 
     def normalize_year(self, year):
         """
