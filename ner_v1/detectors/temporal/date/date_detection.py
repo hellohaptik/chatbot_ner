@@ -165,7 +165,8 @@ class DateAdvanceDetector(object):
                 start_date_list = self._date_dict_from_text(text=pattern[1], start_range_property=True)
                 end_date_list = self._date_dict_from_text(text=pattern[3], end_range_property=True)
                 if start_date_list and end_date_list:
-                    start_date_list, end_date_list = self._generate_range(start_date_list[0], end_date_list[-1])
+                    start_date_list, end_date_list = self._generate_range(start_date_dict=start_date_list[0],
+                                                                          end_date_dict=end_date_list[-1])
                     date_dict_list.extend(start_date_list)
                     date_dict_list.extend(end_date_list)
         return date_dict_list
@@ -197,17 +198,13 @@ class DateAdvanceDetector(object):
             current_range_start_dict = self.date_detector_object.to_date_dict(current_range_start_date,
                                                                               date_type=TYPE_THIS_DAY)
             output_dict = copy.copy(start_date_dict)
-            output_dict.update({detector_constant.DATE_VALUE: current_range_start_dict,
-                                detector_constant.DATE_START_RANGE_PROPERTY: True,
-                                detector_constant.DATE_END_RANGE_PROPERTY: False})
+            output_dict[detector_constant.DATE_VALUE] = current_range_start_dict
             start_date_list.insert(0, output_dict)
 
             next_range_end_date = end_date + datetime.timedelta(days=7)
             next_range_end_dict = self.date_detector_object.to_date_dict(next_range_end_date, date_type=TYPE_NEXT_DAY)
             output_dict = copy.copy(end_date_dict)
-            output_dict.update({detector_constant.DATE_VALUE: next_range_end_dict,
-                                detector_constant.DATE_START_RANGE_PROPERTY: False,
-                                detector_constant.DATE_END_RANGE_PROPERTY: True})
+            output_dict[detector_constant.DATE_VALUE] = next_range_end_dict
             end_date_list.append(output_dict)
 
         return start_date_list, end_date_list
