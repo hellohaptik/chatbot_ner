@@ -39,14 +39,15 @@ class DateAdvanceDetector(object):
         bot_message: str, set as the outgoing bot text/message
     """
 
-    def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
+    def __init__(self, entity_name, timezone='UTC'):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
         Args:
-            entity_name: A string by which the detected date entity substrings would be replaced with on calling
-                        detect_entity()
-            timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+            entity_name (str): A string by which the detected date entity substrings would be replaced with on calling
+                               detect_entity()
+            timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
+                                      default is UTC
         """
         self.text = ''
         self.tagged_text = ''
@@ -611,13 +612,14 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone=pytz.timezone('UTC')):
+    def __init__(self, entity_name, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
             entity_name: A string by which the detected date entity substrings would be replaced with on calling
                         detect_entity()
-            timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+            timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
+                                      default is UTC
 
         """
         self.text = ''
@@ -631,13 +633,13 @@ class DateDetector(object):
         self.regx_to_process = Regex([(r'[\/]', r'')])
         self.regx_to_process_text = Regex([(r'[\,]', r'')])
         self.tag = '__' + entity_name + '__'
-        self.timezone = timezone
         try:
-            self.date_object = datetime.datetime.now(pytz.timezone(timezone))
+            self.timezone = pytz.timezone(timezone)
         except Exception as e:
             ner_logger.debug('Timezone error: %s ' % e)
-            self.date_object = datetime.datetime.now(pytz.timezone('UTC'))
+            self.timezone = pytz.timezone('UTC')
             ner_logger.debug('Default timezone passed as "UTC"')
+        self.date_object = datetime.datetime.now(tz=self.timezone)
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
         self.bot_message = None
