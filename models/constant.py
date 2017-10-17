@@ -15,6 +15,19 @@ CITY_TO_I = 'TO-I'  # Inner tag for property TO
 CITY_VIA_I = 'VIA-I'  # Inner tag for property VIA
 CITY_NORMAL_I = 'NORMAL-I'  # Inner tag for property NORMAL
 
+DATE_O = 'O'  # Outer tag for BIO tag set
+DATE_FROM_B = 'FROM-B'  # Begin tag for property FROM
+DATE_TO_B = 'TO-B'  # Begin tag for property TO
+DATE_START_B = 'START-B'  # Begin tag for property START
+DATE_END_B = 'END-B'  # Begin tag for property END
+DATE_NORMAL_B = 'NORMAL-B'  # Begin tag for property NORMAL
+
+DATE_FROM_I = 'FROM-I'  # Inner tag for property FROM
+DATE_TO_I = 'TO-I'  # Inner tag for property TO
+DATE_START_I = 'START-I'  # Inner tag for property START
+DATE_END_I = 'END-I'  # Inner tag for property END
+DATE_NORMAL_I = 'NORMAL-I'  # Inner tag for property NORMAL
+
 MODEL_CITY_VALUE = 'city'  # Dictionary key of model output that stores the value
 MODEL_CITY_FROM = 'from'  # Dictionary key of model output that stores whether property is From
 MODEL_CITY_TO = 'to'  # Dictionary key of model output that stores whether property is To

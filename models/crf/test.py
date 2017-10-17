@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
-from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT
+from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_ENTITY_TYPE
 from models.constant import INBOUND, OUTBOUND
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH
 from models.crf.output_generation.city import generate_city_output
+from models.crf.output_generation.date import generate_date_output
 
 try:
     import CRFPP
@@ -85,6 +86,9 @@ class PredictCRF(object):
             crf_output = self.run_crf()
             if entity_type == CITY_ENTITY_TYPE:
                 output_list = generate_city_output(crf_data=crf_output)
+                ner_logger.debug('NER MODEL OUTPUT: %s' % output_list)
+            elif entity_type == DATE_ENTITY_TYPE:
+                output_list = generate_date_output(crf_data=crf_output)
                 ner_logger.debug('NER MODEL OUTPUT: %s' % output_list)
         else:
             ner_logger.debug('MODEL IS NOT RUNNING: CRFPP not installed')
