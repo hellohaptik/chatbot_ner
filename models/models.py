@@ -1,5 +1,5 @@
 from chatbot_ner.config import CITY_MODEL_TYPE, DATE_MODEL_TYPE
-from .constant import CRF_MODEL_TYPE, CITY_ENTITY_TYPE
+from .constant import CRF_MODEL_TYPE, CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
 from .crf.test import PredictCRF
 
 
@@ -31,8 +31,9 @@ class Models(object):
                 crf_object = PredictCRF()
                 output_list = crf_object.get_model_output(entity_type=entity_type, bot_message=bot_message,
                                                           user_message=user_message)
-                if DATE_MODEL_TYPE == CRF_MODEL_TYPE:
-                    crf_object = PredictCRF()
-                    output_list = crf_object.get_model_output(entity_type=entity_type, bot_message=bot_message,
-                                                              user_message=user_message)
+        elif entity_type == DATE_ENTITY_TYPE:
+            if DATE_MODEL_TYPE == CRF_MODEL_TYPE:
+                crf_object = PredictCRF()
+                output_list = crf_object.get_model_output(entity_type=entity_type, bot_message=bot_message,
+                                                          user_message=user_message)
         return output_list
