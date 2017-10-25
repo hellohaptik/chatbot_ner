@@ -115,14 +115,13 @@ class PredictCRF(object):
                 ner_logger.debug('CITY CRF model loaded %s' % self._model_path)
 
             self.tagger = CITY_MODEL_OBJECT
-
         elif entity_type == DATE_ENTITY_TYPE:
             self._model_path = DATE_MODEL_PATH
             if not DATE_MODEL_OBJECT:
                 DATE_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
                 ner_logger.debug('date CRF model loaded %s' % self._model_path)
 
-            self.tagger = CITY_MODEL_OBJECT
+            self.tagger = DATE_MODEL_OBJECT
 
     def add_data_to_tagger(self, bot_message, user_message):
         """
