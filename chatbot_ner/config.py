@@ -111,3 +111,5 @@ DATE_MODEL_TYPE = os.environ.get('DATE_MODEL_TYPE')
 DATE_MODEL_PATH = os.environ.get('DATE_MODEL_PATH')
 if not CITY_MODEL_PATH:
     CITY_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'city', 'model_13062017.crf')
+if not DATE_MODEL_PATH:
+    DATE_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'date', 'model_date.crf')
