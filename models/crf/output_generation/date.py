@@ -5,9 +5,12 @@ def generate_date_output(crf_data):
     """
     This function takes a list of crf output as input and returns a json with proper tags of the entity
 
+    Attributes:
+        crf_data : this this the output given from the crf model
+
     for Example:
-        bot_message = 'none'
-        user_message = 'flights from 27th december and arriving on 31st january'
+        bot_message = 'none' # This marks the message sent by the bot 
+        user_message = 'flights from 27th december and arriving on 31st january' # This marks the message sent by the user
 
         Then run_crf will give the following output:
             crf_data = [['none','O'], ['flights', 'O'], ['from', 'O'], ['27th', 'FROM-B'], ['december', 'FROM-I'], 
@@ -72,14 +75,22 @@ def generate_date_output(crf_data):
 def make_json(date_value, from_bool, to_bool, start_bool, end_bool, normal_bool):
     """
     This function return json of the value found in function check_label
+    
+    Args:
+            date_value : value of the date
+            from_bool : Boolean value marking the from flag 
+            to_bool : Boolean value marking the to flag
+            start_bool : Boolean value marking the start_range flag
+            end_bool : Boolean value marking the end_range flag
+            normal_bool : Boolean value marking the normal flag
 
     for Example:
-        Args:
-            date_value = '27th december'
-            from_bool = True
-            to_bool = False
-            via_bool = False
-            normal_bool = False
+        date_value = '27th december'
+        from_bool = True
+        to_bool = False
+        start_bool = False
+        end_bool = False
+        normal_bool = False
 
         then calling this function with ab ove parameters will give:
             {'date': ''27th december', 'via': False, 'from': True, 'to': False, 'normal': False}
@@ -99,16 +110,25 @@ def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool
     """
     this function checks if a particular word has been given a particular label
 
+    Args:
+            reader_list : list returned by run_crf
+            reader_pointer : the pointer to keep track of the reader
+            begin_label : Starting label
+            inner_label : Inner label
+            from_bool : Boolean value to mark the from flag
+            to_bool : Boolean value to mark to flag
+            start_bool : Boolean value to mark the start_range flag
+            end_bool : Boolean value to mark the end_range flag
+            normal_bool : Boolean value to mark the normal flag
+    
     for Example:
-        Args:
-            reader_list = list returned by run_crf
-            reader_pointer = 3
-            begin_label = DATE_FROM_B
-            inner_label = DATE_FROM_I
-            from_bool = True
-            to_bool = False
-            via_bool = False
-            normal_bool = False
+        begin_label = DATE_FROM_B
+        inner_label = DATE_FROM_I
+        from_bool = True
+        to_bool = False
+        start_bool = False
+        end_bool = False
+        normal_bool = False
 
         When check_label is called with above parameters, it checks if the word has been given DATE_FROM_B label
         and its following words
