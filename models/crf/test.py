@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
-from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT
+from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT, DATE_ENTITY_TYPE
 from models.constant import INBOUND, OUTBOUND
-from chatbot_ner.config import ner_logger, CITY_MODEL_PATH
+from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
 from models.crf.output_generation.city import generate_city_output
+from models.crf.output_generation.date import generate_date_output
 
 try:
     import CRFPP
@@ -86,6 +87,9 @@ class PredictCRF(object):
             if entity_type == CITY_ENTITY_TYPE:
                 output_list = generate_city_output(crf_data=crf_output)
                 ner_logger.debug('NER MODEL OUTPUT: %s' % output_list)
+            elif entity_type == DATE_ENTITY_TYPE:
+                output_list = generate_date_output(crf_data=crf_output)
+                ner_logger.debug('NER MODEL OUTPUT: %s' % output_list)
         else:
             ner_logger.debug('MODEL IS NOT RUNNING: CRFPP not installed')
 
@@ -103,6 +107,7 @@ class PredictCRF(object):
 
         """
         global CITY_MODEL_OBJECT
+        global DATE_MODEL_OBJECT
         if entity_type == CITY_ENTITY_TYPE:
             self._model_path = CITY_MODEL_PATH
             if not CITY_MODEL_OBJECT:
@@ -110,6 +115,13 @@ class PredictCRF(object):
                 ner_logger.debug('CITY CRF model loaded %s' % self._model_path)
 
             self.tagger = CITY_MODEL_OBJECT
+        elif entity_type == DATE_ENTITY_TYPE:
+            self._model_path = DATE_MODEL_PATH
+            if not DATE_MODEL_OBJECT:
+                DATE_MODEL_OBJECT = CRFPP.Tagger("-m %s -v 3 -n2" % self._model_path)
+                ner_logger.debug('date CRF model loaded %s' % self._model_path)
+
+            self.tagger = DATE_MODEL_OBJECT
 
     def add_data_to_tagger(self, bot_message, user_message):
         """
