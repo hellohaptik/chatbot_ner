@@ -6,7 +6,18 @@ from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNo
     EngineConnectionException
 
 
+# Taken from https://stackoverflow.com/a/6798042/3697191
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
 class DataStore(object):
+    __metaclass__ = Singleton
     """
     DataStore acts as a wrapper around storage/cache engines to store entity related data, query them with entity values
     to get dictionaries that contain similar words/phrases based on fuzzy searches and conditions. It reads the

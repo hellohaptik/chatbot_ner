@@ -49,6 +49,7 @@ class TextDetector(object):
         self.processed_text = None
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
+        self.db = DataStore()
 
     def set_fuzziness_threshold(self, fuzziness):
         """
@@ -143,13 +144,13 @@ class TextDetector(object):
                                                   stop_words_unigram=True, stop_words_bigram=True,
                                                   stop_words_trigram=True).copy()
         variant_dictionary = {}
-        db = DataStore()
-        trigram_variants = db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                            self.fuzziness_threshold)
-        bigram_variants = db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                           self.fuzziness_threshold)
-        unigram_variants = db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                            self.fuzziness_threshold)
+
+        trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
+                                                                 self.fuzziness_threshold)
+        bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
+                                                                self.fuzziness_threshold)
+        unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
+                                                                 self.fuzziness_threshold)
         variant_dictionary.update(trigram_variants)
         variant_dictionary.update(bigram_variants)
         variant_dictionary.update(unigram_variants)
@@ -199,9 +200,9 @@ class TextDetector(object):
         while token_count < len(text_token_list):
             levenshtein = Levenshtein(variant_token_list[variant_count], text_token_list[token_count],
                                       self.fuzziness_threshold + 1)
-            if variant_token_list[variant_count] == text_token_list[token_count] or \
-                    (len(text_token_list[token_count]) > self.min_size_token_for_levenshtein and
-                             levenshtein.levenshtein_distance() <= self.fuzziness_threshold):
+            if (variant_token_list[variant_count] == text_token_list[token_count]
+                    or (len(text_token_list[token_count]) > self.min_size_token_for_levenshtein
+                        and levenshtein.levenshtein_distance() <= self.fuzziness_threshold)):
                 original_text.append(text_token_list[token_count])
                 variant_count += 1
                 if variant_count == len(variant_token_list):
