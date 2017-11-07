@@ -55,10 +55,10 @@ class Levenshtein(object):
             if None in [deletion_costs, insertion_costs, substitution_costs]:
                 deletion_costs = np.ones(256, dtype=np.float64)
                 insertion_costs = np.ones(256, dtype=np.float64)
-                substitution_costs = np.array([256, 256], dtype=np.float64)
+                substitution_costs = np.full([256, 256], 2)
                 substitution_costs.fill(2)
-            return min(self.max_threshold, lev(self.word1, self.word2, insert_costs=insertion_costs,
-                                               delete_costs=deletion_costs, substitute_costs=substitution_costs))
+            return min(self.max_threshold, int(lev(self.word1, self.word2, insert_costs=insertion_costs,
+                                               delete_costs=deletion_costs, substitute_costs=substitution_costs)))
         else:
             return self.levenshtein_distance()
 
