@@ -3,14 +3,14 @@ from lib.nlp.etc import store_data_in_list
 from lib.nlp.lemmatizer import Lemmatizer, WORDNET_LEMMATIZER
 from lib.nlp.ngram import Ngram
 from lib.nlp.stemmer import Stemmer, PORTER_STEMMER
-from lib.nlp.tokenizer import Tokenizer, WORD_TOKENIZER
+from lib.nlp.tokenizer import Tokenizer, PRELOADED_NLTK_TOKENIZER
 from lib.nlp.regex import Regex
 from chatbot_ner.settings import BASE_DIR
 
 
 stemmer = Stemmer(PORTER_STEMMER)
 lemmatizer = Lemmatizer(WORDNET_LEMMATIZER)
-tokenizer = Tokenizer(WORD_TOKENIZER)
+tokenizer = Tokenizer(PRELOADED_NLTK_TOKENIZER)
 
 
 # Creating list of stop words

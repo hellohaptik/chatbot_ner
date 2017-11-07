@@ -27,26 +27,19 @@ def store_data_in_list(file_path, stemmer=None, lower_case=True):
     return list_of_words
 
 
-def remove_one_list_to_another(list1, list2):
-    """Removes one list to another
-
-    This function will remove the words from list1 which are present in the other list
+def filter_list(list_to_filter, remove_elements):
+    """
     Args:
-        list1: list of words
-        list2: list of words
+        list_to_filter (list): list to filter
+        remove_elements (list): list elements to remove from first list
 
-        It will return the list of words which are present in list1 but not in list2
     Returns:
-        The list of words
-        For example
-        output = remove_one_list_to_another(list1=['hi', 'hello', 'bye'],['hi', 'bye'])
+        list of str: The list of elements in first list but not in second
+
+        For example output = remove_one_list_to_another(list1=['hi', 'hello', 'bye'],['hi', 'bye'])
         print output
         >> ['hello']
     """
+    return filter(lambda token: token not in remove_elements, list_to_filter)
 
-    token_list = []
-    for token in list1:
-        if not token in list2:
-            token_list.append(token)
-    return token_list
 

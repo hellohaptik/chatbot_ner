@@ -202,7 +202,7 @@ class TextDetector(object):
                                       self.fuzziness_threshold + 1)
             if (variant_token_list[variant_count] == text_token_list[token_count]
                     or (len(text_token_list[token_count]) > self.min_size_token_for_levenshtein
-                        and levenshtein.levenshtein_distance() <= self.fuzziness_threshold)):
+                        and levenshtein.edit_distance() <= self.fuzziness_threshold)):
                 original_text.append(text_token_list[token_count])
                 variant_count += 1
                 if variant_count == len(variant_token_list):
