@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import nltk
 from lib.nlp.const import tokenizer
+from lib.nlp.pos import POS
 from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT, DATE_ENTITY_TYPE
 from models.constant import INBOUND, OUTBOUND
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
@@ -71,6 +72,7 @@ class PredictCRF(object):
     def __init__(self):
         self.tagger = None
         self._model_path = None
+        self.pos_tagger = POS()
 
     def get_model_output(self, entity_type, bot_message, user_message):
         """
@@ -106,8 +108,7 @@ class PredictCRF(object):
             entity_type: type of entity
 
         """
-        global CITY_MODEL_OBJECT
-        global DATE_MODEL_OBJECT
+        global CITY_MODEL_OBJECT, DATE_MODEL_OBJECT
         if entity_type == CITY_ENTITY_TYPE:
             self._model_path = CITY_MODEL_PATH
             if not CITY_MODEL_OBJECT:
@@ -158,8 +159,8 @@ class PredictCRF(object):
         tokens_bot_message = tokenizer.tokenize(bot_message)
         tokens_user_message = tokenizer.tokenize(user_message)
 
-        pos_bot_message = nltk.pos_tag(tokens_bot_message)
-        pos_user_message = nltk.pos_tag(tokens_user_message)
+        pos_bot_message = self.pos_tagger.tag(tokens_bot_message)
+        pos_user_message = self.pos_tagger.tag(tokens_user_message)
         for token in pos_bot_message:
             self.tagger.add(str(token[0]) + ' ' + str(token[1]) + ' ' + OUTBOUND)
 
