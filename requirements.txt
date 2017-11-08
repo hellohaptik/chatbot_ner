@@ -1,6 +1,6 @@
 gunicorn==19.6.0
 pytz==2014.2
-nltk==3.0.1
+nltk==3.2.5
 numpy==1.10.4
 elasticsearch==5.3.0
 requests==2.8.1

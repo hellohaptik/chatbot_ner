@@ -50,12 +50,16 @@ class Tokenizer(object):
         return nltk.word_tokenize
 
     def __preloaded_nltk_tokenizer(self):
+        # Code pulled out of nltk == 3.2.5
         tokenizer = nltk.load('tokenizers/punkt/{0}.pickle'.format('english'))
         sent_tokenizer = tokenizer.tokenize
 
         def word_tokenize(text):
             sentences = sent_tokenizer(text)
-            return [token for sent in sentences for token in nltk.tokenize._treebank_word_tokenizer.tokenize(sent)]
+            tokens = []
+            for sent in sentences:
+                tokens.extend(nltk.word_tokenize(sent, preserve_line=True))
+            return tokens
 
         return word_tokenize
 
