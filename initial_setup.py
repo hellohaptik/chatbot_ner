@@ -1,6 +1,6 @@
 import os
-
 import nltk
+from datastore import DataStore
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -14,12 +14,15 @@ status = nltk.download('wordnet')
 if not status:
     print "wordnet Download was unsucessful"
 
-print "Downloading nltk corpus: POS ..."
+print "Downloading nltk corpus: MaxEnt POS ..."
 status = nltk.download('maxent_treebank_pos_tagger')
 if not status:
-    print "POS Download was unsucessful"
+    print "MaxEnt POS Download was unsucessful"
 
-from datastore import DataStore
+print "Downloading nltk corpus: AP POS Tagger..."
+status = nltk.download('averaged_perceptron_tagger')
+if not status:
+    print "AP POS Tagger Download was unsucessful"
 
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"

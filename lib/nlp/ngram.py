@@ -1,18 +1,13 @@
+import nltk
+
+
 class Ngram(object):
     """
-    This class is used to perform Ngram operations
+    Utility to generate ngrams with filters like removing stop words
 
-    In this class we have defined following functionality that can be used to get list of ngrams
-        1. ngram_list:
-            Attributes:
-                ngram: i.e. 1, 2, 3...
-                word_list: list of words
-                stop_word_list: list of words that should be excluded while obtaining list of ngrams
-            This function will get the list of ngrams. If the ngram contains all the stop words then it will not be
-            appended in the list
     For Example:
         ngram_object = Ngram()
-        ngram=2
+        ngram = 2
         word_list = ['hi','hello','how','are','you','hi']
         stop_word_list = ['hi','you']
         output = ngram_object.ngram_list(ngram, word_list, stop_word_list)
@@ -25,33 +20,26 @@ class Ngram(object):
     def __init__(self):
         pass
 
-    def ngram_list(self, ngram, word_list, stop_word_list=None):
-        """This function will get the list of ngrams. If the ngram contains all the stop words then it will not be
-            appended in the list
+    @staticmethod
+    def ngram_list(n, word_list, stop_word_list=None):
+        """
+        Generate ngrams with width n excluding those that are entirely formed of stop words
 
         Args:
-            ngram: i.e. 1, 2, 3...
-            word_list: list of words
-            stop_word_list: list of words that should be excluded while obtaining list of ngrams
+            n (int): i.e. 1, 2, 3...
+            word_list (list of str): list of words
+            stop_word_list (list of str, Optional): list of words that should be excluded while obtaining
+                                                    list of ngrams
 
         Returns:
-            List of ngrams
+            list of str: List of ngrams formed from the given word list except for those that have all their tokes in
+                         stop words list
         """
-
+        stop_word_set = set(stop_word_list) if stop_word_list else []
+        all_ngrams = nltk.ngrams(word_list, n)
         ngram_list = []
-        if len(word_list) >= ngram:
-            n = 0
-            for n in range(0, len(word_list) - ngram + 1):
-                location = 0
-                data = ''
-                count_stop_word = 0
-                while location < ngram:
-                    if stop_word_list and (str(word_list[n + location].lower()) in stop_word_list):
-                        count_stop_word += 1
-                    data += word_list[n + location] + ' '
-                    location += 1
-                if count_stop_word < ngram:
-                    ngram_list.append(data.strip())
-                n += 1
-
+        for ngram in all_ngrams:
+            lowered_ngram_tokens = map(lambda token: token.lower(), ngram)
+            if any(token not in stop_word_set for token in lowered_ngram_tokens):
+                ngram_list.append(' '.join(ngram))
         return ngram_list

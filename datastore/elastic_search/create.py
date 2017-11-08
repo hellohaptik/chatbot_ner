@@ -23,7 +23,7 @@ def delete_index(connection, index_name, logger, **kwargs):
     try:
         connection.indices.delete(index=index_name, **kwargs)
         logger.debug('%s: Delete Index: Operation successfully completed' % log_prefix)
-    except Exception, e:
+    except Exception as e:
         logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
 
 
@@ -101,7 +101,7 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
         else:
             logger.debug('%s: doc_type not in arguments, skipping put_mapping on index ...' % log_prefix)
         logger.debug('%s: Create Index: Operation successfully completed' % log_prefix)
-    except Exception, e:
+    except Exception as e:
         logger.exception('%s:Exception: while creating index, Rolling back \n %s' % (log_prefix, e))
         delete_index(connection=connection, index_name=index_name, logger=logger)
 
