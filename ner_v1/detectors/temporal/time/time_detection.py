@@ -118,8 +118,8 @@ class TimeDetector(object):
 
             Example:
                 time_detector = TimeDetector("time")
-                time_detector.detect_entity('John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in
-                                            15 mins.But the bus was scheduled for 12:30 pm')
+                time_detector.detect_entity('John arrived at the bus stop at 13:50 hrs, expecting the bus to be
+                                            there in 15 mins. But the bus was scheduled for 12:30 pm')
 
                     ([{'hh': 13, 'mm': 50, 'nn': 'hrs'},
                       {'hh': 0, 'mm': '15', 'nn': 'df'},

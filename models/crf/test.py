@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-import nltk
 from lib.nlp.const import tokenizer
 from lib.nlp.pos import POS
-from models.constant import CITY_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT, DATE_ENTITY_TYPE
+from models.constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT
 from models.constant import INBOUND, OUTBOUND
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
 from models.crf.output_generation.city import generate_city_output
@@ -12,6 +11,7 @@ try:
     import CRFPP
     MODEL_RUN = True
 except ImportError:
+    CRFPP = False
     MODEL_RUN = False
 
 """

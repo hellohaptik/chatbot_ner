@@ -109,8 +109,8 @@ class DataStore(object):
 
     def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
-        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and from
-        csv files at file paths in csv_file_paths list
+        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and
+        from csv files at file paths in csv_file_paths list
         Args:
             entity_data_directory_path: Optional, Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs

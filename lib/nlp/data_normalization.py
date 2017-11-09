@@ -28,7 +28,7 @@ class Normalization(object):
         trigram: list of trigrams obtained from input message
         bigram: list of bigrams obtained from input message
         unigram: list of unigrams obtained from input message
-        flag_punctation_removal: True if punctuations need to be removed from message
+        flag_punctuation_removal: True if punctuations need to be removed from message
         flag_tokens_without_stop_words: True if  stop words need to remove from list of tokens
         flag_stem: True if stems need to obtained from a message
         flag_stem_without_stop_words: True if  stop words need to remove from list of stems
@@ -137,7 +137,7 @@ class Normalization(object):
         """Configuration function that enables different functionalities to execute by setting the flags to True
 
         Args:
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             flag_tokens_without_stop_words: True if  stop words need to remove from list of tokens
             flag_stem: True if stems need to obtained from a message
             flag_stem_without_stop_words: True if  stop words need to remove from list of stems
@@ -167,9 +167,9 @@ class Normalization(object):
         """Performs tokenization, stemming, taggig and lemmatization on text
 
         Args:
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             flag_tokens: True if token need to obtained from a message
-            flag_stem: True if stems need to obtained from a message
+            flag_stems: True if stems need to obtained from a message
             flag_lemma: True if lemma need to obtained from a message
 
         Returns:
@@ -234,7 +234,7 @@ class Normalization(object):
 
         Args:
             text: message that needs to be processed
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             stem_unigram: True if list of unigrams needs to be stemmed
             stem_bigram: True if list of bigrams needs to be stemmed
             stem_trigram: True if list of trigrams needs to be stemmed

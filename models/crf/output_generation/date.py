@@ -10,7 +10,8 @@ def generate_date_output(crf_data):
 
     for Example:
         bot_message = 'none' # This marks the message sent by the bot 
-        user_message = 'flights from 27th december and arriving on 31st january' # This marks the message sent by the user
+        user_message = 'flights from 27th december and arriving on 31st january' # This marks the message sent by
+                                                                                   the user
 
         Then run_crf will give the following output:
             crf_data = [['none','O'], ['flights', 'O'], ['from', 'O'], ['27th', 'FROM-B'], ['december', 'FROM-I'], 
@@ -106,7 +107,8 @@ def make_json(date_value, from_bool, to_bool, start_bool, end_bool, normal_bool)
     return python_dict
 
 
-def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool, to_bool, start_bool, end_bool, normal_bool):
+def check_label(reader_list, reader_pointer, begin_label, inner_label, from_bool, to_bool, start_bool, end_bool,
+                normal_bool):
     """
     this function checks if a particular word has been given a particular label
 

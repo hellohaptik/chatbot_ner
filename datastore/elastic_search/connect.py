@@ -8,8 +8,8 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
     Establishes connection to a single Elasticsearch Instance.
     if connection_url is not None, then host, port, user, password are not used
     Args:
-        connection_url: Elasticsearch connection url of the format https://user:secret@host:port/abc . Optional if other
-                        parameters are provided.
+        connection_url: Elasticsearch connection url of the format https://user:secret@host:port/abc .
+                        Optional if other parameters are provided.
         host: nodes to connect to . e.g. localhost. Optional if connection_url is provided
         port: port for elasticsearch connection. Optional if connection_url is provided
         user: Optional, username for elasticsearch authentication

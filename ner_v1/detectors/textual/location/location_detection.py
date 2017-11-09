@@ -13,12 +13,10 @@ class LocationDetector(object):
         entity_name: string by which the detected city entities would be replaced with on calling detect_entity()
         text_dict: dictionary to store lemmas, stems, ngrams used during detection process
         tagged_text: string with city entities replaced with tag defined by entity_name
-        text_entity: list to store detected entities from the text
-        original_location_entity: list of substrings of the text detected as entities
+        location: list to store detected entities from the text
+        original_location_text: list of substrings of the text detected as entities
         processed_text: string with detected time entities removed
-        tag: entity_name prepended and appended with '__'
     """
-
 
     def __init__(self, entity_name):
         self.text = ''
@@ -31,6 +29,7 @@ class LocationDetector(object):
         self.user_address = None
         self.user_lat_long = None
         self.user_location_updated_at = None
+        self.profile_check = True
 
     def detect_location(self):
         """
@@ -62,7 +61,7 @@ class LocationDetector(object):
         self.user_address = user_address
         self.user_lat_long = user_lat_long
         if user_location_updated:
-            if not '+' in user_location_updated:
+            if '+' not in user_location_updated:
                 space = user_location_updated.split(' ')
                 if len(space) == 3:
                     user_location_updated = space[0] + ' ' + '+'.join(space[1:])

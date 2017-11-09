@@ -133,8 +133,8 @@ class TextDetector(object):
         original text which has been identified and will return the results
 
         Returns:
-             A tuple of two lists with first list containing the detected text entities and second list containing their
-            corresponding substrings in the original message.
+             A tuple of two lists with first list containing the detected text entities and second list containing
+             their corresponding substrings in the original message.
         """
         original_final_list = []
         value_final_list = []

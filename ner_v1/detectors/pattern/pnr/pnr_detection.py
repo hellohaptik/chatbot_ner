@@ -118,8 +118,8 @@ class PNRDetector(object):
 
                (['2459547855'], ['2459547855'])
 
-           Additionally this function assigns these lists to self.pnr_list and self.original_original_pnr_text attributes
-           respectively.
+           Additionally this function assigns these lists to self.pnr_list and self.original_original_pnr_text
+           attributes respectively.
 
         """
         # print 'detection for default task'
@@ -131,7 +131,8 @@ class PNRDetector(object):
 
     def _detect_railway_pnr_format(self, railway_pnr_list=None, original_list=None):
         """
-        Detects Indian Railways 10 to 12 digits pnr codes from self.text conforming to formats defined by regex pattern.
+        Detects Indian Railways 10 to 12 digits pnr codes from self.text conforming to formats defined by
+         regex pattern.
 
         This function is called by _detect_railway_pnr()
 

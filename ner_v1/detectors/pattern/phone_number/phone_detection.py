@@ -150,7 +150,8 @@ class PhoneDetector(object):
         A string with all phone numbers removed will be stored in object's processed_text attribute
 
         Args:
-            original_phone_strings: list of substrings of original text to be replaced with tag created from entity_name
+            original_phone_strings: list of substrings of original text to be replaced with tag created
+                                    from entity_name
         """
         for detected_text in original_phone_strings:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
