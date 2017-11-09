@@ -65,8 +65,6 @@ class BudgetDetector(object):
         as budget if its less than 99999
         text: string to extract entities from
         entity_name: string by which the detected size would be replaced with on calling detect_entity()
-        dictionary_name: name of a dictionary that stores the string data. For example: Hunderd, Thousand, lakh, etc.
-        It's a constant and its value is BUDGET_LIST
         tagged_text: string with size replaced with tag defined by entity name
         processed_text: string with sizes detected removed
         budget: list of budgets detected
@@ -277,7 +275,7 @@ class BudgetDetector(object):
                 max_budget = int(pattern[7])
             min_budget = 0
             if pattern[2]:
-                if flag_contains_k and not 'k' in pattern[2]:
+                if flag_contains_k and 'k' not in pattern[2]:
                     pattern[2] = str(pattern[2]).strip() + 'k'
                 min_budget = int(self.regex_object.text_substitute(pattern[2]))
             elif pattern[3]:

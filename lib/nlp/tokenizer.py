@@ -1,7 +1,10 @@
 import nltk
 
 # constants
-WORD_TOKENIZER = 'WORD_TOKENIZER'
+from lib.singleton import Singleton
+
+NLTK_TOKENIZER = 'WORD_TOKENIZER'
+PRELOADED_NLTK_TOKENIZER = 'PRELOADED_NLTK_TOKENIZER'
 
 
 class Tokenizer(object):
@@ -23,26 +26,42 @@ class Tokenizer(object):
 
     """
 
-    def __init__(self, tokenizer_selected=WORD_TOKENIZER):
+    __metaclass__ = Singleton
+
+    def __init__(self, tokenizer_selected=NLTK_TOKENIZER):
         """Initializes a Tokenizer object
 
         Args:
             tokenizer_selected: Tokenizer which needs to be selected for processing
         """
-        self.tokenizer = None
         self.tokenizer_selected = tokenizer_selected
         self.tokenizer_dict = {
-            WORD_TOKENIZER: self.__word_tokenizer
+            NLTK_TOKENIZER: self.__nltk_tokenizer,
+            PRELOADED_NLTK_TOKENIZER: self.__preloaded_nltk_tokenizer,
         }
-        self.tokenizer_dict[self.tokenizer_selected]()
+        self.tokenizer = self.tokenizer_dict[self.tokenizer_selected]()
 
-    def __word_tokenizer(self):
+    def __nltk_tokenizer(self):
         """Initializes Word Tokenizer
 
         Returns:
             Initializes Word Tokenizer
         """
-        self.tokenizer = nltk.word_tokenize
+        return nltk.word_tokenize
+
+    def __preloaded_nltk_tokenizer(self):
+        # Code pulled out of nltk == 3.2.5
+        tokenizer = nltk.load('tokenizers/punkt/{0}.pickle'.format('english'))
+        sent_tokenizer = tokenizer.tokenize
+
+        def word_tokenize(text):
+            sentences = sent_tokenizer(text)
+            tokens = []
+            for sent in sentences:
+                tokens.extend(nltk.word_tokenize(sent, preserve_line=True))
+            return tokens
+
+        return word_tokenize
 
     def get_tokenizer(self):
         """Returns the object of tokenizer
@@ -56,10 +75,10 @@ class Tokenizer(object):
         """Returns the list of tokens from text
 
         Args:
-            tokens: list of tokens
+            text: text to tokenize
 
         Returns:
-            The list of tokens
+            list of str: The list of tokens
             For example:
                 token = Tokenizer()
                 output = token.tokenize('Hey, How are you doing?')
@@ -67,6 +86,4 @@ class Tokenizer(object):
                 >> ['Hey', ',', 'How', 'are', 'you', 'doing', '?']
 
         """
-
-        if WORD_TOKENIZER == self.tokenizer_selected:
-            return self.tokenizer(text)
+        return self.tokenizer(text)

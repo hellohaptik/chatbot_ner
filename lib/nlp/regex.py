@@ -33,9 +33,7 @@ class Regex(object):
         self.pattern_list = pattern_list
         self.text = None
         self.processed_text = None
-        self.pattern_compile = []
-        for pattern in self.pattern_list:
-            self.pattern_compile.append(re.compile(pattern[0]))
+        self.pattern_compile = [re.compile(pattern[0]) for pattern in self.pattern_list]
 
     def text_substitute(self, text):
         """
@@ -56,8 +54,6 @@ class Regex(object):
         """
         self.text = text
         self.processed_text = self.text
-        count = 0
-        while count < len(self.pattern_list):
-            self.processed_text = self.pattern_compile[count].sub(self.pattern_list[count][1], self.text)
-            count += 1
+        for i, compiled_pattern in enumerate(self.pattern_compile):
+            self.processed_text = compiled_pattern.sub(self.pattern_list[i][1], self.text)
         return self.processed_text

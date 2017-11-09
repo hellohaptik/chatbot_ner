@@ -546,7 +546,7 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': '12:30 pm', 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}},
+        >>  [{'detection': 'message', 'original_text': '12:30 pm', 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}},
             {'detection': 'message', 'original_text': 'in 15 mins', 'entity_value': {'mm': '15', 'hh': 0, 'nn': 'df'}},
             {'detection': 'message', 'original_text': '13:50', 'entity_value': {'mm': 50, 'hh': 13, 'nn': 'hrs'}}]
     """
@@ -678,6 +678,7 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
 
     return None
+
 
 def output_entity_dict_list(entity_value_list=None, original_text_list=None, detection_method=None,
                             detection_method_list=None):

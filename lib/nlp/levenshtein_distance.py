@@ -1,3 +1,19 @@
+c_levenshtein = False
+
+deletion_costs, insertion_costs, substitution_costs = None, None, None
+
+try:
+    import numpy as np
+    from weighted_levenshtein import lev
+    deletion_costs = np.ones(256, dtype=np.float64)
+    insertion_costs = np.ones(256, dtype=np.float64)
+    substitution_costs = np.full(shape=[256, 256], fill_value=2, dtype=np.float64)
+    c_levenshtein = True
+except ImportError:
+    np, lev = None, None
+    pass
+
+
 class Levenshtein(object):
     """
     Calculates the Levenshtein distance between two words
@@ -36,6 +52,13 @@ class Levenshtein(object):
         self.word2 = word2
         self.max_threshold = max_threshold
 
+    def edit_distance(self):
+        if c_levenshtein:
+            return min(self.max_threshold, int(lev(self.word1, self.word2, insert_costs=insertion_costs,
+                                               delete_costs=deletion_costs, substitute_costs=substitution_costs)))
+        else:
+            return self.levenshtein_distance()
+
     def levenshtein_distance(self):
         """Returns the levenshtein distance between two words
 
@@ -51,9 +74,7 @@ class Levenshtein(object):
                 output = levenshtein.levenshtein_distance()
                 print output
                 >> 3
-
         """
-
         cost_sub = 2
         cost_ins = 1
         cost_del = 1

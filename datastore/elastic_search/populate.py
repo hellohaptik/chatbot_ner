@@ -98,11 +98,11 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
                 data = [variant for variant in data if variant]
                 dictionary_value[data_row[0].strip().replace('.', ' ')].extend(data)
 
-            except Exception, e:
+            except Exception as e:
                 logger.exception('%s: \t\t== Exception in dict creation for keyword: %s -- %s -- %s =='
                                  % (log_prefix, dictionary_key, data_row, e))
 
-    except Exception, e:
+    except Exception as e:
         logger.exception(
             '%s: \t\t\t=== Exception in __get_variants_dictionary_value_from_key() Dictionary Key: %s \n %s  ===' % (
                 log_prefix,
@@ -113,8 +113,8 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
 
 def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, logger, **kwargs):
     """
-    Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values of
-    dictionary_value parameter generated from the csv file of this entity
+    Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
+    of dictionary_value parameter generated from the csv file of this entity
 
     Args:
         connection: Elasticsearch client object
@@ -125,7 +125,6 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
         dictionary_value: dictionary, mapping entity value to a list of its variants.
                             Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
         logger: logging object to log at debug and exception level
-        update: boolean, True if this is a update type operation, False if create/index type operation
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
