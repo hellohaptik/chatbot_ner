@@ -75,6 +75,8 @@ CHATBOT_NER_DATASTORE = {
         'port': ES_PORT,
         'user': ES_AUTH_NAME,
         'password': ES_AUTH_PASSWORD,
+        'retry_on_timeout': True,
+        'max_retries': 2,
     }
 }
 

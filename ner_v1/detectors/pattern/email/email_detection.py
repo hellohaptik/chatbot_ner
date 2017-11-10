@@ -37,7 +37,8 @@ class EmailDetector(object):
         """Initializes a EmailDetector object
 
         Args:
-           entity_name: A string by which the detected email addresses would be replaced with on calling detect_entity()
+           entity_name: A string by which the detected email addresses would be replaced with on
+                       calling detect_entity()
 
         """
         self.entity_name = entity_name
@@ -138,7 +139,8 @@ class EmailDetector(object):
         A string with all email addresses removed will be stored in object's processed_text attribute
 
         Args:
-            original_email_strings: list of substrings of original text to be replaced with tag created from entity_name
+            original_email_strings: list of substrings of original text to be replaced with tag created
+                                    from entity_name
         """
         for detected_text in original_email_strings:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)

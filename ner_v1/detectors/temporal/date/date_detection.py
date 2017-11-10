@@ -20,8 +20,8 @@ from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
 
 class DateAdvanceDetector(object):
     """
-    DateAdvanceDetector detects dates from the text. It Detects date with the properties like "from", "to","start_range"
-    ,"end_range"and "normal". These dates are returned in a dictionary form that contains relevant text, 
+    DateAdvanceDetector detects dates from the text. It Detects date with the properties like "from", "to",
+    "start_range", "end_range"and "normal". These dates are returned in a dictionary form that contains relevant text,
     its actual value and its attribute in boolean field i.e. "from", "to", "start_range", "end_range" and "normal".
     This class uses DateDetector to detect the entity values. It also has model integrated to it that can be used to
     extract relevant dates from the text
@@ -258,8 +258,8 @@ class DateAdvanceDetector(object):
         Finds departure and return type dates in the given text. It detects 'departure' and 'return' and their synonyms
         and tags all the detected dates in the text accordingly. If both type synonyms are found, and more than one
         dates are detected, first date is marked as departure type and last as return type. If only one date is found,
-        it is marked as departure if 'departure' or both type synonyms are found and marked as 'return' type if 'return'
-        type synonyms were found in the given text
+        it is marked as departure if 'departure' or both type synonyms are found and marked as 'return' type if
+        'return' type synonyms were found in the given text
 
 
         Args:
@@ -757,8 +757,8 @@ class DateDetector(object):
         """
         Detects possible dates for if there are missing parts of date - day, month, year assuming sensible defaults.
         Also detects "everyday","only weekdays", "only weekends","A to B" type ranges in days of week or months,
-        and their variants/ synonyms and returns probable dates by using current year, month, week defaults for parts of
-        dates that are missing or that include relative ranges. Type of dates returned by this method include
+        and their variants/ synonyms and returns probable dates by using current year, month, week defaults for parts
+        of dates that are missing or that include relative ranges. Type of dates returned by this method include
         TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, TYPE_THIS_DAY, REPEAT_WEEKDAYS, REPEAT_WEEKENDS, START_RANGE, END_RANGE,
         REPEAT_START_RANGE, REPEAT_END_RANGE, DATE_START_RANGE, DATE_END_RANGE, WEEKDAYS, WEEKENDS .
 
@@ -1601,8 +1601,8 @@ class DateDetector(object):
 
     def _day_in_next_week(self, date_list=None, original_list=None):
         """
-        Detects "next <day of the week>" and its variants and returns the date on that day in the next week. Week starts
-        with Sunday and ends with Saturday
+        Detects "next <day of the week>" and its variants and returns the date on that day in the next week.
+        Week starts with Sunday and ends with Saturday
 
         Matches "next" or "nxt" followed by day of the week - Sunday/Monday/Tuesday/Wednesday/Thursday/Friday/Saturday
         or their abbreviations. NOTE: Day of the week and their variants are fetched from the data store

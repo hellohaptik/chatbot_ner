@@ -1,6 +1,8 @@
 from nltk.stem import WordNetLemmatizer
 
 # constants
+from lib.singleton import Singleton
+
 WORDNET_LEMMATIZER = 'WORDNET_LEMMATIZER'
 
 
@@ -38,6 +40,8 @@ class Lemmatizer(object):
         lemmatizer: Object of the lemmatizer obtained from external library example, WordNetLemmatizer
 
     """
+
+    __metaclass__ = Singleton
 
     def __init__(self, lemmatizer_selected=WORDNET_LEMMATIZER):
         """Initializes a Lemmatizer object
@@ -125,5 +129,6 @@ class Lemmatizer(object):
             Initializes WordNetLemmatizer
         """
         self.lemmatizer = WordNetLemmatizer()
-        first_lemmatizer = self.lemmatizer.lemmatize('start')
+        # Call lemmatize to avoid lazy load
+        _ = self.lemmatizer.lemmatize('start')
 

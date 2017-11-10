@@ -145,8 +145,8 @@ class NumberDetector(object):
         """
         number_list = []
         original_list = []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]{1,3})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)*)'
-                              r'\s', self.processed_text.lower())
+        patterns = re.findall(r'\s((fo?r)*\s*([0-9]{1,3})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)'
+                              r'*)\s', self.processed_text.lower())
         for pattern in patterns:
             number_list.append(pattern[2])
             original_list.append(pattern[0])

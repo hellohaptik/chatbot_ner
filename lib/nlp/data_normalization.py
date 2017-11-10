@@ -1,6 +1,6 @@
 from lib.nlp.const import lemmatizer, ngram_object, tokenizer, stemmer, regx_punctuation_removal, \
     stop_words
-from lib.nlp.etc import remove_one_list_to_another
+from lib.nlp.etc import filter_list
 from chatbot_ner.config import nlp_logger
 
 
@@ -28,7 +28,7 @@ class Normalization(object):
         trigram: list of trigrams obtained from input message
         bigram: list of bigrams obtained from input message
         unigram: list of unigrams obtained from input message
-        flag_punctation_removal: True if punctuations need to be removed from message
+        flag_punctuation_removal: True if punctuations need to be removed from message
         flag_tokens_without_stop_words: True if  stop words need to remove from list of tokens
         flag_stem: True if stems need to obtained from a message
         flag_stem_without_stop_words: True if  stop words need to remove from list of stems
@@ -137,7 +137,7 @@ class Normalization(object):
         """Configuration function that enables different functionalities to execute by setting the flags to True
 
         Args:
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             flag_tokens_without_stop_words: True if  stop words need to remove from list of tokens
             flag_stem: True if stems need to obtained from a message
             flag_stem_without_stop_words: True if  stop words need to remove from list of stems
@@ -167,9 +167,9 @@ class Normalization(object):
         """Performs tokenization, stemming, taggig and lemmatization on text
 
         Args:
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             flag_tokens: True if token need to obtained from a message
-            flag_stem: True if stems need to obtained from a message
+            flag_stems: True if stems need to obtained from a message
             flag_lemma: True if lemma need to obtained from a message
 
         Returns:
@@ -208,7 +208,7 @@ class Normalization(object):
 
         if flag_tokens:
             self.tokens = self.tokenizer.tokenize(self.text_to_process)
-            self.tokens_without_stop_words = remove_one_list_to_another(self.tokens, self.stop_word_list)
+            self.tokens_without_stop_words = filter_list(self.tokens, self.stop_word_list)
         nlp_logger.debug('=== token is %s ===' % flag_tokens)
 
         if flag_stems:
@@ -216,7 +216,7 @@ class Normalization(object):
                 self.tokens = self.tokenizer.tokenize(self.text_to_process)
             self.stems = self.stemmer.stem_tokens(self.tokens)
             self.stems_without_stop_words = self.stemmer.stem_tokens(
-                remove_one_list_to_another(self.tokens, self.stop_word_list))
+                filter_list(self.tokens, self.stop_word_list))
         nlp_logger.debug('=== stem is %s ===' % flag_stems)
 
         if flag_lemma:
@@ -224,7 +224,7 @@ class Normalization(object):
                 self.tokens = self.tokenizer.tokenize(self.text_to_process)
             self.lemmas = self.lemmatizer.lemmatize_tokens(self.tokens)
             self.lemmas_without_stop_words = self.lemmatizer.lemmatize_tokens(
-                remove_one_list_to_another(self.tokens, self.stop_word_list))
+                filter_list(self.tokens, self.stop_word_list))
 
         return self.__normalization_dictionary()
 
@@ -234,7 +234,7 @@ class Normalization(object):
 
         Args:
             text: message that needs to be processed
-            flag_punctation_removal: True if punctuations need to be removed from message
+            flag_punctuation_removal: True if punctuations need to be removed from message
             stem_unigram: True if list of unigrams needs to be stemmed
             stem_bigram: True if list of bigrams needs to be stemmed
             stem_trigram: True if list of trigrams needs to be stemmed
@@ -278,7 +278,7 @@ class Normalization(object):
         self.text_to_process = self.text_to_process.lower()
 
         self.tokens = self.tokenizer.tokenize(self.text_to_process)
-        self.tokens_without_stop_words = remove_one_list_to_another(self.tokens, self.stop_word_list)
+        self.tokens_without_stop_words = filter_list(self.tokens, self.stop_word_list)
         self.stems = self.stemmer.stem_tokens(self.tokens)
         self.stems_without_stop_words = self.stemmer.stem_tokens(self.tokens_without_stop_words)
 
@@ -358,7 +358,7 @@ class Normalization(object):
         nlp_logger.debug('=== tokens are identified ===')
 
         if self.flag_tokens_without_stop_words:
-            self.tokens_without_stop_words = remove_one_list_to_another(self.tokens, self.stop_word_list)
+            self.tokens_without_stop_words = filter_list(self.tokens, self.stop_word_list)
         nlp_logger.debug('=== tokens without stop words is %s ===' % self.flag_tokens_without_stop_words)
 
         if self.flag_stem and self.tokens:
@@ -370,7 +370,7 @@ class Normalization(object):
                 self.stems_without_stop_words = self.stemmer.stem_tokens(self.tokens_without_stop_words)
             else:
                 self.stems_without_stop_words = self.stemmer.stem_tokens(
-                    remove_one_list_to_another(self.tokens, self.stop_word_list))
+                    filter_list(self.tokens, self.stop_word_list))
         nlp_logger.debug('=== stemmer without stop words is %s ===' % self.flag_stem_without_stop_words)
 
         if self.flag_lemma and self.tokens:
@@ -382,7 +382,7 @@ class Normalization(object):
                 self.lemmas_without_stop_words = self.lemmatizer.lemmatize_tokens(self.tokens_without_stop_words)
             else:
                 self.lemmas_without_stop_words = self.lemmatizer.lemmatize_tokens(
-                    remove_one_list_to_another(self.tokens, self.stop_word_list))
+                    filter_list(self.tokens, self.stop_word_list))
         nlp_logger.debug('=== lemma without stop word is %s ===' % self.flag_lemma_without_stop_words)
 
         if self.stems or self.tokens:

@@ -1,15 +1,18 @@
 import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
-from .constants import ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY, \
-    ELASTICSEARCH_DOC_TYPE
-from .exceptions import DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException, \
-    EngineConnectionException
+from lib.singleton import Singleton
+from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
+                        ELASTICSEARCH_DOC_TYPE)
+from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+                         EngineConnectionException)
 
 
 class DataStore(object):
     """
-    DataStore acts as a wrapper around storage/cache engines to store entity related data, query them with entity values
-    to get dictionaries that contain similar words/phrases based on fuzzy searches and conditions. It reads the
+    Singleton class to connect to engine storing entity related data
+
+    DataStore acts as a wrapper around storage/cache engines to store entity related data, query them with entity
+    values to get dictionaries that contain similar words/phrases based on fuzzy searches and conditions. It reads the
     required configuration from environment variables.
 
     It provides a simple API to create, populate, delete and query the underlying storage of choice
@@ -24,8 +27,9 @@ class DataStore(object):
         _engine: Engine name as read from the environment config
         _connection_settings: Connection settings compiled from variables in the environment config
         _store_name: Name of the database/index to query on the engine server
-        _connection: Low level connection object to the engine, None at initialization
+        _client_or_connection: Low level connection object to the engine, None at initialization
     """
+    __metaclass__ = Singleton
 
     def __init__(self):
         """
@@ -42,7 +46,7 @@ class DataStore(object):
             raise DataStoreSettingsImproperlyConfiguredException()
         # This can be index name for elastic search, table name for SQL,
         self._store_name = None
-        self._connection = None
+        self._client_or_connection = None
         self._connect()
 
     def _connect(self):
@@ -56,12 +60,12 @@ class DataStore(object):
         """
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
-            self._connection = elastic_search.connect.connect(**self._connection_settings)
+            self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
-            self._connection = None
+            self._client_or_connection = None
             raise EngineNotImplementedException()
 
-        if self._connection is None:
+        if self._client_or_connection is None:
             raise EngineConnectionException(engine=self._engine)
 
     def create(self, **kwargs):
@@ -91,12 +95,12 @@ class DataStore(object):
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.create.create_index(connection=self._connection,
+            elastic_search.create.create_index(connection=self._client_or_connection,
                                                index_name=self._store_name,
                                                doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
                                                logger=ner_logger,
@@ -105,8 +109,8 @@ class DataStore(object):
 
     def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
-        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and from
-        csv files at file paths in csv_file_paths list
+        Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and
+        from csv files at file paths in csv_file_paths list
         Args:
             entity_data_directory_path: Optional, Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs
@@ -120,12 +124,12 @@ class DataStore(object):
             All other exceptions raised by elasticsearch-py library
 
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.populate.create_all_dictionary_data(connection=self._connection,
+            elastic_search.populate.create_all_dictionary_data(connection=self._client_or_connection,
                                                                index_name=self._store_name,
                                                                doc_type=self._connection_settings[
                                                                    ELASTICSEARCH_DOC_TYPE],
@@ -148,17 +152,17 @@ class DataStore(object):
                                       or not
                     wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
 
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
 
         Raises:
             All exceptions raised by elasticsearch-py library
 
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            elastic_search.create.delete_index(connection=self._connection,
+            elastic_search.create.delete_index(connection=self._client_or_connection,
                                                index_name=self._store_name,
                                                logger=ner_logger,
                                                ignore=[400, 404],
@@ -197,12 +201,12 @@ class DataStore(object):
                 ...
                 u'koramangala': [u'koramangala']}
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            results_dictionary = elastic_search.query.dictionary_query(connection=self._connection,
+            results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
                                                                        index_name=self._store_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
@@ -241,13 +245,13 @@ class DataStore(object):
                  u'mumbai': u'mumbai',
                  u'pune': u'pune'}
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             if ngrams_list:
-                results_dictionary = elastic_search.query.ngrams_query(connection=self._connection,
+                results_dictionary = elastic_search.query.ngrams_query(connection=self._client_or_connection,
                                                                        index_name=self._store_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
@@ -269,12 +273,12 @@ class DataStore(object):
                     Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.populate.delete_entity_by_name(connection=self._connection,
+            elastic_search.populate.delete_entity_by_name(connection=self._client_or_connection,
                                                           index_name=self._store_name,
                                                           doc_type=self._connection_settings[
                                                               ELASTICSEARCH_DOC_TYPE],
@@ -300,12 +304,12 @@ class DataStore(object):
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.populate.recreate_all_dictionary_data(connection=self._connection,
+            elastic_search.populate.recreate_all_dictionary_data(connection=self._client_or_connection,
                                                                  index_name=self._store_name,
                                                                  doc_type=self._connection_settings[
                                                                      ELASTICSEARCH_DOC_TYPE],
@@ -332,10 +336,10 @@ class DataStore(object):
         Returns:
              boolean, True if DataStore structure exists, False otherwise
         """
-        if self._connection is None:
+        if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            return elastic_search.create.exists(connection=self._connection, index_name=self._store_name)
+            return elastic_search.create.exists(connection=self._client_or_connection, index_name=self._store_name)
 
         return False

@@ -72,7 +72,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
 
         db = DataStore()
         ngrams_list = ['Pune', 'Mumbai', 'Goa', 'Bangalore']
-        ngrams_query(connection=db._connection, index_name=db._store_name,
+        ngrams_query(connection=db._client_or_connection, index_name=db._store_name,
                         doc_type=db._connection_settings[ELASTICSEARCH_DOC_TYPE],
                         entity_name='city', ngrams_list=ngrams_list,
                         fuzziness_threshold=2)

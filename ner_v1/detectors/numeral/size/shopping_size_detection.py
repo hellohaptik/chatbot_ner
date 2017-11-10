@@ -46,7 +46,7 @@ class ShoppingSizeDetector(object):
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
         """
         self.entity_name = entity_name
-        dictionary_name = 'shopping_size'
+        self.dictionary_name = 'shopping_size'
         self.text = ''
         self.text_dict = {}
         self.tagged_text = ''
