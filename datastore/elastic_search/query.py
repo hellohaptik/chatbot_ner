@@ -22,8 +22,6 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
         synonyms/variants of the key
     """
     results_dictionary = {}
-    if 'index' not in kwargs:
-        kwargs = dict(kwargs, index=index_name)
     data = {
         'query': {
             'term': {
@@ -31,11 +29,10 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
                     'value': entity_name
                 }
             }
-        },
-        'size': ELASTICSEARCH_SEARCH_SIZE
+        }
     }
-    kwargs = dict(kwargs, body=data)
-    kwargs = dict(kwargs, doc_type=doc_type)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                  scroll='2m')
     search_results = _run_es_search(connection, **kwargs)
 
     # Parse hits
@@ -92,9 +89,8 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
         data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        kwargs = dict(kwargs, index=index_name)
-        kwargs = dict(kwargs, body=data)
-        kwargs = dict(kwargs, doc_type=doc_type)
+        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                      scroll='2m')
         ngram_results = _run_es_search(connection, **kwargs)
         ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
     return ngram_results
@@ -110,7 +106,18 @@ def _run_es_search(connection, **kwargs):
     Returns:
         dictionary, search results from elasticsearch.ElasticSearch.search
     """
-    return connection.search(**kwargs)
+    connection_result = connection.search(**kwargs)
+    scroll_id = connection_result['_scroll_id']
+    scroll_size = connection_result['hits']['total']
+    hit_list = connection_result['hits']['hits']
+
+    while scroll_size > 0:
+        connection_result = connection.scroll(scroll_id=scroll_id, scroll='2m')
+        scroll_id = connection_result['_scroll_id']
+        scroll_size = len(connection_result['hits']['hits'])
+        hit_list += connection_result['hits']['hits']
+    connection_result['hits']['hits'] = hit_list
+    return connection_result
 
 
 def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold):

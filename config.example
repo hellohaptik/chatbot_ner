@@ -24,6 +24,9 @@ ES_AUTH_PASSWORD=
 # ES_BULK_MSG_SIZE is an integer value
 ES_BULK_MSG_SIZE=1000
 
+# TODO: Documentation for ELASTICSEARCH_SEARCH_SIZE
+ES_SEARCH_SIZE=10000
+
 # Provide the following values if you need AWS authentication
 
 ES_AWS_SECRET_ACCESS_KEY=
