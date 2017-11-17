@@ -55,11 +55,14 @@ ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE')
 ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
+ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
+    ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
 except ValueError:
     ES_BULK_MSG_SIZE = 10000
+    ES_SEARCH_SIZE = 10000
 
 ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
