@@ -158,16 +158,16 @@ class DateAdvanceDetector(object):
             date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
 
         else:
-            month_range_pattern = re.compile(r'\b(([A-Za-z]+)\s*(\-|to)\s*([A-Za-z]+))\b')
-            patterns = month_range_pattern.findall(self.processed_text.lower())
-            for pattern in patterns:
-                start_date_list = self._date_dict_from_text(text=pattern[1], start_range_property=True)
-                end_date_list = self._date_dict_from_text(text=pattern[3], end_range_property=True)
-                if start_date_list and end_date_list:
-                    start_date_list, end_date_list = self._generate_range(start_date_dict=start_date_list[0],
-                                                                          end_date_dict=end_date_list[-1])
-                    date_dict_list.extend(start_date_list)
-                    date_dict_list.extend(end_date_list)
+            parts = re.split(r'\s+(?:\-|to)\s+', self.processed_text.lower())
+            if len(parts) > 1:
+                for start_part, end_part in zip(parts[:-1], parts[1:]):
+                    start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
+                    end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
+                    if start_date_list and end_date_list:
+                        start_date_list, end_date_list = self._generate_range(start_date_dict=start_date_list[0],
+                                                                              end_date_dict=end_date_list[-1])
+                        date_dict_list.extend(start_date_list)
+                        date_dict_list.extend(end_date_list)
         return date_dict_list
 
     def _generate_range(self, start_date_dict, end_date_dict):
