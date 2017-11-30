@@ -7,15 +7,13 @@ import pytz
 import models.constant as model_constant
 import ner_v1.detectors.constant as detector_constant
 from chatbot_ner.config import ner_logger
-from lib.nlp.regex import Regex
 from models.models import Models
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                                        TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
-                                       TYPE_THIS_DAY,
+                                       TYPE_THIS_DAY, TYPE_PAST,
                                        TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
-                                       REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT,
-                                       TYPE_N_DAYS_AFTER)
+                                       REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
 
 
 class DateAdvanceDetector(object):
@@ -189,13 +187,14 @@ class DateAdvanceDetector(object):
                 list containing dictionaries of end of range dates
 
         """
+        repeat_flag = start_date_dict[detector_constant.DATE_VALUE]['type'] in [TYPE_EVERYDAY, TYPE_REPEAT_DAY]
         start_date_list, end_date_list = [start_date_dict], [end_date_dict]
         start_date = self.date_detector_object.to_datetime_object(start_date_dict[detector_constant.DATE_VALUE])
         end_date = self.date_detector_object.to_datetime_object(end_date_dict[detector_constant.DATE_VALUE])
         if end_date < start_date:
             current_range_start_date = start_date - datetime.timedelta(days=7)
             current_range_start_dict = self.date_detector_object.to_date_dict(current_range_start_date,
-                                                                              date_type=TYPE_THIS_DAY)
+                                                                              date_type=TYPE_PAST)
             output_dict = copy.copy(start_date_dict)
             output_dict[detector_constant.DATE_VALUE] = current_range_start_dict
             start_date_list.insert(0, output_dict)
@@ -205,6 +204,19 @@ class DateAdvanceDetector(object):
             output_dict = copy.copy(end_date_dict)
             output_dict[detector_constant.DATE_VALUE] = next_range_end_dict
             end_date_list.append(output_dict)
+
+        if repeat_flag:
+            _start_date_list = []
+            for date_dict in start_date_list:
+                date_dict[detector_constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
+                _start_date_list.append(date_dict)
+
+            _end_date_list = []
+            for date_dict in end_date_list:
+                date_dict[detector_constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
+                _end_date_list.append(date_dict)
+
+            start_date_list, end_date_dict = _start_date_list, _end_date_list
 
         return start_date_list, end_date_list
 
@@ -460,7 +472,7 @@ class DateAdvanceDetector(object):
             detector_constant.DATE_START_RANGE_PROPERTY: start_range_property,
             detector_constant.DATE_END_RANGE_PROPERTY: end_range_property,
             detector_constant.DATE_NORMAL_PROPERTY: normal_property,
-            detector_constant.DATE_DETECTION_METHOD: detection_method
+            detector_constant.DATE_DETECTION_METHOD: detection_method,
         }
 
     def _date_model_detection(self):

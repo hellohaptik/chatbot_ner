@@ -5,17 +5,16 @@ ENTITY_DAY = 'day_list'
 
 TYPE_EXACT = 'date'
 TYPE_EVERYDAY = 'everyday'
+TYPE_PAST = 'past'  # for dates in the past
 TYPE_TODAY = 'today'
 TYPE_TOMORROW = 'tomorrow'
 TYPE_YESTERDAY = 'yesterday'
 TYPE_DAY_AFTER = 'day_after'
 TYPE_DAY_BEFORE = 'day_before'
 TYPE_N_DAYS_AFTER = 'after_n_days'
-# Note constant values have changed, haptik_api would break at
-# haptik_api/ares/entities/constant.py
-# haptik_api/ares/lib/external_api_response/cron.py
 TYPE_NEXT_DAY = 'day_in_next_week'
 TYPE_THIS_DAY = 'day_within_one_week'
+
 
 # ORIGINAL constants
 # TYPE_NEXT_DAY = 'next_day'
@@ -43,12 +42,7 @@ REPEAT_WEEKDAYS = 'repeat_weekdays'
 WEEKENDS = 'weekends'
 REPEAT_WEEKENDS = 'repeat_weekends'
 TYPE_REPEAT_DAY = 'repeat_day'
-START_RANGE = 'start_range'
-END_RANGE = 'end_range'
-REPEAT_START_RANGE = 'repeat_start_range'
-REPEAT_END_RANGE = 'repeat_end_range'
-DATE_START_RANGE = 'date_start_range'
-DATE_END_RANGE = 'date_end_range'
+
 
 MONTH_DICT = {
     u'1': [u'jan', u'january'],
