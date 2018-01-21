@@ -1,10 +1,5 @@
-import re
-import models.constant as model_constant
-from models.models import Models
-from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
-import ner_v1.detectors.constant as detector_constant
-from ner_v1.detectors.textual.text.text_detection import TextDetector
 from lib.nlp.tokenizer import Tokenizer
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class NameDetector(object):
@@ -12,79 +7,61 @@ class NameDetector(object):
         self.entity_name = entity_name
         self.text = ''
         self.names=[]
-        #self.text_dict = {}
         self.tagged_text = ''
-        #self.processed_text = ''
-        #self.city = []
+        self.processed_text = ''
         self.original_name_text = []
-        self.text_detection_object = TextDetector(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entitity_name=entity_name)
 
-    def text_detection_name(self, text):
+    def text_detection_name(self):
         """
-        Makes a call to text_detection
-        Args:
-            text: original text to be passed
-
-        Returns: a list of names detected
-
+        Makes a call to TextDetection
+        :return: list of names detected in TextDetection
         """
-        return self.text_detection_object.detect_entity(text=text)
-
+        return self.text_detection_object.detect_entity(text=self.text)
 
     def detect_entity(self, text):
         """
-
-        Args:
-            text:
-
-        Returns:
-
+        Takes text and and returns names
+        :param text: The original text
+        :return:
+        [{ entity_value : { first_name: "", middle_name: "", last_name: "" }
+            original_text: ""
+            }]
         """
         self.text = text
         self.tagged_text=self.text
-        text_detection_result = self.text_detection_name(text)
-        print(text_detection_result)
-        hashed_text = self.hasher(text, text_detection_result)
-        return self.splitting_logic(hashed_text)
+        text_detection_result = self.text_detection_name()
+        replaced_text = self.replace_detected_text(text_detection_result)
 
-    def hasher(self,text, text_detection_result):
+        return self.creating_name_dictionary(replaced_text)
+
+    def replace_detected_text(self, text_detection_result):
         """
-
-        Args:
-            raw_text:
-            text_detection_result:
-
-        Returns:
-
+        Replaces the detected names by _ _
+        :param text_detection_result: list of detected names from TextDetection
+        :return: tokenized list with detected names replaced by _ _
         """
-        hashed_text = Tokenizer().tokenize(text.lower())
-
+        replaced_text = Tokenizer().tokenize(self.text.lower())
         for i in (text_detection_result[1]):
-            for j in range(len(hashed_text)):
-                hashed_text[j] = hashed_text[j].replace(i, "_" + i + "_")
-        print(hashed_text)
+            for j in range(len(replaced_text)):
+                replaced_text[j] = replaced_text[j].replace(i, "_" + i + "_")
 
+        return replaced_text
 
-
-        return hashed_text
-
-
-
-    def splitting_logic(self, hashed_text):
+    def creating_name_dictionary(self, replaced_text):
         """
-
-        Args:
-            hashed_text:
-
-        Returns:
-
+        Forms a dictionary of the names
+        :param replaced_text:
+        :return: names detected
+        [{ entity_value : { first_name: "", middle_name: "", last_name: "" }
+            original_text: ""
+            }]
         """
         results = []
-        tokenized_text = hashed_text
         name_list = []
         name_holder = []
 
-        for each in tokenized_text:
+        for each in replaced_text:
             if each.startswith('_') and each.endswith('_'):
                 name_holder.append(each.replace('_', ''))
 
@@ -107,5 +84,3 @@ class NameDetector(object):
             results.append(name_dict)
 
         return results
-
-

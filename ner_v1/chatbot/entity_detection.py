@@ -1,5 +1,5 @@
 from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
-    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY
+    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY,GUEST
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
@@ -11,6 +11,7 @@ from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
+from ner_v1.detectors.textual.name.name_detection import NameDetector
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -386,6 +387,102 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
                                             detection_method=FROM_FALLBACK_VALUE)
 
     return None
+
+
+def get_name(message, entity_name, structured_value, fallback_value, bot_message):
+    """This functionality calls the CityDetector class to detect cities
+
+    Attributes:
+        NOTE: Explained above
+
+    Output:
+        NOTE: Explained above
+
+    For Example:
+
+        message = 'i want to go to mummbai'
+        entity_name = 'city'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+            //output with model
+            >>[{'detection': 'model_verified', 'original_text': 'mummbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+
+
+
+        message = "I want to book a flight from delhhi to mumbai"
+        entity_name = 'city'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [
+            {'detection': 'message', 'original_text': 'delhhi',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
+            {'detection': 'message', 'original_text': 'mumbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+            //output with model
+            >> [
+            {'detection': 'model_verified', 'original_text': 'delhhi',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
+            {'detection': 'model_verified', 'original_text': 'mumbai',
+            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+
+
+        message = "mummbai"
+        entity_name = 'city'
+        structured_value = None
+        fallback_value = None
+        bot_message = "Please help me departure city?"
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [{'detection': 'message', 'original_text': 'mummbai',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
+
+            //output with model
+            >> [{'detection': 'model_verified', 'original_text': 'mummbai',
+            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
+
+
+    """
+    if fallback_value == GUEST or fallback_value is None:
+        name_list = []
+        name_detection_object = NameDetector(entity_name)
+        name_detection = name_detection_object.detect_entity(message)
+        for entities in name_detection:
+            name_list.append({'detection': "message", 'entity_value': entities['entity_value'],
+                              'original_text': entities['original_text'],
+                              })
+        return name_list
+    else:
+        full_name = fallback_value.split(' ')
+        middle_name = last_name = None
+        if len(full_name) >= 2:
+            middle_name = full_name[1:-1]
+            last_name = full_name[-1]
+        elif len(full_name) == 2:
+            last_name = full_name[-1]
+
+        return [{'detection': 'fallback_value',
+                 'entity_value': {'first_name':full_name[0], 'middle_name':middle_name, 'last_name':last_name},
+                 'original_text': fallback_value,
+
+                 }]
 
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):

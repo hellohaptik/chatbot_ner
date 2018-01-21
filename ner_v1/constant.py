@@ -44,3 +44,4 @@ PARAMETER_BOT_MESSAGE = 'bot_message'
 
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
+GUEST = 'Guest'
