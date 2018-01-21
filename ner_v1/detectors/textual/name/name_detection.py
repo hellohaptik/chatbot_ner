@@ -10,7 +10,7 @@ class NameDetector(object):
         self.tagged_text = ''
         self.processed_text = ''
         self.original_name_text = []
-        self.text_detection_object = TextDetector(entitity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
 
     def text_detection_name(self):
         """
