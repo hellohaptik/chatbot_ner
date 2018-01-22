@@ -10,7 +10,7 @@ from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
-
+from ner_v1.detectors.textual.name.name_detection import NameDetector
 """
 This file contains functionality that performs entity detection over a chatbot.
 The chatbot contains several elements which can be used to detect entity. For example, message, UI elements (like form,
@@ -385,6 +385,44 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
                                             detection_method=FROM_FALLBACK_VALUE)
 
     return None
+
+
+def get_name(message, entity_name, structured_value, fallback_value, bot_message):
+    """This functionality calls the NameDetector class to detect names
+
+    Attributes:
+        NOTE: Explained above
+
+    Output:
+        NOTE: Explained above
+
+    For Example:
+
+        message = 'My name is yash doshi'
+        entity_name = 'name'
+        structured_value = None
+        fallback_value = Guest
+        bot_message = None
+        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
+                          fallback_value=fallback_value, bot_message=bot_message)
+        print output
+            //output without model
+            >> [{'detection': 'message', 'original_text': 'yash doshi',
+            'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
+    """
+    name_detection = NameDetector(entity_name=entity_name)
+    if structured_value:
+        entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
+        if entity_list:
+            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
+        else:
+            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+    else:
+        entity_list, original_text_list = name_detection.detect_entity(text=message)
+        if entity_list:
+            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
+        elif fallback_value:
+            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
 
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
