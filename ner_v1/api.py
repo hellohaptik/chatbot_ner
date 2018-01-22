@@ -137,6 +137,8 @@ def name(request):
         ner_logger.debug('Exception for city: %s ' % e)
         return HttpResponse(status=400)
 
+    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
 
 def city(request):
     """This functionality calls the get_city() functionality to detect city. It is called through api call
