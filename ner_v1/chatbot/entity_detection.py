@@ -390,7 +390,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_name(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the CityDetector class to detect cities
+    """This functionality calls the NameDetector class to detect names
 
     Attributes:
         NOTE: Explained above
@@ -401,68 +401,35 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
     For Example:
 
         message = 'i want to go to mummbai'
-        entity_name = 'city'
+        entity_name = 'name'
         structured_value = None
-        fallback_value = None
+        fallback_value = Guest
         bot_message = None
         output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
                           fallback_value=fallback_value, bot_message=bot_message)
         print output
             //output without model
-            >> [{'detection': 'message', 'original_text': 'mummbai',
-            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
-
-            //output with model
-            >>[{'detection': 'model_verified', 'original_text': 'mummbai',
-            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
+            >> [{'detection': 'message', 'original_text': 'yash doshi',
+            'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
 
 
 
-
-        message = "I want to book a flight from delhhi to mumbai"
-        entity_name = 'city'
-        structured_value = None
-        fallback_value = None
-        bot_message = None
-        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-            //output without model
-            >> [
-            {'detection': 'message', 'original_text': 'delhhi',
-            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
-            {'detection': 'message', 'original_text': 'mumbai',
-            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
-
-            //output with model
-            >> [
-            {'detection': 'model_verified', 'original_text': 'delhhi',
-            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'New Delhi', 'normal': False}},
-            {'detection': 'model_verified', 'original_text': 'mumbai',
-            'entity_value': {'to': True, 'via': False, 'from': False, 'value': u'Mumbai', 'normal': False}}]
-
-
-        message = "mummbai"
-        entity_name = 'city'
-        structured_value = None
-        fallback_value = None
-        bot_message = "Please help me departure city?"
-        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-            //output without model
-            >> [{'detection': 'message', 'original_text': 'mummbai',
-            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
-
-            //output with model
-            >> [{'detection': 'model_verified', 'original_text': 'mummbai',
-            'entity_value': {'to': False, 'via': False, 'from': True, 'value': u'Mumbai', 'normal': False}}]
 
 
     """
-    if fallback_value == GUEST or fallback_value is None:
-        name_list = []
-        name_detection_object = NameDetector(entity_name)
+    name_list = []
+    name_detection_object = NameDetector(entity_name)
+
+    if structured_value:
+        name_detection= name_detection_object.detect_entity(text=structured_value)
+        for entities in name_detection:
+            name_list.append({'detection': "structured_value_verified", 'entity_value': entities['entity_value'],
+                              'original_text': entities['original_text'],
+                              })
+        return name_list
+
+    elif fallback_value == GUEST or fallback_value is None:
+
         name_detection = name_detection_object.detect_entity(message)
         for entities in name_detection:
             name_list.append({'detection': "message", 'entity_value': entities['entity_value'],
