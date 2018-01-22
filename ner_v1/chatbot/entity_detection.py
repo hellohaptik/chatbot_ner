@@ -1,5 +1,5 @@
 from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
-    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY,GUEST,FIRST_NAME,MIDDLE_NAME,LAST_NAME
+    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
@@ -400,7 +400,7 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
 
     For Example:
 
-        message = 'i want to go to mummbai'
+        message = 'My name is yash doshi'
         entity_name = 'name'
         structured_value = None
         fallback_value = Guest
@@ -411,11 +411,6 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
             //output without model
             >> [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
-
-
-
-
-
     """
     name_detection = NameDetector(entity_name=entity_name)
     if structured_value:
@@ -431,40 +426,6 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
         elif fallback_value:
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
 
-    # name_list = []
-    # name_detection_object = NameDetector(entity_name)
-    #
-    # if structured_value:
-    #     entity_list,original_text_list= name_detection_object.detect_entity(text=structured_value)
-    #     for entities in name_detection:
-    #         name_list.append({DETECTION_METHOD: FROM_STRUCTURE_VALUE_VERIFIED, ENTITY_VALUE: entities[ENTITY_VALUE],
-    #                           ORIGINAL_TEXT: entities[ORIGINAL_TEXT],
-    #                           })
-    #     return name_list
-    #
-    # elif not fallback_value or fallback_value == GUEST:
-    #
-    #     name_detection = name_detection_object.detect_entity(message)
-    #     for entity in name_detection:
-    #         name_list.append({DETECTION_METHOD: FROM_MESSAGE, ENTITY_VALUE: entity[ENTITY_VALUE],
-    #                           ORIGINAL_TEXT: entity[ORIGINAL_TEXT],
-    #                           })
-    #     return name_list
-    # else:
-    #     full_name = fallback_value.split(' ')
-    #     middle_name, last_name = None, None
-    #     if len(full_name) >= 2:
-    #         middle_name = full_name[1:-1] or None
-    #         last_name = full_name[-1]
-    #     elif len(full_name) == 2:
-    #         last_name = full_name[-1]
-    #
-    #     return [{DETECTION_METHOD: FROM_FALLBACK_VALUE,
-    #              ENTITY_VALUE: {FIRST_NAME:full_name[0], MIDDLE_NAME:middle_name, LAST_NAME:last_name},
-    #              ORIGINAL_TEXT: fallback_value,
-    #
-    #              }]
-    #
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
     """This functionality calls the PNRDetector class to detect pnr

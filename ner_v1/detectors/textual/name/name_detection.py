@@ -1,12 +1,13 @@
 from lib.nlp.tokenizer import Tokenizer
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import FIRST_NAME,MIDDLE_NAME,LAST_NAME
+from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
+
 
 class NameDetector(object):
     def __init__(self, entity_name):
         self.entity_name = entity_name
         self.text = ''
-        self.names=[]
+        self.names = []
         self.tagged_text = ''
         self.processed_text = ''
         self.original_name_text = []
@@ -23,9 +24,10 @@ class NameDetector(object):
         """
         Takes text and and returns names
         :param text: The original text
+            Example:
+                text = My name is yash modi
         :return:
-        [  { first_name: "", middle_name: "", last_name: "" }]
-            [ "" ]
+        [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
 
         """
         self.text = text
@@ -33,11 +35,11 @@ class NameDetector(object):
         text_detection_result = self.text_detection_name()
         replaced_text = self.replace_detected_text(text_detection_result)
 
-        return self.creating_name_dictionary(replaced_text)
+        return self.detect_name_entity(replaced_text)
 
     def replace_detected_text(self, text_detection_result):
         """
-        Replaces the detected names by _ _
+        Replaces the detected name by _<name>_
         :param text_detection_result: list of detected names from TextDetection
         :return: tokenized list with detected names replaced by _ _
         """
@@ -48,14 +50,18 @@ class NameDetector(object):
 
         return replaced_text
 
-    def creating_name_dictionary(self, replaced_text):
+    @staticmethod
+    def detect_name_entity(replaced_text):
         """
         Forms a dictionary of the names
         :param replaced_text:
-        :return: names detected
-        [{ { first_name: "", middle_name: "", last_name: "" }
-            original_text: ""
-            }]
+        text: The original text
+            Example:
+                text = My name is yash modi
+        :return:
+        [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
+
+
         """
         original_text, entity_value = [], []
         name_list = []
