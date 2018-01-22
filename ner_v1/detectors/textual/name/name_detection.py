@@ -1,6 +1,6 @@
 from lib.nlp.tokenizer import Tokenizer
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-
+from ner_v1.constant import FIRST_NAME,MIDDLE_NAME,LAST_NAME
 
 class NameDetector(object):
     def __init__(self, entity_name):
@@ -24,9 +24,9 @@ class NameDetector(object):
         Takes text and and returns names
         :param text: The original text
         :return:
-        [{ entity_value : { first_name: "", middle_name: "", last_name: "" }
-            original_text: ""
-            }]
+        [  { first_name: "", middle_name: "", last_name: "" }]
+            [ "" ]
+
         """
         self.text = text
         self.tagged_text=self.text
@@ -53,11 +53,11 @@ class NameDetector(object):
         Forms a dictionary of the names
         :param replaced_text:
         :return: names detected
-        [{ entity_value : { first_name: "", middle_name: "", last_name: "" }
+        [{ { first_name: "", middle_name: "", last_name: "" }
             original_text: ""
             }]
         """
-        results = []
+        original_text, entity_value = [], []
         name_list = []
         name_holder = []
 
@@ -74,13 +74,12 @@ class NameDetector(object):
             name_list.append(name_holder)
 
         for name in name_list:
-            name_dict = {'original_text': " ".join(name),
-                         'entity_value': {"first_name": name[0], "middle_name": None, "last_name": None}}
+            original_text.append(" ".join(name))
+            name_entity_value = {FIRST_NAME: name[0], MIDDLE_NAME: None, LAST_NAME: None}
 
             if len(name) > 1:
-                name_dict['entity_value']['last_name'] = name[-1]
-                name_dict['entity_value']['middle_name'] = " ".join(name[1:-1]) or None
+                name_entity_value[LAST_NAME] = name[-1]
+                name_entity_value[MIDDLE_NAME] = " ".join(name[1:-1]) or None
+            entity_value.append(name_entity_value)
 
-            results.append(name_dict)
-
-        return results
+        return entity_value, original_text

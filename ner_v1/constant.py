@@ -44,4 +44,9 @@ PARAMETER_BOT_MESSAGE = 'bot_message'
 
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
+
+#********************* constans used in name detection*********************
 GUEST = 'Guest'
+FIRST_NAME='first_name'
+MIDDLE_NAME='middle_name'
+LAST_NAME='last_name'
