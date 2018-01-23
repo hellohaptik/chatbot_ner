@@ -67,11 +67,9 @@ class NameDetector(object):
             return entity_value, original_text
 
         if pattern1_match:
-            #print("patter1_match")
             entity_value, original_text = self.get_format_name(pattern1_match[0][1].split())
 
         elif pattern2_match:
-            #print("pattern2_match")
             entity_value, original_text = self.get_format_name(pattern2_match[0].split())
 
         else:
@@ -82,9 +80,10 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, bot_message):
         """
         Takes text and and returns names
+        :param bot_message: previous botmessage
         :param text: The original text
             Example:
                 text = My name is yash modi
@@ -92,6 +91,8 @@ class NameDetector(object):
         [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
 
         """
+        if not self.context_check_botmessage(bot_message):
+            return [], []
         self.text = text
         self.tagged_text = self.text
         text_detection_result = self.text_detection_name()
@@ -150,6 +151,20 @@ class NameDetector(object):
             entity_value.extend(name_entity_value)
 
         return entity_value, original_text
+
+    @staticmethod
+    def context_check_botmessage(botmessage):
+        """
+        Checks if previous botmessage contains name as keyword or not
+        :param botmessage: previous botmessage
+        :return: 
+
+        """
+        if "name" in botmessage:
+            return True
+        return False
+    
+
 
 
 

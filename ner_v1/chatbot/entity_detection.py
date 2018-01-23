@@ -412,7 +412,7 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
     """
     name_detection = NameDetector(entity_name=entity_name)
     if structured_value:
-        entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
+        entity_list, original_text_list = name_detection.detect_entity(text=structured_value, bot_message=bot_message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
