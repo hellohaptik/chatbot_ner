@@ -422,6 +422,7 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
+            fallback_value=NameDetector.get_format_name(fallback_value)
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
 
 
@@ -503,7 +504,6 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            fallback_value = NameDetector.get_format_name(fallback_value.split())
             return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
 
     return None
