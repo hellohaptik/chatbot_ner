@@ -54,8 +54,8 @@ class NameDetector(object):
 
         entity_value, original_text = [], []
         pos_tagger_object = POS()
-        pattern1 = re.compile(r"name\s*(is|)\s*(\w+)")
-        pattern2 = re.compile(r"myself\s+(\w+)")
+        pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
+        pattern2 = re.compile(r"myself\s+([\w\s]+)")
         name_tokens = text.split(' ')
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
