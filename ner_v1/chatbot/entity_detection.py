@@ -422,8 +422,8 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            fallback_value=NameDetector.get_format_name(fallback_value.split())
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            fallback_value = NameDetector.get_format_name(fallback_value.split())
+            return output_entity_dict_value(fallback_value[0], fallback_value[1], FROM_FALLBACK_VALUE)
 
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
