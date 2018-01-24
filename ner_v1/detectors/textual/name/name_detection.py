@@ -10,6 +10,13 @@ class NameDetector(object):
     NameDetector class detects names from text. This class uses TextDetector
     to detect the entity values. This class also contains templates and pos_tagger to capture
     names which are missed by TextDetector.
+
+    Attributes:
+        text: string to extract entities from
+        entity_name: string by which the detected person_name entities would be replaced with on calling detect_entity()
+        tagged_text: string with city entities replaced with tag defined by entity_name
+        processed_text: string with detected time entities removed
+        text_detection_object: the object which is used to call the TextDetector
     """
 
     def __init__(self, entity_name):
