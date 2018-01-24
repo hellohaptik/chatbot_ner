@@ -47,7 +47,6 @@ DICTIONARY_DATA_VARIANTS = 'variants'
 
 #**********************constants used for name detection************************************
 
-GUEST='Guest'
 FIRST_NAME='first_name'
 MIDDLE_NAME='middle_name'
 LAST_NAME='last_name'
