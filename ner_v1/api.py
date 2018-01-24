@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from chatbot_ner.config import ner_logger
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_number, get_email, get_city, get_pnr, \
-    get_number, get_shopping_size, get_time, get_date, get_budget, get_name
+    get_number, get_shopping_size, get_time, get_date, get_budget, get_person_name
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE
@@ -118,7 +118,7 @@ def email(request):
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
-def name(request):
+def person_name(request):
     """This functionality calls the get_name() functionality to detect name. It is called through api call
 
     Attributes:
@@ -128,7 +128,7 @@ def name(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        entity_output = get_name(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
+        entity_output = get_person_name(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_BOT_MESSAGE])
