@@ -387,7 +387,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_name(message, entity_name, structured_value, fallback_value, bot_message):
+def get_person_name(message, entity_name, structured_value, fallback_value, bot_message):
     """This functionality calls the NameDetector class to detect names
 
     Attributes:
@@ -399,20 +399,17 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
     For Example:
 
         message = 'My name is yash doshi'
-        entity_name = 'name'
+        entity_name = 'person_name'
         structured_value = None
         fallback_value = Guest
-        bot_message = None
-        output = get_city(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-            //output without model
-            >> [{'detection': 'message', 'original_text': 'yash doshi',
+        bot_message = what is your name ?
+
+            [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
     name_detection = NameDetector(entity_name=entity_name)
     if structured_value:
-        entity_list, original_text_list = name_detection.detect_entity(text=structured_value, bot_message=bot_message)
+        entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
@@ -422,8 +419,8 @@ def get_name(message, entity_name, structured_value, fallback_value, bot_message
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            fallback_value = NameDetector.get_format_name(fallback_value.split())
-            return output_entity_dict_value(fallback_value[0], fallback_value[1], FROM_FALLBACK_VALUE)
+            fallback_entity_value, fallback_original_value = NameDetector.get_format_name(fallback_value.split())
+            return output_entity_dict_value(fallback_entity_value, fallback_original_value, FROM_FALLBACK_VALUE)
 
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
