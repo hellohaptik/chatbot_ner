@@ -422,6 +422,8 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             fallback_entity_value, fallback_original_value = NameDetector.get_format_name(fallback_value.split())
             return output_entity_dict_value(fallback_entity_value[0], fallback_original_value[0], FROM_FALLBACK_VALUE)
 
+    return None
+
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
     """This functionality calls the PNRDetector class to detect pnr
