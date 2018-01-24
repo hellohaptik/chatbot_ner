@@ -6,7 +6,20 @@ import re
 
 
 class NameDetector(object):
+    """
+    NameDetector class detects names from text. This class uses TextDetector
+    to detect the entity values. This class also contains templates and pos_tagger to capture
+    names which are missed by TextDetector.
+    """
+
     def __init__(self, entity_name):
+        """
+        Initializes a NameDetector object with given entity_name
+
+        Args:
+            entity_name: A string by which the detected substrings that correspond to text entities would be replaced
+                         with on calling detect_entity()
+        """
         self.entity_name = entity_name
         self.text = ''
         self.names = []
@@ -18,10 +31,21 @@ class NameDetector(object):
     @staticmethod
     def get_format_name(name_list):
         """
-        :param name_list: list of names detected
-                Example ['yash', 'modi']
-        :return: ({first_name: "yash", middle_name: None, last_name: "modi"}, "yash modi")
+        Takes input as name_list which contains the names detected.
+        It separates the first, middle and last names.
+        It returns two lists:
+        1.Containing the names separated into first, middle and last name.
+        2.The original text.
+
+        Args:
+            name_list (list): List of names detected
+            Example:
+                 ['yash', 'doshi']
+
+        Returns:
+        ({first_name: "yash", middle_name: None, last_name: "modi"}, "yash modi")
         """
+
         original_text = " ".join(name_list)
 
         first_name = name_list[0]
@@ -39,21 +63,27 @@ class NameDetector(object):
     def text_detection_name(self):
         """
         Makes a call to TextDetection and return the person_name detected from the elastic search.
-        :return: list of names detected in TextDetection in the form of variants detected and original_text
-        Example : my name is yash doshi
-        ([u'dosh', u'yash'], ['doshi', 'yash'])
+        Returns:
+           Tuple with list of names detected in TextDetection in the form of variants detected and original_text
 
+         Example : my name is yash doshi
 
+         ([u'dosh', u'yash'], ['doshi', 'yash'])
         """
+
         return self.text_detection_object.detect_entity(text=self.text)
 
     def get_name_using_pos_tagger(self, text):
         """
-        Runs the text through templates and the returns words which are nouns
-        and not present in the templates.
-        :param text:
-                Example text= My name is yash modi
-        :return: [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
+        First checks if the text contains cardinals or interrogation.
+        Then passes the text through templates.
+        Then returns words which are nouns or adjectives
+        Args:
+            text (string): The text obtained from the user.
+
+            Example text= My name is yash modi
+        Returns:
+            [{first_name: "yash", middle_name: None, last_name: "modi"}], ["yash modi"]
         """
 
         entity_value, original_text = [], []
@@ -86,15 +116,19 @@ class NameDetector(object):
 
     def detect_entity(self, text, bot_message=None):
         """
-        Takes text and and returns names
-        :param bot_message: previous botmessage
-        :param text: The original text
-            Example:
-                text = My name is yash modi
-        :return:
-        [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
+        Takes text as input and  returns two lists
+        1.entity_value in the form of first, middle and last names
+        2.original text.
+        Args:
+           text(string): the original text
+           bot_message(string): previous bot message
 
+           Example:
+                    text=my name is yash doshi
+       Returns:
+                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
+
         if bot_message:
             if not self.context_check_botmessage(bot_message):
                 return [], []
@@ -112,14 +146,20 @@ class NameDetector(object):
     def replace_detected_text(self, text_detection_result):
         """
         Replaces the detected name from text_detection_result by _<name>_
-        :param text_detection_result: list of detected names from TextDetection
-         ([u'dosh', u'yash'], ['doshi', 'yash'])
+        Args:
+            text_detection_result: tuple of detected names from TextDetection
+            consisting of two lists
+            1.The variants detected
+            2.The original text
+            ([u'dosh', u'yash'], ['doshi', 'yash'])
 
-        :return: tokenized list with detected names replaced by _ _
-        Example: my name is yash doshi
-        my name is _yash_ _doshi_
+            Example:
+                    text_detection_result= ([u'dosh', u'yash'], ['doshi', 'yash'])
+            Returns:
+                    ['my', 'name', 'is', 'yash', 'doshi']
 
         """
+
         replaced_text = Tokenizer().tokenize(self.text.lower())
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
@@ -131,15 +171,15 @@ class NameDetector(object):
         """
         Separates the detected names into first, middle and last names.
         Returns in form of two lists entity_value and original_text
-        :param replaced_text: text in which names detected from TextDetector are replaced by
+        Args:
+            replaced_text: text in which names detected from TextDetector are replaced by
         _<name>_
         Example:
                 replaced_text = My name is _yash_ _modi_
-        :return:
-        [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
-
-
+        Returns:
+                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
         """
+
         original_text, entity_value = [], []
         name_list = []
         name_holder = []
@@ -166,16 +206,14 @@ class NameDetector(object):
     @staticmethod
     def context_check_botmessage(botmessage):
         """
-        Checks if previous botmessage contains name as keyword or not
-        :param botmessage: previous botmessage
-        :return: 
-
+        Checks if previous botmessage conatins name as a keyword or not
+        Args:
+            botmessage: it consists of the previous botmessage
+            Example: what is your name ?
+        Returns:
+            True
         """
+
         if "name" in botmessage:
             return True
         return False
-    
-
-
-
-
