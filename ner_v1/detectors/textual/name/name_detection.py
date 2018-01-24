@@ -26,20 +26,24 @@ class NameDetector(object):
 
         first_name = name_list[0]
         middle_name = None
-        last_mame = None
+        last_name = None
 
         if len(name_list) > 1:
-            last_mame = name_list[-1]
+            last_name = name_list[-1]
             middle_name = " ".join(name_list[1:-1]) or None
 
-        entity_value = {FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_mame}
+        entity_value = {FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name}
 
         return [entity_value], [original_text]
 
     def text_detection_name(self):
         """
-        Makes a call to TextDetection
-        :return: list of names detected in TextDetection
+        Makes a call to TextDetection and return the person_name detected from the elastic search.
+        :return: list of names detected in TextDetection in the form of variants detected and original_text
+        Example : my name is yash doshi
+        ([u'dosh', u'yash'], ['doshi', 'yash'])
+
+
         """
         return self.text_detection_object.detect_entity(text=self.text)
 
@@ -62,7 +66,7 @@ class NameDetector(object):
         pattern2_match = pattern2.findall(text)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
-                       word[1].startswith('WP')]
+                       word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
             return entity_value, original_text
 
@@ -72,7 +76,7 @@ class NameDetector(object):
         elif pattern2_match:
             entity_value, original_text = self.get_format_name(pattern2_match[0].split())
 
-        else:
+        elif len(name_tokens) < 4:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
@@ -80,7 +84,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text, bot_message):
+    def detect_entity(self, text, bot_message=None):
         """
         Takes text and and returns names
         :param bot_message: previous botmessage
@@ -91,13 +95,14 @@ class NameDetector(object):
         [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
 
         """
-        if not self.context_check_botmessage(bot_message):
-            return [], []
+        if bot_message:
+            if not self.context_check_botmessage(bot_message):
+                return [], []
         self.text = text
         self.tagged_text = self.text
         text_detection_result = self.text_detection_name()
         replaced_text = self.replace_detected_text(text_detection_result)
-        entity_value, original_text = self.detect_name_entity(replaced_text)
+        entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
             entity_value, original_text = self.get_name_using_pos_tagger(text)
@@ -106,24 +111,30 @@ class NameDetector(object):
 
     def replace_detected_text(self, text_detection_result):
         """
-        Replaces the detected name by _<name>_
+        Replaces the detected name from text_detection_result by _<name>_
         :param text_detection_result: list of detected names from TextDetection
+         ([u'dosh', u'yash'], ['doshi', 'yash'])
+
         :return: tokenized list with detected names replaced by _ _
+        Example: my name is yash doshi
+        my name is _yash_ _doshi_
+
         """
         replaced_text = Tokenizer().tokenize(self.text.lower())
-        for i in (text_detection_result[1]):
+        for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
-                replaced_text[j] = replaced_text[j].replace(i, "_" + i + "_")
+                replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
 
         return replaced_text
 
-    def detect_name_entity(self, replaced_text):
+    def detect_person_name_entity(self, replaced_text):
         """
-        Forms a dictionary of the names
-        :param replaced_text:
-        text: The original text
-            Example:
-                text = My name is yash modi
+        Separates the detected names into first, middle and last names.
+        Returns in form of two lists entity_value and original_text
+        :param replaced_text: text in which names detected from TextDetector are replaced by
+        _<name>_
+        Example:
+                replaced_text = My name is _yash_ _modi_
         :return:
         [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
 
