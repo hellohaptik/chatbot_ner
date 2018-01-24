@@ -44,3 +44,9 @@ PARAMETER_BOT_MESSAGE = 'bot_message'
 PARAMETER_TIMEZONE = 'timezone'
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
+
+#**********************constants used for name detection************************************
+
+FIRST_NAME='first_name'
+MIDDLE_NAME='middle_name'
+LAST_NAME='last_name'
