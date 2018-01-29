@@ -946,7 +946,7 @@ Following are the list of different entity types along with its API call:
       PORT=8081
       ```
 
-      ```python
+      ```shell
       curl -i 'http://'$URL':'$PORT'/v1/person_name/?message=my%20name%20is%yash%20doshi&entity_name=person_name&structured_value=&fallback_value=Guest&bot_message=what%20is%your%20name%20?'
       ```
 
@@ -996,7 +996,7 @@ Following are the list of different entity types along with its API call:
 
       ​
 
-      ```python
+      ```shell
       curl -i 'http://'$URL':'$PORT'/v1/person_name/?message=&entity_name=person_name&structured_value=&fallback_value=sagar%20nimesh%20dedhia&bot_message=what%20is%your%20name%20?'
       ```
 
