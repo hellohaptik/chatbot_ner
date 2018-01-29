@@ -698,9 +698,9 @@ Following are the list of different entity types along with its API call:
 - Example:
 
   - Example 1:
-     
+
     - Use the **timezone** parameter to pass your current timezone to date detection
-    
+
     - ```python
       message = "set me reminder on 23rd december"
       entity_name = 'date'
@@ -909,6 +909,109 @@ Following are the list of different entity types along with its API call:
             "original_text": "36",
             "entity_value": {
               "value": "36"
+            }
+          }
+        ]
+      }
+      ```
+
+### person_name
+
+- This functionality calls the NameDetector class to detect Name entities.
+
+- Examples:
+
+  - Example 1:
+
+    - ```python
+      message = 'my name is yash doshi'
+      entity_name = 'person_name'
+      structured_value = None
+      fallback_value = 'Guest'
+      bot_message = 'what is your name ?'
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_person_name
+      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```python
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```python
+      curl -i 'http://'$URL':'$PORT'/v1/person_name/?message=my%20name%20is%yash%20doshi&entity_name=person_name&structured_value=&fallback_value=Guest&bot_message=what%20is%your%20name%20?'
+      ```
+
+    - *CURL Output:*
+
+      ```python
+      {
+        "data": [
+          {
+            "detection": "message",
+            "original_text": "yash doshi",
+            "entity_value": {
+              "first_name": "yash",
+              "last_name": "doshi",
+              "middle_name": null
+              
+            }
+          }
+        ]
+      }
+      ```
+
+  - Example 2:
+
+    - ```python
+      message = ''
+      entity_name = 'person_name'
+      structured_value = None
+      fallback_value = 'sagar nimesh dedhia'
+      bot_message = 'what is your name ?'
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_person_name
+      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```python
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ​
+
+      ```python
+      curl -i 'http://'$URL':'$PORT'/v1/person_name/?message=&entity_name=person_name&structured_value=&fallback_value=sagar%20nimesh%20dedhia&bot_message=what%20is%your%20name%20?'
+      ```
+
+    - *CURL Output:*
+
+      ```python
+      {
+        "data": [
+          {
+            "detection": "fallback_value",
+            "original_text": "sagar nimesh dedhia",
+            "entity_value": {
+              "first_name": "sagar"
+              "last_name": "dedhia"
+              "middle_name": "nimesh"
             }
           }
         ]
