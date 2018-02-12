@@ -2,21 +2,45 @@ import re
 
 
 class RegexDetector(object):
+    """
+    RegexDetector is used to detect text from the inbound message which abide by the specified regex.
+    """
     def __init__(self, entity_name, regex):
+        """
+
+        Args:
+            entity_name:
+            regex:
+        Attributes:
+             self.entity_name (str) : holds the entity name
+             self.text (str) : holds the original text
+             self.tagged_text (str) : holds the detected entities replaced by self.tag
+             self.processed_text (str) : holds the text left to be processed
+
+        """
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
         self.regex = regex
-        self.original_regex_text = []
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text):
         """
-        Take text and returns email details
-        :param text:
-        :param form:
-        :return: tuple (list of email , original text)
+        Takes input as text and returns text detected for the specified regex.
+        Args:
+            text (str) : Contains the message sent by the user.
+
+        Returns:
+            (regex_list, original_list) (tuple):
+            regex_list (list) : list of detected text for the specified text
+            original_list (list) : list of original text provided by the user
+        Example:
+            self.regex = r'\d+'
+            self.text = 'aman123"
+
+            detect_entity()
+            >> (['123'], ['123'])
         """
         self.text = ' ' + text + ' '
         self.processed_text = self.text
@@ -25,15 +49,29 @@ class RegexDetector(object):
         return regex_list, original_list
 
     def detect_regex(self):
+        """
+        Detects text based on the aforementioned regex
+        Raises an error for an invalid regex
+        Returns:
+                (regex_list, original_list) (tuple):
+                regex_list (list) : list of detected text for the specified text
+                original_list (list) : list of original text provided by the user
+        Example:
+            self.regex = r'\d+'
+            self.text = 'aman123"
+
+            detect_entity()
+            >> (['123'], ['123'])
+        """
         original_list = []
         regex_list = []
         try:
             compiled_regex = re.compile(self.regex)
-        except ValueError:
-            return "Incorrect regex expression"
-        regex_list.append(compiled_regex.findall(self.text)[0])
-        original_list.extend(regex_list)
-        self.update_processed_text(regex_list)
+            regex_list.append(compiled_regex.findall(self.text)[0])
+            original_list.extend(regex_list)
+            self.update_processed_text(regex_list)
+        except Exception as e:
+            print(e)
         return regex_list, original_list
 
     def update_processed_text(self, regex_list):

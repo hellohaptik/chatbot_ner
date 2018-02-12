@@ -468,7 +468,7 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
 
 
 def get_regex(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the PNRDetector class to detect pnr
+    """This functionality calls the RegexDetector class to detect regex
 
     Attributes:
         NOTE: Explained above
@@ -476,7 +476,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
     Output:
         NOTE: Explained above
 
-    For Example:
+    Example:
 
         message = 'check my pnr status for 2141215305.'
         entity_name = 'train_pnr'
