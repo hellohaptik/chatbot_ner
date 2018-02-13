@@ -12,6 +12,7 @@ from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
+import ast
 """
 This file contains functionality that performs entity detection over a chatbot.
 The chatbot contains several elements which can be used to detect entity. For example, message, UI elements (like form,
@@ -490,7 +491,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
             >> [{'detection': 'message', 'original_text': '2141215305', 'entity_value': {'value': '2141215305'}}]
 
     """
-
+    meta_data = ast.literal_eval(meta_data)['regex']
     regex_detection = RegexDetector(entity_name=entity_name, regex=meta_data['regex'])
     if structured_value:
         entity_list, original_text_list = regex_detection.detect_entity(text=structured_value)
