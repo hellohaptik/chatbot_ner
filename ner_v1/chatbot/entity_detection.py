@@ -467,7 +467,7 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
     return None
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message):
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message,meta_data):
     """This functionality calls the RegexDetector class to detect regex
 
     Attributes:
@@ -491,7 +491,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
 
     """
 
-    regex_detection = RegexDetector(entity_name=entity_name, regex=r'\d+')
+    regex_detection = RegexDetector(entity_name=entity_name, regex=meta_data['regex'])
     if structured_value:
         entity_list, original_text_list = regex_detection.detect_entity(text=structured_value)
         if entity_list:
