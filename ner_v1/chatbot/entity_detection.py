@@ -470,26 +470,29 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
 
 
 def get_regex(message, entity_name, structured_value, fallback_value, bot_message,meta_data):
-    """This functionality calls the RegexDetector class to detect regex
+    """This functionality calls the RegexDetector class to detect text that abide by the specified
+        regex.
+        The meta_data consists the regex
 
     Attributes:
         NOTE: Explained above
-
+        meta_data (dict) : It consists of the regex
     Output:
         NOTE: Explained above
 
     Example:
 
-        message = 'check my pnr status for 2141215305.'
-        entity_name = 'train_pnr'
+        message = 'abc123'
+        entity_name = 'regex'
+        meta_data = {'regex': '\d'}
         structured_value = None
         fallback_value = None
         bot_message = None
-        output = get_pnr(message=message, entity_name=entity_name, structured_value=structured_value,
-                        fallback_value=fallback_value, bot_message=bot_message)
+        output = get_regex(message=message, entity_name=entity_name, structured_value=structured_value,
+                        fallback_value=fallback_value, bot_message=bot_message, meta_data=meta_data)
         print output
 
-            >> [{'detection': 'message', 'original_text': '2141215305', 'entity_value': {'value': '2141215305'}}]
+            >> [{'detection': 'message', 'original_text': '1', 'entity_value': {'value': '1'}}]
 
     """
     ner_logger.debug("META_DATA_BEFORE>>>>> %s" % meta_data)
