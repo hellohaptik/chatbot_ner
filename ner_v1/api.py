@@ -114,7 +114,7 @@ def regex(request):
                                          parameters_dict[PARAMETER_META_DATA])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
-        ner_logger.debug('Exception for phone_number: %s ' % e)
+        ner_logger.debug('Exception for regex: %s ' % e)
         return HttpResponse(status=400)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
