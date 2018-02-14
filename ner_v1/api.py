@@ -98,7 +98,8 @@ def phone_number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 def regex(request):
-    """This functionality calls the get_phone_number() functionality to detect phone numbers. It is called through api call
+    """This functionality calls the get_regex() functionality to detect text those abide by the specified regex.
+    It is called through api call
 
     Attributes:
         request: url parameters
