@@ -496,7 +496,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
 
     """
     ner_logger.debug("BEFORE AST LITERAL REGEX>>>>>>%s" % meta_data)
-    meta_data = ast.literal_eval(meta_data)
+    meta_data = ast.literal_eval(str(meta_data))
     ner_logger.debug("REGEX>>>>>>%s" % meta_data)
     regex_detection = RegexDetector(entity_name=entity_name, regex=meta_data)
     if structured_value:
