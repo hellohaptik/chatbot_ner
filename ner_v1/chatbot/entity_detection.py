@@ -469,7 +469,7 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
     return None
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message,meta_data):
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message,regex):
     """This functionality calls the RegexDetector class to detect text that abide by the specified
         regex.
         The meta_data consists the regex
@@ -495,8 +495,8 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
             >> [{'detection': 'message', 'original_text': '1', 'entity_value': {'value': '1'}}]
 
     """
-    ner_logger.debug("BEFORE AST LITERAL REGEX>>>>>>%s" % meta_data)
-    ner_logger.debug("REGEX>>>>>>%s" % meta_data)
+    ner_logger.debug("BEFORE AST LITERAL REGEX>>>>>>%s" % regex)
+    ner_logger.debug("REGEX>>>>>>%s" % regex)
     regex_detection = RegexDetector(entity_name=entity_name, regex=meta_data)
     if structured_value:
         entity_list, original_text_list = regex_detection.detect_entity(text=structured_value)
