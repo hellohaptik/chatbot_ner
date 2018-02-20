@@ -9,7 +9,7 @@ from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_nu
     get_number, get_shopping_size, get_time, get_date, get_budget, get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
-    PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_META_DATA
+    PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX
 
 
 def get_parameters_dictionary(request):
@@ -28,7 +28,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
                        PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
-                       PARAMETER_META_DATA: request.GET.get('meta_data')}
+                       PARAMETER_REGEX: request.GET.get('regex')}
 
     return parameters_dict
 
@@ -112,7 +112,7 @@ def regex(request):
                                          parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
                                          parameters_dict[PARAMETER_BOT_MESSAGE],
-                                         parameters_dict[PARAMETER_META_DATA])
+                                         parameters_dict[PARAMETER_REGEX])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
         ner_logger.debug('Exception for regex: %s ' % e)
