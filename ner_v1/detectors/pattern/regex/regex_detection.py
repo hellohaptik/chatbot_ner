@@ -1,4 +1,5 @@
 import re
+from chatbot_ner.config import ner_logger
 
 
 class RegexDetector(object):
@@ -71,7 +72,7 @@ class RegexDetector(object):
             original_list.extend(regex_list)
             self.update_processed_text(regex_list)
         except Exception as e:
-            print(e)
+            ner_logger.debug("Exception detect regex: %s" % e.message)
         return regex_list, original_list
 
     def update_processed_text(self, regex_list):

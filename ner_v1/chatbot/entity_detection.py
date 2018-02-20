@@ -12,7 +12,6 @@ from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
-import ast
 from chatbot_ner.config import ner_logger
 """
 This file contains functionality that performs entity detection over a chatbot.
