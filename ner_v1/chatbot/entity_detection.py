@@ -11,6 +11,7 @@ from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
+from chatbot_ner.config import ner_logger
 """
 This file contains functionality that performs entity detection over a chatbot.
 The chatbot contains several elements which can be used to detect entity. For example, message, UI elements (like form,
@@ -362,11 +363,15 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
     """
     city_detection = CityDetector(entity_name=entity_name)
+    ner_logger.debug('ENTITY NAME>>>>>%s' % str(entity_name) )
     city_detection.set_bot_message(bot_message=bot_message)
+    ner_logger.debug('BOT MESSAGE>>>>>%s' % bot_message)
+    ner_logger.debug('STRUCTURED VALUE>>>>>%s' % str(structured_value))
     if structured_value:
         entity_dict_list = city_detection.detect_entity(text=structured_value)
         entity_list, original_text_list, detection_method_list = \
             city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
+        ner_logger.debug(' ENTITY LIST OUTPUT OF STRUCTURED VALUE>>>>>%s' % str(entity_dict_list))
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
@@ -377,6 +382,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         entity_dict_list = city_detection.detect_entity(text=message, run_model=True)
         entity_list, original_text_list, detection_method_list = \
             city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
+        ner_logger.debug('ENTITY DICT LIST ELSE>>>>>%s' % entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method_list=detection_method_list)
