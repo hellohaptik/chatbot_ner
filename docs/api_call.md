@@ -1032,13 +1032,14 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = 'enter the otp'
+      regex = \d{4,6}
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_regex
-      output = get_regex(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_regex(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, regex=regex)
       print output
       ```
 
