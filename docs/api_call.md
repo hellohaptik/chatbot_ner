@@ -1050,7 +1050,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/regex/?message=123456%20is%20my%otp&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20'
+      curl -i 'http://'$URL':'$PORT'/v1/regex/?message=123456%20is%20my%otp&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20&regex=\d{4,6}'
       ```
 
     - *CURL Output:*
