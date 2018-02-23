@@ -18,4 +18,5 @@ urlpatterns = patterns('',
     url(r'^v1/ner/$', 'ner_v1.api.ner'),
     url(r'^v1/combine_output/$', 'ner_v1.api.combine_output'),
     url(r'^v1/person_name/$', 'ner_v1.api.person_name'),
+    url(r'^v1/regex/$', 'ner_v1.api.regex'),
 )

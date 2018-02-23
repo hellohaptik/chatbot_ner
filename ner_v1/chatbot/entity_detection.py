@@ -11,6 +11,7 @@ from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
+from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
 from chatbot_ner.config import ner_logger
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -464,6 +465,51 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
             return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = pnr_detection.detect_entity(text=message)
+        if entity_list:
+            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
+        elif fallback_value:
+            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+
+    return None
+
+
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message,regex):
+    """This functionality calls the RegexDetector class to detect text that abide by the specified
+        regex.
+        The meta_data consists the regex
+
+    Attributes:
+        NOTE: Explained above
+        meta_data (dict) : It consists of the regex
+    Output:
+        NOTE: Explained above
+
+    Example:
+
+        message = 'abc123'
+        entity_name = 'regex'
+        meta_data = {'regex': '\d'}
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_regex(message=message, entity_name=entity_name, structured_value=structured_value,
+                        fallback_value=fallback_value, bot_message=bot_message, meta_data=meta_data)
+        print output
+
+            >> [{'detection': 'message', 'original_text': '1', 'entity_value': {'value': '1'}}]
+
+    """
+    ner_logger.debug("BEFORE AST LITERAL REGEX>>>>>>%s" % regex)
+    ner_logger.debug("REGEX>>>>>>%s" % regex)
+    regex_detection = RegexDetector(entity_name=entity_name, regex=regex)
+    if structured_value:
+        entity_list, original_text_list = regex_detection.detect_entity(text=structured_value)
+        if entity_list:
+            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
+        else:
+            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+    else:
+        entity_list, original_text_list = regex_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
