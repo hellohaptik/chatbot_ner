@@ -3,7 +3,7 @@ from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
 from lib.nlp.levenshtein_distance import Levenshtein
 from lib.nlp.regex import Regex
-
+import re
 
 class TextDetector(object):
     """
@@ -162,7 +162,7 @@ class TextDetector(object):
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
-                self.processed_text = self.processed_text.replace(original_text, self.tag)
+                self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text)
 
         return value_final_list, original_final_list
 

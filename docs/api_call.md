@@ -1018,6 +1018,58 @@ Following are the list of different entity types along with its API call:
       }
       ```
 
+### regex
+
+- This functionality calls the RegexDetector class to detect  entities that abide by the specified regex.
+
+- Examples:
+
+  - Example 1:
+
+    - ```python
+      message = '123456 is my otp'
+      entity_name = 'regex_test_otp'
+      structured_value = None
+      fallback_value = None
+      bot_message = 'enter the otp'
+      regex = \d{4,6}
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_regex
+      output = get_regex(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, regex=regex)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```python
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/regex/?message=123456%20is%20my%otp&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20&regex=\d{4,6}'
+      ```
+
+    - *CURL Output:*
+
+      ```python
+      {
+        "data": [
+          {
+            "detection": "message",
+            "original_text": "123456",
+            "entity_value": "123456"
+          }
+            ]
+      }
+      ```
+
+    ​
+
 ## Data Tagging
 
 - This functionality tags the message with the entity name and also identifies the entity values.
