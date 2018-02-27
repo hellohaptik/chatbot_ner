@@ -43,7 +43,7 @@ class RegexDetector(object):
             detect_entity()
             >> (['123'], ['123'])
         """
-        self.text = ' ' + text + ' '
+        self.text = text.strip()
         self.processed_text = self.text
         self.tagged_text = self.text
         regex_list, original_list = self.detect_regex()
