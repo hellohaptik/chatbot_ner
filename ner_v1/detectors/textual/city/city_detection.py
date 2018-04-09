@@ -503,20 +503,23 @@ class CityDetector(object):
             if entity_value_list:
                 city_value = entity_value_list[0]
                 detection_method = FROM_MODEL_VERIFIED
-            else:
-                city_value = output[model_constant.MODEL_CITY_VALUE]
-                detection_method = FROM_MODEL_NOT_VERIFIED
 
-            city_dict_list.append(
-                {
-                    detector_constant.CITY_VALUE: city_value,
-                    detector_constant.ORIGINAL_CITY_TEXT: output[model_constant.MODEL_CITY_VALUE],
-                    detector_constant.CITY_FROM_PROPERTY: output[model_constant.MODEL_CITY_FROM],
-                    detector_constant.CITY_TO_PROPERTY: output[model_constant.MODEL_CITY_TO],
-                    detector_constant.CITY_VIA_PROPERTY: output[model_constant.MODEL_CITY_VIA],
-                    detector_constant.CITY_NORMAL_PROPERTY: output[model_constant.MODEL_CITY_NORMAL],
-                    detector_constant.CITY_DETECTION_METHOD: detection_method
-                }
+            # Note: not appending city names which are not present in elastic as model is capturing wrong data
 
-            )
+            # else:
+            #     city_value = output[model_constant.MODEL_CITY_VALUE]
+            #     detection_method = FROM_MODEL_NOT_VERIFIED
+
+                city_dict_list.append(
+                    {
+                        detector_constant.CITY_VALUE: city_value,
+                        detector_constant.ORIGINAL_CITY_TEXT: output[model_constant.MODEL_CITY_VALUE],
+                        detector_constant.CITY_FROM_PROPERTY: output[model_constant.MODEL_CITY_FROM],
+                        detector_constant.CITY_TO_PROPERTY: output[model_constant.MODEL_CITY_TO],
+                        detector_constant.CITY_VIA_PROPERTY: output[model_constant.MODEL_CITY_VIA],
+                        detector_constant.CITY_NORMAL_PROPERTY: output[model_constant.MODEL_CITY_NORMAL],
+                        detector_constant.CITY_DETECTION_METHOD: detection_method
+                    }
+
+                )
         return city_dict_list
