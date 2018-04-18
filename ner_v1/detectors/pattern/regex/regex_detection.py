@@ -4,83 +4,91 @@ from chatbot_ner.config import ner_logger
 
 class RegexDetector(object):
     """
-    RegexDetector is used to detect text from the inbound message which abide by the specified regex.
+    Detect entity from text using a regular expression pattern
+
+    Attributes:
+         entity_name (str) : holds the entity name
+         text (str) : holds the original text
+         tagged_text (str) : holds the detected entities replaced by self.tag
+         processed_text (str) : holds the text left to be processed
+         matches (list of _sre.SRE_Match): re.finditer match objects
+         pattern (raw str or str or unicode): pattern to be compiled into a re object
     """
-    def __init__(self, entity_name, regex):
+    def __init__(self, entity_name, pattern, re_flags=re.UNICODE):
         """
-
         Args:
-            entity_name:
-            regex:
-        Attributes:
-             self.entity_name (str) : holds the entity name
-             self.text (str) : holds the original text
-             self.tagged_text (str) : holds the detected entities replaced by self.tag
-             self.processed_text (str) : holds the text left to be processed
+            entity_name (str): an indicator value as tag to replace detected values
+            pattern (raw str or str or unicode): pattern to be compiled into a re object
 
+        Raises:
+            TypeError: if the given pattern fails to compile
         """
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.regex = regex
+        self.pattern = re.compile(pattern, re_flags)
+        self.matches = []
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text):
         """
-        Takes input as text and returns text detected for the specified regex.
+        Run regex pattern on the provided text and return non overlapping group 0 matches
+
         Args:
-            text (str) : Contains the message sent by the user.
+            text (str): Text to find patterns on
 
         Returns:
-            (regex_list, original_list) (tuple):
-            regex_list (list) : list of detected text for the specified text
-            original_list (list) : list of original text provided by the user
-        Example:
-            self.regex = r'\d+'
-            self.text = 'aman123"
+            tuple containing
+                list: list containing substrings of text that matched the set pattern
+                list: list containing corresponding substrings of original text that were identified as entity values
 
-            detect_entity()
-            >> (['123'], ['123'])
+        Note:
+            In this case both returned lists are identical.
+
+        Example:
+            >> regex_detector = RegexDetector(entity_name='numerals', pattern='\\d+')
+            >> regex_detector.detect_entity('My phone is 911234567890. Call me at 2pm')
+            (['911234567890', '2'], ['911234567890', '2'])
+            >> regex_detector.tagged_text
+            'My phone is __numerals__. Call me at __numerals__pm'
+
         """
-        self.text = text.strip()
+        self.text = text
         self.processed_text = self.text
         self.tagged_text = self.text
-        regex_list, original_list = self.detect_regex()
-        return regex_list, original_list
+        match_list, original_list = self._detect_regex()
+        self._update_processed_text(match_list)
+        return match_list, original_list
 
-    def detect_regex(self):
+    def _detect_regex(self):
         """
         Detects text based on the aforementioned regex
-        Raises an error for an invalid regex
-        Returns:
-                (regex_list, original_list) (tuple):
-                regex_list (list) : list of detected text for the specified text
-                original_list (list) : list of original text provided by the user
-        Example:
-            self.regex = r'\d+'
-            self.text = 'aman123"
 
-            detect_entity()
-            >> (['123'], ['123'])
+        Returns:
+            tuple containing
+                list: list containing substrings of text that matched the set pattern
+                list: list containing corresponding substrings of original text that were identified as entity values
+
         """
         original_list = []
-        regex_list = []
-        try:
-            compiled_regex = re.compile(self.regex)
-            regex_list.append(compiled_regex.findall(self.text)[0])
-            original_list.extend(regex_list)
-            self.update_processed_text(regex_list)
-        except Exception as e:
-            ner_logger.debug("Exception detect regex: %s" % e.message)
-        return regex_list, original_list
+        match_list = []
+        for match in self.pattern.finditer(self.processed_text):
+            self.matches.append(match)
+            match_list.append(match.group(0))
+            original_list.append(match.group(0))
+        return match_list, original_list
 
-    def update_processed_text(self, regex_list):
+    def _update_processed_text(self, match_list):
         """
-        This function updates text by replacing already detected email
-        :return:
+        Update processed text by removing already found entity values and update tagged text to replace found
+        values with the set tag
+
+        Args:
+            match_list: list containing substrings of text that matched the set pattern
+
         """
-        for detected_text in regex_list:
+        for detected_text in match_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
