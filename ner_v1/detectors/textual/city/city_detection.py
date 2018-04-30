@@ -1,8 +1,9 @@
 import re
+
 import models.constant as model_constant
+import ner_v1.detectors.constant as detector_constant
 from models.models import Models
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
-import ner_v1.detectors.constant as detector_constant
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
@@ -39,6 +40,7 @@ class CityDetector(object):
         self.processed_text = ''
         self.city = []
         self.text_detection_object = TextDetector(entity_name=entity_name)
+        self.text_detection_object.set_fuzziness_threshold(fuzziness=2)
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text, run_model=False):
@@ -143,7 +145,6 @@ class CityDetector(object):
         city_dict_list = []
         patterns = re.findall(r'\s(([A-Za-z]+)\s+(\-|to|2|and)\s+([A-Za-z\s]+))\.?\b', self.processed_text.lower())
         for pattern in patterns:
-
             city_dict_list.extend(
                 self._city_dict_from_text(text=pattern[1], from_property=True)
             )

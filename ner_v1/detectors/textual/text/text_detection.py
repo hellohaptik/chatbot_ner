@@ -1,9 +1,11 @@
+import re
+
 from datastore import DataStore
 from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
-from lib.nlp.levenshtein_distance import Levenshtein
+from lib.nlp.levenshtein_distance import edit_distance
 from lib.nlp.regex import Regex
-import re
+
 
 class TextDetector(object):
     """
@@ -21,7 +23,7 @@ class TextDetector(object):
                          detect entities
         text_dict: dictionary to store lemmas, stems, ngrams used during detection process
         fuzziness_threshold: maximum Levenshtein's distance allowed during similarity matching
-        min_size_token_for_levenshtein: minimum number of words a phrase must have to be considered for calculating
+        min_size_token_for_levenshtein: minimum number of letters a word must have to be considered for calculating
                                         edit distance with similar ngrams from the datastore
         tagged_text: string with time entities replaced with tag defined by entity_name
         text_entity: list to store detected entities from the text
@@ -64,7 +66,7 @@ class TextDetector(object):
 
     def set_min_size_for_levenshtein(self, min_size):
         """
-        Sets the minimum number of words a phrase must have to be considered for calculating edit distance with similar
+        Sets the minimum number of letters a word must have to be considered for calculating edit distance with similar
         ngrams from the datastore
 
         Args:
@@ -155,7 +157,17 @@ class TextDetector(object):
         variant_dictionary.update(bigram_variants)
         variant_dictionary.update(unigram_variants)
         variant_list = variant_dictionary.keys()
-        variant_list.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
+
+        exact_matches, fuzzy_variants = [], []
+        for variant in variant_list:
+            if variant.lower() in self.processed_text.lower():
+                exact_matches.append(variant)
+            else:
+                fuzzy_variants.append(variant)
+
+        exact_matches.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
+        fuzzy_variants.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
+        variant_list = exact_matches + fuzzy_variants
 
         for variant in variant_list:
             original_text = self._get_entity_from_text(variant, self.processed_text.lower())
@@ -192,24 +204,27 @@ class TextDetector(object):
             Output:
                 'delehi'
         """
-        variant_token_list = tokenizer.tokenize(variant.lower())
-        text_token_list = tokenizer.tokenize(text.lower())
+        variant_tokens = tokenizer.tokenize(variant.lower())
+        text_tokens = tokenizer.tokenize(text.lower())
         original_text = []
         variant_count = 0
-        token_count = 0
-        while token_count < len(text_token_list):
-            levenshtein = Levenshtein(variant_token_list[variant_count], text_token_list[token_count],
-                                      self.fuzziness_threshold + 1)
-            if (variant_token_list[variant_count] == text_token_list[token_count]
-                    or (len(text_token_list[token_count]) > self.min_size_token_for_levenshtein
-                        and levenshtein.edit_distance() <= self.fuzziness_threshold)):
-                original_text.append(text_token_list[token_count])
+        for text_token in text_tokens:
+            variant_token = variant_tokens[variant_count]
+
+            utext_token = text_token
+            if type(utext_token) == 'str':
+                utext_token = utext_token.decode('utf-8')
+
+            same = variant_token == text_token
+            if same or (len(utext_token) >= self.min_size_token_for_levenshtein
+                        and edit_distance(string1=variant_token,
+                                          string2=text_token,
+                                          max_distance=self.fuzziness_threshold + 1) <= self.fuzziness_threshold):
+                original_text.append(text_token)
                 variant_count += 1
-                if variant_count == len(variant_token_list):
+                if variant_count == len(variant_tokens):
                     return ' '.join(original_text)
             else:
                 original_text = []
                 variant_count = 0
-
-            token_count += 1
         return None
