@@ -469,9 +469,9 @@ Following are the list of different entity types along with its API call:
 
 -   This functionality calls the PNRDetector class to detect pnr.
 
--   Example:
+- Example:
 
--   - Example 1: 
+- - Example 1: 
 
     - ```python
       message = 'check my pnr status for 2141215305.'
@@ -1021,6 +1021,12 @@ Following are the list of different entity types along with its API call:
 ### regex
 
 - This functionality calls the RegexDetector class to detect  entities that abide by the specified regex.
+  > IMPORTANT NOTE:
+  >
+  > 1. The regex pattern provided must be escaped if you are not passing in a raw string (marked by 'r' in Python)
+  > 2. Errors in compiling the provided pattern are not handled and will result in an exception
+  > 3. chatbot_ner also uses re.UNICODE flag by default for detection. This can be overridden by using re_flags argument in the constructor
+  > 4. If you are using groups, only 0th group will be returned. Sub grouping is not supported at the moment
 
 - Examples:
 
@@ -1032,14 +1038,14 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = 'enter the otp'
-      regex = \d{4,6}
+      regex = '\\d{4,6}'
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_regex
-      output = get_regex(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, regex=regex)
+      output = get_regex(message=message,entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, pattern=regex)
       print output
       ```
 
