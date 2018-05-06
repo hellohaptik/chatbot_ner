@@ -948,7 +948,7 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
             entity_value = {
                 ENTITY_VALUE_DICT_KEY: entity_value
             }
-        method = detection_method[i] if detection_method_list else detection_method
+        method = detection_method_list[i] if detection_method_list else detection_method
         entity_list.append(
             {
                 ENTITY_VALUE: entity_value,
