@@ -160,7 +160,7 @@ def person_name(request):
                                         parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
-        ner_logger.debug('Exception for city: %s ' % e)
+        ner_logger.debug('Exception for person_name: %s ' % e)
         return HttpResponse(status=400)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
