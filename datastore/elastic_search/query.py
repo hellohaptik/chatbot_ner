@@ -142,7 +142,7 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
                 pass
         return lo, hi
 
-    if ELASTICSEARCH_VERSION_MAJOR >= 6 and ELASTICSEARCH_VERSION_MINOR >= 2:
+    if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
         return fuzzy_setting
 
     if type(fuzzy_setting) == str:
