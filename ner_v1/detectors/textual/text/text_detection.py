@@ -24,7 +24,7 @@ class TextDetector(object):
         text_dict (dict): dictionary to store lemmas, stems, ngrams used during detection process
         _fuzziness (str or int): If this parameter is str, elasticsearch's
                                  auto is used with low and high term distances. Default low and high term distances
-                                 are 3 and 6 for elasticsearch. For this module they are set to 4 and 6 respectively.
+                                 are 3 and 6 for elasticsearch. For this module they are set to 4 and 7 respectively.
                                  In auto mode, if length of term is less than low it must match exactly, if it is
                                  between [low, high) one insert/delete/substitution is allowed, for anything higher
                                  than equal to high, two inserts/deletes/substitutions are allowed
@@ -56,11 +56,11 @@ class TextDetector(object):
         self.tag = '__' + self.entity_name + '__'
 
         # defaults
-        self._fuzziness = "auto:4,6"
-        self._fuzziness_lo, self._fuzziness_hi = 4, 6
+        self._fuzziness = "auto:4,7"
+        self._fuzziness_lo, self._fuzziness_hi = 4, 7
         self._min_token_size_for_fuzziness = 4
 
-        self.set_fuzziness_threshold(fuzziness=(4, 6))
+        self.set_fuzziness_threshold(fuzziness=(4, 7))
         self.db = DataStore()
 
     def set_fuzziness_threshold(self, fuzziness):
@@ -71,8 +71,8 @@ class TextDetector(object):
         Args:
             fuzziness (iterable or int): If this parameter is int, elasticsearch's auto is used with
                                          low and high term distances.
-                                         Please make sure the iterable has only two integers like (4, 6).
-                                         This will generate "auto:4,6"
+                                         Please make sure the iterable has only two integers like (4, 7).
+                                         This will generate "auto:4,7"
 
                                          Note that this also sets
                                          _min_token_size_for_fuzziness to first value of the iterable
