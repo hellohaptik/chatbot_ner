@@ -45,7 +45,7 @@
 6.  Install Java and setup Elasticsearch
 
          You can skip this step if you have separate Elasticsearch instance and don't want to setup one locally.
-         NOTE: If you have >= JDK 1.7.x then you can setup elasticsearch directly.   
+         NOTE: If you have >= JDK 1.8.x then you can setup elasticsearch directly.
 
     -  Ubuntu:
 
@@ -65,12 +65,12 @@
     ```shell
     $ mkdir -p ~/chatbot_ner_elasticsearch
     $ cd /tmp/
-    $ curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.4/elasticsearch-2.4.4.tar.gz
-    $ tar -xzf elasticsearch-2.4.4.tar.gz -C ~/chatbot_ner_elasticsearch/
-    $ ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
+    $ curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.0.0.tar.gz
+    $ tar -xzf elasticsearch-6.0.0.tar.gz -C ~/chatbot_ner_elasticsearch/
+    $ ~/chatbot_ner_elasticsearch/elasticsearch-6.0.0/bin/elasticsearch -d
     ```
 
-     Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/`
+     Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-6.0.0/`
 
 
 7. Copy config.example to config and configure the settings for datastore

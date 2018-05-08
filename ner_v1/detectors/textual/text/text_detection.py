@@ -17,19 +17,24 @@ class TextDetector(object):
 
 
     Attributes:
-        text: string to extract entities from
-        entity_name: string by which the detected time entities would be replaced with on calling detect_entity()
-        regx_to_process: list of regex patterns to match and remove text that matches these patterns before starting to
-                         detect entities
-        text_dict: dictionary to store lemmas, stems, ngrams used during detection process
-        fuzziness_threshold: maximum Levenshtein's distance allowed during similarity matching
-        min_size_token_for_levenshtein: minimum number of letters a word must have to be considered for calculating
-                                        edit distance with similar ngrams from the datastore
-        tagged_text: string with time entities replaced with tag defined by entity_name
-        text_entity: list to store detected entities from the text
-        original_text_entity: list of substrings of the text detected as entities
-        processed_text: string with detected time entities removed
-        tag: entity_name prepended and appended with '__'
+        text (str): string to extract entities from
+        entity_name (str): string by which the detected time entities would be replaced with on calling detect_entity()
+        regx_to_process (lib.nlp.Regex): list of regex patterns to match and remove text that matches
+                                         these patterns before starting to detect entities
+        text_dict (dict): dictionary to store lemmas, stems, ngrams used during detection process
+        _fuzziness (str or int): If this parameter is str, elasticsearch's
+                                 auto is used with low and high term distances. Default low and high term distances
+                                 are 3 and 6 for elasticsearch. For this module they are set to 4 and 6 respectively.
+                                 In auto mode, if length of term is less than low it must match exactly, if it is
+                                 between [low, high) one insert/delete/substitution is allowed, for anything higher
+                                 than equal to high, two inserts/deletes/substitutions are allowed
+        _min_token_size_for_fuzziness (int): minimum number of letters a word must have to be considered
+                                             for calculating edit distance with similar ngrams from the datastore
+        tagged_text (str): string with time entities replaced with tag defined by entity_name
+        text_entity (list): list to store detected entities from the text
+        original_text_entity (list): list of substrings of the text detected as entities
+        processed_text (str): string with detected time entities removed
+        tag (str): entity_name prepended and appended with '__'
     """
 
     def __init__(self, entity_name=None):
@@ -43,28 +48,81 @@ class TextDetector(object):
         self.text = None
         self.regx_to_process = Regex([(r'[\'\/]', r'')])
         self.text_dict = {}
-        self.fuzziness_threshold = 1
-        self.min_size_token_for_levenshtein = 4
         self.tagged_text = None
         self.text_entity = []
         self.original_text_entity = []
         self.processed_text = None
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
+
+        # defaults
+        self._fuzziness = "auto:4,6"
+        self._fuzziness_lo, self._fuzziness_hi = 4, 6
+        self._min_token_size_for_fuzziness = 4
+
+        self.set_fuzziness_threshold(fuzziness=(4, 6))
         self.db = DataStore()
 
     def set_fuzziness_threshold(self, fuzziness):
         """
-        Sets the fuzziness threshold for similarity searches. The fuzziness threshold corresponds to the
+        Sets the fuzziness thresholds for similarity searches. The fuzziness threshold corresponds to the
         maximum Levenshtein's distance allowed during similarity matching
 
         Args:
-            fuzziness: integer, maximum allowed Levenshtein's distance from the word/phrase being tested for
-                       entity match
-        """
-        self.fuzziness_threshold = fuzziness
+            fuzziness (iterable or int): If this parameter is int, elasticsearch's auto is used with
+                                         low and high term distances.
+                                         Please make sure the iterable has only two integers like (4, 6).
+                                         This will generate "auto:4,6"
 
-    def set_min_size_for_levenshtein(self, min_size):
+                                         Note that this also sets
+                                         _min_token_size_for_fuzziness to first value of the iterable
+
+                                         Default low and high term distances are 3 and 6 for elasticsearch.
+                                         See [1] for more details.
+
+                                         If this argument is int, elasticsearch will set fuzziness as
+                                         min(2, fuzziness)
+
+        [1] https://www.elastic.co/guide/en/elasticsearch/reference/current/common-options.html#fuzziness
+
+        """
+        try:
+            iter(fuzziness)
+            if len(fuzziness) == 2:
+                lo, hi = fuzziness
+                self._fuzziness_lo, self._fuzziness_hi = int(lo), int(hi)
+                self._fuzziness = "auto:" + str(self._fuzziness_lo) + "," + str(self._fuzziness_hi)
+                self._min_token_size_for_fuzziness = lo
+            else:
+                self._fuzziness = "auto"
+        except TypeError:
+            if type(fuzziness) == int or type(fuzziness) == float:
+                self._fuzziness = int(fuzziness)  # Note that elasticsearch would take min(2, self._fuzziness)
+            else:
+                raise TypeError('fuziness has to be either an iterable of length 2 or an int')
+
+    def _get_fuzziness_threshold_for_token(self, token):
+        """
+        Return dynamic fuzziness threshold for damerau-levenshtein check based on length of token if elasticsearch
+        fuzziness was set to auto mode
+
+        Args:
+            token (str or unicode): the string to calculate fuzziness threshold for
+
+        Returns:
+            int: fuzziness threshold for ngram matching on elastic search results
+        """
+        if type(self._fuzziness) == int:
+            return self._fuzziness + 1
+        else:
+            if len(token) < self._fuzziness_lo:
+                return 1  # Allow only insert/delete
+            elif len(token) >= self._fuzziness_hi:
+                return 3  # Allow upto three insert/deletes or one substitution + one insert/delete
+            else:
+                return 2  # lo <= len < hi Allow upto two inserts/deletes and one substitution
+
+    def set_min_token_size_for_levenshtein(self, min_size):
         """
         Sets the minimum number of letters a word must have to be considered for calculating edit distance with similar
         ngrams from the datastore
@@ -73,7 +131,7 @@ class TextDetector(object):
             min_size: integer, maximum allowed Levenshtein's distance from the word/phrase being tested for
             entity match
         """
-        self.min_size_token_for_levenshtein = min_size
+        self._min_token_size_for_fuzziness = min_size
 
     def detect_entity(self, text):
         """
@@ -148,11 +206,11 @@ class TextDetector(object):
         variant_dictionary = {}
 
         trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                                 self.fuzziness_threshold)
+                                                                 self._fuzziness)
         bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                                self.fuzziness_threshold)
+                                                                self._fuzziness)
         unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                                 self.fuzziness_threshold)
+                                                                 self._fuzziness)
         variant_dictionary.update(trigram_variants)
         variant_dictionary.update(bigram_variants)
         variant_dictionary.update(unigram_variants)
@@ -216,10 +274,11 @@ class TextDetector(object):
                 utext_token = utext_token.decode('utf-8')
 
             same = variant_token == text_token
-            if same or (len(utext_token) >= self.min_size_token_for_levenshtein
+            ft = self._get_fuzziness_threshold_for_token(utext_token)
+            if same or (len(utext_token) >= self._min_token_size_for_fuzziness
                         and edit_distance(string1=variant_token,
                                           string2=text_token,
-                                          max_distance=self.fuzziness_threshold + 1) <= self.fuzziness_threshold):
+                                          max_distance=ft + 1) <= ft):
                 original_text.append(text_token)
                 variant_count += 1
                 if variant_count == len(variant_tokens):
