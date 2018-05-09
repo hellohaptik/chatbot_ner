@@ -58,9 +58,9 @@ class TextDetector(object):
         # defaults
         self._fuzziness = "auto:4,7"
         self._fuzziness_lo, self._fuzziness_hi = 4, 7
-        self._min_token_size_for_fuzziness = 4
+        self._min_token_size_for_fuzziness = self._fuzziness_lo
 
-        self.set_fuzziness_threshold(fuzziness=(4, 7))
+        self.set_fuzziness_threshold(fuzziness=(self._fuzziness_lo, self._fuzziness_hi))
         self.db = DataStore()
 
     def set_fuzziness_threshold(self, fuzziness):
