@@ -55,12 +55,16 @@ class TextDetector(object):
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
 
-        # defaults
+        # defaults for auto mode
         self._fuzziness = "auto:4,7"
         self._fuzziness_lo, self._fuzziness_hi = 4, 7
         self._min_token_size_for_fuzziness = self._fuzziness_lo
+        # self.set_fuzziness_threshold(fuzziness=(self._fuzziness_lo, self._fuzziness_hi))
 
-        self.set_fuzziness_threshold(fuzziness=(self._fuzziness_lo, self._fuzziness_hi))
+        # defaults for non-auto mode
+        self.set_fuzziness_threshold(fuzziness=1)
+        self._min_token_size_for_fuzziness = 4
+
         self.db = DataStore()
 
     def set_fuzziness_threshold(self, fuzziness):
@@ -113,14 +117,14 @@ class TextDetector(object):
             int: fuzziness threshold for ngram matching on elastic search results
         """
         if type(self._fuzziness) == int:
-            return self._fuzziness + 1
+            return self._fuzziness
         else:
             if len(token) < self._fuzziness_lo:
-                return 1  # Allow only insert/delete
+                return 0  # strict match
             elif len(token) >= self._fuzziness_hi:
-                return 3  # Allow upto three insert/deletes or one substitution + one insert/delete
+                return 2  # Allow upto two inserts/deletes and one substitution
             else:
-                return 2  # lo <= len < hi Allow upto two inserts/deletes and one substitution
+                return 1  # lo <= len < hi Allow only insert/delete
 
     def set_min_token_size_for_levenshtein(self, min_size):
         """
