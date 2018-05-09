@@ -40,7 +40,6 @@ class CityDetector(object):
         self.processed_text = ''
         self.city = []
         self.text_detection_object = TextDetector(entity_name=entity_name)
-        self.text_detection_object.set_fuzziness_threshold(fuzziness=2)
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text, run_model=False):
