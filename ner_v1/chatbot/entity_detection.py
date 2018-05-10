@@ -12,6 +12,7 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from chatbot_ner.config import ner_logger
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -148,6 +149,9 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     """
     text_detection = TextDetector(entity_name=entity_name)
+    text_detection.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+    fuzziness = parse_fuzziness_parameter(fuzziness)
+    text_detection.set_fuzziness_threshold(fuzziness=fuzziness)
     if structured_value:
         text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
         if text_entity_list:
@@ -958,3 +962,14 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
         )
 
     return entity_list
+
+
+def parse_fuzziness_parameter(fuzziness):
+    try:
+        if isinstance(fuzziness, str):
+            fuzziness = tuple([int(value) for value in fuzziness.split(',')])
+    except ValueError as e:
+        fuzziness = 1
+        ner_logger.debug("Error in parsing fuzziness %s" % (e.message))
+    return fuzziness
+
