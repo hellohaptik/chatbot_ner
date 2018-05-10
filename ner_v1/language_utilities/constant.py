@@ -1,5 +1,6 @@
 import requests
 from django.conf import settings
+import re
 
 ORIGINAL_TEXT = 'original_text'
 SOURCE_LANGUAGE_CODE = 'source_language_code'
@@ -25,3 +26,18 @@ LANGUAGE_DETECTION_URL = 'language/language_detection'
 
 LANGUAGE_UTILITIES_SESSION = requests.Session()
 HTTP_TIMEOUT = 20
+
+emoji_pattern = re.compile("["u"\U0001F600-\U0001F64F"  # emoticons
+                           u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                           u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                           u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           u'\U0001f1e6-\U0001f1ff'
+                           u'\U0001f300-\U0001f5ff'
+                           u'\U0001f600-\U0001f64f'
+                           u'\U0001f680-\U0001f6ff'
+                           u'\U0001f910-\U0001f918\U0001f980-\U0001f984\U0001f9c0'
+                           u'\U0000200d'
+                           u'\U0000fe0f'
+                           u'\U00002600-\U000027bf'
+                           u'\U0001f3fb-\U0001f3ff'
+                           "]+", flags=re.UNICODE)
