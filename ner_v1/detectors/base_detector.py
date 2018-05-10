@@ -7,18 +7,29 @@ from ner_v1.language_utilities.constant import TRANSLATED_TEXT
 
 
 class BaseDetector(object):
+    """
+    This class is the base class from which will be inherited by individual detectors. It primarily contains the
+    priority flow of structured value, message and fallback value and is also use to extend language support for
+    detectors using translation
+    
+    Attributes:
+        supported_languages (set): Set of languages supported by a particular detector
+        source_language_script (str): ISO-639 language code of query text for detection
+        target_language_script (str): ISO-639 language code in which detector would process the query
+        translation_enabled (bool): Decides to either enable or disable translation API
+    """
     __metaclass__ = abc.ABCMeta
 
     supported_languages = set()
     source_language_script = ENGLISH_LANG
-    target_language__script = ENGLISH_LANG
+    target_language_script = ENGLISH_LANG
     translation_enabled = False
 
     def __init__(self):
         pass
 
     @abc.abstractmethod
-    def detect_entity(self, text):
+    def detect_entity(self, text, **kwargs):
         """
         This method runs the core entity detection logic defined inside entity detectors
         Args:
@@ -35,14 +46,14 @@ class BaseDetector(object):
         supported language and query language for which subclass is initialized
         """
         if self.source_language_script in self.supported_languages:
-            self.target_language__script = self.source_language_script
+            self.target_language_script = self.source_language_script
         elif ENGLISH_LANG in self.supported_languages and self.translation_enabled:
-            self.target_language__script = ENGLISH_LANG
+            self.target_language_script = ENGLISH_LANG
         else:
             raise NotImplementedError('Please enable translation or extend language support'
                                       'for %s' % self.source_language_script)
 
-    def detect(self, message=None, structured_value=None, fallback_value=None, bot_message=None, **kwargs):
+    def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
 
@@ -104,14 +115,14 @@ class BaseDetector(object):
         """
         self.set_language_processing_script()
 
-        if self.source_language_script != self.target_language__script and self.translation_enabled:
+        if self.source_language_script != self.target_language_script and self.translation_enabled:
             if structured_value:
                 translation_output = translate_text(structured_value, self.source_language_script,
-                                                    self.target_language__script)
+                                                    self.target_language_script)
                 structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
             elif message:
                 translation_output = translate_text(message, self.source_language_script,
-                                                    self.target_language__script)
+                                                    self.target_language_script)
                 message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
