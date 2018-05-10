@@ -9,3 +9,4 @@ django==1.8
 django-dotenv==1.3.0
 weighted-levenshtein==0.1
 ipython
+googletrans==2.2.0
