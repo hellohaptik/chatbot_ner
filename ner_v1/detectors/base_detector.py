@@ -34,6 +34,7 @@ class BaseDetector(object):
         This method runs the core entity detection logic defined inside entity detectors
         Args:
             text: text snippet from which entities needs to be detected
+            **kwargs: values specific to different detectors such as 'last bot message', custom configs, etc.
         Return: 
             tuple: Two lists of same length containing detected values and original substring from text which is used
             to derive the detected value respectively
