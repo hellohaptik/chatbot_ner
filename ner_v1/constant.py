@@ -44,7 +44,7 @@ PARAMETER_BOT_MESSAGE = 'bot_message'
 PARAMETER_TIMEZONE = 'timezone'
 PARAMETER_REGEX = 'regex'
 PARAMETER_FUZZINESS = 'fuzziness'
-MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
+PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
 

@@ -85,7 +85,7 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, fallback_value, bot_message):
+def get_text(message, entity_name, structured_value, fallback_value, bot_message, fuzziness, min_token_len_fuzziness):
     """Use TextDetector (elasticsearch) to detect textual entities
 
     Args:
