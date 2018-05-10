@@ -89,8 +89,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
         data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
-                      scroll='1m')
+        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
         ngram_results = _run_es_search(connection, **kwargs)
         ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
     return ngram_results
@@ -99,7 +98,9 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
 def _run_es_search(connection, **kwargs):
     """
     Execute the elasticsearch.ElasticSearch.search() method and return all results using
-    elasticsearch.ElasticSearch.scroll() method
+    elasticsearch.ElasticSearch.scroll() method if and only if scroll is passed in kwargs.
+    Note that this is not recommended for large queries and can severly impact performance.
+
     Args:
         connection: Elasticsearch client object
         kwargs:
@@ -107,17 +108,26 @@ def _run_es_search(connection, **kwargs):
     Returns:
         dictionary, search results from elasticsearch.ElasticSearch.search
     """
-    result = connection.search(**kwargs)
+    scroll = kwargs.pop('scroll', False)
+    if not scroll:
+        return connection.search(**kwargs)
+
+    result = connection.search(scroll=scroll, **kwargs)
     scroll_id = result['_scroll_id']
     scroll_size = result['hits']['total']
     hit_list = result['hits']['hits']
-
+    scroll_ids = [scroll_id]
     while scroll_size > 0:
-        result = connection.scroll(scroll_id=scroll_id, scroll='1m')
-        scroll_id = result['_scroll_id']
-        scroll_size = len(result['hits']['hits'])
-        hit_list += result['hits']['hits']
+        _result = connection.scroll(scroll_id=scroll_id, scroll=scroll)
+        scroll_id = _result['_scroll_id']
+        scroll_ids.append(scroll_id)
+        scroll_size = len(_result['hits']['hits'])
+        hit_list += _result['hits']['hits']
+
     result['hits']['hits'] = hit_list
+    if scroll_ids:
+        connection.clear_scroll(body={"scroll_id": scroll_ids})
+
     return result
 
 
