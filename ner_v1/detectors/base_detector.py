@@ -110,8 +110,8 @@ class BaseDetector(object):
                                                     self.target_language__script)
                 structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
             elif message:
-                translation_output= translate_text(message, self.source_language_script,
-                                                   self.target_language__script)
+                translation_output = translate_text(message, self.source_language_script,
+                                                    self.target_language__script)
                 message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
