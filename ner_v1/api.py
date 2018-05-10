@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from chatbot_ner.config import ner_logger
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
-from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_number, get_email, get_city, get_pnr, \
+from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_email, get_city, get_pnr, \
     get_number, get_shopping_size, get_time, get_date, get_budget, get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
@@ -38,7 +38,7 @@ def get_parameters_dictionary(request):
 
 
 def text(request):
-    """This functionality calls the get_text() functionality to detect textual entities. It is called through api call
+    """This functionality initializes text detection functionality to detect textual entities.
 
     Attributes:
         request: url parameters
