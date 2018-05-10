@@ -5,9 +5,11 @@ from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
 from lib.nlp.levenshtein_distance import edit_distance
 from lib.nlp.regex import Regex
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
 
-class TextDetector(object):
+class TextDetector(BaseDetector):
     """
     TextDetector detects custom entities in text string by performing similarity searches against a list fetched from
     datastore (elasticsearch) and tags them.
@@ -37,14 +39,16 @@ class TextDetector(object):
         tag (str): entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name=None):
+    def __init__(self, entity_name=None, language_script=ENGLISH_LANG):
         """
         Initializes a TextDetector object with given entity_name
 
         Args:
             entity_name: A string by which the detected substrings that correspond to text entities would be replaced
                          with on calling detect_entity()
+            language_script: ISO 639 code for language of entities to be detected by the instance of this class             
         """
+        super(TextDetector, self).__init__()
         self.text = None
         self.regx_to_process = Regex([(r'[\'\/]', r'')])
         self.text_dict = {}
@@ -54,6 +58,10 @@ class TextDetector(object):
         self.processed_text = None
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
+
+        # assigning values to superclass attributes
+        self.supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        self.source_language_script = language_script
 
         # defaults for auto mode
         self._fuzziness = "auto:4,7"
@@ -137,7 +145,7 @@ class TextDetector(object):
         """
         self._min_token_size_for_fuzziness = min_size
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -146,8 +154,8 @@ class TextDetector(object):
         is returned. For more information on how data is stored, see Datastore docs.
 
         Args:
-            text: string to extract textual entities from
-
+            text (unicode): string to extract textual entities from
+            **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             Tuple containing two lists, first containing entity value as defined into datastore
             and second list containing corresponding original substrings in text

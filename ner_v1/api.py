@@ -9,7 +9,9 @@ from ner_v1.chatbot.entity_detection import get_text, get_location, get_phone_nu
     get_number, get_shopping_size, get_time, get_date, get_budget, get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
-    PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX
+    PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
+    PARAMETER_SOURCE_LANGUAGE
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 def get_parameters_dictionary(request):
@@ -28,7 +30,9 @@ def get_parameters_dictionary(request):
                        PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
                        PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
-                       PARAMETER_REGEX: request.GET.get('regex')}
+                       PARAMETER_REGEX: request.GET.get('regex'),
+                       PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script'),
+                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language')}
 
     return parameters_dict
 
@@ -43,10 +47,11 @@ def text(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        entity_output = get_text(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                 parameters_dict[PARAMETER_BOT_MESSAGE])
+        text_detector = TextDetector(entity_name=PARAMETER_ENTITY_NAME, language_script=PARAMETER_LANGUAGE_SCRIPT)
+        entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
+                                             structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                             fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                             bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
         ner_logger.debug('Exception for text_synonym: %s ' % e)
