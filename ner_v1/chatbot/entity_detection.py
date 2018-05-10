@@ -100,7 +100,10 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-
+        fuzziness : This is the fuzziness parameter passed via haptik_api. It is used to set the fuzziness
+                    threshold of text_detection
+        min_token_len_fuzziness (int): This is the minimum token length passed via haptik_api.
+                                        It is used to set the min_token_size for levenshtein.
 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
