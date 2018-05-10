@@ -965,6 +965,26 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
 
 
 def parse_fuzziness_parameter(fuzziness):
+    """
+    This function takes input as the fuzziness value.
+    If the fuzziness is int it is returned as it is.
+    If the input is a ',' separated str value, the function returns a tuple with all values
+    present in the str after casting them to int.
+    Args:
+        fuzziness : The fuzzines value that needs to be parsed.
+    Returns:
+        fuzziness (tuple): It returns a tuple with of all the values cast to int present
+        in the str.
+
+    Examples:
+        fuzziness = 2
+        parse_fuzziness_parameter(fuzziness)
+        >> 2
+
+        fuzziness = '3,4'
+        parse_fuzziness_parameter(fuzziness)
+        >> (3,4)
+    """
     try:
         if isinstance(fuzziness, str):
             fuzziness = tuple([int(value) for value in fuzziness.split(',')])
@@ -972,4 +992,3 @@ def parse_fuzziness_parameter(fuzziness):
         fuzziness = 1
         ner_logger.debug("Error in parsing fuzziness %s" % str(e))
     return fuzziness
-
