@@ -106,11 +106,13 @@ class BaseDetector(object):
 
         if self.source_language_script != self.target_language__script and self.translation_enabled:
             if structured_value:
-                structured_value = translate_text(structured_value, self.source_language_script,
-                                                  self.target_language__script)[TRANSLATED_TEXT]
+                translation_output = translate_text(structured_value, self.source_language_script,
+                                                    self.target_language__script)
+                structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
             elif message:
-                message = translate_text(message, self.source_language_script,
-                                         self.target_language__script)[TRANSLATED_TEXT]
+                translation_output= translate_text(message, self.source_language_script,
+                                                   self.target_language__script)
+                message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
         entity_list, original_text_list = self.detect_entity(text=text)
