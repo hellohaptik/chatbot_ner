@@ -84,16 +84,18 @@ def check_json_compatibility_translation(text, source_script, target_script):
     return json.dumps(data)
 
 
-def translate_haptik_message(text, source_script, target_script):
+def translate_text(text, source_language_code, target_language_code):
     """
     The following is used to translate text containing hsl characters.
     Args:
         text (str): The text that has to be translated
-        source_script (str): The language code in which the language is written in.
-        target_script (str): The language in which translation has to be performed.
+        source_language_code (str): The language code in which the language is written in.
+        target_language_code (str): The language in which translation has to be performed.
 
     Returns:
-        text (str): The translated sentence with hsl compatibility.
+        response (dict): It returns a dict with two keys
+        1. status (bool): Boolean value indication the failure or success of the translation.
+        2. translated_text (str): The translated text into the target_language_code
     Example
         text:u'{"text":"Hey [user.name], <b><i>Introducing IPL updates on Haptik</i>!</b><br>
         Now get toss info, score alerts and a lot more for IPL 2017.
@@ -101,13 +103,13 @@ def translate_haptik_message(text, source_script, target_script):
         :[{"actionable_text":"Set Score Alerts","location_required":false,"uri":"","is_default":1,"type":"TEXT_ONLY",
         "payload":{"link":"","message":"Yes! Keep me updated","gogo_message":""},"emoji":""}]}}'
 
-        translate_haptik_message(source_script='en', target_script='hi', text=text)
-        >> {"text": "\u0905\u0930\u0947 [user.name], <b> <i> \</ b> </ i> :)",
+        translate_haptik_message(source_language_code='en', target_language_code='hi', text=text)
+        >>{'translated_text': {"text": "\u0905\u0930\u0947 [user.name], <b> <i> \</ b> </ i> :)",
         "type": "BUTTON", "data": {"items": [{"actionable_text": "Set Score Alerts", "location_required": false,
         "uri": "", "is_default": 1, "type": "TEXT_ONLY", "payload":
-        {"gogo_message": "", "message": "Yes! Keep me updated", "link": ""}, "emoji": ""}]}}
+        {"gogo_message": "", "message": "Yes! Keep me updated", "link": ""}, "emoji": ""}]}}, status: True}
     """
-    status = False
+    response = {TRANSLATED_TEXT: None, 'status': False}
     try:
         if isinstance(text, str):
             text = text.decode('utf-8')
@@ -116,12 +118,12 @@ def translate_haptik_message(text, source_script, target_script):
             if '{' not in response_split[i]:
                 response_split[i] = remove_emoji(response_split[i])
                 response_split[i] = language_module_request(language_url=TRANSLATION_URL,
-                                                            source_language_code=source_script,
-                                                            target_language_code=target_script,
+                                                            source_language_code=source_language_code,
+                                                            target_language_code=target_language_code,
                                                             text=response_split[i])[TRANSLATED_TEXT]
             elif 'text' in response_split[i]:
                 response_split[i] = ((check_json_compatibility_translation(
-                    text=response_split[i], source_script=source_script, target_script=target_script)))
+                    text=response_split[i], source_script=source_language_code, target_script=target_language_code)))
             else:
                 response_split_braces = response_split[i].split('{')
                 for j in range(len(response_split_braces)):
@@ -129,15 +131,16 @@ def translate_haptik_message(text, source_script, target_script):
                         response_split_braces[j] = remove_emoji(response_split_braces[j])
                         response_split_braces[j] = language_module_request(
                             language_url=TRANSLATION_URL,
-                            source_language_code=source_script,
-                            target_language_code=target_script,
+                            source_language_code=source_language_code,
+                            target_language_code=target_language_code,
                             text=response_split_braces[j])[TRANSLATED_TEXT]
                 response_split[i] = '{'.join(response_split_braces)
         text = '<m>'.join(response_split)
-        status = True
-    except ValueError as e:
+        response['status'] = True
+        response[TRANSLATED_TEXT] = text
+    except Exception as e:
         ner_logger.debug("Exception while translating, Error %s" % str(e))
-    return text, status
+    return response
 
 
 def remove_emoji(text):
