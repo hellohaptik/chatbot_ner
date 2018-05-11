@@ -989,7 +989,9 @@ def parse_fuzziness_parameter(fuzziness):
         >> (3,4)
     """
     try:
-        if isinstance(fuzziness, str):
+        if len(fuzziness.split(',')) == 1:
+            fuzziness = int(fuzziness)
+        else:
             fuzziness = tuple([int(value) for value in fuzziness.split(',')])
     except ValueError as e:
         fuzziness = 1
