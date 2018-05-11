@@ -977,10 +977,11 @@ def parse_fuzziness_parameter(fuzziness):
     If the input is a ',' separated str value, the function returns a tuple with all values
     present in the str after casting them to int.
     Args:
-        fuzziness : The fuzzines value that needs to be parsed.
+        fuzziness (str) or (int): The fuzzines value that needs to be parsed.
     Returns:
-        fuzziness (tuple): It returns a tuple with of all the values cast to int present
+        fuzziness (tuple) or (int): It returns a tuple with of all the values cast to int present
         in the str.
+        If the fuzziness is a single element then int is returned
 
     Examples:
         fuzziness = 2
@@ -992,6 +993,8 @@ def parse_fuzziness_parameter(fuzziness):
         >> (3,4)
     """
     try:
+        if isinstance(fuzziness, int):
+            return fuzziness
         fuzziness_split = fuzziness.split(',')
         if len(fuzziness_split) == 1:
             fuzziness = int(fuzziness)
