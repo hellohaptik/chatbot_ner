@@ -56,6 +56,7 @@ ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
+LANGUAGE_MODULE = os.environ.get('LANGUAGE_MODULE')
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)

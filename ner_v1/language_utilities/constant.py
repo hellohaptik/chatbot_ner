@@ -1,5 +1,5 @@
 import requests
-from django.conf import settings
+from chatbot_ner.config import LANGUAGE_MODULE
 import re
 
 ORIGINAL_TEXT = 'original_text'
@@ -16,8 +16,7 @@ DETECTED_LANGUAGE_SOURCE = 'detected_source_language'
 HINDI_LANG = 'hi'
 ENGLISH_LANG = 'en'
 
-#LANGUAGE_UTILITIES_URL = settings.LANGUAGE_MODULE  # URL to language_utitlities
-LANGUAGE_UTILITIES_URL = 'http://54.190.19.68:80/'
+LANGUAGE_UTILITIES_URL = LANGUAGE_MODULE  # URL to language_utitlities
 
 LANGUAGE_UTILITIES = 'language_utilities'
 
