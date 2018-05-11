@@ -78,4 +78,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-LANGUAGE_MODULE = os.environ.get('LANGUAGE_MODULE')
+#LANGUAGE_MODULE = os.environ.get('LANGUAGE_MODULE')
