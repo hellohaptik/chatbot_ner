@@ -991,8 +991,6 @@ def parse_fuzziness_parameter(fuzziness):
         >> (3,4)
     """
     try:
-        if not isinstance(fuzziness, str):
-            fuzziness = str(fuzziness)
         if len(fuzziness.split(',')) == 1:
             fuzziness = int(fuzziness)
         else:
