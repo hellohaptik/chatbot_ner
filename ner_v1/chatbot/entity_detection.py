@@ -153,6 +153,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """
     text_detection = TextDetector(entity_name=entity_name)
     if min_token_len_fuzziness:
+        min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_detection.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
     if fuzziness:
         fuzziness = parse_fuzziness_parameter(fuzziness)
@@ -991,10 +992,11 @@ def parse_fuzziness_parameter(fuzziness):
         >> (3,4)
     """
     try:
-        if len(fuzziness.split(',')) == 1:
+        fuzziness_split = fuzziness.split(',')
+        if len(fuzziness_split) == 1:
             fuzziness = int(fuzziness)
         else:
-            fuzziness = tuple([int(value.strip()) for value in fuzziness.split(',')])
+            fuzziness = tuple([int(value.strip()) for value in fuzziness_split])
     except ValueError as e:
         fuzziness = 1
         ner_logger.debug("Error in parsing fuzziness %s" % str(e))
