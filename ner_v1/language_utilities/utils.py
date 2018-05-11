@@ -8,6 +8,7 @@ from ner_v1.language_utilities.constant import TRANSLATION_URL, TRANSLATION_EXPI
     TRANSLITERATION_URL, TRANSLITERATED_TEXT, HINDI_LANG, HTTP_TIMEOUT, LANGUAGE_UTILITIES,\
     LANGUAGE_UTILITIES_URL, LANGUAGE_UTILITIES_SESSION, emoji_pattern
 import requests
+from six import iteritems
 
 def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG):
     """   
