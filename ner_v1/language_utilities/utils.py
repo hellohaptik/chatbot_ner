@@ -325,3 +325,27 @@ def encode_values(dictionary):
             value = encode_text(value)
         dictionary[key] = value
     return dictionary
+
+
+def encode_text(text, lower=False, strip=False, encoding='utf-8'):
+    """
+
+    Encode encoded string using specified encoding with optionally unicode.lower and unicode.strip transforms
+
+    Args:
+        text (str): string to encode
+        lower (bool, optional): if True, unicode.lower is applied
+        strip (bool, optional): if True, unicode.strip is applied
+        encoding (str, optional): encoding to use to encode the string, defaults to 'utf-8'
+
+    Returns:
+        str: encoded string using the specified decoding
+
+    """
+    if lower:
+        text = text.lower()
+    if strip:
+        text = text.strip()
+
+    text_str = text.encode(encoding=encoding, errors='ignore')
+    return text_str
