@@ -994,7 +994,7 @@ def parse_fuzziness_parameter(fuzziness):
         if len(fuzziness.split(',')) == 1:
             fuzziness = int(fuzziness)
         else:
-            fuzziness = tuple([int(value) for value in fuzziness.split(',')])
+            fuzziness = tuple([int(value.strip()) for value in fuzziness.split(',')])
     except ValueError as e:
         fuzziness = 1
         ner_logger.debug("Error in parsing fuzziness %s" % str(e))
