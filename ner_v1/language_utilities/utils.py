@@ -77,7 +77,7 @@ def translate_text(text, source_language_code, target_language_code):
         :[{"actionable_text":"Set Score Alerts","location_required":false,"uri":"","is_default":1,"type":"TEXT_ONLY",
         "payload":{"link":"","message":"Yes! Keep me updated","gogo_message":""},"emoji":""}]}}'
 
-        translate_haptik_message(source_language_code='en', target_language_code='hi', text=text)
+        translate_text(source_language_code='en', target_language_code='hi', text=text)
         >>{'translated_text': {"text": "\u0905\u0930\u0947 [user.name], <b> <i> \</ b> </ i> :)",
         "type": "BUTTON", "data": {"items": [{"actionable_text": "Set Score Alerts", "location_required": false,
         "uri": "", "is_default": 1, "type": "TEXT_ONLY", "payload":
@@ -169,9 +169,8 @@ def language_get(url, params, service_name):
     """
     entity_data = None
     try:
-        response = LANGUAGE_UTILITIES_SESSION.get(url,
-                                                              params=encode_values(params),
-                                                              timeout=HTTP_TIMEOUT)
+        response = LANGUAGE_UTILITIES_SESSION.get(url, params=encode_values(params),
+                                                  timeout=HTTP_TIMEOUT)
         if response and response.status_code == 200:
             entity_data = json.loads(response.text)['data']
     except requests.exceptions.Timeout:
