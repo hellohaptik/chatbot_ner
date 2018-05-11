@@ -279,7 +279,7 @@ class TextDetector(object):
 
             same = variant_token == text_token
             ft = self._get_fuzziness_threshold_for_token(utext_token)
-            if same or (len(utext_token) >= self._min_token_size_for_fuzziness
+            if same or (len(utext_token) > self._min_token_size_for_fuzziness
                         and edit_distance(string1=variant_token,
                                           string2=text_token,
                                           max_distance=ft + 1) <= ft):
