@@ -1,18 +1,18 @@
-from ner_v1.constant import FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE, \
-    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY
+from ner_v1.constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
+                             FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
-from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
-from ner_v1.detectors.textual.city.city_detection import CityDetector
-from ner_v1.detectors.temporal.date.date_detection import DateAdvanceDetector
-from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
+from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
+from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
-from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.detectors.temporal.time.time_detection import TimeDetector
-from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
-from chatbot_ner.config import ner_logger
+from ner_v1.detectors.temporal.date.date_detection import DateAdvanceDetector
+from ner_v1.detectors.temporal.time.time_detection import TimeDetector
+from ner_v1.detectors.textual.city.city_detection import CityDetector
+from ner_v1.detectors.textual.name.name_detection import NameDetector
+from ner_v1.detectors.textual.text.text_detection import TextDetector
+
 """
 This file contains functionality that performs entity detection over a chatbot.
 The chatbot contains several elements which can be used to detect entity. For example, message, UI elements (like form,
@@ -30,37 +30,37 @@ and parameters. Reason is maintenance.
 
 
 Parameters:
-    message: message on which detection logic needs to run. It is unstructured text from which entity needs to be
-    extracted. For example "I want to order pizza"
-
-    entity_name: name of the entity. It is used to run a particular detection logic by looking into the dictionary. In
-    detection logic for example, get_text() the entity name will be different based on which entities we need to
-    detect. For example, if we want to detect cuisine then entity_name must be "cuisine", for dish entity_name must be
-    "dish" and so on. But in few detection logic like get_phone_number(), entity_name does not have any significance as
-    detection logic of phone_number won't change based on the entity_name.
-
-    structured_value: it is a value which is obtained from the structured text (For example, UI elements like form,
-    payload, etc)
-
-    fallback_value: it is a fallback value. If the detection logic fails to detect any value either from
-    structured_value or message then we return a fallback_value as an output.
-    This value is derived from third party api or from users profile. For example, if user says "Nearby ATMs". In this
-    example user has not provided any information about his location in the chat but, we can pass a fallback_value that
-    will contain its location value from its profile or third party api (like geopy, etc)
-
-    bot_message: previous message from a bot/agent. This is an important parameter, many a times the entity value
-    relies on the message from the bot/agent i.e. what bot saying or asking.
-    For example: bot might ask for departure date to book a flight and user might reply with date.
-    Now, it can not be disambiguated whether its departure date or arrival date unless  we know what bot is asking for?
-      For example:
-      bot: Please help me with date of departure?
-      user: 23rd March
+    message (str): message on which detection logic is to be run. It is unstructured text from which entity needs to be
+                   extracted. For example "I want to order pizza"
+    entity_name (str): name of the entity. It is used to run a particular detection logic by looking
+                       into the dictionary. In detection logic for example, get_text() the entity name will
+                       be different based on which entities we need to detect.
+                       For example, if we want to detect cuisine then entity_name must be "cuisine",
+                       for dish entity_name must be "dish" and so on. But in few detection logic like
+                       get_phone_number(), entity_name does not have any significance
+                       as detection logic of phone_number won't change based on the entity_name.
+    structured_value (str): it is a value which is obtained from the structured text
+                            (For example, UI elements like form, payload, etc)
+    fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output. This value is derived
+                          from third party api or from users profile. For example, if user says "Nearby ATMs".
+                          In this example user has not provided any information about his location in the chat but,
+                          we can pass a fallback_value that will contain its location value from its profile
+                          or third party api (like geopy, etc)
+    bot_message (str): previous message from a bot/agent. This is an important parameter, many a times the entity value
+                       relies on the message from the bot/agent i.e. what bot saying or asking.
+                       Example: bot might ask for departure date to book a flight and user might reply with date.
+                       Now, it can not be disambiguated whether its departure date or arrival date unless
+                       we know what bot is asking for?
+                      Example:
+                      bot: Please help me with date of departure?
+                      user: 23rd March
 
 
 Format of entity detection functionality for a chatbot:
 
 The general architecture of executing any detection logic is as follows:
-1. We initialize the individual entity detection class by passing necessary parameters
+1. We initialize the individual entity detection by passing necessary parameters
 2. if structured_value is present then we run the entity detection logic over the structured_value to extract the
 necessary entity values if it fails then we consider the structured_value as entity value and return as it is.
 3. if structured_value is not present then we execute the detection logic over a message and returns the entity
@@ -86,15 +86,26 @@ The output is stored in a list of dictionary contains the following structure
 
 
 def get_text(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the TextDetector class to detect textual entities
+    """Use TextDetector (elasticsearch) to detect textual entities
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'i want to order chinese from  mainland china and pizza from domminos'
         entity_name = 'restaurant'
@@ -142,28 +153,38 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         text_entity_list, original_text_list = text_detection.detect_entity(message)
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_location(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the TextDetector class to detect location
+    """"Use TextDetector (elasticsearch) to detect location
 
-    TODO: We can improve this by creating separate class for location detection instead of using TextDetector
+    TODO: We can improve this by creating separate for location detection instead of using TextDetector
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
     """
 
     text_detection = TextDetector(entity_name=entity_name)
@@ -172,27 +193,38 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         text_entity_list, original_text_list = text_detection.detect_entity(message)
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the PhoneDetector class to detect phone numbers
+    """Use PhoneDetector to detect phone numbers
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'my contact number is 9049961794'
         entity_name = 'phone_number'
@@ -226,27 +258,38 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = phone_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_email(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the EmailDetector class to detect email ids
+    """Use EmailDetector to detect email ids
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'my email id is apurv.nagvenkar@gmail.com'
         entity_name = 'email'
@@ -281,27 +324,38 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = email_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_city(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the CityDetector class to detect cities
+    """Use CityDetector to detect cities
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'i want to go to mummbai'
         entity_name = 'city'
@@ -373,8 +427,9 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(entity_value=structured_value, original_text=structured_value,
-                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list(entity_value_list=[structured_value],
+                                           original_text_list=[structured_value],
+                                           detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_dict_list = city_detection.detect_entity(text=message, run_model=True)
         entity_list, original_text_list, detection_method_list = \
@@ -383,22 +438,34 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method_list=detection_method_list)
         elif fallback_value:
-            return output_entity_dict_value(entity_value=fallback_value, original_text=fallback_value,
-                                            detection_method=FROM_FALLBACK_VALUE)
+            return output_entity_dict_list(entity_value_list=[fallback_value],
+                                           original_text_list=[fallback_value],
+                                           detection_method=FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the NameDetector class to detect names
+    """Use NameDetector to detect names
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'My name is yash doshi'
         entity_name = 'person_name'
@@ -415,28 +482,41 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = name_detection.detect_entity(text=message, bot_message=bot_message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
             fallback_entity_value, fallback_original_value = NameDetector.get_format_name(fallback_value.split())
-            return output_entity_dict_value(fallback_entity_value[0], fallback_original_value[0], FROM_FALLBACK_VALUE)
+            return output_entity_dict_list(entity_value_list=[fallback_entity_value[0]],
+                                           original_text_list=[fallback_original_value[0]],
+                                           detection_method=FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the PNRDetector class to detect pnr
+    """Use PNRDetector to detect pnr
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = 'check my pnr status for 2141215305.'
         entity_name = 'train_pnr'
@@ -457,72 +537,92 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = pnr_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message,regex):
-    """This functionality calls the RegexDetector class to detect text that abide by the specified
-        regex.
-        The meta_data consists the regex
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern):
+    """Use RegexDetector to detect text that abide by the specified
+        pattern.
+        The meta_data consists the pattern
 
-    Attributes:
-        NOTE: Explained above
-        meta_data (dict) : It consists of the regex
-    Output:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
+
+
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
 
     Example:
 
         message = 'abc123'
-        entity_name = 'regex'
-        meta_data = {'regex': '\d'}
+        entity_name = 'numerals'
+        pattern = '\\d+'
         structured_value = None
         fallback_value = None
         bot_message = None
         output = get_regex(message=message, entity_name=entity_name, structured_value=structured_value,
-                        fallback_value=fallback_value, bot_message=bot_message, meta_data=meta_data)
+                           fallback_value=fallback_value, bot_message=bot_message, pattern=pattern)
         print output
 
-            >> [{'detection': 'message', 'original_text': '1', 'entity_value': {'value': '1'}}]
+            >> [{'detection': 'message', 'original_text': '123', 'entity_value': {'value': '123'}}]
 
     """
-    ner_logger.debug("BEFORE AST LITERAL REGEX>>>>>>%s" % regex)
-    ner_logger.debug("REGEX>>>>>>%s" % regex)
-    regex_detection = RegexDetector(entity_name=entity_name, regex=regex)
+    regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern)
     if structured_value:
-        entity_list, original_text_list = regex_detection.detect_entity(text=structured_value)
+        entity_list, original_text_list = regex_detector.detect_entity(text=structured_value)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_list, original_text_list = regex_detection.detect_entity(text=message)
+        entity_list, original_text_list = regex_detector.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_shopping_size(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the ShoppingSizeDetector class to detect cloth size
+    """Use ShoppingSizeDetector to detect cloth size
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = "I want to buy Large shirt and jeans of 36 waist"
         entity_name = 'shopping_size'
@@ -544,27 +644,38 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = size_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_number(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the NumberDetector class to detect numerals
+    """Use NumberDetector to detect numerals
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = "I want to purchase 30 units of mobile and 40 units of Television"
         entity_name = 'number_of_unit'
@@ -599,27 +710,38 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = number_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_time(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the TimeDetector class to detect time
+    """Use TimeDetector to detect time
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = "John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. \
         But the bus was scheduled for 12:30 pm"
@@ -642,27 +764,38 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = time_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
 def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC'):
-    """This functionality calls the DateDetector class to detect date
+    """Use DateDetector to detect date
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = "set me reminder on 23rd december"
         entity_name = 'date'
@@ -704,8 +837,9 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method=FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(entity_value=structured_value, original_text=structured_value,
-                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list(entity_value_list=[structured_value],
+                                           original_text_list=[structured_value],
+                                           detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_dict_list = date_detection.detect_entity(text=message, run_model=False)
         entity_list, original_text_list, detection_method_list = \
@@ -724,15 +858,26 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_budget(message, entity_name, structured_value, fallback_value, bot_message):
-    """This functionality calls the BudgetDetector class to detect budget
+    """Use BudgetDetector to detect budget
 
-    Attributes:
-        NOTE: Explained above
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
 
-    Output:
-        NOTE: Explained above
 
-    For Example:
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
 
         message = "shirts between 2000 to 3000"
         entity_name = 'budget'
@@ -754,29 +899,38 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
-            return output_entity_dict_value(structured_value, structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = budget_detection.detect_entity(text=message)
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            return output_entity_dict_value(fallback_value, fallback_value, FROM_FALLBACK_VALUE)
+            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
     return None
 
 
-def output_entity_dict_list(entity_value_list=None, original_text_list=None, detection_method=None,
+def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
                             detection_method_list=None):
-    """This function will return the list of dictionary as an output.
+    """Format detected entity values in list of dictionaries that contain entity_value, detection and original_text
 
-    Attributes:
-        entity_value_list: list of entity values which are identified from given detection logic
-        original_text_list: list original values or actual values from message/structured_value which are identified
-        detection_method: this will store how the entity is detected i.e. whether from message, structured_value or
-        fallback, verified from model or not.
-        detection_method_list: this will store how the entity is detected in the list format.
-
-    Output:
+    Args:
+        entity_value_list (list): list of entity values which are identified from given detection logic
+        original_text_list (list): list original values or actual values from message/structured_value 
+                                   which are identified
+        detection_method (str, optional): how the entity was detected 
+                                          i.e. whether from message, structured_value
+                                               or fallback, verified from model or not.
+                                          defaults to None
+        detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
+                                               if provided, this argument will be used over detection method
+                                               defaults to None 
+    
+    Returns:
+          list of dict: list containing dictionaries, each containing entity_value, original_text and detection;
+                        entity_value is in itself a dict with its keys varying from entity to entity
+    
+    Example Output:
         [
             {
                 "entity_value": entity_value,
@@ -789,64 +943,18 @@ def output_entity_dict_list(entity_value_list=None, original_text_list=None, det
         detection_method_list = []
 
     entity_list = []
-    count = 0
-    if entity_value_list:
-        while count < len(entity_value_list):
-            if type(entity_value_list[count]) in [str, unicode]:
-                entity_value_list[count] = {
-                    ENTITY_VALUE_DICT_KEY: entity_value_list[count]
-                }
-            if detection_method_list:
-                entity_list.append(
-                    {
-                        ENTITY_VALUE: entity_value_list[count],
-                        DETECTION_METHOD: detection_method_list[count],
-                        ORIGINAL_TEXT: original_text_list[count]
-                    }
-                )
-            else:
-                entity_list.append(
-                    {
-                        ENTITY_VALUE: entity_value_list[count],
-                        DETECTION_METHOD: detection_method,
-                        ORIGINAL_TEXT: original_text_list[count]
-                    }
-                )
-
-            count += 1
-
-    return entity_list
-
-
-def output_entity_dict_value(entity_value=None, original_text=None, detection_method=None):
-    """This function will return the list of dictionary as an output.
-    It similar to output_entity_dict_list() except the parameters/attributes
-
-    Attributes:
-        entity_value: entity value which are identified from given detection logic
-        original_text: original value or actual values from message/structured_value which are identified
-        detection_method: this will store how the entity is detected i.e. whether from message, structured_value or
-        fallback.
-
-    Output:
-        [
-            {
-                "entity_value": entity_value,
-                "detection": detection_method,
-                "original_text": original_text
+    for i, entity_value in enumerate(entity_value_list):
+        if type(entity_value) in [str, unicode]:
+            entity_value = {
+                ENTITY_VALUE_DICT_KEY: entity_value
             }
-        ]
-    """
-    if type(entity_value) in [str, unicode]:
-        entity_value = {
-            ENTITY_VALUE_DICT_KEY: entity_value
-        }
+        method = detection_method_list[i] if detection_method_list else detection_method
+        entity_list.append(
+            {
+                ENTITY_VALUE: entity_value,
+                DETECTION_METHOD: method,
+                ORIGINAL_TEXT: original_text_list[i]
+            }
+        )
 
-    entity_list = [
-        {
-            ENTITY_VALUE: entity_value,
-            DETECTION_METHOD: detection_method,
-            ORIGINAL_TEXT: original_text
-        }
-    ]
     return entity_list

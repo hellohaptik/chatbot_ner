@@ -1,6 +1,6 @@
 import re
 
-from ..constants import ELASTICSEARCH_SEARCH_SIZE
+from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -89,8 +89,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
         data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
-                      scroll='1m')
+        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
         ngram_results = _run_es_search(connection, **kwargs)
         ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
     return ngram_results
@@ -99,7 +98,9 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
 def _run_es_search(connection, **kwargs):
     """
     Execute the elasticsearch.ElasticSearch.search() method and return all results using
-    elasticsearch.ElasticSearch.scroll() method
+    elasticsearch.ElasticSearch.scroll() method if and only if scroll is passed in kwargs.
+    Note that this is not recommended for large queries and can severly impact performance.
+
     Args:
         connection: Elasticsearch client object
         kwargs:
@@ -107,18 +108,63 @@ def _run_es_search(connection, **kwargs):
     Returns:
         dictionary, search results from elasticsearch.ElasticSearch.search
     """
-    result = connection.search(**kwargs)
+    scroll = kwargs.pop('scroll', False)
+    if not scroll:
+        return connection.search(**kwargs)
+
+    result = connection.search(scroll=scroll, **kwargs)
     scroll_id = result['_scroll_id']
     scroll_size = result['hits']['total']
     hit_list = result['hits']['hits']
-
+    scroll_ids = [scroll_id]
     while scroll_size > 0:
-        result = connection.scroll(scroll_id=scroll_id, scroll='1m')
-        scroll_id = result['_scroll_id']
-        scroll_size = len(result['hits']['hits'])
-        hit_list += result['hits']['hits']
+        _result = connection.scroll(scroll_id=scroll_id, scroll=scroll)
+        scroll_id = _result['_scroll_id']
+        scroll_ids.append(scroll_id)
+        scroll_size = len(_result['hits']['hits'])
+        hit_list += _result['hits']['hits']
+
     result['hits']['hits'] = hit_list
+    if scroll_ids:
+        connection.clear_scroll(body={"scroll_id": scroll_ids})
+
     return result
+
+
+def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
+    """
+    Approximately emulate AUTO:[low],[high] functionality of elasticsearch 6.2+ on older versions
+
+    Args:
+        term (str): search string
+        fuzzy_setting (int or str): Can be int or "auto" or "auto:<int>,<int>"
+
+    Returns:
+         int or str: fuzziness as int when ES version < 6.2
+                     otherwise the input is returned as it is
+    """
+    def parse_auto(auto_str):
+        lo, hi = 3, 6
+        if auto_str.lower().startswith("auto:"):
+            try:
+                lo, hi = map(int, auto_str[5:].split(","))
+            except ValueError:
+                pass
+        return lo, hi
+
+    if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
+        return fuzzy_setting
+
+    if type(fuzzy_setting) == str:
+        low, high = parse_auto(fuzzy_setting)
+        if len(term) < low:
+            return 0
+        elif len(term) >= high:
+            return 2
+        else:
+            return 1
+
+    return fuzzy_setting
 
 
 def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold):
@@ -157,7 +203,7 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
             'match': {
                 'variants': {
                     'query': ngram,
-                    'fuzziness': fuzziness_threshold,
+                    'fuzziness': _get_dynamic_fuzziness_threshold(ngram, fuzziness_threshold),
                     'prefix_length': 1,
                     'operator': 'and'
                 }

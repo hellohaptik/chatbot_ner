@@ -97,6 +97,7 @@ def phone_number(request):
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
+
 def regex(request):
     """This functionality calls the get_regex() functionality to detect text those abide by the specified regex.
     It is called through api call
@@ -109,10 +110,10 @@ def regex(request):
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_regex(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                         parameters_dict[PARAMETER_BOT_MESSAGE],
-                                         parameters_dict[PARAMETER_REGEX])
+                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                  parameters_dict[PARAMETER_BOT_MESSAGE],
+                                  parameters_dict[PARAMETER_REGEX])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
         ner_logger.debug('Exception for regex: %s ' % e)
@@ -142,6 +143,7 @@ def email(request):
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
+
 def person_name(request):
     """This functionality calls the get_name() functionality to detect name. It is called through api call
 
@@ -153,12 +155,12 @@ def person_name(request):
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_person_name(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                 parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                 parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                 parameters_dict[PARAMETER_BOT_MESSAGE])
+                                        parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                        parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                        parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError, e:
-        ner_logger.debug('Exception for city: %s ' % e)
+        ner_logger.debug('Exception for person_name: %s ' % e)
         return HttpResponse(status=400)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
