@@ -4,8 +4,8 @@ from ner_v1.language_utilities.constant import ENGLISH_LANG
 from ner_v1.language_utilities.constant import TRANSLATED_TEXT
 from chatbot_ner.config import ner_logger
 import json
-from ner_v1.language_utilities.constant import TRANSLATION_URL, TRANSLATION_EXPIRY_TIME, \
-    TRANSLITERATION_URL, TRANSLITERATED_TEXT, HINDI_LANG, HTTP_TIMEOUT, LANGUAGE_UTILITIES,\
+from ner_v1.language_utilities.constant import TRANSLATION_URL, \
+    HTTP_TIMEOUT, LANGUAGE_UTILITIES,\
     LANGUAGE_UTILITIES_URL, LANGUAGE_UTILITIES_SESSION, emoji_pattern
 import requests
 from six import iteritems
@@ -54,7 +54,6 @@ def check_json_compatibility_translation(text, source_script, target_script):
                                                    source_language_code=source_script,
                                                    target_language_code=target_script,
                                                    text=data['text'])[TRANSLATED_TEXT]
-            # To handle emojis as translator doesnt handle emojis
             # To handle actionable_text
             try:
                 actionable_text = data['data']['items'][0]['actionable_text']
@@ -77,53 +76,6 @@ def check_json_compatibility_translation(text, source_script, target_script):
                                                                    source_language_code=source_script,
                                                                    target_language_code=target_script,
                                                                    text=message_split[i])[TRANSLATED_TEXT]
-                data['data']['items'][0]['payload']['message'] = '{'.join(message_split)
-            except Exception:
-                ner_logger.debug('No message available for %s' % text)
-    except Exception:
-        ner_logger.debug('Cannot load json')
-    return json.dumps(data)
-
-
-def check_json_compatibility_transliteration(text, source_script, target_script):
-    """
-    This class used to check if text is a json and if it is it transliterates the text part.
-    Args:
-        text (str): The text for which translation has to be done
-        source_script (str): The language code in which the language is written in.
-        target_script (str): The language in which translation has to be performed.
-    Returns:
-        response (str): It returns a json dump.
-    """
-    data = text
-    try:
-        data = json.loads(text)
-        if data:
-            data['text'] = language_module_request(language_url=TRANSLITERATION_URL,
-                                                   source_language_code=source_script,
-                                                   target_language_code=target_script,
-                                                   text=data['text'])[TRANSLITERATED_TEXT]
-            #           To handle actionable_text
-            try:
-                actionable_text = data['data']['items'][0]['actionable_text']
-                data['data']['items'][0]['actionable_text'] = language_module_request(
-                    language_url=TRANSLITERATION_URL,
-                    source_language_code=source_script,
-                    target_language_code=target_script,
-                    text=actionable_text)[TRANSLITERATED_TEXT]
-            except Exception:
-                ner_logger.debug('No actionable_text available for %s' % text)
-            #           To handle message
-            try:
-                message = data['data']['items'][0]['payload']['message']
-                message_split = message.split('{')
-                for i in range(len(message_split)):
-                    if '}' not in message_split[i]:
-                        response = language_module_request(language_url=TRANSLITERATION_URL,
-                                                           source_language_code=source_script,
-                                                           target_language_code=target_script,
-                                                           text=message_split[i])
-                        message_split[i] = response[TRANSLITERATED_TEXT]
                 data['data']['items'][0]['payload']['message'] = '{'.join(message_split)
             except Exception:
                 ner_logger.debug('No message available for %s' % text)
@@ -188,67 +140,6 @@ def translate_haptik_message(text, source_script, target_script):
     return text, status
 
 
-def transliterate_haptik_message(text, source_script, target_script=ENGLISH_LANG):
-    """
-    The following is used to translate text containing hsl characters.
-    Args:
-        text (str): The text that has to be translated
-        source_script (str): The language code in which the language is written in.
-        target_script (str): The language in which translation has to be performed.
-
-    Returns:
-        text (str): The translated sentence with hsl compatibility.
-
-    Examples:
-        text:{"text": "\u0905\u0930\u0947 [user.name], <b> <i> \u0939\u0948\u092a\u094d\u092a
-        \u0940\u0915 \u092a\u0930 \u0906\u0908\u092a\u0940\u090f </ b> </ i> :)",
-        "type": "BUTTON", "data": {"items": [{"actionable_text": "Set Score Alerts",
-        "location_required": false,
-        "uri": "", "is_default": 1, "type": "TEXT_ONLY", "payload":
-        {"gogo_message": "", "message": "Yes! Keep me updated", "link": ""}, "emoji": ""}]}}
-
-        transliterate_haptik_message(source_script='hi', target_script='en',
-        text=text)
-
-
-         >> '{"text": "are i  happik par aipiel update pesh karna   i
-        now aipiel  ke liye tos jankari  score alrt aur bhut kuchh recieve karen  apna recieve
-         karne ke liye abhi sadashyata len swyn     i   criketbddi       i   ",
-        "type": "BUTTON", "data": {"items": [{"actionable_text": "Set Score Alerts", "loc
-        action_required": false, "uri": "", "is_default": 1, "type": "TEXT_ONLY", "payload":
-        {"link": "", "message": "Yes! Keep me updated", "gogo_message": ""}, "emoji": ""}]}}'
-    """
-    status = False
-    try:
-        response_split = text.split('<m>')
-        for i in range(len(response_split)):
-            if '{' not in response_split[i]:
-                response_split[i] = language_module_request(language_url=TRANSLITERATION_URL,
-                                                            source_language_code=source_script,
-                                                            target_language_code=target_script,
-                                                            text=response_split[i])[TRANSLITERATED_TEXT]
-                if not response_split[i]:
-                    response_split[i] = '  '
-            elif 'text' in response_split[i]:
-                response_split[i] = (check_json_compatibility_transliteration(
-                    text=response_split[i], source_script=source_script, target_script=target_script))
-            else:
-                response_split_braces = response_split[i].split('{')
-                for j in range(len(response_split_braces)):
-                    if '}' not in response_split_braces[j]:
-                        response_split_braces[j] = language_module_request(
-                            language_url=TRANSLITERATION_URL,
-                            source_language_code=source_script,
-                            target_language_code=target_script,
-                            text=response_split_braces[j])[TRANSLITERATED_TEXT]
-                response_split[i] = '{'.join(response_split_braces)
-        text = '<m>'.join(response_split)
-        status = True
-    except ValueError as e:
-        ner_logger.debug("Exception while transliteration, Error %s" % str(e))
-    return text, status
-
-
 def remove_emoji(text):
     """
     This method is used to remove any emojis if present.
@@ -268,7 +159,7 @@ def language_module_request(language_url, **kwargs):
 
     Args:
         language_url (str): Key of the language_module url to be hit,
-                              see ares.constant.LANGUAGE_UTILITIES_URLS for the mapping
+                              see constant.LANGUAGE_UTILITIES_URLS for the mapping
         **kwargs: everything else to be sent as parameters in the GET request
 
     Returns:
