@@ -152,9 +152,11 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     """
     text_detection = TextDetector(entity_name=entity_name)
-    text_detection.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
-    fuzziness = parse_fuzziness_parameter(fuzziness)
-    text_detection.set_fuzziness_threshold(fuzziness=fuzziness)
+    if min_token_len_fuzziness:
+        text_detection.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+    if fuzziness:
+        fuzziness = parse_fuzziness_parameter(fuzziness)
+        text_detection.set_fuzziness_threshold(fuzziness=fuzziness)
     if structured_value:
         text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
         if text_entity_list:
