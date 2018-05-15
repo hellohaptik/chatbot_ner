@@ -175,6 +175,8 @@ class BaseDetector(object):
         """
         if detection_method_list is None:
             detection_method_list = []
+        if entity_value_list is None:
+            entity_value_list = []
 
         entity_list = []
         for i, entity_value in enumerate(entity_value_list):
