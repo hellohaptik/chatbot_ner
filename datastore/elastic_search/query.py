@@ -91,9 +91,9 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     ngram_results = {}
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
-        data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
-                      language_script=search_language_script)
+        data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold,
+                                                    language_script=search_language_script)
+        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
         ngram_results = _run_es_search(connection, **kwargs)
         ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
     return ngram_results
