@@ -60,8 +60,8 @@ class TextDetector(BaseDetector):
         self.tag = '__' + self.entity_name + '__'
 
         # assigning values to superclass attributes
-        self.supported_languages = [ENGLISH_LANG, HINDI_LANG]
-        self.source_language_script = source_language_script
+        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        self._source_language_script = source_language_script
 
         # defaults for auto mode
         self._fuzziness = "auto:4,7"
@@ -74,6 +74,14 @@ class TextDetector(BaseDetector):
         self._min_token_size_for_fuzziness = 4
 
         self.db = DataStore()
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    @property
+    def source_language_script(self):
+        return self._source_language_script
 
     def set_fuzziness_threshold(self, fuzziness):
         """

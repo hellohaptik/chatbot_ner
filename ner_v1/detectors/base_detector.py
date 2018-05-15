@@ -13,20 +13,34 @@ class BaseDetector(object):
     detectors using translation
     
     Attributes:
-        supported_languages (set): Set of languages supported by a particular detector
-        source_language_script (str): ISO-639 language code of query text for detection
         target_language_script (str): ISO-639 language code in which detector would process the query
         translation_enabled (bool): Decides to either enable or disable translation API
     """
     __metaclass__ = abc.ABCMeta
 
-    supported_languages = set()
-    source_language_script = ENGLISH_LANG
     target_language_script = ENGLISH_LANG
     translation_enabled = False
 
     def __init__(self):
         pass
+
+    @abc.abstractproperty
+    def supported_languages(self):
+        """
+        This method returns the list of languages supported by entity detectors        
+        Return:
+             list: List of ISO 639 codes of languages supported by subclass/detector
+        """
+        return []
+
+    @abc.abstractproperty
+    def source_language_script(self):
+        """
+        This method returns the list of languages supported by entity detectors        
+        Return:
+             str: ISO 639 codes of languages supported by subclass/detector
+        """
+        return ''
 
     @abc.abstractmethod
     def detect_entity(self, text, **kwargs):
