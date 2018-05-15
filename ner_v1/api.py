@@ -12,6 +12,7 @@ from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
 def get_parameters_dictionary(request):
@@ -31,8 +32,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
                        PARAMETER_REGEX: request.GET.get('regex'),
-                       PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script'),
-                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language')}
+                       PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
+                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG)}
 
     return parameters_dict
 
@@ -47,7 +48,8 @@ def text(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        text_detector = TextDetector(entity_name=PARAMETER_ENTITY_NAME, language_script=PARAMETER_LANGUAGE_SCRIPT)
+        text_detector = TextDetector(entity_name=PARAMETER_ENTITY_NAME,
+                                     source_language_script=PARAMETER_LANGUAGE_SCRIPT)
         entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],

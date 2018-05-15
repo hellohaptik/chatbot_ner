@@ -39,14 +39,14 @@ class TextDetector(BaseDetector):
         tag (str): entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name=None, language_script=ENGLISH_LANG):
+    def __init__(self, entity_name=None, source_language_script=ENGLISH_LANG):
         """
         Initializes a TextDetector object with given entity_name
 
         Args:
             entity_name: A string by which the detected substrings that correspond to text entities would be replaced
                          with on calling detect_entity()
-            language_script: ISO 639 code for language of entities to be detected by the instance of this class             
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class             
         """
         super(TextDetector, self).__init__()
         self.text = None
@@ -61,7 +61,7 @@ class TextDetector(BaseDetector):
 
         # assigning values to superclass attributes
         self.supported_languages = [ENGLISH_LANG, HINDI_LANG]
-        self.source_language_script = language_script
+        self.source_language_script = source_language_script
 
         # defaults for auto mode
         self._fuzziness = "auto:4,7"
