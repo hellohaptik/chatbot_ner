@@ -46,7 +46,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
 
 def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuzziness_threshold,
-                 **kwargs):
+                 search_language_script=ENGLISH_LANG, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given ngrams list. The query
     searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
@@ -58,6 +58,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
         entity_name: name of the entity to perform a 'term' query on
         ngrams_list: list of ngrams to perform fuzzy search for
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
+        search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
@@ -87,7 +88,6 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    search_language_script=kwargs.get('search_language_script', ENGLISH_LANG)
     ngram_results = {}
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
