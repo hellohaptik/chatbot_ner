@@ -26,6 +26,7 @@ def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG
     try:
         tr = Translator()
         response[TRANSLATED_TEXT] = tr.translate(text, src=source_language_code, dest=target_language_code).text
+        response['status'] = True
     except Exception, e:
         ner_logger.debug('Exception while translation: %s ' % e)
     return response

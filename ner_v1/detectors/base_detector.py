@@ -41,7 +41,7 @@ class BaseDetector(object):
         """
         return [], []
 
-    def set_language_processing_script(self):
+    def _set_language_processing_script(self):
         """
         This method is used to decide the language in which detector should run it's logic based on
         supported language and query language for which subclass is initialized
@@ -114,7 +114,7 @@ class BaseDetector(object):
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
                     
         """
-        self.set_language_processing_script()
+        self._set_language_processing_script()
 
         if self.source_language_script != self.target_language_script and self.translation_enabled:
             if structured_value:
