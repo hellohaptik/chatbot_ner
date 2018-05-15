@@ -5,6 +5,7 @@ from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT
                         ELASTICSEARCH_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
 class DataStore(object):
@@ -248,6 +249,7 @@ class DataStore(object):
         if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
+        search_language_script = kwargs.get('search_language_script', ENGLISH_LANG)
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             if ngrams_list:
@@ -257,7 +259,8 @@ class DataStore(object):
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        ngrams_list=ngrams_list,
-                                                                       fuzziness_threshold=fuzziness_threshold)
+                                                                       fuzziness_threshold=fuzziness_threshold,
+                                                                       search_language_script=search_language_script)
 
         return results_dictionary
 

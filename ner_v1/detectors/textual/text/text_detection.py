@@ -218,11 +218,14 @@ class TextDetector(BaseDetector):
         variant_dictionary = {}
 
         trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                                 self._fuzziness)
+                                                                 self._fuzziness,
+                                                                 search_language_script=self.target_language_script)
         bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                                self._fuzziness)
+                                                                self._fuzziness,
+                                                                search_language_script=self.target_language_script)
         unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                                 self._fuzziness)
+                                                                 self._fuzziness,
+                                                                 search_language_script=self.target_language_script)
         variant_dictionary.update(trigram_variants)
         variant_dictionary.update(bigram_variants)
         variant_dictionary.update(unigram_variants)

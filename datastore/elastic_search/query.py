@@ -1,6 +1,8 @@
 import re
 
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
+from ner_v1.language_utilities.constant import ENGLISH_LANG
+
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -85,11 +87,13 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
+    search_language_script=kwargs.get('search_language_script', ENGLISH_LANG)
     ngram_results = {}
     if ngrams_list:
         ngrams_length = len(ngrams_list[0].strip().split())
         data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold)
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
+        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                      language_script=search_language_script)
         ngram_results = _run_es_search(connection, **kwargs)
         ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
     return ngram_results
@@ -167,7 +171,7 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
     return fuzzy_setting
 
 
-def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold):
+def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold, language_script=ENGLISH_LANG):
     """
     Generates compound elasticsearch boolean search query dictionary for the given ngrams list. The query generated
     searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
@@ -176,22 +180,29 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
         entity_name: name of the entity to perform a 'term' query on
         ngrams_list: list of ngrams to perform fuzzy search for
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
-
+        language_script: language of documents to be searched
     Returns:
         dictionary, the search query for ngrams
 
     """
-    term_dict = {
+    term_dict_entity_name = {
         'term': {
             'entity_data': {
                 'value': entity_name
             }
         }
     }
+    term_dict_language = {
+        'term': {
+            'language_script': {
+                'value': language_script
+            }
+        }
+    }
     data = {
         'query': {
             'bool': {
-                'must': [term_dict],
+                'must': [term_dict_entity_name, term_dict_language],
                 'should': [],
                 'minimum_number_should_match': 1
             }
