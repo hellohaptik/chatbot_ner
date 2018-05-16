@@ -22,6 +22,7 @@ ENTITY_VALUE = 'entity_value'
 DETECTION_METHOD = 'detection'
 # original_text is a key that will store actual value that was detected. For example, mcd
 ORIGINAL_TEXT = 'original_text'
+DETECTION_LANGUAGE = 'language'
 
 ENTITY_VALUE_DICT_KEY = 'value'
 

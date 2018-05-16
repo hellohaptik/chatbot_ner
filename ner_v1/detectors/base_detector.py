@@ -1,7 +1,8 @@
 import abc
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 from ner_v1.constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
-                             FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
+                             FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
+                             DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v1.language_utilities.utils import translate_text
 from ner_v1.language_utilities.constant import TRANSLATED_TEXT
 
@@ -155,11 +156,11 @@ class BaseDetector(object):
                 value, method, original_text = fallback_value, FROM_FALLBACK_VALUE, fallback_value
 
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
-                                            detection_method=method)
+                                            detection_method=method, detection_language=self.target_language_script)
 
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
-                                detection_method_list=None):
+                                detection_method_list=None, detection_language=ENGLISH_LANG):
         """Format detected entity values in list of dictionaries that contain entity_value, detection and original_text
 
         Args:
@@ -172,7 +173,8 @@ class BaseDetector(object):
                                               defaults to None
             detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
                                                    if provided, this argument will be used over detection method
-                                                   defaults to None 
+                                                   defaults to None
+            detection_language(str): ISO 639 code for language in which entity is detected                                        
 
         Returns:
               list of dict: list containing dictionaries, each containing entity_value, original_text and detection;
@@ -203,7 +205,8 @@ class BaseDetector(object):
                 {
                     ENTITY_VALUE: entity_value,
                     DETECTION_METHOD: method,
-                    ORIGINAL_TEXT: original_text_list[i]
+                    ORIGINAL_TEXT: original_text_list[i],
+                    DETECTION_LANGUAGE: detection_language
                 }
             )
         return entity_list
