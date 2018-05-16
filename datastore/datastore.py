@@ -216,12 +216,14 @@ class DataStore(object):
 
         return results_dictionary
 
-    def get_similar_ngrams_dictionary(self, entity_name, ngrams_list, fuzziness_threshold="auto:4,7", **kwargs):
+    def get_similar_ngrams_dictionary(self, entity_name, ngrams_list, fuzziness_threshold="auto:4,7",
+                                      search_language_script=ENGLISH_LANG, **kwargs):
         """
         Args:
             entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
             ngrams_list: the list of ngrams to get variants search results for
             fuzziness_threshold: fuzziness allowed for search results on entity value variants
+            search_language_script: language of elasticsearch documents which are eligible for match
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -249,7 +251,6 @@ class DataStore(object):
         if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
-        search_language_script = kwargs.get('search_language_script', ENGLISH_LANG)
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             if ngrams_list:
