@@ -48,8 +48,8 @@ def text(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        text_detector = TextDetector(entity_name=PARAMETER_ENTITY_NAME,
-                                     source_language_script=PARAMETER_LANGUAGE_SCRIPT)
+        text_detector = TextDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+                                     source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
         entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
