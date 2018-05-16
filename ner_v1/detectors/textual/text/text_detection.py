@@ -39,16 +39,21 @@ class TextDetector(BaseDetector):
         tag (str): entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name=None, source_language_script=ENGLISH_LANG):
+    def __init__(self, entity_name=None, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """
         Initializes a TextDetector object with given entity_name
 
         Args:
             entity_name: A string by which the detected substrings that correspond to text entities would be replaced
                          with on calling detect_entity()
-            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class             
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
-        super(TextDetector, self).__init__()
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        super(TextDetector, self).__init__(source_language_script, translation_enabled)
+
         self.text = None
         self.regx_to_process = Regex([(r'[\'\/]', r'')])
         self.text_dict = {}
@@ -58,10 +63,6 @@ class TextDetector(BaseDetector):
         self.processed_text = None
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
-
-        # assigning values to superclass attributes
-        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
-        self._source_language_script = source_language_script
 
         # defaults for auto mode
         self._fuzziness = "auto:4,7"
@@ -78,10 +79,6 @@ class TextDetector(BaseDetector):
     @property
     def supported_languages(self):
         return self._supported_languages
-
-    @property
-    def source_language_script(self):
-        return self._source_language_script
 
     def set_fuzziness_threshold(self, fuzziness):
         """
