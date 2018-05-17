@@ -144,12 +144,13 @@ class BaseDetector(object):
             if entity_list:
                 value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list
             else:
-                value, method, original_text = structured_value, FROM_STRUCTURE_VALUE_NOT_VERIFIED, structured_value
+                value, method, original_text = [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED,\
+                                               [structured_value]
         else:
             if entity_list:
                 value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
             else:
-                value, method, original_text = fallback_value, FROM_FALLBACK_VALUE, fallback_value
+                value, method, original_text = [fallback_value], FROM_FALLBACK_VALUE, [fallback_value]
 
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
                                             detection_method=method, detection_language=self._target_language_script)
