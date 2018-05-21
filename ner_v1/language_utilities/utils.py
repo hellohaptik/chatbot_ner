@@ -60,7 +60,7 @@ def get_translate(text, target, source):
         return None
 
 
-def translate(text, source_language_code, target_language_code=ENGLISH_LANG):
+def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG):
     """
     Args:
        text (str): Text snippet which needs to be translated
