@@ -41,7 +41,7 @@ def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG
     """
     response = {TRANSLATED_TEXT: None, 'status': False}
     try:
-        query_params = {"format": text, "source": source_language_code, "target": target_language_code}
+        query_params = {"q": text, "format": "text", "source": source_language_code, "target": target_language_code}
         url = TRANSLATE_URL + "&" + unicode_urlencode(query_params)
         request = requests.get(url, timeout=2)
         if request.status_code == 200:
