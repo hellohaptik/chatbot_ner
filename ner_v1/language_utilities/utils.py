@@ -28,7 +28,7 @@ def make_request(url):
     Args:
         url (str): url to which to make request
     Returns:
-        (str): url response data
+        (str): returns url response data
     """
     return urllib.urlopen(url).read()
 
