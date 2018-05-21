@@ -3,7 +3,7 @@ from ner_v1.language_utilities.constant import ENGLISH_LANG
 from ner_v1.language_utilities.constant import TRANSLATED_TEXT
 from chatbot_ner.config import ner_logger, GOOGLE_TRANSLATE_API_KEY
 import urllib
-import demjson
+import requests
 
 
 TRANSLATE_URL = "https://www.googleapis.com/language/translate/v2?key=" + GOOGLE_TRANSLATE_API_KEY
@@ -30,34 +30,8 @@ def make_request(url):
     Returns:
         (str): returns url response data
     """
-    return urllib.urlopen(url).read()
-
-
-def get_translate(text, target, source):
-    """
-    Method to get raw response data of google translation API to translate given text from target
-    language to source language
-    Args:
-        text (str): text to be translated
-        target (str): language code in which text will be translated
-        source (str): language code of the given text
-    Returns:
-        (dict): dict containing response
-        For example: Consider following example
-                 text: 'नमस्ते आप कैसे हैं'
-                'source': 'hi'
-                'target': 'en'
-
-                >> get_translate(text, 'hi', 'en')
-                >> {u'data': {u'translations': [{u'translatedText': u'\u092e\u0947\u0930\u093e \u0928\u093e\'}]}}
-    """
-    query_params = {"q": text, "source": source, "target": target}
-    url = TRANSLATE_URL + "&" + unicode_urlencode(query_params)
-    try:
-        return demjson.decode(make_request(url))
-    except Exception, e:
-        ner_logger.debug('Exception while decoding json response data for translation: %s ' % e)
-        return None
+    request = requests.get(url)
+    return request.json()
 
 
 def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG):
@@ -79,10 +53,12 @@ def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG
     """
     response = {TRANSLATED_TEXT: None, 'status': False}
     try:
-        response[TRANSLATED_TEXT] = \
-            get_translate(text, target_language_code,
-                          source_language_code)["data"]["translations"][0]["translatedText"].replace('&#39;', "'")
-        response['status'] = True
+        query_params = {"format": text, "source": source_language_code, "target": target_language_code}
+        url = TRANSLATE_URL + "&" + unicode_urlencode(query_params)
+        translate_response = make_request(url)
+        if translate_response:
+            response[TRANSLATED_TEXT] = translate_response["data"]["translations"][0]["translatedText"]
+            response['status'] = True
     except Exception, e:
-        ner_logger.debug('Exception while translation: %s ' % e)
+        ner_logger.exception('Exception while translation: %s ' % e)
     return response
