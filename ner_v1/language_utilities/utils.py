@@ -57,6 +57,7 @@ def get_translate(text, target, source):
         return demjson.decode(make_request(url))
     except Exception, e:
         ner_logger.debug('Exception while decoding json response data for translation: %s ' % e)
+        return None
 
 
 def translate(text, source_language_code, target_language_code=ENGLISH_LANG):
@@ -84,3 +85,4 @@ def translate(text, source_language_code, target_language_code=ENGLISH_LANG):
         response['status'] = True
     except Exception, e:
         ner_logger.debug('Exception while translation: %s ' % e)
+    return response
