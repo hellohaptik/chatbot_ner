@@ -22,18 +22,6 @@ def unicode_urlencode(params):
     return urllib.urlencode([(k, isinstance(v, unicode) and v.encode('utf-8') or v) for k, v in params])
 
 
-def make_request(url):
-    """
-    Method to make a request call and return data for given url
-    Args:
-        url (str): url to which to make request
-    Returns:
-        (str): returns url response data
-    """
-    request = requests.get(url)
-    return request.json()
-
-
 def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG):
     """
     Args:
@@ -55,8 +43,9 @@ def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG
     try:
         query_params = {"format": text, "source": source_language_code, "target": target_language_code}
         url = TRANSLATE_URL + "&" + unicode_urlencode(query_params)
-        translate_response = make_request(url)
-        if translate_response:
+        request = requests.get(url, timeout=2)
+        if request.status_code == 200:
+            translate_response = request.json()
             response[TRANSLATED_TEXT] = translate_response["data"]["translations"][0]["translatedText"]
             response['status'] = True
     except Exception, e:
