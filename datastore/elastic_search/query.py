@@ -275,6 +275,8 @@ def _parse_es_ngram_search_results(ngram_results, ngrams_length):
     variant_dictionary = {}
     if ngram_results and ngram_results['hits']['total'] > 0:
         for hit in ngram_results['hits']['hits']:
+            if 'highlight' not in hit:
+                continue
             count_of_variants = len(hit['highlight']['variants'])
             count = 0
             while count < count_of_variants:
