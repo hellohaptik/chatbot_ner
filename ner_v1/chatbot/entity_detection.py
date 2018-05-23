@@ -12,6 +12,7 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from chatbot_ner.config import ner_logger
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -85,7 +86,7 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, fallback_value, bot_message):
+def get_text(message, entity_name, structured_value, fallback_value, bot_message, fuzziness, min_token_len_fuzziness):
     """Use TextDetector (elasticsearch) to detect textual entities
 
     Args:
@@ -99,7 +100,10 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-
+        fuzziness : This is the fuzziness parameter passed via haptik_api. It is used to set the fuzziness
+                    threshold of text_detection
+        min_token_len_fuzziness (int): This is the minimum token length passed via haptik_api.
+                                        It is used to set the min_token_size for levenshtein.
 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
@@ -148,6 +152,12 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     """
     text_detection = TextDetector(entity_name=entity_name)
+    if min_token_len_fuzziness:
+        min_token_len_fuzziness = int(min_token_len_fuzziness)
+        text_detection.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+    if fuzziness:
+        fuzziness = parse_fuzziness_parameter(fuzziness)
+        text_detection.set_fuzziness_threshold(fuzziness=fuzziness)
     if structured_value:
         text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
         if text_entity_list:
@@ -958,3 +968,39 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
         )
 
     return entity_list
+
+
+def parse_fuzziness_parameter(fuzziness):
+    """
+    This function takes input as the fuzziness value.
+    If the fuzziness is int it is returned as it is.
+    If the input is a ',' separated str value, the function returns a tuple with all values
+    present in the str after casting them to int.
+    Args:
+        fuzziness (str) or (int): The fuzzines value that needs to be parsed.
+    Returns:
+        fuzziness (tuple) or (int): It returns a tuple with of all the values cast to int present
+        in the str.
+        If the fuzziness is a single element then int is returned
+
+    Examples:
+        fuzziness = 2
+        parse_fuzziness_parameter(fuzziness)
+        >> 2
+
+        fuzziness = '3,4'
+        parse_fuzziness_parameter(fuzziness)
+        >> (3,4)
+    """
+    try:
+        if isinstance(fuzziness, int):
+            return fuzziness
+        fuzziness_split = fuzziness.split(',')
+        if len(fuzziness_split) == 1:
+            fuzziness = int(fuzziness)
+        else:
+            fuzziness = tuple([int(value.strip()) for value in fuzziness_split])
+    except ValueError as e:
+        fuzziness = 1
+        ner_logger.debug("Error in parsing fuzziness %s" % str(e))
+    return fuzziness
