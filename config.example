@@ -33,3 +33,6 @@ ES_AWS_SECRET_ACCESS_KEY=
 ES_AWS_ACCESS_KEY_ID=
 ES_AWS_REGION=
 ES_AWS_SERVICE=
+
+# In order to enable entity detection for multiple languages, we use google translate. Please enter the key(optional)
+GOOGLE_TRANSLATE_API_KEY=
