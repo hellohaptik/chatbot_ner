@@ -5,6 +5,7 @@ from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT
                         ELASTICSEARCH_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
 class DataStore(object):
@@ -215,12 +216,14 @@ class DataStore(object):
 
         return results_dictionary
 
-    def get_similar_ngrams_dictionary(self, entity_name, ngrams_list, fuzziness_threshold="auto:4,7", **kwargs):
+    def get_similar_ngrams_dictionary(self, entity_name, ngrams_list, fuzziness_threshold="auto:4,7",
+                                      search_language_script=ENGLISH_LANG, **kwargs):
         """
         Args:
             entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
             ngrams_list: the list of ngrams to get variants search results for
             fuzziness_threshold: fuzziness allowed for search results on entity value variants
+            search_language_script: language of elasticsearch documents which are eligible for match
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -257,7 +260,8 @@ class DataStore(object):
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        ngrams_list=ngrams_list,
-                                                                       fuzziness_threshold=fuzziness_threshold)
+                                                                       fuzziness_threshold=fuzziness_threshold,
+                                                                       search_language_script=search_language_script)
 
         return results_dictionary
 
