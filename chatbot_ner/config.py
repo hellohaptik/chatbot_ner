@@ -114,7 +114,7 @@ else:
 if os.path.exists(MODEL_CONFIG_PATH):
     dotenv.read_dotenv(MODEL_CONFIG_PATH)
 else:
-    ner_logger.warning('Warning: no file named "model_config" found at %s. This is not a problem if you ''
+    ner_logger.warning('Warning: no file named "model_config" found at %s. This is not a problem if you '
                        'dont want to run NER with ML models', MODEL_CONFIG_PATH)
 
 CITY_MODEL_TYPE = os.environ.get('CITY_MODEL_TYPE')
