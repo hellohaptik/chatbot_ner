@@ -219,7 +219,7 @@ class DataStore(object):
         return results_dictionary
 
     def get_similar_ngrams_dictionary(self, entity_name, ngrams_list, fuzziness_threshold="auto:4,7",
-                                      search_language_script=ENGLISH_LANG, **kwargs):
+                                      search_language_script=None, **kwargs):
         """
         Args:
             entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants

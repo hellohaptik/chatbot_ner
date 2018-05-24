@@ -45,7 +45,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
 
 def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuzziness_threshold,
-                 search_language_script=ENGLISH_LANG, **kwargs):
+                 search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given ngrams list. The query
     searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
