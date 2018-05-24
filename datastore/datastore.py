@@ -206,11 +206,13 @@ class DataStore(object):
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
                                                                        index_name=self._store_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
+                                                                       request_timeout=request_timeout,
                                                                        **kwargs)
 
         return results_dictionary
@@ -250,6 +252,7 @@ class DataStore(object):
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
             if ngrams_list:
                 results_dictionary = elastic_search.query.ngrams_query(connection=self._client_or_connection,
                                                                        index_name=self._store_name,
@@ -257,7 +260,9 @@ class DataStore(object):
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        ngrams_list=ngrams_list,
-                                                                       fuzziness_threshold=fuzziness_threshold)
+                                                                       fuzziness_threshold=fuzziness_threshold,
+                                                                       request_timeout=request_timeout,
+                                                                       **kwargs)
 
         return results_dictionary
 
