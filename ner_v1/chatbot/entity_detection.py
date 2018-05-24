@@ -431,7 +431,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
                                            original_text_list=[structured_value],
                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_dict_list = city_detection.detect_entity(text=message, run_model=True)
+        entity_dict_list = city_detection.detect_entity(text=message, run_model=False)
         entity_list, original_text_list, detection_method_list = \
             city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
