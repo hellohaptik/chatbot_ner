@@ -68,6 +68,11 @@ ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
 ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
 ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
+GOOGLE_TRANSLATE_API_KEY = os.environ.get('GOOGLE_TRANSLATE_API_KEY')
+
+if not GOOGLE_TRANSLATE_API_KEY:
+    ner_logger.warning('Google Translate API key is null or not set')
+    GOOGLE_TRANSLATE_API_KEY = ''
 
 CHATBOT_NER_DATASTORE = {
     'engine': ENGINE,
@@ -104,13 +109,13 @@ elif ES_AWS_REGION and ES_AWS_SERVICE:
     CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
 else:
-    ner_logger.debug('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
+    ner_logger.warning('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
 
 if os.path.exists(MODEL_CONFIG_PATH):
     dotenv.read_dotenv(MODEL_CONFIG_PATH)
 else:
-    ner_logger.debug('Warning: no file named "model_config" found at %s. This is not a problem if you '
-                     'dont want to run NER with ML models', MODEL_CONFIG_PATH)
+    ner_logger.warning('Warning: no file named "model_config" found at %s. This is not a problem if you '
+                       'dont want to run NER with ML models', MODEL_CONFIG_PATH)
 
 CITY_MODEL_TYPE = os.environ.get('CITY_MODEL_TYPE')
 CITY_MODEL_PATH = os.environ.get('CITY_MODEL_PATH')
