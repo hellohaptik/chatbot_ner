@@ -1,8 +1,7 @@
 import re
 
-from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 from ner_v1.language_utilities.constant import ENGLISH_LANG
-
+from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -46,7 +45,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
 
 def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuzziness_threshold,
-                 search_language_script=ENGLISH_LANG, **kwargs):
+                 search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given ngrams list. The query
     searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
@@ -147,6 +146,7 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
          int or str: fuzziness as int when ES version < 6.2
                      otherwise the input is returned as it is
     """
+
     def parse_auto(auto_str):
         lo, hi = 3, 6
         if auto_str.lower().startswith("auto:"):
@@ -171,7 +171,7 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
     return fuzzy_setting
 
 
-def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold, language_script=ENGLISH_LANG):
+def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold, language_script=None):
     """
     Generates compound elasticsearch boolean search query dictionary for the given ngrams list. The query generated
     searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
@@ -180,11 +180,13 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
         entity_name: name of the entity to perform a 'term' query on
         ngrams_list: list of ngrams to perform fuzzy search for
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
-        language_script: language of documents to be searched
+        language_script: language of documents to be searched, optional, defaults to None
+
     Returns:
         dictionary, the search query for ngrams
 
     """
+    must_terms = []
     term_dict_entity_name = {
         'term': {
             'entity_data': {
@@ -192,17 +194,22 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
             }
         }
     }
-    term_dict_language = {
-        'term': {
-            'language_script': {
-                'value': language_script
+    must_terms.append(term_dict_entity_name)
+
+    if language_script is not None:
+        term_dict_language = {
+            'term': {
+                'language_script': {
+                    'value': language_script
+                }
             }
         }
-    }
+        must_terms.append(term_dict_language)
+
     data = {
         'query': {
             'bool': {
-                'must': [term_dict_entity_name, term_dict_language],
+                'must': must_terms,
                 'should': [],
                 'minimum_number_should_match': 1
             }
