@@ -22,6 +22,7 @@ ENTITY_VALUE = 'entity_value'
 DETECTION_METHOD = 'detection'
 # original_text is a key that will store actual value that was detected. For example, mcd
 ORIGINAL_TEXT = 'original_text'
+DETECTION_LANGUAGE = 'language'
 
 ENTITY_VALUE_DICT_KEY = 'value'
 
@@ -43,6 +44,10 @@ PARAMETER_FALLBACK_VALUE = 'fallback_value'
 PARAMETER_BOT_MESSAGE = 'bot_message'
 PARAMETER_TIMEZONE = 'timezone'
 PARAMETER_REGEX = 'regex'
+
+# Language parameters of the query.
+PARAMETER_LANGUAGE_SCRIPT = 'language_script'  # ISO 639 code for language. For eg, 'en' for 'Namaste', 'Hello'
+PARAMETER_SOURCE_LANGUAGE = 'source_language'  # ISO 639 code vocabulary.  For eg, 'hi' for 'Namaste', 'en' for 'Hello'
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
 

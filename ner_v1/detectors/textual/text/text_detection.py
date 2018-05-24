@@ -5,9 +5,11 @@ from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
 from lib.nlp.levenshtein_distance import edit_distance
 from lib.nlp.regex import Regex
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
 
-class TextDetector(object):
+class TextDetector(BaseDetector):
     """
     TextDetector detects custom entities in text string by performing similarity searches against a list fetched from
     datastore (elasticsearch) and tags them.
@@ -37,14 +39,21 @@ class TextDetector(object):
         tag (str): entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name=None):
+    def __init__(self, entity_name=None, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """
         Initializes a TextDetector object with given entity_name
 
         Args:
             entity_name: A string by which the detected substrings that correspond to text entities would be replaced
                          with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        super(TextDetector, self).__init__(source_language_script, translation_enabled)
+
         self.text = None
         self.regx_to_process = Regex([(r'[\'\/]', r'')])
         self.text_dict = {}
@@ -66,6 +75,10 @@ class TextDetector(object):
         self._min_token_size_for_fuzziness = 4
 
         self.db = DataStore()
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def set_fuzziness_threshold(self, fuzziness):
         """
@@ -137,7 +150,7 @@ class TextDetector(object):
         """
         self._min_token_size_for_fuzziness = min_size
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -146,8 +159,8 @@ class TextDetector(object):
         is returned. For more information on how data is stored, see Datastore docs.
 
         Args:
-            text: string to extract textual entities from
-
+            text (unicode): string to extract textual entities from
+            **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             Tuple containing two lists, first containing entity value as defined into datastore
             and second list containing corresponding original substrings in text
@@ -210,11 +223,14 @@ class TextDetector(object):
         variant_dictionary = {}
 
         trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                                 self._fuzziness)
+                                                                 self._fuzziness,
+                                                                 search_language_script=self._target_language_script)
         bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                                self._fuzziness)
+                                                                self._fuzziness,
+                                                                search_language_script=self._target_language_script)
         unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                                 self._fuzziness)
+                                                                 self._fuzziness,
+                                                                 search_language_script=self._target_language_script)
         variant_dictionary.update(trigram_variants)
         variant_dictionary.update(bigram_variants)
         variant_dictionary.update(unigram_variants)
