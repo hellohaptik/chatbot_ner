@@ -81,6 +81,7 @@ CHATBOT_NER_DATASTORE = {
         'retry_on_timeout': False,
         'max_retries': 1,
         'timeout': 20,
+        'request_timeout': 20,
     }
 }
 
