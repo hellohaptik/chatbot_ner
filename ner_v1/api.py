@@ -10,7 +10,7 @@ from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
-    PARAMETER_SOURCE_LANGUAGE
+    PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
@@ -33,7 +33,10 @@ def get_parameters_dictionary(request):
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
                        PARAMETER_REGEX: request.GET.get('regex'),
                        PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
-                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG)}
+                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
+                       PARAMETER_FUZZINESS: request.GET.get('fuzziness'),
+                       PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness')
+                       }
 
     return parameters_dict
 
@@ -48,8 +51,12 @@ def text(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        fuzziness = parameters_dict[PARAMETER_FUZZINESS]
+        min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
         text_detector = TextDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                      source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
+        text_detector.set_fuzziness_threshold(fuzziness)
+        text_detector.set_min_token_size_for_levenshtein(min_token_len_fuzziness)
         entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],

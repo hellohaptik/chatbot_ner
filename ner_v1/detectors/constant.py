@@ -88,6 +88,3 @@ DATE_TYPE_PROPERTY = 'type'
 DATE_VALUE = 'value'
 ORIGINAL_DATE_TEXT = 'text'
 DATE_DETECTION_METHOD = 'detection_method'
-
-PARAMETER_FUZZINESS = 'fuzziness'
-MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
