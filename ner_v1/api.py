@@ -55,7 +55,7 @@ def text(request):
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
         text_detector = TextDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                      source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
-
+        ner_logger.debug('fuzziness: %s min_token_len_fuzziness %s' % (str(fuzziness), str(min_token_len_fuzziness)))
         if fuzziness:
             fuzziness = parse_fuzziness_parameter(fuzziness)
             text_detector.set_fuzziness_threshold(fuzziness)
@@ -380,26 +380,26 @@ def combine_output(request):
 
 def parse_fuzziness_parameter(fuzziness):
     """
-        This function takes input as the fuzziness value.
-        If the fuzziness is int it is returned as it is.
-        If the input is a ',' separated str value, the function returns a tuple with all values
-        present in the str after casting them to int.
-        Args:
-            fuzziness (str) or (int): The fuzzines value that needs to be parsed.
-        Returns:
-            fuzziness (tuple) or (int): It returns a tuple with of all the values cast to int present
-            in the str.
-            If the fuzziness is a single element then int is returned
+    This function takes input as the fuzziness value.
+    If the fuzziness is int it is returned as it is.
+    If the input is a ',' separated str value, the function returns a tuple with all values
+    present in the str after casting them to int.
+    Args:
+        fuzziness (str) or (int): The fuzzines value that needs to be parsed.
+    Returns:
+        fuzziness (tuple) or (int): It returns a tuple with of all the values cast to int present
+        in the str.
+        If the fuzziness is a single element then int is returned
 
-        Examples:
-            fuzziness = 2
-            parse_fuzziness_parameter(fuzziness)
-            >> 2
+    Examples:
+        fuzziness = 2
+        parse_fuzziness_parameter(fuzziness)
+        >> 2
 
-            fuzziness = '3,4'
-            parse_fuzziness_parameter(fuzziness)
-            >> (3,4)
-        """
+        fuzziness = '3,4'
+        parse_fuzziness_parameter(fuzziness)
+        >> (3,4)
+    """
     try:
         if isinstance(fuzziness, int):
             return fuzziness
