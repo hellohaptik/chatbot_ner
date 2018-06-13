@@ -270,6 +270,55 @@ class DataStore(object):
 
         return results_dictionary
 
+    def get_similar_dictionary(self, entity_name, user_typed_sentence, fuzziness_threshold="auto:4,7",
+                               search_language_script=None, **kwargs):
+        """
+        Args:
+            entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
+            ngrams_list: the list of ngrams to get variants search results for
+            fuzziness_threshold: fuzziness allowed for search results on entity value variants
+            search_language_script: language of elasticsearch documents which are eligible for match
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+        Returns:
+            dictionary mapping entity value variants to their entity value
+
+        Example:
+            db = DataStore()
+            ngrams_list = ['Pune', 'Mumbai', 'Goa', 'Bangalore']
+            db.get_similar_ngrams_dictionary(entity_name='city', ngrams_list=ngrams_list, fuzziness_threshold=2)
+
+            Output:
+                {u'Bangalore': u'Bangalore',
+                 u'Mulbagal': u'Mulbagal',
+                 u'Multai': u'Multai',
+                 u'Mumbai': u'Mumbai',
+                 u'Pune': u'Pune',
+                 u'Puri': u'Puri',
+                 u'bangalore': u'bengaluru',
+                 u'goa': u'goa',
+                 u'mumbai': u'mumbai',
+                 u'pune': u'pune'}
+        """
+        if self._client_or_connection is None:
+            self._connect()
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.user_says_query(connection=self._client_or_connection,
+                                                                      index_name=self._store_name,
+                                                                      doc_type=self._connection_settings[
+                                                                         ELASTICSEARCH_DOC_TYPE],
+                                                                      entity_name=entity_name,
+                                                                      user_typed_sentence=user_typed_sentence,
+                                                                      fuzziness_threshold=fuzziness_threshold,
+                                                                      search_language_script=search_language_script,
+                                                                      request_timeout=request_timeout,
+                                                                      **kwargs)
+        return results_dictionary
+
     def delete_entity(self, entity_name, **kwargs):
         """
         Deletes the entity data for entity named entity_named from the datastore

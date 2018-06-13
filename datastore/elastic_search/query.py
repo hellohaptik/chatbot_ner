@@ -98,6 +98,57 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     return ngram_results
 
 
+def user_says_query(connection, index_name, doc_type, entity_name, user_typed_sentence, fuzziness_threshold,
+                    search_language_script=None, **kwargs):
+    """
+    Performs compound elasticsearch boolean search query with highlights for the given user sentence . The query
+    searches for entity_name in the index & returns search results for the user sentence only if entity_name is found.
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name: name of the entity to perform a 'term' query on
+        user_typed_sentence: user typed sentence in which entity has to be searched
+        fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
+        search_language_script: language of elasticsearch documents which are eligible for match
+        kwargs:
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+    Returns:
+        dictionary of the parsed results from highlighted search query results on the user says sentence,
+        mapping highlighted fuzzy entity variant to entity value
+
+    Example:
+        # The following example is just for demonstration purpose. Normally we should call
+        # Datastore().get_similar_ngrams_dictionary to get these results
+
+        db = DataStore()
+        ngrams_list = ['Pune', 'Mumbai', 'Goa', 'Bangalore']
+        ngrams_query(connection=db._client_or_connection, index_name=db._store_name,
+                        doc_type=db._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                        entity_name='city', ngrams_list=ngrams_list,
+                        fuzziness_threshold=2)
+
+        {u'Bangalore': u'Bangalore',
+         u'Mulbagal': u'Mulbagal',
+         u'Multai': u'Multai',
+         u'Mumbai': u'Mumbai',
+         u'Pune': u'Pune',
+         u'Puri': u'Puri',
+         u'bangalore': u'bengaluru',
+         u'goa': u'goa',
+         u'mumbai': u'mumbai',
+         u'pune': u'pune'}
+    """
+    data = _generate_es_search_dictionary(entity_name, user_typed_sentence, fuzziness_threshold,
+                                                language_script=search_language_script)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
+    results = _run_es_search(connection, **kwargs)
+    results = _parse_es_search_results(results)
+    return results
+
+
 def _run_es_search(connection, **kwargs):
     """
     Execute the elasticsearch.ElasticSearch.search() method and return all results using
@@ -239,6 +290,73 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
     return data
 
 
+def _generate_es_search_dictionary(entity_name, user_typed_text, fuzziness_threshold, language_script=None):
+    """
+    Generates compound elasticsearch boolean search query dictionary for the user says sentence. The query generated
+    searches for entity_name in the index and returns search results for the matched word (of user-says sentence)
+     only if entity_name is found.
+
+    Args:
+        entity_name: name of the entity to perform a 'term' query on
+        user_typed_text: The sentence typed by user on which we need to identify the enitites.
+        fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
+        language_script: language of documents to be searched, optional, defaults to None
+
+    Returns:
+        dictionary, the search query for the user typed sentence
+
+    """
+    must_terms = []
+    term_dict_entity_name = {
+        'term': {
+            'entity_data': {
+                'value': entity_name
+            }
+        }
+    }
+    must_terms.append(term_dict_entity_name)
+
+    if language_script is not None:
+        term_dict_language = {
+            'term': {
+                'language_script': {
+                    'value': language_script
+                }
+            }
+        }
+        must_terms.append(term_dict_language)
+
+    data = {
+        'query': {
+            'bool': {
+                'must': must_terms,
+                'should': [],
+                'minimum_number_should_match': 1
+            }
+        }
+    }
+    query_should_data = []
+    query = {
+        'match': {
+            'variants': {
+                'query': user_typed_text,
+                'fuzziness': _get_dynamic_fuzziness_threshold(user_typed_text, fuzziness_threshold),
+                'prefix_length': 1
+            }
+        }
+    }
+    query_should_data.append(query)
+    data['query']['bool']['should'] = query_should_data
+    data['highlight'] = {
+        'fields': {
+            'variants': {}
+        },
+        'number_of_fragments': 20
+    }
+
+    return data
+
+
 def _parse_es_ngram_search_results(ngram_results, ngrams_length):
     """
     Parses highlighted results returned from elasticsearch query on ngrams
@@ -301,6 +419,85 @@ def _parse_es_ngram_search_results(ngram_results, ngrams_length):
                 if len(hit['highlight']['variants'][count].split()) >= ngrams_length:
                     entity_value_list.append(hit['_source']['value'])
                     variant_value_list.append(hit['highlight']['variants'][count])
+                count += 1
+    count = 0
+
+    while count < len(variant_value_list):
+        variant_value_list[count] = re.sub('\s+', ' ', variant_value_list[count]).strip()
+        if variant_value_list[count].count('<em>') == len(variant_value_list[count].split()):
+            variant = variant_value_list[count].replace('<em>', '')
+            variant = variant.replace('</em>', '')
+            if variant.strip() in variant_dictionary:
+                existing_value = variant_dictionary[variant.strip()]
+                if len(existing_value.split(' ')) > len(entity_value_list[count].split(' ')):
+                    variant_dictionary[variant.strip()] = entity_value_list[count]
+            else:
+                variant_dictionary[variant.strip()] = entity_value_list[count]
+        count += 1
+
+    return variant_dictionary
+
+
+def _parse_es_search_results(results):
+    """
+    Parses highlighted results returned from elasticsearch query on user typed sentence
+
+    Args:
+        results: search results dictionary from elasticsearch including highlights and scores
+
+    Returns:
+        dictionary of the parsed results from highlighted search query results on ngrams_list
+
+    Example:
+        Parameter ngram_results has highlighted search results as follows:
+
+        {u'_shards': {u'failed': 0, u'successful': 5, u'total': 5},
+        u'hits': {u'hits': [{u'_id': u'AVrW02UE9WNuMIY9vmWn',
+        u'_index': u'doc_type_name',
+        u'_score': 11.501145,
+        u'_source': {u'dict_type': u'variants',
+        u'entity_data': u'city',
+        u'value': u'goa',
+        u'variants': [u'', u'goa']},
+        u'_type': u'data_dictionary',
+        u'highlight': {u'variants': [u'<em>goa</em>']}},
+        {u'_id': u'AVrW02W99WNuMIY9vmcf',
+        u'_index': u'gogo_entity_data',
+        u'_score': 11.210829,
+        u'_source': {u'dict_type': u'variants',
+        u'entity_data': u'city',
+        u'value': u'Mumbai',
+        u'variants': [u'', u'Mumbai']},
+        u'_type': u'data_dictionary',
+        u'highlight': {u'variants': [u'<em>Mumbai</em>']}},
+        ...
+        u'max_score': 11.501145,
+        u'total': 17},
+        u'timed_out': False,
+        u'took': 96}
+
+        After parsing highlighted results, this function returns
+
+        {...
+         u'Mumbai': u'Mumbai',
+         ...
+         u'goa': u'goa',
+         u'mumbai': u'mumbai',
+         ...
+        }
+
+    """
+    entity_value_list, variant_value_list = [], []
+    variant_dictionary = {}
+    if results and results['hits']['total'] > 0:
+        for hit in results['hits']['hits']:
+            if 'highlight' not in hit:
+                continue
+            count_of_variants = len(hit['highlight']['variants'])
+            count = 0
+            while count < count_of_variants:
+                entity_value_list.append(hit['_source']['value'])
+                variant_value_list.append(hit['highlight']['variants'][count])
                 count += 1
     count = 0
 
