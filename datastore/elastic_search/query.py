@@ -1,6 +1,7 @@
 import re
 
 from ner_v1.language_utilities.constant import ENGLISH_LANG
+from chatbot_ner.config import ner_logger
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
 log_prefix = 'datastore.elastic_search.query'
@@ -145,6 +146,8 @@ def user_says_query(connection, index_name, doc_type, entity_name, user_typed_se
                                                 language_script=search_language_script)
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     results = _run_es_search(connection, **kwargs)
+    ner_logger.debug("*************************user_says_query******************************************")
+    ner_logger.debug(results)
     results = _parse_es_search_results(results)
     return results
 
@@ -286,7 +289,6 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
         },
         'number_of_fragments': 20
     }
-
     return data
 
 
@@ -354,7 +356,7 @@ def _generate_es_search_dictionary(entity_name, user_typed_text, fuzziness_thres
         },
         'number_of_fragments': 20
     }
-
+    ner_logger.debug(data)
     return data
 
 
@@ -515,4 +517,6 @@ def _parse_es_search_results(results):
                 variant_dictionary[variant.strip()] = entity_value_list[count]
         count += 1
 
+    ner_logger.debug("*****************_parse_es_search_results*******************************8")
+    ner_logger.debug(variant_dictionary)
     return variant_dictionary
