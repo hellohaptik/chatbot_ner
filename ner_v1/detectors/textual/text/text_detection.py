@@ -1,5 +1,6 @@
 import re
 
+from chatbot_ner.config import ner_logger
 from datastore import DataStore
 from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
@@ -258,6 +259,10 @@ class TextDetector(BaseDetector):
                 original_final_list.append(original_text)
                 self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text)
 
+        ner_logger.debug("*******************_text_detection_with_variants**************************")
+        ner_logger.debug(value_final_list)
+        ner_logger.debug("****************************************************************************")
+        ner_logger.debug(original_final_list)
         return value_final_list, original_final_list
 
     def _get_entity_from_text(self, variant, text):
