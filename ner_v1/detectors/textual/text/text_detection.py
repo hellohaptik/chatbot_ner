@@ -215,25 +215,29 @@ class TextDetector(BaseDetector):
         """
         original_final_list = []
         value_final_list = []
-        normalization = Normalization()
-        self.text_dict = normalization.ngram_data(self.processed_text.lower(), flag_punctuation_removal=False,
-                                                  stem_unigram=False, stem_bigram=False, stem_trigram=False,
-                                                  stop_words_unigram=True, stop_words_bigram=True,
-                                                  stop_words_trigram=True).copy()
+        # normalization = Normalization()
+        # self.text_dict = normalization.ngram_data(self.processed_text.lower(), flag_punctuation_removal=False,
+        #                                           stem_unigram=False, stem_bigram=False, stem_trigram=False,
+        #                                           stop_words_unigram=True, stop_words_bigram=True,
+        #                                           stop_words_trigram=True).copy()
         variant_dictionary = {}
 
-        trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                                 self._fuzziness,
-                                                                 search_language_script=self._target_language_script)
-        bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                                self._fuzziness,
-                                                                search_language_script=self._target_language_script)
-        unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                                 self._fuzziness,
-                                                                 search_language_script=self._target_language_script)
-        variant_dictionary.update(trigram_variants)
-        variant_dictionary.update(bigram_variants)
-        variant_dictionary.update(unigram_variants)
+        # trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
+        #                                                          self._fuzziness,
+        #                                                          search_language_script=self._target_language_script)
+        # bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
+        #                                                         self._fuzziness,
+        #                                                         search_language_script=self._target_language_script)
+        # unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
+        #                                                          self._fuzziness,
+        #                                                          search_language_script=self._target_language_script)
+        # variant_dictionary.update(trigram_variants)
+        # variant_dictionary.update(bigram_variants)
+        # variant_dictionary.update(unigram_variants)
+
+        variants = self.db.get_similar_dictionary(self.entity_name, self.processed_text.lower(),
+                                                  self._fuzziness, search_language_script=self._target_language_script)
+        variant_dictionary.update(variants)
         variant_list = variant_dictionary.keys()
 
         exact_matches, fuzzy_variants = [], []
