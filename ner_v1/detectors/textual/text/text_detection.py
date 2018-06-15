@@ -252,10 +252,10 @@ class TextDetector(BaseDetector):
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
-                self.tagged_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.tagged_text, re.UNICODE)
+                self.tagged_text = re.sub(r'\b%s\b' % original_text, self.tag, self.tagged_text, re.UNICODE)
                 # Instead of dropping completely like in other entities,
                 # we replace with tag to avoid matching non contiguous segments
-                self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text, re.UNICODE)
+                self.processed_text = re.sub(r'\b%s\b' % original_text, self.tag, self.processed_text, re.UNICODE)
 
         return value_final_list, original_final_list
 
