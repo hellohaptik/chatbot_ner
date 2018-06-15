@@ -196,8 +196,10 @@ class TextDetector(BaseDetector):
         self.text = self.regx_to_process.text_substitute(self.text)
         self.text = ' ' + self.text.lower() + ' '
         self.processed_text = self.text
-        text_entity_data = self._text_detection_with_variants()
         self.tagged_text = self.processed_text
+
+        text_entity_data = self._text_detection_with_variants()
+
         self.text_entity = text_entity_data[0]
         self.original_text_entity = text_entity_data[1]
         return text_entity_data
@@ -252,10 +254,11 @@ class TextDetector(BaseDetector):
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
-                self.tagged_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.tagged_text, re.UNICODE)
+                _pattern = re.compile(r'\b%s\b' % original_text, re.UNICODE)
+                self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
                 # Instead of dropping completely like in other entities,
                 # we replace with tag to avoid matching non contiguous segments
-                self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text, re.UNICODE)
+                self.processed_text = _pattern.sub(self.tag, self.processed_text)
 
         return value_final_list, original_final_list
 

@@ -64,15 +64,14 @@ def text(request):
             min_token_len_fuzziness = int(min_token_len_fuzziness)
             text_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-
         entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                              bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for text_synonym: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
@@ -91,15 +90,16 @@ def location(request):
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
                                      parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for location: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for location: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
 def phone_number(request):
-    """This functionality calls the get_phone_number() functionality to detect phone numbers. It is called through api call
+    """This functionality calls the get_phone_number() functionality to detect phone numbers. It is called through
+    api call
 
     Attributes:
         request: url parameters
@@ -113,9 +113,9 @@ def phone_number(request):
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
                                          parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for phone_number: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for phone_number: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -137,9 +137,9 @@ def regex(request):
                                   parameters_dict[PARAMETER_BOT_MESSAGE],
                                   parameters_dict[PARAMETER_REGEX])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for regex: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for regex: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -159,9 +159,9 @@ def email(request):
                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
                                   parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for email: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for email: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -181,9 +181,9 @@ def person_name(request):
                                         parameters_dict[PARAMETER_FALLBACK_VALUE],
                                         parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for person_name: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for person_name: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -203,9 +203,9 @@ def city(request):
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for city: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for city: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -225,9 +225,9 @@ def pnr(request):
                                 parameters_dict[PARAMETER_FALLBACK_VALUE],
                                 parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for pnr: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for pnr: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -247,9 +247,9 @@ def shopping_size(request):
                                           parameters_dict[PARAMETER_FALLBACK_VALUE],
                                           parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for shopping_size: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for shopping_size: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -269,9 +269,9 @@ def number(request):
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
                                    parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for numeric: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for numeric: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -291,9 +291,9 @@ def time(request):
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for time: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for time: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -314,9 +314,9 @@ def date(request):
                                  parameters_dict[PARAMETER_BOT_MESSAGE],
                                  parameters_dict[PARAMETER_TIMEZONE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        ner_logger.debug('Exception for date: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for date: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
@@ -336,10 +336,9 @@ def budget(request):
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
                                    parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError, e:
-        entity_output = {}
-        ner_logger.debug('Exception for budget: %s ' % e)
-        return HttpResponse(status=400)
+    except TypeError as e:
+        ner_logger.exception('Exception for budget: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
