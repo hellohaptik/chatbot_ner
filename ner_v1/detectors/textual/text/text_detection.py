@@ -236,7 +236,9 @@ class TextDetector(BaseDetector):
         # variant_dictionary.update(bigram_variants)
         # variant_dictionary.update(unigram_variants)
 
-        variants = self.db.get_similar_dictionary(self.entity_name, self.processed_text.lower(),
+        tokens = tokenizer.tokenize(self.processed_text)
+        message = u' '.join(tokens)
+        variants = self.db.get_similar_dictionary(self.entity_name, message,
                                                   self._fuzziness, search_language_script=self._target_language_script)
         variant_dictionary.update(variants)
         variant_list = variant_dictionary.keys()
