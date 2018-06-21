@@ -261,16 +261,11 @@ class TextDetector(BaseDetector):
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
-<<<<<<< HEAD
                 _pattern = re.compile(r'\b%s\b' % original_text, re.UNICODE)
                 self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
                 # Instead of dropping completely like in other entities,
                 # we replace with tag to avoid matching non contiguous segments
                 self.processed_text = _pattern.sub(self.tag, self.processed_text)
-=======
-                self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text)
->>>>>>> 912712f3708c0801934b7054efde4f1d23e2b0be
-
         ner_logger.debug("*******************_text_detection_with_variants**************************")
         ner_logger.debug(value_final_list)
         ner_logger.debug("****************************************************************************")
