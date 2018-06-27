@@ -99,7 +99,7 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
     return ngram_results
 
 
-def user_says_query(connection, index_name, doc_type, entity_name, user_typed_sentence, fuzziness_threshold,
+def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
                     search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given user sentence . The query
@@ -142,7 +142,7 @@ def user_says_query(connection, index_name, doc_type, entity_name, user_typed_se
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    data = _generate_es_search_dictionary(entity_name, user_typed_sentence, fuzziness_threshold,
+    data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
                                                 language_script=search_language_script)
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     results = _run_es_search(connection, **kwargs)
@@ -290,7 +290,7 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
     return data
 
 
-def _generate_es_search_dictionary(entity_name, user_typed_text, fuzziness_threshold, language_script=None):
+def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, language_script=None):
     """
     Generates compound elasticsearch boolean search query dictionary for the user says sentence. The query generated
     searches for entity_name in the index and returns search results for the matched word (of user-says sentence)
@@ -339,8 +339,8 @@ def _generate_es_search_dictionary(entity_name, user_typed_text, fuzziness_thres
     query = {
         'match': {
             'variants': {
-                'query': user_typed_text,
-                'fuzziness': _get_dynamic_fuzziness_threshold(user_typed_text, fuzziness_threshold),
+                'query': text,
+                'fuzziness': _get_dynamic_fuzziness_threshold(text, fuzziness_threshold),
                 'prefix_length': 1
             }
         }

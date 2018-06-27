@@ -270,7 +270,7 @@ class DataStore(object):
 
         return results_dictionary
 
-    def get_similar_dictionary(self, entity_name, user_typed_sentence, fuzziness_threshold="auto:4,7",
+    def get_similar_dictionary(self, entity_name, text, fuzziness_threshold="auto:4,7",
                                search_language_script=None, **kwargs):
         """
         Args:
@@ -307,12 +307,12 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.user_says_query(connection=self._client_or_connection,
+            results_dictionary = elastic_search.query.full_text_query(connection=self._client_or_connection,
                                                                       index_name=self._store_name,
                                                                       doc_type=self._connection_settings[
                                                                          ELASTICSEARCH_DOC_TYPE],
                                                                       entity_name=entity_name,
-                                                                      user_typed_sentence=user_typed_sentence,
+                                                                      sentence=text,
                                                                       fuzziness_threshold=fuzziness_threshold,
                                                                       search_language_script=search_language_script,
                                                                       request_timeout=request_timeout,
