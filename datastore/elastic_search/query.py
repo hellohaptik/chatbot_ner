@@ -144,27 +144,10 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
          int or str: fuzziness as int when ES version < 6.2
                      otherwise the input is returned as it is
     """
-
-    def parse_auto(auto_str):
-        lo, hi = 3, 6
-        if auto_str.lower().startswith("auto:"):
-            try:
-                lo, hi = map(int, auto_str[5:].split(","))
-            except ValueError:
-                pass
-        return lo, hi
-
-    if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
-        return fuzzy_setting
-
     if type(fuzzy_setting) == str:
-        low, high = parse_auto(fuzzy_setting)
-        if len(term) < low:
-            return 0
-        elif len(term) >= high:
-            return 2
-        else:
-            return 1
+        if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
+            return fuzzy_setting
+        return 'auto'
 
     return fuzzy_setting
 
