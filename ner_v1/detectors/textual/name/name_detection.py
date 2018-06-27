@@ -1,8 +1,9 @@
-from lib.nlp.tokenizer import Tokenizer
-from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from lib.nlp.pos import *
 import re
+
+from lib.nlp.const import tokenizer
+from lib.nlp.pos import *
+from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class NameDetector(object):
@@ -167,7 +168,7 @@ class NameDetector(object):
 
         """
 
-        replaced_text = Tokenizer().tokenize(self.text.lower())
+        replaced_text = tokenizer.tokenize(self.text.lower())
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
