@@ -226,6 +226,7 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
         'fields': {
             'variants': {}
         },
+        'order': 'score',
         'number_of_fragments': 20
     }
 
