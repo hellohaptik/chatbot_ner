@@ -213,6 +213,7 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
         'fields': {
             'variants': {}
         },
+        'order': 'score',
         'number_of_fragments': 20
     }
     return data
