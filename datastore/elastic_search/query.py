@@ -1,6 +1,7 @@
 import re
 
 from ner_v1.language_utilities.constant import ENGLISH_LANG
+from chatbot_ner.config import ner_logger
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
 log_prefix = 'datastore.elastic_search.query'
@@ -44,26 +45,26 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
     return results_dictionary
 
 
-def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuzziness_threshold,
-                 search_language_script=None, **kwargs):
+def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
+                    search_language_script=None, **kwargs):
     """
-    Performs compound elasticsearch boolean search query with highlights for the given ngrams list. The query
-    searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
+    Performs compound elasticsearch boolean search query with highlights for the given user sentence . The query
+    searches for entity_name in the index & returns search results for the user sentence only if entity_name is found.
 
     Args:
         connection: Elasticsearch client object
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
-        ngrams_list: list of ngrams to perform fuzzy search for
+        user_typed_sentence: user typed sentence in which entity has to be searched
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
     Returns:
-        dictionary of the parsed results from highlighted search query results on ngrams_list, mapping highlighted
-        fuzzy entity variant to entity value
+        dictionary of the parsed results from highlighted search query results on the user says sentence,
+        mapping highlighted fuzzy entity variant to entity value
 
     Example:
         # The following example is just for demonstration purpose. Normally we should call
@@ -87,15 +88,12 @@ def ngrams_query(connection, index_name, doc_type, entity_name, ngrams_list, fuz
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    ngram_results = {}
-    if ngrams_list:
-        ngrams_length = len(ngrams_list[0].strip().split())
-        data = _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold,
-                                                    language_script=search_language_script)
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
-        ngram_results = _run_es_search(connection, **kwargs)
-        ngram_results = _parse_es_ngram_search_results(ngram_results, ngrams_length)
-    return ngram_results
+    data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
+                                                language_script=search_language_script)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
+    results = _run_es_search(connection, **kwargs)
+    results = _parse_es_search_results(results)
+    return results
 
 
 def _run_es_search(connection, **kwargs):
@@ -146,44 +144,28 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
          int or str: fuzziness as int when ES version < 6.2
                      otherwise the input is returned as it is
     """
-
-    def parse_auto(auto_str):
-        lo, hi = 3, 6
-        if auto_str.lower().startswith("auto:"):
-            try:
-                lo, hi = map(int, auto_str[5:].split(","))
-            except ValueError:
-                pass
-        return lo, hi
-
-    if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
-        return fuzzy_setting
-
     if type(fuzzy_setting) == str:
-        low, high = parse_auto(fuzzy_setting)
-        if len(term) < low:
-            return 0
-        elif len(term) >= high:
-            return 2
-        else:
-            return 1
+        if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
+            return fuzzy_setting
+        return 'auto'
 
     return fuzzy_setting
 
 
-def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_threshold, language_script=None):
+def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, language_script=None):
     """
-    Generates compound elasticsearch boolean search query dictionary for the given ngrams list. The query generated
-    searches for entity_name in the index and returns search results for ngrams only if entity_name is found.
+    Generates compound elasticsearch boolean search query dictionary for the user says sentence. The query generated
+    searches for entity_name in the index and returns search results for the matched word (of user-says sentence)
+     only if entity_name is found.
 
     Args:
         entity_name: name of the entity to perform a 'term' query on
-        ngrams_list: list of ngrams to perform fuzzy search for
+        user_typed_text: The sentence typed by user on which we need to identify the enitites.
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         language_script: language of documents to be searched, optional, defaults to None
 
     Returns:
-        dictionary, the search query for ngrams
+        dictionary, the search query for the user typed sentence
 
     """
     must_terms = []
@@ -216,36 +198,33 @@ def _generate_es_ngram_search_dictionary(entity_name, ngrams_list, fuzziness_thr
         }
     }
     query_should_data = []
-    for ngram in ngrams_list:
-        query = {
-            'match': {
-                'variants': {
-                    'query': ngram,
-                    'fuzziness': _get_dynamic_fuzziness_threshold(ngram, fuzziness_threshold),
-                    'prefix_length': 1,
-                    'operator': 'and'
-                }
+    query = {
+        'match': {
+            'variants': {
+                'query': text,
+                'fuzziness': _get_dynamic_fuzziness_threshold(text, fuzziness_threshold),
+                'prefix_length': 1
             }
         }
-        query_should_data.append(query)
+    }
+    query_should_data.append(query)
     data['query']['bool']['should'] = query_should_data
     data['highlight'] = {
         'fields': {
             'variants': {}
         },
+        'order': 'score',
         'number_of_fragments': 20
     }
-
     return data
 
 
-def _parse_es_ngram_search_results(ngram_results, ngrams_length):
+def _parse_es_search_results(results):
     """
-    Parses highlighted results returned from elasticsearch query on ngrams
+    Parses highlighted results returned from elasticsearch query on user typed sentence
 
     Args:
-        ngram_results: search results dictionary from elasticsearch including highlights and scores
-        ngrams_length: length of the ngrams in ngrams_list on which search query was performed
+        results: search results dictionary from elasticsearch including highlights and scores
 
     Returns:
         dictionary of the parsed results from highlighted search query results on ngrams_list
@@ -291,16 +270,15 @@ def _parse_es_ngram_search_results(ngram_results, ngrams_length):
     """
     entity_value_list, variant_value_list = [], []
     variant_dictionary = {}
-    if ngram_results and ngram_results['hits']['total'] > 0:
-        for hit in ngram_results['hits']['hits']:
+    if results and results['hits']['total'] > 0:
+        for hit in results['hits']['hits']:
             if 'highlight' not in hit:
                 continue
             count_of_variants = len(hit['highlight']['variants'])
             count = 0
             while count < count_of_variants:
-                if len(hit['highlight']['variants'][count].split()) >= ngrams_length:
-                    entity_value_list.append(hit['_source']['value'])
-                    variant_value_list.append(hit['highlight']['variants'][count])
+                entity_value_list.append(hit['_source']['value'])
+                variant_value_list.append(hit['highlight']['variants'][count])
                 count += 1
     count = 0
 
