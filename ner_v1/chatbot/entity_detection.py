@@ -488,9 +488,9 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
-            fallback_entity_value, fallback_original_value = NameDetector.get_format_name(fallback_value.split())
-            return output_entity_dict_list(entity_value_list=[fallback_entity_value[0]],
-                                           original_text_list=[fallback_original_value[0]],
+            fallback_entity_value, fallback_original_value = NameDetector.format_name_value(fallback_value.split())
+            return output_entity_dict_list(entity_value_list=[fallback_entity_value],
+                                           original_text_list=[fallback_original_value],
                                            detection_method=FROM_FALLBACK_VALUE)
 
     return None
