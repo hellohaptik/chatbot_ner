@@ -1,8 +1,8 @@
-from lib.nlp.tokenizer import Tokenizer
-from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from lib.nlp.pos import *
 import re
+
+from lib.nlp.pos import POS
+from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
+from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
 class NameDetector(object):
@@ -12,11 +12,16 @@ class NameDetector(object):
     names which are missed by TextDetector.
 
     Attributes:
-        text: string to extract entities from
-        entity_name: string by which the detected person_name entities would be replaced with on calling detect_entity()
-        tagged_text: string with city entities replaced with tag defined by entity_name
-        processed_text: string with detected time entities removed
-        text_detection_object: the object which is used to call the TextDetector
+        text (str): string to extract entities from
+        entity_name (str): name of the entity to pass on to TextDetector. The datastore would have
+                           dictionary of person names under this name
+        tagged_text (str): string with person name entities replaced with tag defined by entity_name
+        processed_text (str): string with detected time entities removed
+        text_detector (TextDetector): TextDetector object
+        detected_name_values (list): list containing formatted values for all names detected
+        detected_name_original_texts (list): list containing spans of texts corresponding to values
+                                             in detected_name_values
+        tag (str): entity_name prepended and appended with '__'
     """
 
     def __init__(self, entity_name):
@@ -29,203 +34,191 @@ class NameDetector(object):
         """
         self.entity_name = entity_name
         self.text = ''
-        self.names = []
         self.tagged_text = ''
         self.processed_text = ''
-        self.original_name_text = []
-        self.text_detection_object = TextDetector(entity_name=entity_name)
+        self.detected_name_values = []
+        self.detected_name_original_texts = []
+        self.text_detector = TextDetector(entity_name=entity_name)
+        self.tag = '__' + self.entity_name + '__'
 
-    @staticmethod
-    def get_format_name(name_list):
+    def detect_entity(self, text, bot_message=None):
         """
-        Takes input as name_list which contains the names detected.
-        It separates the first, middle and last names.
-        It returns two lists:
-        1.Containing the names separated into first, middle and last name.
-        2.The original text.
+        Detect names using patterns and text detection
 
         Args:
-            name_list (list): List of names detected
+           text (str): text to detect names from
+           bot_message (str, optional): previous bot message in context.
+
+        Returns:
+            tuple:
+                list of dict: containing first_name, middle_name and last_name
+                list of str: original text corresponding to the found value
+
+        Example:
+            In: text = "my name is yash doshi"
+            Out: [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
+        """
+        self.text = text
+        self.processed_text = self.text.lower()
+        self.tagged_text = self.processed_text
+
+        if bot_message:
+            if not self._check_name_patterns_botmessage(bot_message):
+                return [], []
+
+        entity_values, original_texts = self._detect_name_with_text_detector()
+        self.detected_name_values, self.detected_name_original_texts = entity_values, original_texts
+        self._update_processed_text(original_texts)
+
+        if not entity_values:
+            entity_values, original_texts = self._detect_name_with_patterns_pos_tagger()
+            self.detected_name_values, self.detected_name_original_texts = entity_values, original_texts
+            self._update_processed_text(original_texts)
+
+        return self.detected_name_values, self.detected_name_original_texts
+
+    def _detect_name_with_text_detector(self):
+        """
+        Use TextDetector to find names in the given text using a long list of common names
+
+        Returns:
+            tuple:
+                list of dict: containing first_name, middle_name and last_name
+                list of str: original text corresponding to the found value
+
+        Example:
+            In: "my name is yash doshi"
+            Out: [{first_name: "yash", middle_name: None, last_name: "modi"}], ["yash modi"]
+
+        """
+        entity_values, original_texts = [], []
+
+        entity_value_list, original_text_list = self.text_detector.detect_entity(text=self.processed_text)
+        detected_tokens = set(original_text_list)
+        tokens = self.processed_text.split()
+        start = 0
+        while start < len(tokens):
+            if tokens[start] in detected_tokens:
+                end = start
+                while end < len(tokens) and tokens[end] in detected_tokens:
+                    end += 1
+                entity_values.append(self.format_name_value(tokens[start:end]))
+                original_texts.append(' '.join(tokens[start:end]))
+                start = end
+        return entity_values, original_texts
+
+    def _detect_name_with_patterns_pos_tagger(self):
+        """
+        Use POS Tags and regex patterns to extract words that potentially be names
+
+        if the text contains cardinals or interrogation, no entities are detected on such text
+        Otherwise patterns are used to extract tokens that can be names. Pattern is formed of prefixes commonly
+        used to introduce names
+
+        If pattern matching fails to extract keywords, POS tags are used to extract Noun and Adjective words
+
+        Returns:
+            tuple:
+                list of dict: containing first_name, middle_name and last_name
+                list of str: original text corresponding to the found value
+
+        Example:
+             In: text = 'My name is yash modi'
+             Out: [{first_name: "yash", middle_name: None, last_name: "modi"}], ["yash modi"]
+        """
+        entity_values, original_texts = [], []
+
+        pos_tagger = POS()
+        tokens = self.processed_text.split()
+        tagged_tokens = pos_tagger.tag(tokens)
+
+        is_question = [word[0] for word in tagged_tokens if word[1].startswith('WR') or
+                       word[1].startswith('WP') or word[1].startswith('CD')]
+
+        if is_question:
+            return entity_values, original_texts
+
+        pattern = re.compile(r"\b(?:name\s+is|name's|"
+                             r"(?:me is|i\s+am|i'm)(?:\s+called)?|"
+                             r"call\s+me|myself)"
+                             r"\s+(\w+(?:\s+\w+){0,2})\b", re.UNICODE | re.IGNORECASE)
+        # the above pattern can have false positives is the text does not end with name
+        # because we greedily extract 3 tokens after introduction prefixes
+        # It can also have false negatives if someone has name with more than three tokens or designations are involved
+
+        pattern_matches = pattern.findall(self.processed_text)
+
+        for pattern_match in pattern_matches:
+            entity_value, original_text = self.format_name_value(pattern_match.split())
+            entity_values.append(entity_value)
+            original_texts.append(original_text)
+
+        if not entity_values and len(tokens) < 4:  # Condition too strict
+            # TODO: A better approach will be to find spans of NN* and JJ* in the text and tag them
+            pos_words = [word[0] for word in tagged_tokens if word[1].startswith('NN') or
+                         word[1].startswith('JJ')]  # this is not guaranteed to be a span
+            if pos_words:
+                entity_value, original_text = self.format_name_value(pos_words)
+                entity_values.append(entity_value)
+                original_texts.append(original_text)
+
+        return entity_values, original_texts
+
+    @staticmethod
+    def format_name_value(name_parts_list):
+        """
+        Convert name parts list to a dict of first, middle and last names
+
+        Args:
+            name_parts_list (list): List of names detected
             Example:
                  ['yash', 'doshi']
 
         Returns:
-        ({first_name: "yash", middle_name: None, last_name: "modi"}, "yash modi")
+            tuple:
+                dict: containing first_name, middle_name and last_name
+                str: original text corresponding to the found value
+
+        E.g. output ({first_name: "yash", middle_name: None, last_name: "modi"}, "yash modi")
         """
 
-        original_text = " ".join(name_list)
+        original_text = ' '.join(name_parts_list)
 
-        first_name = name_list[0]
+        first_name = name_parts_list[0]
         middle_name = None
         last_name = None
 
-        if len(name_list) > 1:
-            last_name = name_list[-1]
-            middle_name = " ".join(name_list[1:-1]) or None
+        if len(name_parts_list) > 1:
+            last_name = name_parts_list[-1]
+            middle_name = " ".join(name_parts_list[1:-1]) or None
 
         entity_value = {FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name}
-
-        return [entity_value], [original_text]
-
-    def text_detection_name(self):
-        """
-        Makes a call to TextDetection and return the person_name detected from the elastic search.
-        Returns:
-           Tuple with list of names detected in TextDetection in the form of variants detected and original_text
-
-         Example : my name is yash doshi
-
-         ([u'dosh', u'yash'], ['doshi', 'yash'])
-        """
-
-        return self.text_detection_object.detect_entity(text=self.text)
-
-    def get_name_using_pos_tagger(self, text):
-        """
-        First checks if the text contains cardinals or interrogation.
-        Then passes the text through templates.
-        Then returns words which are nouns or adjectives
-        Args:
-            text (string): The text obtained from the user.
-
-            Example text= My name is yash modi
-        Returns:
-            [{first_name: "yash", middle_name: None, last_name: "modi"}], ["yash modi"]
-        """
-
-        entity_value, original_text = [], []
-        pos_tagger_object = POS()
-        pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
-        pattern2 = re.compile(r"myself\s+([\w\s]+)")
-        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
-        name_tokens = text.split(' ')
-        tagged_names = pos_tagger_object.tag(name_tokens)
-        pattern1_match = pattern1.findall(text)
-        pattern2_match = pattern2.findall(text)
-        pattern3_match = pattern3.findall(text)
-
-        is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
-                       word[1].startswith('WP') or word[1].startswith('CD')]
-        if is_question:
-            return entity_value, original_text
-
-        if pattern1_match:
-            entity_value, original_text = self.get_format_name(pattern1_match[0][1].split())
-
-        elif pattern2_match:
-            entity_value, original_text = self.get_format_name(pattern2_match[0].split())
-
-        elif pattern3_match:
-            entity_value, original_text = self.get_format_name(pattern3_match[0].split())
-
-        elif len(name_tokens) < 4:
-            pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
-                         word[1].startswith('JJ')]
-            if pos_words:
-                entity_value, original_text = self.get_format_name(pos_words)
-
-        return entity_value, original_text
-
-    def detect_entity(self, text, bot_message=None):
-        """
-        Takes text as input and  returns two lists
-        1.entity_value in the form of first, middle and last names
-        2.original text.
-        Args:
-           text(string): the original text
-           bot_message(string): previous bot message
-
-           Example:
-                    text=my name is yash doshi
-       Returns:
-                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
-        """
-
-        if bot_message:
-            if not self.context_check_botmessage(bot_message):
-                return [], []
-        self.text = text
-        self.tagged_text = self.text
-        text_detection_result = self.text_detection_name()
-        replaced_text = self.replace_detected_text(text_detection_result)
-        entity_value, original_text = self.detect_person_name_entity(replaced_text)
-
-        if not entity_value:
-            entity_value, original_text = self.get_name_using_pos_tagger(text)
-
-        return entity_value, original_text
-
-    def replace_detected_text(self, text_detection_result):
-        """
-        Replaces the detected name from text_detection_result by _<name>_
-        Args:
-            text_detection_result: tuple of detected names from TextDetection
-            consisting of two lists
-            1.The variants detected
-            2.The original text
-            ([u'dosh', u'yash'], ['doshi', 'yash'])
-
-            Example:
-                    text_detection_result= ([u'dosh', u'yash'], ['doshi', 'yash'])
-            Returns:
-                    ['my', 'name', 'is', 'yash', 'doshi']
-
-        """
-
-        replaced_text = Tokenizer().tokenize(self.text.lower())
-        for detected_original_text in (text_detection_result[1]):
-            for j in range(len(replaced_text)):
-                replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
-
-        return replaced_text
-
-    def detect_person_name_entity(self, replaced_text):
-        """
-        Separates the detected names into first, middle and last names.
-        Returns in form of two lists entity_value and original_text
-        Args:
-            replaced_text: text in which names detected from TextDetector are replaced by
-        _<name>_
-        Example:
-                replaced_text = My name is _yash_ _modi_
-        Returns:
-                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ "yash modi"]
-        """
-
-        original_text, entity_value = [], []
-        name_list = []
-        name_holder = []
-
-        for each in replaced_text:
-            if each.startswith('_') and each.endswith('_'):
-                name_holder.append(each.replace('_', ''))
-
-            else:
-                if name_holder:
-                    name_list.append(name_holder)
-                    name_holder = []
-
-        if name_holder:
-            name_list.append(name_holder)
-
-        for name in name_list:
-            name_entity_value, original_text_value = self.get_format_name(name)
-            original_text.extend(original_text_value)
-            entity_value.extend(name_entity_value)
 
         return entity_value, original_text
 
     @staticmethod
-    def context_check_botmessage(botmessage):
+    def _check_name_patterns_botmessage(botmessage):
         """
-        Checks if previous botmessage conatins name as a keyword or not
+        Check if previous botmessage contains some patterns to trigger name detection ot not
+
         Args:
             botmessage: it consists of the previous botmessage
-            Example: what is your name ?
+
         Returns:
-            True
+            bool: if bot message passes conditions to trigger detection
+
         """
 
-        if "name" in botmessage:
-            return True
-        return False
+        return "name" in botmessage
+
+    def _update_processed_text(self, original_texts):
+        """
+        Replace detected names with tag generated from entity_name used to initialize the object with
+
+        Args:
+            original_texts(list of str): list of substrings of original text to be replaced with tag
+                                         created from entity_name
+        """
+        for detected_text in original_texts:
+            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            self.processed_text = self.processed_text.replace(detected_text, '')
