@@ -48,22 +48,22 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
                     search_language_script=None, **kwargs):
     """
-    Performs compound elasticsearch boolean search query with highlights for the given user sentence . The query
-    searches for entity_name in the index & returns search results for the user sentence only if entity_name is found.
+    Performs compound elasticsearch boolean search query with highlights for the given sentence . The query
+    searches for entity_name in the index & returns search results for the sentence only if entity_name is found.
 
     Args:
         connection: Elasticsearch client object
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
-        user_typed_sentence: user typed sentence in which entity has to be searched
+        sentence: sentence in which entity has to be searched
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
     Returns:
-        dictionary of the parsed results from highlighted search query results on the user says sentence,
+        dictionary of the parsed results from highlighted search query results on the sentence,
         mapping highlighted fuzzy entity variant to entity value
 
     Example:
@@ -154,18 +154,18 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
 
 def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, language_script=None):
     """
-    Generates compound elasticsearch boolean search query dictionary for the user says sentence. The query generated
-    searches for entity_name in the index and returns search results for the matched word (of user-says sentence)
+    Generates compound elasticsearch boolean search query dictionary for the sentence. The query generated
+    searches for entity_name in the index and returns search results for the matched word (of sentence)
      only if entity_name is found.
 
     Args:
         entity_name: name of the entity to perform a 'term' query on
-        user_typed_text: The sentence typed by user on which we need to identify the enitites.
+        text: The text on which we need to identify the enitites.
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         language_script: language of documents to be searched, optional, defaults to None
 
     Returns:
-        dictionary, the search query for the user typed sentence
+        dictionary, the search query for the text
 
     """
     must_terms = []
@@ -221,7 +221,7 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
 
 def _parse_es_search_results(results):
     """
-    Parses highlighted results returned from elasticsearch query on user typed sentence
+    Parses highlighted results returned from elasticsearch query on the text
 
     Args:
         results: search results dictionary from elasticsearch including highlights and scores
