@@ -1,5 +1,6 @@
 import re
 
+from chatbot_ner.config import ner_logger
 from datastore import DataStore
 from lib.nlp.const import tokenizer
 from lib.nlp.data_normalization import Normalization
@@ -35,7 +36,7 @@ class TextDetector(BaseDetector):
         tagged_text (str): string with time entities replaced with tag defined by entity_name
         text_entity (list): list to store detected entities from the text
         original_text_entity (list): list of substrings of the text detected as entities
-        processed_text (str): string with detected time entities removed
+        processed_text (str): string with detected text entities removed
         tag (str): entity_name prepended and appended with '__'
     """
 
@@ -196,8 +197,10 @@ class TextDetector(BaseDetector):
         self.text = self.regx_to_process.text_substitute(self.text)
         self.text = ' ' + self.text.lower() + ' '
         self.processed_text = self.text
-        text_entity_data = self._text_detection_with_variants()
         self.tagged_text = self.processed_text
+
+        text_entity_data = self._text_detection_with_variants()
+
         self.text_entity = text_entity_data[0]
         self.original_text_entity = text_entity_data[1]
         return text_entity_data
@@ -215,25 +218,13 @@ class TextDetector(BaseDetector):
         """
         original_final_list = []
         value_final_list = []
-        normalization = Normalization()
-        self.text_dict = normalization.ngram_data(self.processed_text.lower(), flag_punctuation_removal=False,
-                                                  stem_unigram=False, stem_bigram=False, stem_trigram=False,
-                                                  stop_words_unigram=True, stop_words_bigram=True,
-                                                  stop_words_trigram=True).copy()
         variant_dictionary = {}
 
-        trigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['trigram'],
-                                                                 self._fuzziness,
-                                                                 search_language_script=self._target_language_script)
-        bigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['bigram'],
-                                                                self._fuzziness,
-                                                                search_language_script=self._target_language_script)
-        unigram_variants = self.db.get_similar_ngrams_dictionary(self.entity_name, self.text_dict['unigram'],
-                                                                 self._fuzziness,
-                                                                 search_language_script=self._target_language_script)
-        variant_dictionary.update(trigram_variants)
-        variant_dictionary.update(bigram_variants)
-        variant_dictionary.update(unigram_variants)
+        tokens = tokenizer.tokenize(self.processed_text)
+        message = u' '.join(tokens)
+        variants = self.db.get_similar_dictionary(self.entity_name, message,
+                                                  self._fuzziness, search_language_script=self._target_language_script)
+        variant_dictionary.update(variants)
         variant_list = variant_dictionary.keys()
 
         exact_matches, fuzzy_variants = [], []
@@ -252,8 +243,11 @@ class TextDetector(BaseDetector):
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
-                self.processed_text = re.sub(r'\b' + original_text + r'\b', self.tag, self.processed_text)
-
+                _pattern = re.compile(r'\b%s\b' % original_text, re.UNICODE)
+                self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
+                # Instead of dropping completely like in other entities,
+                # we replace with tag to avoid matching non contiguous segments
+                self.processed_text = _pattern.sub(self.tag, self.processed_text)
         return value_final_list, original_final_list
 
     def _get_entity_from_text(self, variant, text):
