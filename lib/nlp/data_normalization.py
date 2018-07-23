@@ -14,7 +14,7 @@ class Normalization(object):
         ngram: its an object of Ngram class
         tokenizer: its an object of Tokenizer class
         stemmer: its an object of Stemmer class
-        regx_to_process: its an object of Regex class
+        regx_to_process: its an object of RegexReplace class
         stop_word_list: list of stop words
         text: message that needs to be processed
         text_to_process: isa text but regular expression and all the processing operations are performed on this

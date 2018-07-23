@@ -1,7 +1,7 @@
 import re
 
 from ner_v1.detectors.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
-from lib.nlp.regex import Regex
+from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
@@ -97,7 +97,7 @@ class BudgetDetector(object):
         self.original_budget_text = []
 
         regex_for_thousand = [(r'(\d+)k', r'\g<1>000')]
-        self.regex_object = Regex(regex_for_thousand)
+        self.regex_object = RegexReplace(regex_for_thousand)
         self.tag = '__' + self.entity_name + '__'
         self.text_detection_object = TextDetector(entity_name=ES_BUDGET_LIST)
 

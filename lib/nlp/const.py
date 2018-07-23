@@ -4,7 +4,7 @@ from lib.nlp.lemmatizer import Lemmatizer, WORDNET_LEMMATIZER
 from lib.nlp.ngram import Ngram
 from lib.nlp.stemmer import Stemmer, PORTER_STEMMER
 from lib.nlp.tokenizer import Tokenizer, PRELOADED_NLTK_TOKENIZER, LUCENE_STANDARD_TOKENIZER
-from lib.nlp.regex import Regex
+from lib.nlp.regexreplace import RegexReplace
 from chatbot_ner.settings import BASE_DIR
 
 
@@ -24,5 +24,5 @@ stop_words = store_data_in_list(stop_word_path)
 ngram_object = Ngram()
 
 punctuation_removal_list = [(r'[^\w\'\/]', r' '), (r'\'', r'')]
-regx_punctuation_removal = Regex(punctuation_removal_list)
+regx_punctuation_removal = RegexReplace(punctuation_removal_list)
 

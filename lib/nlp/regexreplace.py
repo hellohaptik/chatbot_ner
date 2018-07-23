@@ -1,7 +1,7 @@
 import re
 
 
-class Regex(object):
+class RegexReplace(object):
     """
     This class is used to perform regex operations
     Its a class which can be used to perform various regex operations like substitution, pattern matching, searching,
@@ -10,7 +10,7 @@ class Regex(object):
 
     For Example:
         pattern_list = [('[\,\?]', ''),(r'\bu\b','you')]
-        regex = Regex(pattern_list)
+        regex = RegexReplace(pattern_list)
         output = regex.text_substitute('Hey, where are u going?')
         print output
         >> 'Hey where are you going'
@@ -24,7 +24,7 @@ class Regex(object):
     """
 
     def __init__(self, pattern_list):
-        """Initializes a Regex object
+        """Initializes a RegexReplace object
 
         Args:
             pattern_list: List of tuples -> [(pattern_to_search, pattern_to_replace),...]
@@ -46,7 +46,7 @@ class Regex(object):
             will return the substituted text
             For example:
                 pattern_list = [('[\,\?]', ''),(r'\bu\b','you')]
-                regex = Regex(pattern_list)
+                regex = RegexReplace(pattern_list)
                 output = regex.text_substitute('Hey, where are u going?')
                 print output
                 >> 'Hey where are you going'

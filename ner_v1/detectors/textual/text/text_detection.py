@@ -3,7 +3,7 @@ import re
 from datastore import DataStore
 from lib.nlp.const import TOKENIZER
 from lib.nlp.levenshtein_distance import edit_distance
-from lib.nlp.regex import Regex
+from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.base_detector import BaseDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
@@ -20,7 +20,7 @@ class TextDetector(BaseDetector):
     Attributes:
         text (str): string to extract entities from
         entity_name (str): string by which the detected time entities would be replaced with on calling detect_entity()
-        regx_to_process (lib.nlp.Regex): list of regex patterns to match and remove text that matches
+        regx_to_process (lib.nlp.RegexReplace): list of regex patterns to match and remove text that matches
                                          these patterns before starting to detect entities
         text_dict (dict): dictionary to store lemmas, stems, ngrams used during detection process
         _fuzziness (str or int): If this parameter is str, elasticsearch's
@@ -54,7 +54,7 @@ class TextDetector(BaseDetector):
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
 
         self.text = None
-        self.regx_to_process = Regex([(r'[\'\/]', r'')])
+        self.regx_to_process = RegexReplace([(r'[\'\/]', r'')])
         self.text_dict = {}
         self.tagged_text = None
         self.text_entity_values = []
@@ -285,7 +285,6 @@ class TextDetector(BaseDetector):
         variant_token_i = 0
         for text_token in text_tokens:
             variant_token = variant_tokens[variant_token_i]
-
 
             same = variant_token == text_token
             ft = self._get_fuzziness_threshold_for_token(text_token)

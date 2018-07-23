@@ -3,7 +3,7 @@ from collections import defaultdict
 from future.utils import iteritems
 
 from lib.nlp.const import TOKENIZER
-from lib.nlp.regex import Regex
+from lib.nlp.regexreplace import RegexReplace
 from ner_v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 
 
@@ -74,7 +74,7 @@ def combine_output_of_detection_logic_and_tag(entity_data, text):
           }
 
     """
-    regex = Regex([(r'[\'\/]', r'')])
+    regex = RegexReplace([(r'[\'\/]', r'')])
     text = regex.text_substitute(text)
     final_entity_data = defaultdict(list)
     tagged_text = text.lower()
