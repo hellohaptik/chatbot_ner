@@ -98,10 +98,12 @@ class NameDetector(object):
         pos_tagger_object = POS()
         pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
+        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
         name_tokens = text.split(' ')
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
+        pattern3_match = pattern3.findall(text)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
@@ -113,6 +115,9 @@ class NameDetector(object):
 
         elif pattern2_match:
             entity_value, original_text = self.get_format_name(pattern2_match[0].split())
+
+        elif pattern3_match:
+            entity_value, original_text = self.get_format_name(pattern3_match[0].split())
 
         elif len(name_tokens) < 4:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
