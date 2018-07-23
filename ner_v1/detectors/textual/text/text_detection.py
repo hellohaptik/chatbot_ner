@@ -1,9 +1,7 @@
 import re
 
-from chatbot_ner.config import ner_logger
 from datastore import DataStore
-from lib.nlp.const import tokenizer
-from lib.nlp.data_normalization import Normalization
+from lib.nlp.const import TOKENIZER
 from lib.nlp.levenshtein_distance import edit_distance
 from lib.nlp.regex import Regex
 from ner_v1.detectors.base_detector import BaseDetector
@@ -34,8 +32,8 @@ class TextDetector(BaseDetector):
         _min_token_size_for_fuzziness (int): minimum number of letters a word must have to be considered
                                              for calculating edit distance with similar ngrams from the datastore
         tagged_text (str): string with time entities replaced with tag defined by entity_name
-        text_entity (list): list to store detected entities from the text
-        original_text_entity (list): list of substrings of the text detected as entities
+        text_entity_values (list): list to store detected entities from the text
+        original_texts (list): list of substrings of the text detected as entities
         processed_text (str): string with detected text entities removed
         tag (str): entity_name prepended and appended with '__'
     """
@@ -59,8 +57,8 @@ class TextDetector(BaseDetector):
         self.regx_to_process = Regex([(r'[\'\/]', r'')])
         self.text_dict = {}
         self.tagged_text = None
-        self.text_entity = []
-        self.original_text_entity = []
+        self.text_entity_values = []
+        self.original_texts = []
         self.processed_text = None
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
@@ -190,20 +188,19 @@ class TextDetector(BaseDetector):
                 Output:
                     ' come to __city__, __city__,  i will visit __city__ next year '
 
-        Additionally this function assigns these lists to self.time and self.original_text_entity attributes
+        Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        self.text = text
-        self.text = self.regx_to_process.text_substitute(self.text)
-        self.text = ' ' + self.text.lower() + ' '
-        self.processed_text = self.text
+        self.text = text.lower()
+        self.processed_text = self.regx_to_process.text_substitute(self.text)
+        self.processed_text = u' ' + u' '.join(TOKENIZER.tokenize(self.processed_text)) + u' '
         self.tagged_text = self.processed_text
 
-        text_entity_data = self._text_detection_with_variants()
+        values, original_texts = self._text_detection_with_variants()
 
-        self.text_entity = text_entity_data[0]
-        self.original_text_entity = text_entity_data[1]
-        return text_entity_data
+        self.text_entity_values, self.original_texts = values, original_texts
+
+        return self.text_entity_values, self.original_texts
 
     def _text_detection_with_variants(self):
         """
@@ -220,26 +217,26 @@ class TextDetector(BaseDetector):
         value_final_list = []
         variant_dictionary = {}
 
-        tokens = tokenizer.tokenize(self.processed_text)
-        message = u' '.join(tokens)
-        variants = self.db.get_similar_dictionary(self.entity_name, message,
-                                                  self._fuzziness, search_language_script=self._target_language_script)
+        variants = self.db.get_similar_dictionary(entity_name=self.entity_name,
+                                                  text=u' '.join(TOKENIZER.tokenize(self.processed_text)),
+                                                  fuzziness_threshold=self._fuzziness,
+                                                  search_language_script=self._target_language_script)
         variant_dictionary.update(variants)
         variant_list = variant_dictionary.keys()
 
         exact_matches, fuzzy_variants = [], []
         for variant in variant_list:
-            if variant.lower() in self.processed_text.lower():
+            if variant.lower() in self.processed_text:
                 exact_matches.append(variant)
             else:
                 fuzzy_variants.append(variant)
 
-        exact_matches.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
-        fuzzy_variants.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
+        exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+        fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
         variant_list = exact_matches + fuzzy_variants
 
         for variant in variant_list:
-            original_text = self._get_entity_from_text(variant, self.processed_text.lower())
+            original_text = self._get_entity_subtext_from_text(variant, self.processed_text)
             if original_text:
                 value_final_list.append(variant_dictionary[variant])
                 original_final_list.append(original_text)
@@ -250,7 +247,7 @@ class TextDetector(BaseDetector):
                 self.processed_text = _pattern.sub(self.tag, self.processed_text)
         return value_final_list, original_final_list
 
-    def _get_entity_from_text(self, variant, text):
+    def _get_entity_subtext_from_text(self, variant, text):
         """
         Checks ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
 
@@ -276,12 +273,18 @@ class TextDetector(BaseDetector):
             Output:
                 'delehi'
         """
-        variant_tokens = tokenizer.tokenize(variant.lower())
-        text_tokens = tokenizer.tokenize(text.lower())
+        if isinstance(text, bytes):
+            text = text.decode('utf-8').lower()
+
+        if isinstance(variant, bytes):
+            variant = variant.decode('utf-8').lower()
+
+        variant_tokens = TOKENIZER.tokenize(variant)
+        text_tokens = TOKENIZER.tokenize(text)
         original_text = []
-        variant_count = 0
+        variant_token_i = 0
         for text_token in text_tokens:
-            variant_token = variant_tokens[variant_count]
+            variant_token = variant_tokens[variant_token_i]
 
             utext_token = text_token
             if type(utext_token) == 'str':
@@ -294,10 +297,10 @@ class TextDetector(BaseDetector):
                                           string2=text_token,
                                           max_distance=ft + 1) <= ft):
                 original_text.append(text_token)
-                variant_count += 1
-                if variant_count == len(variant_tokens):
+                variant_token_i += 1
+                if variant_token_i == len(variant_tokens):
                     return ' '.join(original_text)
             else:
                 original_text = []
-                variant_count = 0
+                variant_token_i = 0
         return None

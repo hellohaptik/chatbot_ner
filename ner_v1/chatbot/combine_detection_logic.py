@@ -1,5 +1,8 @@
 from collections import defaultdict
-from lib.nlp.const import tokenizer
+
+from future.utils import iteritems
+
+from lib.nlp.const import TOKENIZER
 from lib.nlp.regex import Regex
 from ner_v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 
@@ -77,12 +80,12 @@ def combine_output_of_detection_logic_and_tag(entity_data, text):
     tagged_text = text.lower()
     processed_text = text.lower()
     tag_preprocess_dict = defaultdict(list)
-    for entity, entity_list in entity_data.iteritems():
+    for entity, entity_list in iteritems(entity_data):
         if entity_list:
             for entity_identified in entity_list:
                 if entity_identified[ORIGINAL_TEXT] and \
-                                entity_identified[DETECTION_METHOD] in [FROM_MESSAGE, FROM_MODEL_VERIFIED,
-                                                                        FROM_MODEL_NOT_VERIFIED]:
+                        entity_identified[DETECTION_METHOD] in [FROM_MESSAGE, FROM_MODEL_VERIFIED,
+                                                                FROM_MODEL_NOT_VERIFIED]:
                     tag_preprocess_dict[entity_identified[ORIGINAL_TEXT].lower()].append([entity_identified, entity])
                 else:
                     tag_preprocess_dict['NA'].append([entity_identified, entity])
@@ -127,9 +130,9 @@ def sort_original_text(original_text_list):
     """
     final_original_text = []
     sort_original_text_dict = defaultdict(list)
-    original_text_list.sort(key=lambda s: len(tokenizer.tokenize(s)), reverse=True)
+    original_text_list.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
     for original in original_text_list:
-        length_of_token = len(tokenizer.tokenize(original))
+        length_of_token = len(TOKENIZER.tokenize(original))
         sort_original_text_dict[length_of_token].append(original)
     for token_length in reversed(sorted(sort_original_text_dict.keys())):
         list_of_tokens = sort_original_text_dict[token_length]

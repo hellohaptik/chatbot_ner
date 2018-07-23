@@ -1,7 +1,6 @@
 import re
 
-from ner_v1.language_utilities.constant import ENGLISH_LANG
-from chatbot_ner.config import ner_logger
+from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
 log_prefix = 'datastore.elastic_search.query'
@@ -89,7 +88,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
          u'pune': u'pune'}
     """
     data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
-                                                language_script=search_language_script)
+                                          language_script=search_language_script)
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     results = _run_es_search(connection, **kwargs)
     results = _parse_es_search_results(results)
@@ -221,13 +220,14 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
 
 def _parse_es_search_results(results):
     """
-    Parses highlighted results returned from elasticsearch query on user typed sentence
+    Parse highlighted results returned from elasticsearch query and generate a variants to values dictionary
 
     Args:
         results: search results dictionary from elasticsearch including highlights and scores
 
     Returns:
-        dictionary of the parsed results from highlighted search query results on ngrams_list
+        dict: dict mapping matching variants to their entity values based on the
+              parsed results from highlighted search query results
 
     Example:
         Parameter ngram_results has highlighted search results as follows:
@@ -268,31 +268,32 @@ def _parse_es_search_results(results):
         }
 
     """
-    entity_value_list, variant_value_list = [], []
-    variant_dictionary = {}
+    entity_values, entity_variants = [], []
+    variants_to_values = {}
     if results and results['hits']['total'] > 0:
         for hit in results['hits']['hits']:
             if 'highlight' not in hit:
                 continue
-            count_of_variants = len(hit['highlight']['variants'])
-            count = 0
-            while count < count_of_variants:
-                entity_value_list.append(hit['_source']['value'])
-                variant_value_list.append(hit['highlight']['variants'][count])
-                count += 1
-    count = 0
 
-    while count < len(variant_value_list):
-        variant_value_list[count] = re.sub('\s+', ' ', variant_value_list[count]).strip()
-        if variant_value_list[count].count('<em>') == len(variant_value_list[count].split()):
-            variant = variant_value_list[count].replace('<em>', '')
+            value = hit['_source']['value']
+            for variant in hit['highlight']['variants']:
+                entity_values.append(value)
+                entity_variants.append(variant)
+
+    for value, variant in zip(entity_values, entity_variants):
+        variant = re.sub('\s+', ' ', variant.strip())
+        variant_tokens = TOKENIZER.tokenize(variant)
+        if variant.count('<em>') == len(variant_tokens):
+            variant = variant.replace('<em>', '')
             variant = variant.replace('</em>', '')
-            if variant.strip() in variant_dictionary:
-                existing_value = variant_dictionary[variant.strip()]
-                if len(existing_value.split(' ')) > len(entity_value_list[count].split(' ')):
-                    variant_dictionary[variant.strip()] = entity_value_list[count]
+            variant = variant.strip()
+            if variant in variants_to_values:
+                old_value = variants_to_values[variant]
+                if len(TOKENIZER.tokenize(old_value)) > len(TOKENIZER.tokenize(value)):
+                    # Note: Although this condition evaluates to true rarely, it is unclear why we settle
+                    # on values with lesser number of tokens. This is subject to change in the future.
+                    variants_to_values[variant] = value
             else:
-                variant_dictionary[variant.strip()] = entity_value_list[count]
-        count += 1
+                variants_to_values[variant] = value
 
-    return variant_dictionary
+    return variants_to_values

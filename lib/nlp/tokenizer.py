@@ -83,7 +83,7 @@ class Tokenizer(object):
         return word_tokenize
 
     def get_tokenizer(self):
-        """Returns the object of tokenizer
+        """Get the object of set tokenizer
 
         Returns:
             The object of tokenizer

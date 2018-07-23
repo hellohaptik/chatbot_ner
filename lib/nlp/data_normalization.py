@@ -1,4 +1,4 @@
-from lib.nlp.const import lemmatizer, ngram_object, tokenizer, stemmer, regx_punctuation_removal, \
+from lib.nlp.const import lemmatizer, ngram_object, nltk_tokenizer, stemmer, regx_punctuation_removal, \
     stop_words
 from lib.nlp.etc import filter_list
 from chatbot_ner.config import nlp_logger
@@ -95,7 +95,8 @@ class Normalization(object):
 
         self.lemmatizer = lemmatizer
         self.ngram = ngram_object
-        self.tokenizer = tokenizer
+        # CAUTION: The following nltk_tokenizer (nltk punkt) is different from elasticsearch's standard tokenizer
+        self.tokenizer = nltk_tokenizer
         self.stemmer = stemmer
         self.regx_to_process = regx_punctuation_removal
 
