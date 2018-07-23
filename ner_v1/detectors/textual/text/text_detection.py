@@ -1,7 +1,6 @@
 import re
 
-from future.utils import iteritems
-
+from six import iteritems
 from datastore import DataStore
 from lib.nlp.const import TOKENIZER
 from lib.nlp.levenshtein_distance import edit_distance

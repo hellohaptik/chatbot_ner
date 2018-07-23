@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from future.utils import iteritems
+from six import iteritems
 
 from lib.nlp.const import TOKENIZER
 from lib.nlp.regexreplace import RegexReplace
