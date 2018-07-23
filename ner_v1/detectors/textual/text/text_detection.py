@@ -152,7 +152,7 @@ class TextDetector(BaseDetector):
     def _process_text(self, text):
         self.text = text.lower()
         if isinstance(self.text, bytes):
-            variant = self.text.decode('utf-8')
+            self.text = self.text.decode('utf-8')
 
         self.processed_text = self.text
 
@@ -162,23 +162,66 @@ class TextDetector(BaseDetector):
         self.processed_text = u' ' + self.processed_text + u' '
         self.tagged_text = self.processed_text
 
-    def _get_original_text(self, matched_tokens):
+    def _get_substring_from_processed_text(self, matched_tokens):
+        """
+        Get part of original text that was detected as some entity value.
 
-        def _get_raw_to_processed_token_indices_map(processed_text):
-            processed_text_tokens = TOKENIZER.tokenize(processed_text)
+        This method was written to tackle cases when original text contains special characters which are dropped
+        during tokenization
+
+        Args:
+            matched_tokens (list): list of tokens (usually tokens from fuzzy match results from ES)
+                                   to find as a contiguous substring in the processed text considering the effects
+                                   of tokenizer
+
+        Returns:
+            str or unicode: part of original text that corresponds to given tokens
+
+        E.g.
+        self.processed_text = u'i want to order 1 pc hot & crispy'
+        tokens = [u'i', u'want', u'to', u'order', u'1', u'pc', u'hot', u'crispy']
+        indices = [(1, 2), (3, 7), (8, 10), (11, 16), (17, 18), (19, 21), (22, 25), (28, 34)])
+
+        In: matched_tokens = [u'1', u'pc', u'hot', u'crispy']
+        Out: 1 pc hot & crispy
+
+        Notice that & is dropped during tokenization but when finding original text, we recover it from processed text
+        """
+
+        def _get_tokens_and_indices(text):
+            """
+            Args:
+                text (str or unicode): text to get tokens from and indicies of those tokens in the given text
+
+            Returns:
+                tuple:
+                    list: containing tokens, direct results from tokenizer.tokenize
+                    list: containing (int, int) indicating start and end position of ith token (of first list)
+                          in given text
+
+            E.g.
+            In: text = u'i want to order 1 pc hot & crispy'
+            Out: ([u'i', u'want', u'to', u'order', u'1', u'pc', u'hot', u'crispy'],
+                  [(1, 2), (3, 7), (8, 10), (11, 16), (17, 18), (19, 21), (22, 25), (28, 34)])
+
+            """
+            processed_text_tokens = TOKENIZER.tokenize(text)
             processed_text_tokens_indices = []
 
-            txt = processed_text
+            offset = 0
+            txt = text
             for token in processed_text_tokens:
                 st = txt.index(token)
                 en = st + len(token)
-                processed_text_tokens_indices.append((st, en))
                 txt = txt[en:]
+                processed_text_tokens_indices.append((offset + st, offset + en))
+                offset += en
+
             return processed_text_tokens, processed_text_tokens_indices
 
         try:
             n = len(matched_tokens)
-            tokens, indices = _get_raw_to_processed_token_indices_map(self.processed_text)
+            tokens, indices = _get_tokens_and_indices(self.processed_text)
             for i in range(len(tokens) - n + 1):
                 if tokens[i:i + n] == matched_tokens:
                     start = indices[i][0]
@@ -201,8 +244,9 @@ class TextDetector(BaseDetector):
             text (unicode): string to extract textual entities from
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
-            Tuple containing two lists, first containing entity value as defined into datastore
-            and second list containing corresponding original substrings in text
+            tuple:
+                list: containing entity value as defined into datastore
+                list: containing corresponding original substrings in text
 
         Example:
             DataStore().get_entity_dictionary('city')
@@ -247,8 +291,9 @@ class TextDetector(BaseDetector):
         original text which has been identified and will return the results
 
         Returns:
-             A tuple of two lists with first list containing the detected text entities and second list containing
-             their corresponding substrings in the original message.
+             tuple:
+                list: containing the detected text entities
+                list: containing their corresponding substrings in the original message.
         """
         original_final_list = []
         value_final_list = []
@@ -279,7 +324,7 @@ class TextDetector(BaseDetector):
         variant_list = exact_matches + fuzzy_variants
 
         for variant in variant_list:
-            original_text = self._get_entity_subtext_from_text(variant, self.processed_text)
+            original_text = self._get_entity_substring_from_text(variant, self.processed_text)
             if original_text:
                 value_final_list.append(variants_to_values[variant])
                 original_final_list.append(original_text)
@@ -290,7 +335,7 @@ class TextDetector(BaseDetector):
                 self.processed_text = _pattern.sub(self.tag, self.processed_text)
         return value_final_list, original_final_list
 
-    def _get_entity_subtext_from_text(self, variant, text):
+    def _get_entity_substring_from_text(self, variant, text):
         """
         Checks ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
 
@@ -299,7 +344,7 @@ class TextDetector(BaseDetector):
             text: text to detect entities from
 
         Returns:
-            part of the given text that was detected as entity given the variant, None otherwise
+            str or unicode: part of the given text that was detected as entity given the variant, None otherwise
 
         Example:
             text_detection = TextDetector('city')
@@ -332,7 +377,7 @@ class TextDetector(BaseDetector):
                 original_text_tokens.append(text_token)
                 variant_token_i += 1
                 if variant_token_i == len(variant_tokens):
-                    return self._get_original_text(original_text_tokens)
+                    return self._get_substring_from_processed_text(original_text_tokens)
             else:
                 original_text_tokens = []
                 variant_token_i = 0
