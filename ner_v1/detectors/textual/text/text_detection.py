@@ -1,5 +1,7 @@
 import re
 
+from future.utils import iteritems
+
 from datastore import DataStore
 from lib.nlp.const import TOKENIZER
 from lib.nlp.levenshtein_distance import edit_distance
@@ -215,18 +217,20 @@ class TextDetector(BaseDetector):
         """
         original_final_list = []
         value_final_list = []
-        variant_dictionary = {}
+        variants_to_values = {}
 
-        variants = self.db.get_similar_dictionary(entity_name=self.entity_name,
-                                                  text=u' '.join(TOKENIZER.tokenize(self.processed_text)),
-                                                  fuzziness_threshold=self._fuzziness,
-                                                  search_language_script=self._target_language_script)
-        variant_dictionary.update(variants)
-        variant_list = variant_dictionary.keys()
+        _variants_to_values = self.db.get_similar_dictionary(entity_name=self.entity_name,
+                                                             text=u' '.join(TOKENIZER.tokenize(self.processed_text)),
+                                                             fuzziness_threshold=self._fuzziness,
+                                                             search_language_script=self._target_language_script)
+        for k, v in iteritems(_variants_to_values):
+            variants_to_values[k.lower()] = v
+
+        variants = variants_to_values.keys()
 
         exact_matches, fuzzy_variants = [], []
-        for variant in variant_list:
-            if variant.lower() in self.processed_text:
+        for variant in variants:
+            if variant in self.processed_text:
                 exact_matches.append(variant)
             else:
                 fuzzy_variants.append(variant)
@@ -238,7 +242,7 @@ class TextDetector(BaseDetector):
         for variant in variant_list:
             original_text = self._get_entity_subtext_from_text(variant, self.processed_text)
             if original_text:
-                value_final_list.append(variant_dictionary[variant])
+                value_final_list.append(variants_to_values[variant])
                 original_final_list.append(original_text)
                 _pattern = re.compile(r'\b%s\b' % original_text, re.UNICODE)
                 self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
