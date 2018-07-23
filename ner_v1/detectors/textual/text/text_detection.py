@@ -54,7 +54,7 @@ class TextDetector(BaseDetector):
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
 
         self.text = None
-        self.regx_to_process = RegexReplace([(r'[\'\/]', r'')])
+        self.regx_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
         self.text_dict = {}
         self.tagged_text = None
         self.text_entity_values = []
@@ -193,7 +193,7 @@ class TextDetector(BaseDetector):
         """
         self.text = text.lower()
         self.processed_text = self.regx_to_process.text_substitute(self.text)
-        self.processed_text = u' ' + u' '.join(TOKENIZER.tokenize(self.processed_text)) + u' '
+        self.processed_text = u' ' + self.processed_text + u' '
         self.tagged_text = self.processed_text
 
         values, original_texts = self._text_detection_with_variants()

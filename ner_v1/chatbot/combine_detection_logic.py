@@ -74,7 +74,7 @@ def combine_output_of_detection_logic_and_tag(entity_data, text):
           }
 
     """
-    regex = RegexReplace([(r'[\'\/]', r'')])
+    regex = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
     text = regex.text_substitute(text)
     final_entity_data = defaultdict(list)
     tagged_text = text.lower()

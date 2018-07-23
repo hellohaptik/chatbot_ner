@@ -282,11 +282,9 @@ def _parse_es_search_results(results):
 
     for value, variant in zip(entity_values, entity_variants):
         variant = re.sub('\s+', ' ', variant.strip())
-        variant_tokens = TOKENIZER.tokenize(variant)
-        if variant.count('<em>') == len(variant_tokens):
-            variant = variant.replace('<em>', '')
-            variant = variant.replace('</em>', '')
-            variant = variant.strip()
+        variant_no_highlight_tags = variant.replace('<em>', '').replace('</em>', '').strip()
+        if variant.count('<em>') == len(TOKENIZER.tokenize(variant_no_highlight_tags)):
+            variant = variant_no_highlight_tags
             if variant in variants_to_values:
                 old_value = variants_to_values[variant]
                 if len(TOKENIZER.tokenize(old_value)) > len(TOKENIZER.tokenize(value)):

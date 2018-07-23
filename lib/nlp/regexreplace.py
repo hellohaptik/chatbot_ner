@@ -17,8 +17,6 @@ class RegexReplace(object):
 
     Attributes:
         pattern_list: List of tuples -> [(pattern_to_search, pattern_to_replace),...]
-        text: text on which regex needs to be performed
-        processed_text: Its text that will store the output
         pattern_compile: Object of 're' gets created for each pattern present in the list
 
     """
@@ -31,9 +29,7 @@ class RegexReplace(object):
         """
 
         self.pattern_list = pattern_list
-        self.text = None
-        self.processed_text = None
-        self.pattern_compile = [re.compile(pattern[0]) for pattern in self.pattern_list]
+        self.pattern_compile = [re.compile(pattern[0], re.IGNORECASE | re.UNICODE) for pattern in self.pattern_list]
 
     def text_substitute(self, text):
         """
@@ -43,7 +39,7 @@ class RegexReplace(object):
             text: text on which substitution needs to be performed
 
         Returns:
-            will return the substituted text
+            str: text
             For example:
                 pattern_list = [('[\,\?]', ''),(r'\bu\b','you')]
                 regex = RegexReplace(pattern_list)
@@ -52,8 +48,7 @@ class RegexReplace(object):
                 >> 'Hey where are you going'
 
         """
-        self.text = text
-        self.processed_text = self.text
+        processed_text = text
         for i, compiled_pattern in enumerate(self.pattern_compile):
-            self.processed_text = compiled_pattern.sub(self.pattern_list[i][1], self.text)
-        return self.processed_text
+            processed_text = compiled_pattern.sub(self.pattern_list[i][1], processed_text)
+        return processed_text
