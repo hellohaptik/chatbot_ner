@@ -1,3 +1,4 @@
+from six import string_types
 import re
 
 from lib.nlp.const import TOKENIZER
@@ -143,7 +144,7 @@ def _get_dynamic_fuzziness_threshold(term, fuzzy_setting):
          int or str: fuzziness as int when ES version < 6.2
                      otherwise the input is returned as it is
     """
-    if type(fuzzy_setting) == str:
+    if isinstance(fuzzy_setting, string_types):
         if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
             return fuzzy_setting
         return 'auto'

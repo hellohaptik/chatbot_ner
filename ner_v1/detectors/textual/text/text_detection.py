@@ -286,13 +286,10 @@ class TextDetector(BaseDetector):
         for text_token in text_tokens:
             variant_token = variant_tokens[variant_token_i]
 
-            utext_token = text_token
-            if type(utext_token) == 'str':
-                utext_token = utext_token.decode('utf-8')
 
             same = variant_token == text_token
-            ft = self._get_fuzziness_threshold_for_token(utext_token)
-            if same or (len(utext_token) > self._min_token_size_for_fuzziness
+            ft = self._get_fuzziness_threshold_for_token(text_token)
+            if same or (len(text_token) > self._min_token_size_for_fuzziness
                         and edit_distance(string1=variant_token,
                                           string2=text_token,
                                           max_distance=ft + 1) <= ft):
