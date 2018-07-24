@@ -285,13 +285,7 @@ def _parse_es_search_results(results):
         variant_no_highlight_tags = variant.replace('<em>', '').replace('</em>', '').strip()
         if variant.count('<em>') == len(TOKENIZER.tokenize(variant_no_highlight_tags)):
             variant = variant_no_highlight_tags
-            if variant in variants_to_values:
-                old_value = variants_to_values[variant]
-                if len(TOKENIZER.tokenize(old_value)) > len(TOKENIZER.tokenize(value)):
-                    # Note: Although this condition evaluates to true rarely, it is unclear why we settle
-                    # on values with lesser number of tokens. This is subject to change in the future.
-                    variants_to_values[variant] = value
-            else:
+            if variant not in variants_to_values:
                 variants_to_values[variant] = value
 
     return variants_to_values
