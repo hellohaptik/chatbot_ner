@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from lib.nlp.const import tokenizer
+from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from models.constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT
 from models.constant import INBOUND, OUTBOUND
@@ -156,8 +156,8 @@ class PredictCRF(object):
         if bot_message is None:
             bot_message = ''
 
-        tokens_bot_message = tokenizer.tokenize(bot_message)
-        tokens_user_message = tokenizer.tokenize(user_message)
+        tokens_bot_message = nltk_tokenizer.tokenize(bot_message)
+        tokens_user_message = nltk_tokenizer.tokenize(user_message)
 
         pos_bot_message = self.pos_tagger.tag(tokens_bot_message)
         pos_user_message = self.pos_tagger.tag(tokens_user_message)
