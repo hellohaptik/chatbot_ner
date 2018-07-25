@@ -1,10 +1,12 @@
 import nltk
 
+import regex
 # constants
 from lib.singleton import Singleton
 
 NLTK_TOKENIZER = 'WORD_TOKENIZER'
 PRELOADED_NLTK_TOKENIZER = 'PRELOADED_NLTK_TOKENIZER'
+LUCENE_STANDARD_TOKENIZER = 'LUCENE_STANDARD_TOKENIZER'
 
 
 class Tokenizer(object):
@@ -38,8 +40,21 @@ class Tokenizer(object):
         self.tokenizer_dict = {
             NLTK_TOKENIZER: self.__nltk_tokenizer,
             PRELOADED_NLTK_TOKENIZER: self.__preloaded_nltk_tokenizer,
+            LUCENE_STANDARD_TOKENIZER: self.__lucene_standard_tokenizer,
         }
         self.tokenizer = self.tokenizer_dict[self.tokenizer_selected]()
+
+    def __lucene_standard_tokenizer(self):
+        """
+        Tokenizer that mimicks Elasticsearch/Lucene's standard tokenizer
+        Uses word boundaries defined in Unicode Annex 29
+        """
+        words_pattern = regex.compile(r'\w(?:\B\S)*', flags=regex.V1 | regex.WORD | regex.UNICODE)
+
+        def word_tokenize(text):
+            return words_pattern.findall(text)
+
+        return word_tokenize
 
     def __nltk_tokenizer(self):
         """Initializes Word Tokenizer
@@ -50,6 +65,10 @@ class Tokenizer(object):
         return nltk.word_tokenize
 
     def __preloaded_nltk_tokenizer(self):
+        """
+        Faster version of nltk punkt tokenizer. It avoids a heavy I/O cycle at each tokenize call by preloading it
+        WARNING! It loads only the english tokenizer
+        """
         # Code pulled out of nltk == 3.2.5
         tokenizer = nltk.load('tokenizers/punkt/{0}.pickle'.format('english'))
         sent_tokenizer = tokenizer.tokenize
@@ -64,7 +83,7 @@ class Tokenizer(object):
         return word_tokenize
 
     def get_tokenizer(self):
-        """Returns the object of tokenizer
+        """Get the object of set tokenizer
 
         Returns:
             The object of tokenizer

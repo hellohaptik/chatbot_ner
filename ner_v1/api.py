@@ -377,6 +377,7 @@ def combine_output(request):
     ner_logger.debug('Finished %s : %s ' % (message, output))
     return HttpResponse(json.dumps({'data': output}), content_type='application/json')
 
+
 def parse_fuzziness_parameter(fuzziness):
     """
     This function takes input as the fuzziness value.

@@ -1,4 +1,4 @@
-from lib.nlp.const import lemmatizer, ngram_object, tokenizer, stemmer, regx_punctuation_removal, \
+from lib.nlp.const import lemmatizer, ngram_object, nltk_tokenizer, stemmer, regx_punctuation_removal, \
     stop_words
 from lib.nlp.etc import filter_list
 from chatbot_ner.config import nlp_logger
@@ -14,7 +14,7 @@ class Normalization(object):
         ngram: its an object of Ngram class
         tokenizer: its an object of Tokenizer class
         stemmer: its an object of Stemmer class
-        regx_to_process: its an object of Regex class
+        regx_to_process: its an object of RegexReplace class
         stop_word_list: list of stop words
         text: message that needs to be processed
         text_to_process: isa text but regular expression and all the processing operations are performed on this
@@ -95,7 +95,8 @@ class Normalization(object):
 
         self.lemmatizer = lemmatizer
         self.ngram = ngram_object
-        self.tokenizer = tokenizer
+        # CAUTION: The following nltk_tokenizer (nltk punkt) is different from elasticsearch's standard tokenizer
+        self.tokenizer = nltk_tokenizer
         self.stemmer = stemmer
         self.regx_to_process = regx_punctuation_removal
 
