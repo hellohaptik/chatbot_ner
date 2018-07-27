@@ -205,11 +205,11 @@ class TextDetector(BaseDetector):
                   [(1, 2), (3, 7), (8, 10), (11, 16), (17, 18), (19, 21), (22, 25), (28, 34)])
 
             """
-            processed_text_tokens = TOKENIZER.tokenize(text)
+            txt = text.rstrip() + ' __eos__'
+            processed_text_tokens = TOKENIZER.tokenize(txt)
             processed_text_tokens_indices = []
 
             offset = 0
-            txt = text
             for token in processed_text_tokens:
                 st = txt.index(token)
                 en = st + len(token)
@@ -228,6 +228,10 @@ class TextDetector(BaseDetector):
                 txt = txt[en:]
                 processed_text_tokens_indices.append((offset + st, offset + en))
                 offset += en
+
+            # remove eos parts
+            processed_text_tokens.pop()
+            processed_text_tokens_indices.pop()
 
             return processed_text_tokens, processed_text_tokens_indices
 
