@@ -218,7 +218,7 @@ class TextDetector(BaseDetector):
                 # It extends the previous token's end boundary if there are special characters except whitespace
                 # towards the end of previous token
                 prefix = txt[:en]
-                prefix_tokens = whitespace_tokenizer.tokenize()
+                prefix_tokens = whitespace_tokenizer.tokenize(prefix)
                 if prefix and len(prefix_tokens) > 1 and prefix_tokens[0]:
                     if processed_text_tokens_indices:
                         s, e = processed_text_tokens_indices.pop()
