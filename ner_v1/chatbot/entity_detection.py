@@ -7,7 +7,7 @@ from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
-from ner_v1.detectors.temporal.date.date_detection import DateAdvanceDetector
+from ner_v1.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
@@ -827,7 +827,7 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     """
     if timezone is None:
         timezone = 'UTC'
-    date_detection = DateAdvanceDetector(entity_name=entity_name, timezone=timezone)
+    date_detection = DateAdvancedDetector(entity_name=entity_name, timezone=timezone)
     date_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         entity_dict_list = date_detection.detect_entity(text=structured_value)
