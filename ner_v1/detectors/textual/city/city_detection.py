@@ -19,7 +19,7 @@ class CityDetector(object):
         text: string to extract entities from
         entity_name: string by which the detected city entities would be replaced with on calling detect_entity()
         tagged_text: string with city entities replaced with tag defined by entity_name
-        text_entity: list to store detected entities from the text
+        city: list to store detected entities from the text
         processed_text: string with detected time entities removed
         tag: entity_name prepended and appended with '__'
     """

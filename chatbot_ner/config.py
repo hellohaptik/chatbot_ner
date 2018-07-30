@@ -1,8 +1,9 @@
-import os
-import dotenv
 import logging.handlers
-from requests_aws4auth import AWS4Auth
+import os
+
+import dotenv
 from elasticsearch import RequestsHttpConnection
+from requests_aws4auth import AWS4Auth
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, 'config')

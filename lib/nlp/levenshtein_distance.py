@@ -22,10 +22,12 @@ def edit_distance(string1, string2, insertion_cost=1, deletion_cost=1, substitut
     So, whenever distance exceeds the max_distance the function will break and return the max_distance else
     it will return levenshtein distance
     """
-    if type(string1) == str:
+    if isinstance(string1, bytes):
         string1 = string1.decode('utf-8')
-    if type(string2) == str:
+
+    if isinstance(string2, bytes):
         string2 = string2.decode('utf-8')
+
     if len(string1) > len(string2):
         string1, string2 = string2, string1
     distances = range(len(string1) + 1)
