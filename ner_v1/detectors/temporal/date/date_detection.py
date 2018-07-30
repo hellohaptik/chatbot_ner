@@ -1745,7 +1745,7 @@ class DateDetector(object):
         for pattern in patterns:
             original = pattern[0]
 
-            dd = pattern[1]
+            dd = int(pattern[1])
             mm = self.now_date.month
             yy = self.now_date.year
 
@@ -1757,9 +1757,9 @@ class DateDetector(object):
                     yy += 1
 
             date_dict = {
-                'dd': int(dd),
-                'mm': int(mm),
-                'yy': int(yy),
+                'dd': dd,
+                'mm': mm,
+                'yy': yy,
                 'type': TYPE_POSSIBLE_DAY
             }
             date_list.append(date_dict)
@@ -1850,7 +1850,7 @@ class DateDetector(object):
         for pattern in patterns:
             original = pattern[0]
 
-            dd = pattern[1]
+            dd = int(pattern[1])
             previous_mm = self.now_date.month
             yy = self.now_date.year
             mm = previous_mm + 1
@@ -1859,7 +1859,7 @@ class DateDetector(object):
                 yy += 1
 
             date_dict = {
-                'dd': int(dd),
+                'dd': dd,
                 'mm': mm,
                 'yy': yy,
                 'type': TYPE_POSSIBLE_DAY
