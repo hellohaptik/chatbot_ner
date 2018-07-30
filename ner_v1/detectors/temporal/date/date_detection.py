@@ -16,9 +16,9 @@ from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                                        REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
 
 
-class DateAdvanceDetector(object):
+class DateAdvancedDetector(object):
     """
-    DateAdvanceDetector detects dates from the text. It Detects date with the properties like "from", "to",
+    DateAdvancedDetector detects dates from the text. It detects date with the properties like "from", "to",
     "start_range", "end_range"and "normal". These dates are returned in a dictionary form that contains relevant text,
     its actual value and its attribute in boolean field i.e. "from", "to", "start_range", "end_range" and "normal".
     This class uses DateDetector to detect the entity values. It also has model integrated to it that can be used to
@@ -30,14 +30,13 @@ class DateAdvanceDetector(object):
         processed_text: string with detected date entities removed
         date: list of date entities detected
         original_date_text: list to store substrings of the date detected as date entities
-        regex_to_process_text: Replaces ',' with empty strings ''
         entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tag: entity_name prepended and appended with '__'
         date_detector_object: DateDetector object used to detect dates in the given text
         bot_message: str, set as the outgoing bot text/message
     """
 
-    def __init__(self, entity_name, timezone='UTC'):
+    def __init__(self, entity_name='date', timezone='UTC'):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
@@ -412,7 +411,8 @@ class DateAdvanceDetector(object):
         date_list, original_list = self.date_detector_object.detect_entity(text)
         return date_list, original_list
 
-    def unzip_convert_date_dictionaries(self, entity_dict_list):
+    @staticmethod
+    def unzip_convert_date_dictionaries(entity_dict_list):
         """
         Separate out date dictionaries into list of dictionaries of date values, corresponding list of substrings in
         the original text for each date dictionary and corresponding list of detection method for each date dictionary
@@ -445,7 +445,8 @@ class DateAdvanceDetector(object):
             detection_list.append(entity_dict[detector_constant.DATE_DETECTION_METHOD])
         return entity_list, original_list, detection_list
 
-    def _to_output_dict(self, date_dict, original_text, from_property, to_property, start_range_property,
+    @staticmethod
+    def _to_output_dict(date_dict, original_text, from_property, to_property, start_range_property,
                         end_range_property, normal_property, detection_method):
         """
         Generate output dict for the detected date value with extra metadata
@@ -578,7 +579,7 @@ class DateDetector(object):
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         regx_to_process: regex to remove forward slash while updating list that stores  text
         regx_to_process_text: regex to remove forward slash while before detecting entities
-        date_object: datetime object holding timestamp while DateDetector instantiation
+        now_date: datetime object holding timestamp while DateDetector instantiation
         month_dictionary: dictonary mapping month indexes to month spellings and 
                             fuzzy variants(spell errors, abbreviations)
         day_dictionary: dictonary mapping day indexes to day of week spellings and 
@@ -645,7 +646,7 @@ class DateDetector(object):
             ner_logger.debug('Timezone error: %s ' % e)
             self.timezone = pytz.timezone('UTC')
             ner_logger.debug('Default timezone passed as "UTC"')
-        self.date_object = datetime.datetime.now(tz=self.timezone)
+        self.now_date = datetime.datetime.now(tz=self.timezone)
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
         self.bot_message = None
@@ -1269,12 +1270,12 @@ class DateDetector(object):
                 dd = int(dd)
             if mm:
                 mm = int(mm)
-            if self.date_object.month > mm:
-                yy = self.date_object.year + 1
-            elif self.date_object.day > dd and self.date_object.month == mm:
-                yy = self.date_object.year + 1
+            if self.now_date.month > mm:
+                yy = self.now_date.year + 1
+            elif self.now_date.day > dd and self.now_date.month == mm:
+                yy = self.now_date.year + 1
             else:
-                yy = self.date_object.year
+                yy = self.now_date.year
             if mm:
                 date_dict = {
                     'dd': int(dd),
@@ -1326,12 +1327,12 @@ class DateDetector(object):
                 dd = int(dd)
             if mm:
                 mm = int(mm)
-            if self.date_object.month > mm:
-                yy = self.date_object.year + 1
-            elif self.date_object.day > dd and self.date_object.month == mm:
-                yy = self.date_object.year + 1
+            if self.now_date.month > mm:
+                yy = self.now_date.year + 1
+            elif self.now_date.day > dd and self.now_date.month == mm:
+                yy = self.now_date.year + 1
             else:
-                yy = self.date_object.year
+                yy = self.now_date.year
             if mm:
                 date_dict = {
                     'dd': int(dd),
@@ -1366,9 +1367,9 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern
-            dd = self.date_object.day
-            mm = self.date_object.month
-            yy = self.date_object.year
+            dd = self.now_date.day
+            mm = self.now_date.month
+            yy = self.now_date.year
             date_dict = {
                 'dd': int(dd),
                 'mm': int(mm),
@@ -1404,7 +1405,7 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            tomorrow = self.date_object + datetime.timedelta(days=1)
+            tomorrow = self.now_date + datetime.timedelta(days=1)
             dd = tomorrow.day
             mm = tomorrow.month
             yy = tomorrow.year
@@ -1441,7 +1442,7 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            yesterday = self.date_object - datetime.timedelta(days=1)
+            yesterday = self.now_date - datetime.timedelta(days=1)
             dd = yesterday.day
             mm = yesterday.month
             yy = yesterday.year
@@ -1479,7 +1480,7 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            day_after = self.date_object + datetime.timedelta(days=2)
+            day_after = self.now_date + datetime.timedelta(days=2)
             dd = day_after.day
             mm = day_after.month
             yy = day_after.year
@@ -1516,7 +1517,7 @@ class DateDetector(object):
         for pattern in patterns:
             original = pattern[0]
             days = int(pattern[1])
-            day_after = self.date_object + datetime.timedelta(days=days)
+            day_after = self.now_date + datetime.timedelta(days=days)
             dd = day_after.day
             mm = day_after.month
             yy = day_after.year
@@ -1553,7 +1554,7 @@ class DateDetector(object):
         for pattern in patterns:
             original = pattern[0]
             days = int(pattern[1])
-            day_after = self.date_object + datetime.timedelta(days=days)
+            day_after = self.now_date + datetime.timedelta(days=days)
             dd = day_after.day
             mm = day_after.month
             yy = day_after.year
@@ -1591,7 +1592,7 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            day_before = self.date_object - datetime.timedelta(days=2)
+            day_before = self.now_date - datetime.timedelta(days=2)
             dd = day_before.day
             mm = day_before.month
             yy = day_before.year
@@ -1639,10 +1640,10 @@ class DateDetector(object):
             original = pattern[0]
             probable_day = pattern[2]
             day = self.__get_day_index(probable_day)
-            current_day = self.__get_day_index(self.date_object.strftime("%A"))
+            current_day = self.__get_day_index(self.now_date.strftime("%A"))
             if day and current_day:
                 date_after_days = int(day) - int(current_day) + 7
-                day_to_set = self.date_object + datetime.timedelta(days=date_after_days)
+                day_to_set = self.now_date + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
                 yy = day_to_set.year
@@ -1690,13 +1691,13 @@ class DateDetector(object):
             original = pattern[0].strip()
             probable_day = pattern[2]
             day = self.__get_day_index(probable_day)
-            current_day = self.__get_day_index(self.date_object.strftime("%A"))
+            current_day = self.__get_day_index(self.now_date.strftime("%A"))
             if day and current_day:
                 if int(current_day) <= int(day):
                     date_after_days = int(day) - int(current_day)
                 else:
                     date_after_days = int(day) - int(current_day) + 7
-                day_to_set = self.date_object + datetime.timedelta(days=date_after_days)
+                day_to_set = self.now_date + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
                 yy = day_to_set.year
@@ -1745,8 +1746,15 @@ class DateDetector(object):
             original = pattern[0]
 
             dd = pattern[1]
-            mm = self.date_object.month
-            yy = self.date_object.year
+            mm = self.now_date.month
+            yy = self.now_date.year
+
+            date = datetime.date(year=yy, month=mm, day=dd)
+            if date < self.now_date.date():
+                mm += 1
+                if mm + 1 > 12:
+                    mm = 1
+                    yy += 1
 
             date_dict = {
                 'dd': int(dd),
@@ -1793,8 +1801,8 @@ class DateDetector(object):
             original = pattern[0]
 
             dd = pattern[1]
-            mm = self.date_object.month
-            yy = self.date_object.year
+            mm = self.now_date.month
+            yy = self.now_date.year
 
             date_dict = {
                 'dd': int(dd),
@@ -1843,16 +1851,17 @@ class DateDetector(object):
             original = pattern[0]
 
             dd = pattern[1]
-            previous_mm = self.date_object.month
-            yy = self.date_object.year
-            mm = int(previous_mm) + 1
+            previous_mm = self.now_date.month
+            yy = self.now_date.year
+            mm = previous_mm + 1
             if mm > 12:
                 mm = 1
+                yy += 1
 
             date_dict = {
                 'dd': int(dd),
                 'mm': mm,
-                'yy': int(yy),
+                'yy': yy,
                 'type': TYPE_POSSIBLE_DAY
             }
             date_list.append(date_dict)
@@ -1880,7 +1889,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        now = self.date_object
+        now = self.now_date
         end = now + datetime.timedelta(days=n_days)
         regex_pattern = re.compile(r'\b\s*((everyday|daily|every\s{0,3}day|all\sday|all\sdays))\s*\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
@@ -1931,7 +1940,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        now = self.date_object
+        now = self.now_date
         end = now + datetime.timedelta(days=n_days)
         regex_pattern = re.compile(r'\b(([eE]veryday|[dD]aily)|all\sdays[\s]?except[\s]?([wW]eekend|[wW]eekends))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
@@ -1945,7 +1954,7 @@ class DateDetector(object):
         today = now.weekday()
         count = 0
         weekend = []
-        date_day = self.date_object
+        date_day = self.now_date
         while count < 15:
             if today > 6:
                 today = 0
@@ -2009,7 +2018,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        now = self.date_object
+        now = self.now_date
         end = now + datetime.timedelta(days=n_days)
         regex_pattern = re.compile(r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?'
                                    r'([wW]eekday|[wW]eekdays))\b')
@@ -2024,7 +2033,7 @@ class DateDetector(object):
         today = now.weekday()
         count = 0
         weekend = []
-        date_day = self.date_object
+        date_day = self.now_date
         while count < 50:
             if today > 6:
                 today = 0
@@ -2098,7 +2107,7 @@ class DateDetector(object):
             dd2 = pattern[2]
             probable_mm = pattern[3]
             mm = self.__get_month_index(probable_mm)
-            yy = self.date_object.year
+            yy = self.now_date.year
             if mm:
                 date_dict_1 = {
                     'dd': int(dd1),
@@ -2120,7 +2129,8 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    def _is_everyday_present(self, text):
+    @staticmethod
+    def _is_everyday_present(text):
         """
         Detects if there is one of following words in text:
             "every", "daily", "recur", "always", "continue", "every day", "all"
@@ -2139,7 +2149,8 @@ class DateDetector(object):
         else:
             return False
 
-    def _check_current_day(self, date_list):
+    @staticmethod
+    def _check_current_day(date_list):
         """
         Checks if TYPE_THIS_DAY or TYPE_REPEAT_DAY type of date is present in the date_list consisting of detected
         date dictionaries by checking "type" of each date
@@ -2157,7 +2168,8 @@ class DateDetector(object):
         else:
             return False
 
-    def _check_date_presence(self, date_list):
+    @staticmethod
+    def _check_date_presence(date_list):
         """
         Checks if TYPE_NORMAL type of date is present in the date_list consisting of detected date dictionaries by
         checking "type" of each date
@@ -2242,7 +2254,8 @@ class DateDetector(object):
                 return day
         return None
 
-    def to_date_dict(self, datetime_object, date_type=TYPE_EXACT):
+    @staticmethod
+    def to_date_dict(datetime_object, date_type=TYPE_EXACT):
         """
         Convert the given datetime object to a dictionary containing dd, mm, yy
 
@@ -2291,7 +2304,7 @@ class DateDetector(object):
         past_regex = re.compile(r'birth|bday|dob|born')
         present_regex = None
         future_regex = None
-        this_century = int(str(self.date_object.year)[:2])
+        this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
             if self.bot_message:
                 if past_regex and past_regex.search(self.bot_message):
