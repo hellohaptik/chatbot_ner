@@ -4,7 +4,7 @@ from six import iteritems
 
 from chatbot_ner.config import ner_logger
 from datastore import DataStore
-from lib.nlp.const import TOKENIZER
+from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 # from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.base_detector import BaseDetector
@@ -205,17 +205,33 @@ class TextDetector(BaseDetector):
                   [(1, 2), (3, 7), (8, 10), (11, 16), (17, 18), (19, 21), (22, 25), (28, 34)])
 
             """
-            processed_text_tokens = TOKENIZER.tokenize(text)
+            txt = text.rstrip() + ' __eos__'
+            processed_text_tokens = TOKENIZER.tokenize(txt)
             processed_text_tokens_indices = []
 
             offset = 0
-            txt = text
             for token in processed_text_tokens:
                 st = txt.index(token)
                 en = st + len(token)
+
+                # Small block to handle tricky cases like '(A B) C'
+                # It extends the previous token's end boundary if there are special characters except whitespace
+                # towards the end of previous token
+                prefix = txt[:en]
+                prefix_tokens = whitespace_tokenizer.tokenize(prefix)
+                if prefix and len(prefix_tokens) > 1 and prefix_tokens[0]:
+                    if processed_text_tokens_indices:
+                        s, e = processed_text_tokens_indices.pop()
+                        e += len(prefix_tokens[0])
+                        processed_text_tokens_indices.append((s, e))
+
                 txt = txt[en:]
                 processed_text_tokens_indices.append((offset + st, offset + en))
                 offset += en
+
+            # remove eos parts
+            processed_text_tokens.pop()
+            processed_text_tokens_indices.pop()
 
             return processed_text_tokens, processed_text_tokens_indices
 
@@ -328,7 +344,7 @@ class TextDetector(BaseDetector):
             if original_text:
                 value_final_list.append(variants_to_values[variant])
                 original_final_list.append(original_text)
-                _pattern = re.compile(r'\b%s\b' % original_text, re.UNICODE)
+                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), re.UNICODE)
                 self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
                 # Instead of dropping completely like in other entities,
                 # we replace with tag to avoid matching non contiguous segments
