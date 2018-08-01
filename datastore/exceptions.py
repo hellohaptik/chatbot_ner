@@ -1,5 +1,5 @@
 __all__ = [
-    'DataStoreSettingsImproperlyConfiguredException', 'EngineNotImplementedException',
+    'DataStoreSettingsImproperlyConfiguredException', 'EngineNotImplementedException', 'EngineConnectionException'
 ]
 
 
