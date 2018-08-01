@@ -331,17 +331,17 @@ class TextDetector(BaseDetector):
         # Length based ordering, this reorders the results from datastore
         # that are already sorted by some relevance scoring
 
-        # exact_matches, fuzzy_variants = [], []
-        # _text = u' '.join(TOKENIZER.tokenize(self.processed_text))
-        # for variant in variants_list:
-        #     if u' '.join(TOKENIZER.tokenize(variant)) in _text:
-        #         exact_matches.append(variant)
-        #     else:
-        #         fuzzy_variants.append(variant)
-        #
-        # exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-        # fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-        # variants_list = exact_matches + fuzzy_variants
+        exact_matches, fuzzy_variants = [], []
+        _text = u' '.join(TOKENIZER.tokenize(self.processed_text))
+        for variant in variants_list:
+            if u' '.join(TOKENIZER.tokenize(variant)) in _text:
+                exact_matches.append(variant)
+            else:
+                fuzzy_variants.append(variant)
+
+        exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+        fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+        variants_list = exact_matches + fuzzy_variants
 
         for variant in variants_list:
             original_text = self._get_entity_substring_from_text(variant, self.processed_text)

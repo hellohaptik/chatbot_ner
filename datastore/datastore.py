@@ -60,7 +60,7 @@ class DataStore(object):
             All other exceptions raised by elasticsearch-py library
         """
         if self._engine == ELASTICSEARCH:
-            self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
+            self._store_name = self._connection_settings[ELASTICSEARCH_INDEX_NAME]
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None

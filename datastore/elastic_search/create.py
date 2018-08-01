@@ -85,7 +85,8 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
                 'properties': {
                     'variants': {
                         'type': 'string',
-                        'analyzer': 'my_analyzer'
+                        'analyzer': 'my_analyzer',
+                        'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
                     }
                 }
             }

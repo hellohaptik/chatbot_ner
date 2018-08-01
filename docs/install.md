@@ -65,12 +65,12 @@
     ```shell
     $ mkdir -p ~/chatbot_ner_elasticsearch
     $ cd /tmp/
-    $ curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.0.0.tar.gz
-    $ tar -xzf elasticsearch-6.0.0.tar.gz -C ~/chatbot_ner_elasticsearch/
-    $ ~/chatbot_ner_elasticsearch/elasticsearch-6.0.0/bin/elasticsearch -d
+    $ curl -L -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.5.0.tar.gz
+    $ tar -xzf elasticsearch-5.5.0.tar.gz -C ~/chatbot_ner_elasticsearch/
+    $ ~/chatbot_ner_elasticsearch/elasticsearch-5.5.0/bin/elasticsearch -d
     ```
 
-     Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-6.0.0/`
+     Elasticsearch will be extracted to `~/chatbot_ner_elasticsearch/elasticsearch-5.5.0/`
 
 
 7. Copy config.example to config and configure the settings for datastore
