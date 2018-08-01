@@ -1,4 +1,7 @@
 # Setup of Chatbot NER via. Docker
+> Note: The docker setup creates no user and uses elasticsearch 2.x in root mode,
+> the support for which has been removed since elasticsearch 5.x.
+> The code in develop has been changed to support 5.x+ but the docker file has not been updated yet
 
 Following are the steps to create the Docker image and run NER via Docker.
 
