@@ -1,5 +1,5 @@
 import re
-
+import collections
 from six import iteritems
 
 from chatbot_ner.config import ner_logger
@@ -313,7 +313,7 @@ class TextDetector(BaseDetector):
         """
         original_final_list = []
         value_final_list = []
-        variants_to_values = {}
+        variants_to_values = collections.OrderedDict()
 
         _variants_to_values = self.db.get_similar_dictionary(entity_name=self.entity_name,
                                                              text=u' '.join(TOKENIZER.tokenize(self.processed_text)),
@@ -326,20 +326,24 @@ class TextDetector(BaseDetector):
 
             variants_to_values[variant] = value
 
-        variants = variants_to_values.keys()
+        variants_list = variants_to_values.keys()
+
+        # Length based ordering, this reorders the results from datastore
+        # that are already sorted by some relevance scoring
 
         exact_matches, fuzzy_variants = [], []
-        for variant in variants:
-            if variant in self.processed_text:
+        _text = u' '.join(TOKENIZER.tokenize(self.processed_text))
+        for variant in variants_list:
+            if u' '.join(TOKENIZER.tokenize(variant)) in _text:
                 exact_matches.append(variant)
             else:
                 fuzzy_variants.append(variant)
 
         exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
         fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-        variant_list = exact_matches + fuzzy_variants
+        variants_list = exact_matches + fuzzy_variants
 
-        for variant in variant_list:
+        for variant in variants_list:
             original_text = self._get_entity_substring_from_text(variant, self.processed_text)
             if original_text:
                 value_final_list.append(variants_to_values[variant])

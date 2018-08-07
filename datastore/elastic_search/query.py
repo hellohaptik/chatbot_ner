@@ -1,6 +1,6 @@
 from six import string_types
 import re
-
+import collections
 from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 
@@ -63,8 +63,9 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
     Returns:
-        dictionary of the parsed results from highlighted search query results on the sentence,
-        mapping highlighted fuzzy entity variant to entity value
+        collections.OrderedDict: dictionary of the parsed results from highlighted search query results
+                                 on the sentence, mapping highlighted fuzzy entity variant to entity value ordered
+                                 by relevance order returned by elasticsearch
 
     Example:
         # The following example is just for demonstration purpose. Normally we should call
@@ -223,11 +224,11 @@ def _parse_es_search_results(results):
     Parse highlighted results returned from elasticsearch query and generate a variants to values dictionary
 
     Args:
-        results: search results dictionary from elasticsearch including highlights and scores
+        results (dict): search results dictionary from elasticsearch including highlights and scores
 
     Returns:
-        dict: dict mapping matching variants to their entity values based on the
-              parsed results from highlighted search query results
+        collections.OrderedDict: dict mapping matching variants to their entity values based on the
+                                 parsed results from highlighted search query results
 
     Example:
         Parameter ngram_results has highlighted search results as follows:
@@ -269,7 +270,7 @@ def _parse_es_search_results(results):
 
     """
     entity_values, entity_variants = [], []
-    variants_to_values = {}
+    variants_to_values = collections.OrderedDict()
     if results and results['hits']['total'] > 0:
         for hit in results['hits']['hits']:
             if 'highlight' not in hit:

@@ -65,7 +65,7 @@ Now lets add the newly created csv file to the datastore.
 - Make sure to start the engine you configured with datastore( eg. elasticsearch)
 
   ```shell
-  $ ~/chatbot_ner_elasticsearch/elasticsearch-2.4.4/bin/elasticsearch -d
+  $ ~/chatbot_ner_elasticsearch/elasticsearch-5.5.0/bin/elasticsearch -d
   ```
 
 - Activate chatbot_ner virtual environment
