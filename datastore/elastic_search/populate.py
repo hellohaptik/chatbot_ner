@@ -233,14 +233,13 @@ def external_api_entity_update(connection, index_name, doc_type, dictionary_data
     status = False
     try:
         logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
-        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                              entity_name=dictionary_name, logger=logger, **kwargs)
+#        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+#                              entity_name=dictionary_name, logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
         if dictionary_data:
             dictionary_value = structure_external_api_json(dictionary_data)
 
-            index_name = 5
             logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
             add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                     dictionary_key=dictionary_name,
