@@ -59,8 +59,12 @@ class DataStore(object):
             EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
+        alias_config = True
         if self._engine == ELASTICSEARCH:
-            self._store_name = self._connection_settings[ELASTICSEARCH_INDEX_NAME]
+            self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
+            if alias_config:
+                self._store_name = elastic_search.connect._get_current_live_index(self._store_name)
+
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None
@@ -231,7 +235,7 @@ class DataStore(object):
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
         Returns:
-            collections.OrderedDict: dictionary mapping entity value variants to their entity value
+            dictionary mapping entity value variants to their entity value
 
         Example:
             db = DataStore()
@@ -258,7 +262,7 @@ class DataStore(object):
             results_dictionary = elastic_search.query.full_text_query(connection=self._client_or_connection,
                                                                       index_name=self._store_name,
                                                                       doc_type=self._connection_settings[
-                                                                         ELASTICSEARCH_DOC_TYPE],
+                                                                          ELASTICSEARCH_DOC_TYPE],
                                                                       entity_name=entity_name,
                                                                       sentence=text,
                                                                       fuzziness_threshold=fuzziness_threshold,
@@ -297,15 +301,15 @@ class DataStore(object):
         """
         Deletes the existing data and repopulates it for entities from csv files stored in directory path indicated by
         entity_data_directory_path and from csv files at file paths in csv_file_paths list
-        
-        Args:    
+
+        Args:
             entity_data_directory_path: Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs
             csv_file_paths: Optional, list of absolute file paths to csv files
             kwargs:
                 For Elasticsearch:
                     Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-        
+
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
@@ -328,7 +332,7 @@ class DataStore(object):
     def _check_doc_type_for_elasticsearch(self):
         """
         Checks if doc_type is present in connection settings, if not an exception is raised
-        
+
         Raises:
              DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
         """
@@ -349,3 +353,21 @@ class DataStore(object):
             return elastic_search.create.exists(connection=self._client_or_connection, index_name=self._store_name)
 
         return False
+
+    def external_api_update_entity(self, dictionary_name, dictionary_data, **kwargs):
+        status = False
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            status = elastic_search.populate.external_api_entity_update(connection=self._client_or_connection,
+                                                                        index_name=self._store_name,
+                                                                        doc_type=self._connection_settings[
+                                                                            ELASTICSEARCH_DOC_TYPE],
+                                                                        logger=ner_logger,
+                                                                        dictionary_data=dictionary_data,
+                                                                        dictionary_name=dictionary_name,
+                                                                        **kwargs)
+
+        return status
