@@ -1,5 +1,5 @@
 from elasticsearch import helpers
-
+from external_api.external_api_utilities import structure_external_api_json, _get_current_live_index
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
@@ -226,3 +226,29 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
     for delete_query in delete_bulk_queries:
         result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
+
+
+def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, logger, **kwargs):
+    logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
+    status = False
+    try:
+        logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
+        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+                              entity_name=dictionary_name, logger=logger, **kwargs)
+        logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
+
+        if dictionary_data:
+            dictionary_value = structure_external_api_json(dictionary_data)
+
+            index_name = _get_current_live_index(alias_name=index_name)
+            logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
+            add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
+                                    dictionary_key=dictionary_name,
+                                    dictionary_value=dictionary_value, logger=logger, **kwargs)
+            logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
+
+        status = True
+    except ValueError:
+        logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % str(ValueError))
+
+    return status
