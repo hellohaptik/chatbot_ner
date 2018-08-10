@@ -1,5 +1,5 @@
 from elasticsearch import helpers
-from external_api.external_api_utilities import structure_external_api_json, _get_current_live_index
+from external_api.external_api_utilities import structure_external_api_json
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
@@ -240,7 +240,7 @@ def external_api_entity_update(connection, index_name, doc_type, dictionary_data
         if dictionary_data:
             dictionary_value = structure_external_api_json(dictionary_data)
 
-            index_name = _get_current_live_index(alias_name=index_name)
+            index_name = 5
             logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
             add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                     dictionary_key=dictionary_name,
