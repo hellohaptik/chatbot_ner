@@ -70,10 +70,10 @@ def fetch_index_alias_points_to(es_url, alias_name):
     if response.status_code == 200:
         json_obj = json.loads(response.content)
         indices = json_obj.keys()
-        if '' in indices:
-            return ''
-        elif '' in indices:
-            return ''
+        if CHATBOT_NER_DATASTORE.get('es_index_1') in indices:
+            return CHATBOT_NER_DATASTORE.get('es_index_1')
+        elif CHATBOT_NER_DATASTORE.get('es_index_2') in indices:
+            return CHATBOT_NER_DATASTORE.get('es_index_2')
         else:
             raise FetchIndexForAliasException(alias_name)
     raise FetchIndexForAliasException('fetch index for ' + alias_name + ' failed')
