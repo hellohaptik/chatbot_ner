@@ -61,6 +61,7 @@ ES_INDEX_1 = os.environ.get('ES_INDEX_1')
 ES_INDEX_2 = os.environ.get('ES_INDEX_2')
 SOURCE_URL = os.environ.get('SOURCE_URL')
 DESTINATION_URL = os.environ.get('DESTINATION_URL')
+ES_ALIAS = os.environ.get('ES_ALIAS')
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -95,6 +96,7 @@ CHATBOT_NER_DATASTORE = {
         'es_index_2': ES_INDEX_2,
         'source_url': SOURCE_URL,
         'destination_url': DESTINATION_URL,
+        'es_alias': ES_ALIAS,
     }
 }
 
