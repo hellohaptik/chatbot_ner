@@ -57,7 +57,10 @@ ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
-
+ES_INDEX_1 = os.environ.get('ES_INDEX_1')
+ES_INDEX_2 = os.environ.get('ES_INDEX_2')
+SOURCE_URL = os.environ.get('SOURCE_URL')
+DESTINATION_URL = os.environ.get('DESTINATION_URL')
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -88,6 +91,10 @@ CHATBOT_NER_DATASTORE = {
         'max_retries': 1,
         'timeout': 20,
         'request_timeout': 20,
+        'es_index_1': ES_INDEX_1,
+        'es_index_2': ES_INDEX_2,
+        'source_url': SOURCE_URL,
+        'destination_url': DESTINATION_URL
     }
 }
 
