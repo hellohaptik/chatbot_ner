@@ -54,8 +54,8 @@ def transfer_specific_entities(request):
 
     """
     status = False
-    source = CHATBOT_NER_DATASTORE.get('elastic_search').get('source_url')
-    destination = CHATBOT_NER_DATASTORE.get('elastic_search').get('destination_url')
+    source = CHATBOT_NER_DATASTORE.get('elasticsearch').get('source_url')
+    destination = CHATBOT_NER_DATASTORE.get('elasticsearch').get('destination_url')
     es_object = ESTransfer(source=source, destination=destination)
     entity_list_dict = json.loads(request.body)
     entity_list = entity_list_dict.get('entity_list')
