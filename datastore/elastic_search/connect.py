@@ -49,8 +49,8 @@ class FetchIndexForAliasException(Exception):
 def _get_current_live_index(alias_name):
     es_scheme = ''
     es_url = (es_scheme + "://" +
-                          CHATBOT_NER_DATASTORE.get('host') + ":" +
-                          CHATBOT_NER_DATASTORE.get('port'))
+                          CHATBOT_NER_DATASTORE.get('elasticsearch').get('host') + ":" +
+                          CHATBOT_NER_DATASTORE.get('elasticsearch').get('port'))
     current_live_index = fetch_index_alias_points_to(es_url, alias_name)
     return current_live_index
 
@@ -70,10 +70,12 @@ def fetch_index_alias_points_to(es_url, alias_name):
     if response.status_code == 200:
         json_obj = json.loads(response.content)
         indices = json_obj.keys()
-        if CHATBOT_NER_DATASTORE.get('es_index_1') in indices:
-            return CHATBOT_NER_DATASTORE.get('es_index_1')
-        elif CHATBOT_NER_DATASTORE.get('es_index_2') in indices:
-            return CHATBOT_NER_DATASTORE.get('es_index_2')
+        es_index_1 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_1')
+        es_index_2 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_2')
+        if es_index_1 in indices:
+            return es_index_1
+        elif es_index_2 in indices:
+            return es_index_2
         else:
             raise FetchIndexForAliasException(alias_name)
     raise FetchIndexForAliasException('fetch index for ' + alias_name + ' failed')
