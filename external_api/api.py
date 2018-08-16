@@ -3,6 +3,8 @@ from chatbot_ner.config import ner_logger
 from django.http import HttpResponse
 from datastore.datastore import DataStore
 from external_api.external_api_utilities import structure_es_result, structure_external_api_json
+from chatbot_ner.config import CHATBOT_NER_DATASTORE
+from external_api.es_transfer import ESTransfer
 
 
 def get_entity_word_variants(request):
@@ -41,4 +43,21 @@ def update_dictionary(request):
     status = datastore_obj.external_api_update_entity(dictionary_name=dictionary_name,
                                                       dictionary_data=dictionary_data)
 
+    return HttpResponse(json.dumps({'status': status}), content_type='application/json')
+
+
+def transfer_specific_entities(request):
+    """This functionality initializes text detection functionality to detect textual entities.
+
+    Attributes:
+        request: url parameters
+
+    """
+    status = False
+    source = CHATBOT_NER_DATASTORE.get('elastic_search').get('source_url')
+    destination = CHATBOT_NER_DATASTORE.get('elastic_search').get('destination_url')
+    es_object = ESTransfer(source=source, destination=destination)
+    entity_list_dict = json.loads(request.body)
+    entity_list = entity_list_dict.get('entity_list')
+    es_object.transfer_specific_entities(list_of_entities=entity_list)
     return HttpResponse(json.dumps({'status': status}), content_type='application/json')
