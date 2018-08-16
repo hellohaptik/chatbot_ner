@@ -24,6 +24,6 @@ urlpatterns = patterns('',
     url(r'^entities/update_dictionary', 'external_api.api.update_dictionary'),
 
     # Transfer Dictioanry
-    url(r'^entities/transfer_specific_entities', 'external_api.api.transfer_specific_entities'),
+    url(r'^entities/transfer_entities', 'external_api.api.transfer_entities'),
 
 )

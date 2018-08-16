@@ -46,7 +46,7 @@ def update_dictionary(request):
     return HttpResponse(json.dumps({'status': status}), content_type='application/json')
 
 
-def transfer_specific_entities(request):
+def transfer_entities(request):
     """This functionality initializes text detection functionality to detect textual entities.
 
     Attributes:
