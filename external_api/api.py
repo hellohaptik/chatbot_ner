@@ -8,34 +8,31 @@ from external_api.es_transfer import ESTransfer
 
 
 def get_entity_word_variants(request):
-    """This functionality initializes text detection functionality to detect textual entities.
+    """
+    This function is used obtain the entity dictionary given the dictionary name.
+    Args:
+        request (HttpResponse): HTTP response from url
 
-    Attributes:
-        request: url parameters
+    Returns:
 
     """
-    status = False
-    result = []
-    try:
-        dictionary_name = request.GET.get('dictionary_name')
-        datastore_obj = DataStore()
-        result = datastore_obj.get_entity_dictionary(entity_name=dictionary_name)
-        result = structure_es_result(result)
-        status = True
+    dictionary_name = request.GET.get('dictionary_name')
+    datastore_obj = DataStore()
+    result = datastore_obj.get_entity_dictionary(entity_name=dictionary_name)
+    result = structure_es_result(result)
 
-    except TypeError:
-        ner_logger.debug('Error %s' % str(TypeError))
-    return HttpResponse(json.dumps({'status': status, 'result': result}), content_type='application/json')
+    return HttpResponse(json.dumps({'result': result}), content_type='application/json')
 
 
 def update_dictionary(request):
-    """This functionality initializes text detection functionality to detect textual entities.
+    """
+    This function is used to update the dictionary entities.
+    Args:
+        request (HttpResponse): HTTP response from url
 
-    Attributes:
-        request: url parameters
+    Returns:
 
     """
-
     word_entity_info = json.loads(request.body)
     dictionary_name = word_entity_info.get('dictionary_name')
     dictionary_data = word_entity_info.get('dictionary_data')
@@ -49,10 +46,12 @@ def update_dictionary(request):
 
 
 def transfer_entities(request):
-    """This functionality initializes text detection functionality to detect textual entities.
+    """
+    This method is used to transfer entities from the source to destination.
+    Args:
+        request (HttpResponse): HTTP response from url
 
-    Attributes:
-        request: url parameters
+    Returns:
 
     """
     status = False

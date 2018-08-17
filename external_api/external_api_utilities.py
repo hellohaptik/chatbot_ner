@@ -4,6 +4,14 @@ from django.conf import settings
 
 
 def structure_es_result(result):
+    """
+    This method is used to structure the query result in accordance to the external_api call format.
+    Args:
+        result (list): The result returned by the elastic search read query.
+
+    Returns:
+        structured_result (list): List dict each consisting of value and variants.
+    """
     structured_result = []
     # The list around result.keys() is to make it compatible to python3
     key_list = list(result.keys())
@@ -14,6 +22,14 @@ def structure_es_result(result):
 
 
 def structure_external_api_json(json):
+    """
+
+    Args:
+        json:
+
+    Returns:
+
+    """
     dictionary_value = {}
 
     for temp_dict in json:
