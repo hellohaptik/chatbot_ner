@@ -111,7 +111,7 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
     return dictionary_value
 
 
-def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, logger, **kwargs):
+def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script,logger, **kwargs):
     """
     Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
     of dictionary_value parameter generated from the csv file of this entity
@@ -146,6 +146,7 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
                       'dict_type': DICTIONARY_DATA_VARIANTS,
                       'value': value,
                       'variants': dictionary_value[value],
+                      "language_script": language_script,
                       '_type': doc_type,
                       '_op_type': 'index'
                       }
@@ -228,13 +229,14 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
 
 
-def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,logger, **kwargs):
+def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,
+                               logger, **kwargs):
     logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
     status = False
     try:
         logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
-#        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-#                              entity_name=dictionary_name, logger=logger, **kwargs)
+        delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+                              entity_name=dictionary_name, logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
         if dictionary_data:
@@ -243,7 +245,7 @@ def external_api_entity_update(connection, index_name, doc_type, dictionary_data
             logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
             add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                     dictionary_key=dictionary_name,
-                                    dictionary_value=dictionary_value, logger=logger, **kwargs)
+                                    dictionary_value=dictionary_value, language_script=language_script,logger=logger, **kwargs)
             logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
         status = True
