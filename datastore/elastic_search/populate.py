@@ -228,7 +228,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
 
 
-def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, logger, **kwargs):
+def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,logger, **kwargs):
     logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
     status = False
     try:

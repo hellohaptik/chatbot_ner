@@ -354,7 +354,7 @@ class DataStore(object):
 
         return False
 
-    def external_api_update_entity(self, dictionary_name, dictionary_data, **kwargs):
+    def external_api_update_entity(self, dictionary_name, dictionary_data, language_script, **kwargs):
         status = False
         if self._client_or_connection is None:
             self._connect()
@@ -368,6 +368,7 @@ class DataStore(object):
                                                                         logger=ner_logger,
                                                                         dictionary_data=dictionary_data,
                                                                         dictionary_name=dictionary_name,
+                                                                        language_script=language_script,
                                                                         **kwargs)
 
         return status
