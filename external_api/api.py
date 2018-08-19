@@ -58,8 +58,11 @@ def transfer_entities(request):
 
     """
     try:
-        source = CHATBOT_NER_DATASTORE.get('elasticsearch').get('source_url')
-        destination = CHATBOT_NER_DATASTORE.get('elasticsearch').get('destination_url')
+        engine = CHATBOT_NER_DATASTORE.get('engine')
+        source = CHATBOT_NER_DATASTORE.get(engine).get('es_scheme') + \
+            CHATBOT_NER_DATASTORE.get(engine).get('host') + ':' + \
+            CHATBOT_NER_DATASTORE.get(engine).get('port')
+        destination = CHATBOT_NER_DATASTORE.get(engine).get('destination_url')
         es_object = ESTransfer(source=source, destination=destination)
         entity_list_dict = json.loads(request.body)
         entity_list = entity_list_dict.get('entity_list')

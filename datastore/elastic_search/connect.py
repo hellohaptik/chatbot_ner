@@ -47,10 +47,10 @@ class FetchIndexForAliasException(Exception):
 
 
 def _get_current_live_index(alias_name):
-    es_scheme = ''
-    es_url = (es_scheme + "://" +
-                          CHATBOT_NER_DATASTORE.get('elasticsearch').get('host') + ":" +
-                          CHATBOT_NER_DATASTORE.get('elasticsearch').get('port'))
+    engine = CHATBOT_NER_DATASTORE.get('engine')
+    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme')
+              + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
+              CHATBOT_NER_DATASTORE.get(engine).get('port'))
     current_live_index = fetch_index_alias_points_to(es_url, alias_name)
     return current_live_index
 
