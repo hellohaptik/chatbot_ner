@@ -64,7 +64,7 @@ def transfer_entities(request):
             CHATBOT_NER_DATASTORE.get(engine).get('port')
         destination = CHATBOT_NER_DATASTORE.get(engine).get('destination_url')
         es_object = ESTransfer(source=source, destination=destination)
-        entity_list_dict = json.loads(request.body)
+        entity_list_dict = json.loads(request.GET.get('word_info'))
         entity_list = entity_list_dict.get('entity_list')
         es_object.transfer_specific_entities(list_of_entities=entity_list)
     except ValueError:
