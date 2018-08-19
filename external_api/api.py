@@ -35,7 +35,7 @@ def update_dictionary(request):
 
     """
     try:
-        word_info = json.loads(request.body)
+        word_info = json.loads(request.GET.get('word_info'))
         dictionary_name = word_info.get('dictionary_name')
         dictionary_data = word_info.get('dictionary_data')
         language_script = word_info.get('language_script')
