@@ -355,20 +355,17 @@ class DataStore(object):
         return False
 
     def external_api_update_entity(self, dictionary_name, dictionary_data, language_script, **kwargs):
-        status = False
         if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            status = elastic_search.populate.external_api_entity_update(connection=self._client_or_connection,
-                                                                        index_name=self._store_name,
-                                                                        doc_type=self._connection_settings[
-                                                                            ELASTICSEARCH_DOC_TYPE],
-                                                                        logger=ner_logger,
-                                                                        dictionary_data=dictionary_data,
-                                                                        dictionary_name=dictionary_name,
-                                                                        language_script=language_script,
-                                                                        **kwargs)
-
-        return status
+            elastic_search.populate.external_api_entity_update(connection=self._client_or_connection,
+                                                               index_name=self._store_name,
+                                                               doc_type=self._connection_settings[
+                                                                    ELASTICSEARCH_DOC_TYPE],
+                                                               logger=ner_logger,
+                                                               dictionary_data=dictionary_data,
+                                                               dictionary_name=dictionary_name,
+                                                               language_script=language_script,
+                                                               **kwargs)

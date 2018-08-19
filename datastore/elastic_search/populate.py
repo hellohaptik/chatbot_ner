@@ -3,6 +3,7 @@ from external_api.external_api_utilities import structure_external_api_json
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
+from django.http import HttpResponse
 
 log_prefix = 'datastore.elastic_search.populate'
 
@@ -232,7 +233,6 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
 def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,
                                logger, **kwargs):
     logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
-    status = False
     try:
         logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
         delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
@@ -247,9 +247,6 @@ def external_api_entity_update(connection, index_name, doc_type, dictionary_data
                                     dictionary_key=dictionary_name,
                                     dictionary_value=dictionary_value, language_script=language_script,logger=logger, **kwargs)
             logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
-
-        status = True
     except ValueError:
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % str(ValueError))
-
-    return status
+        return HttpResponse(status=500)
