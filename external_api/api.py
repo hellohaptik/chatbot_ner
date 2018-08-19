@@ -35,10 +35,9 @@ def update_dictionary(request):
 
     """
     try:
-        word_entity_info = json.loads(request.body)
-        dictionary_name = word_entity_info.get('dictionary_name')
-        dictionary_data = word_entity_info.get('dictionary_data')
-        language_script = word_entity_info.get('language_script')
+        dictionary_name = request.GET.get('dictionary_name')
+        dictionary_data = request.GET.get('dictionary_data')
+        language_script = request.GET.get('language_script')
         datastore_obj = DataStore()
         datastore_obj.external_api_update_entity(dictionary_name=dictionary_name,
                                                  dictionary_data=dictionary_data,
