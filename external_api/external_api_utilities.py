@@ -1,8 +1,3 @@
-import requests
-import json
-from django.conf import settings
-
-
 def structure_es_result(result):
     """
     This method is used to structure the query result in accordance to the external_api call format.
