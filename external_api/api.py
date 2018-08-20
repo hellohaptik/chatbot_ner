@@ -72,6 +72,14 @@ def transfer_entities(request):
 
 
 def update_training_data(request):
+    """
+    This method is used to update the training text and entity list for the given entity.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse: HttpResponse with appropriate status
+    """
     try:
         training_data = json.loads(request.GET.get('word_info'))
         text_list = training_data.get('text_list')
@@ -88,12 +96,12 @@ def update_training_data(request):
 
 def get_training_data(request):
     """
-    This function is used obtain the entity dictionary given the dictionary name.
+    This function is used obtain the training text list and entities given the dictionary name.
     Args:
         request (HttpResponse): HTTP response from url
 
     Returns:
-
+        HttpResponse: HttpResponse with appropriate status and data
     """
     try:
         dictionary_name = request.GET.get('dictionary_name')

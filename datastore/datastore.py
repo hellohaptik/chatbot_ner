@@ -177,7 +177,8 @@ class DataStore(object):
     def get_entity_dictionary(self, entity_name, training_config=False, **kwargs):
         """
         Args:
-            entity_name: the name of the entity to get the stored data for
+            entity_name (str): the name of the entity to get the stored data for
+            training_config (bool): Boolean to indicate the query is for training index or variants index
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -388,6 +389,17 @@ class DataStore(object):
                                                                **kwargs)
 
     def external_api_update_training_data(self, entity_name, text_list, entity_list, language_script, **kwargs):
+        """
+
+        Args:
+            entity_name (str): Name of the entity that needs to be populated
+            text_list (list): List  consisting of training text
+            entity_list (list): List of entities corresponding to the text_list
+            language_script (str): Language code for the language script used.
+            **kwargs:
+                For Elasticsearch:
+                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+        """
         if self._client_or_connection is None:
             self._connect()
 

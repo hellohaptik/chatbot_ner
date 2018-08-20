@@ -13,6 +13,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, training_con
 
     Args:
         connection: Elasticsearch client object
+        training_config (bool): Boolean to indicate the query is for training index or variants index
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
