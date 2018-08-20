@@ -2,8 +2,13 @@ import json
 from django.http import HttpResponse
 from datastore.datastore import DataStore
 from external_api.external_api_utilities import structure_es_result
-from chatbot_ner.config import CHATBOT_NER_DATASTORE
-from external_api.es_transfer import ESTransfer
+from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+                                  EngineConnectionException, IndexForTransferException,
+                                  AliasForTransferException)
+from external_api.es_transfer import IndexNotFoundException, InvalidESURLException, \
+    SourceDestinationSimilarException, \
+    InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
+    FetchIndexForAliasException, DeleteIndexFromAliasException
 
 
 def get_entity_word_variants(request):
@@ -15,14 +20,26 @@ def get_entity_word_variants(request):
     Returns:
         HttpResponse : With data consisting of a list of value variants.
     """
+    response = {"success": False, "error": "", "result": []}
     try:
         dictionary_name = request.GET.get('dictionary_name')
         datastore_obj = DataStore()
         result = datastore_obj.get_entity_dictionary(entity_name=dictionary_name)
         result = structure_es_result(result)
-    except ValueError:
-        return HttpResponse(status=500)
-    return HttpResponse(json.dumps({'data': result}), content_type='application/json', status=200)
+        response['result'] = result
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException, ValueError) as error_message:
+        response['error'] = error_message
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException:
+        response['error'] = "Base exception has occured"
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
 def update_dictionary(request):
@@ -34,6 +51,7 @@ def update_dictionary(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status.
     """
+    response = {"success": False, "error": ""}
     try:
         word_info = json.loads(request.GET.get('word_info'))
         dictionary_name = word_info.get('dictionary_name')
@@ -43,9 +61,18 @@ def update_dictionary(request):
         datastore_obj.external_api_update_entity(dictionary_name=dictionary_name,
                                                  dictionary_data=dictionary_data,
                                                  language_script=language_script)
-    except ValueError:
-        return HttpResponse(status=500)
-    return HttpResponse(status=200)
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException, ValueError) as error_message:
+        response['error'] = error_message
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException:
+        response['error'] = "Base exception has occured"
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
 def transfer_entities(request):
@@ -56,12 +83,22 @@ def transfer_entities(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status.
     """
+    response = {"success": False, "error": ""}
+    try:
+        entity_list_dict = json.loads(request.GET.get('word_info'))
+        entity_list = entity_list_dict.get('entity_list')
 
-    entity_list_dict = json.loads(request.GET.get('word_info'))
-    entity_list = entity_list_dict.get('entity_list')
-    datastore_object = DataStore()
-    status, error = datastore_object.transfer_entities(entity_list=entity_list)
-    result = {"status": status, "error": error}
-    if not status:
-        HttpResponse(json.dumps({"data": result}), content_type='application/json', status=500)
-    return HttpResponse(json.dumps({"data": result}), content_type='application/json', status=200)
+        datastore_object = DataStore()
+        datastore_object.transfer_entities(entity_list=entity_list)
+        response['success'] = True
+    except (ValueError, IndexNotFoundException, InvalidESURLException,
+            SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
+            PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
+            AliasForTransferException, IndexForTransferException) as error_message:
+        response['error'] = error_message
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+    except BaseException:
+        response['error'] = "Base exception occured"
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)

@@ -1,5 +1,6 @@
 __all__ = [
-    'DataStoreSettingsImproperlyConfiguredException', 'EngineNotImplementedException', 'EngineConnectionException'
+    'DataStoreSettingsImproperlyConfiguredException', 'EngineNotImplementedException', 'EngineConnectionException',
+    'IndexForTransferException', 'AliasForTransferException'
 ]
 
 
@@ -29,6 +30,26 @@ class EngineConnectionException(Exception):
     def __init__(self, message=None, engine='the configured engine'):
         self.value = "Chatbot NER datastore was unable to connect to " + engine + \
                      ". Please make sure the " + engine + " service is reachable."
+        if message:
+            self.value = message
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class IndexForTransferException(Exception):
+    def __init__(self, message=None):
+        self.value = "ES index has not been configured for transfer. Please configure before transfer."
+        if message:
+            self.value = message
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class AliasForTransferException(Exception):
+    def __init__(self, message=None):
+        self.value = "ES alias has not been configured for transfer. Please configure before transfer."
         if message:
             self.value = message
 

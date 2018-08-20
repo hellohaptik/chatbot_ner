@@ -384,10 +384,10 @@ class DataStore(object):
     def transfer_entities(self, entity_list):
 
         es_url = CHATBOT_NER_DATASTORE.get(self._engine).get('connection_url')
-        if not es_url:
+        if es_url is None:
             es_url = elastic_search.connect.get_es_url()
+        if es_url is None:
+            raise DataStoreSettingsImproperlyConfiguredException()
         destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
         es_object = ESTransfer(source=es_url, destination=destination)
-        status, error = es_object.transfer_specific_entities(list_of_entities=entity_list)
-
-        return status, error
+        es_object.transfer_specific_entities(list_of_entities=entity_list)

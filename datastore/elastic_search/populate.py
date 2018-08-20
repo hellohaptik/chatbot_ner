@@ -3,7 +3,6 @@ from external_api.external_api_utilities import structure_external_api_json
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
-from django.http import HttpResponse
 
 log_prefix = 'datastore.elastic_search.populate'
 
