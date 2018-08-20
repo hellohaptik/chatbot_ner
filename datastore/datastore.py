@@ -226,7 +226,7 @@ class DataStore(object):
                                                                        doc_type=doc_type,
                                                                        entity_name=entity_name,
                                                                        request_timeout=request_timeout,
-                                                                       training_config=True,
+                                                                       training_config=training_config,
                                                                        **kwargs)
 
         return results_dictionary
