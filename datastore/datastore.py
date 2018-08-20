@@ -2,7 +2,7 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
 
@@ -62,6 +62,7 @@ class DataStore(object):
         alias_config = CHATBOT_NER_DATASTORE.get(engine).get('es_alias_config')
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
+            self._training_store_name = self._connection_settings.get(ES_TRAINING_INDEX, '_all')
             if alias_config:
                 self._store_name = elastic_search.connect.get_current_live_index(self._store_name)
 
