@@ -2,6 +2,7 @@ from elasticsearch import Elasticsearch
 import requests
 from chatbot_ner.config import CHATBOT_NER_DATASTORE
 import json
+from external_api.es_transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
 
@@ -46,37 +47,11 @@ class FetchIndexForAliasException(Exception):
     pass
 
 
-def _get_current_live_index(alias_name):
+def get_current_live_index(alias_name):
     engine = CHATBOT_NER_DATASTORE.get('engine')
     es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme')
               + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
               CHATBOT_NER_DATASTORE.get(engine).get('port'))
-    current_live_index = fetch_index_alias_points_to(es_url, alias_name)
+    es_object = ESTransfer(source=es_url, destination=None)
+    current_live_index = es_object.fetch_index_alias_points_to(es_url, alias_name)
     return current_live_index
-
-
-def fetch_index_alias_points_to(es_url, alias_name):
-    """
-    This function fetches the current live index, ie the index the alias points to
-
-    Args
-        es_url (str): The elasticsearch URL
-        alias_name (str):  The name of alias for which the list of indices has to be fetched
-
-    Returns
-        current_live_index (str): The current live index
-    """
-    response = requests.get(es_url + '/*/_alias/' + alias_name)
-    if response.status_code == 200:
-        json_obj = json.loads(response.content)
-        indices = json_obj.keys()
-        es_index_1 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_1')
-        es_index_2 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_2')
-        if es_index_1 in indices:
-            return es_index_1
-        elif es_index_2 in indices:
-            return es_index_2
-        else:
-            raise FetchIndexForAliasException(alias_name)
-    raise FetchIndexForAliasException('fetch index for ' + alias_name + ' failed')
-

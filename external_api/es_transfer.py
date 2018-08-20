@@ -77,9 +77,10 @@ class ESTransfer(object):
         """
         self.source = source
         self.destination = destination
-        self.es_index_1 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_1')
-        self.es_index_2 = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_index_2')
-        self.es_alias = CHATBOT_NER_DATASTORE.get('elasticsearch').get('es_alias')
+        self.engine = CHATBOT_NER_DATASTORE.get('engine')
+        self.es_index_1 = CHATBOT_NER_DATASTORE.get(self.engine).get('es_index_1')
+        self.es_index_2 = CHATBOT_NER_DATASTORE.get(self.engine).get('es_index_2')
+        self.es_alias = CHATBOT_NER_DATASTORE.get(self.engine).get('es_alias')
 
     def _validate_source_destination_index_name(self):
         """

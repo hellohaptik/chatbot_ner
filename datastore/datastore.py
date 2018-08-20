@@ -64,7 +64,7 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
             if alias_config:
-                self._store_name = elastic_search.connect._get_current_live_index(self._store_name)
+                self._store_name = elastic_search.connect.get_current_live_index(self._store_name)
 
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
