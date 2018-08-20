@@ -154,7 +154,7 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
         doc_type: {
             'properties': {
                     "entity_data": {
-                        "type": "keyword"
+                        "type": "text"
                     },
                     "text": {
                         "enabled": "false"
@@ -163,7 +163,7 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
                         "enabled": "false"
                     },
                     "language_script": {
-                        "type": "keyword"
+                        "type": "text"
                     }
                 }
             }
