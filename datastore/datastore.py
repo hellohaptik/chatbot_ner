@@ -2,7 +2,7 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX)
+                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX, ES_TRAINING_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
 
@@ -216,13 +216,14 @@ class DataStore(object):
             request_timeout = self._connection_settings.get('request_timeout', 20)
             if training_config:
                 index_name = self._training_store_name
+                doc_type = self._connection_settings[ES_TRAINING_DOC_TYPE]
             else:
                 index_name = self._store_name
+                doc_type = self._connection_settings[ELASTICSEARCH_DOC_TYPE],
 
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
                                                                        index_name=index_name,
-                                                                       doc_type=self._connection_settings[
-                                                                           ELASTICSEARCH_DOC_TYPE],
+                                                                       doc_type=doc_type,
                                                                        entity_name=entity_name,
                                                                        request_timeout=request_timeout,
                                                                        training_config=True,
@@ -408,7 +409,7 @@ class DataStore(object):
             elastic_search.populate.external_api_training_data_update(connection=self._client_or_connection,
                                                                       index_name=self._training_store_name,
                                                                       doc_type=self._connection_settings[
-                                                                            ELASTICSEARCH_DOC_TYPE],
+                                                                            ES_TRAINING_DOC_TYPE],
                                                                       logger=ner_logger,
                                                                       entity_name=entity_name,
                                                                       text_list=text_list,
