@@ -258,3 +258,43 @@ def external_api_entity_update(connection, index_name, doc_type, dictionary_data
                                 dictionary_key=dictionary_name,
                                 dictionary_value=dictionary_value, language_script=language_script,logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
+
+
+def external_api_training_data_update(connection, index_name, doc_type, entity_name, text_list, entity_list, language_script,
+                                      logger, **kwargs):
+    logger.debug('%s: +++ Started: external_api__training_entity_update_() +++' % log_prefix)
+    logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
+    delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+                          entity_name=entity_name, logger=logger, **kwargs)
+    logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
+
+    if text_list:
+        logger.debug('%s: +++ Started: add_training_data_elastic_search() +++' % log_prefix)
+        add_training_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
+                                         entity_name=entity_name,
+                                         text_list=text_list,
+                                         entity_list=entity_list,
+                                         language_script=language_script, logger=logger, **kwargs)
+        logger.debug('%s: +++ Completed: add_training_data_elastic_search() +++' % log_prefix)
+
+
+def add_training_data_elastic_search(connection, index_name, doc_type, entity_name, text_list, entity_list,
+                                     language_script, logger, **kwargs):
+    str_query = []
+    for text, entities in zip(text_list, entity_list):
+        query_dict = {'_index': index_name,
+                      'entity_data': entity_name,
+                      'text': text,
+                      'entities': entities,
+                      'language_script': language_script,
+                      '_type': doc_type,
+                      '_op_type': 'index'
+                      }
+        str_query.append(query_dict)
+        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+            logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
+            str_query = []
+    if str_query:
+        result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+        logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
