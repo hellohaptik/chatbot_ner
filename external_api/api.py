@@ -56,15 +56,11 @@ def transfer_entities(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status.
     """
-    engine = CHATBOT_NER_DATASTORE.get('engine')
-    source = CHATBOT_NER_DATASTORE.get(engine).get('es_scheme') + \
-        CHATBOT_NER_DATASTORE.get(engine).get('host') + ':' + \
-        CHATBOT_NER_DATASTORE.get(engine).get('port')
-    destination = CHATBOT_NER_DATASTORE.get(engine).get('destination_url')
-    es_object = ESTransfer(source=source, destination=destination)
+
     entity_list_dict = json.loads(request.GET.get('word_info'))
     entity_list = entity_list_dict.get('entity_list')
-    status, error = es_object.transfer_specific_entities(list_of_entities=entity_list)
+    datastore_object = DataStore()
+    status, error = datastore_object.transfer_entities(entity_list=entity_list)
     result = {"status": status, "error": error}
     if not status:
         HttpResponse(json.dumps({"data": result}), content_type='application/json', status=500)

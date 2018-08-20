@@ -5,6 +5,7 @@ from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT
                         ELASTICSEARCH_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
+from external_api.es_transfer import ESTransfer
 
 
 class DataStore(object):
@@ -379,3 +380,14 @@ class DataStore(object):
                                                                dictionary_name=dictionary_name,
                                                                language_script=language_script,
                                                                **kwargs)
+
+    def transfer_entities(self, entity_list):
+
+        es_url = CHATBOT_NER_DATASTORE.get(self._engine).get('connection_url')
+        if not es_url:
+            es_url = elastic_search.connect.get_es_url()
+        destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
+        es_object = ESTransfer(source=es_url, destination=destination)
+        status, error = es_object.transfer_specific_entities(list_of_entities=entity_list)
+
+        return status, error

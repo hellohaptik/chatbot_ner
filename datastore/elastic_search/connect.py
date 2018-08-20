@@ -54,10 +54,15 @@ def get_current_live_index(alias_name):
     Returns:
         current_live_index (str): The index to which the alias is pointing.
     """
+    es_url = get_es_url()
+    es_object = ESTransfer(source=es_url, destination=None)
+    current_live_index = es_object.fetch_index_alias_points_to(es_url, alias_name)
+    return current_live_index
+
+
+def get_es_url():
     engine = CHATBOT_NER_DATASTORE.get('engine')
     es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme')
               + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
               CHATBOT_NER_DATASTORE.get(engine).get('port'))
-    es_object = ESTransfer(source=es_url, destination=None)
-    current_live_index = es_object.fetch_index_alias_points_to(es_url, alias_name)
-    return current_live_index
+    return es_url
