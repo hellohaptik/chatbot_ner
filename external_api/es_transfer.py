@@ -405,18 +405,27 @@ class ESTransfer(object):
         Args
             list_of_entities (string): list of ES dictionary names to be transferred
         """
-        self._validate_source_destination_index_name()
-        # self._validate_alias_and_index()
+        status = False
+        error = ''
+        try:
+            self._validate_source_destination_index_name()
+            # self._validate_alias_and_index()
 
-        current_live_index = self.fetch_index_alias_points_to(self.destination, self.es_alias)
+            current_live_index = self.fetch_index_alias_points_to(self.destination, self.es_alias)
 
-        new_live_index = self.get_new_live_index(current_live_index)
+            new_live_index = self.get_new_live_index(current_live_index)
 
-        # Backup process
-        self.transfer_data_internal(self.destination, current_live_index, new_live_index)
+            # Backup process
+            self.transfer_data_internal(self.destination, current_live_index, new_live_index)
 
-        # call utils function to transfer specific entities
-        self._transfer_specific_documents(new_live_index, list_of_entities)
+            # call utils function to transfer specific entities
+            self._transfer_specific_documents(new_live_index, list_of_entities)
 
-        # swap the index for the alias
-        self.swap_index_in_es_url(self.destination)
+            # swap the index for the alias
+            self.swap_index_in_es_url(self.destination)
+            status = True
+        except (IndexNotFoundException, InvalidESURLException, SourceDestinationSimilarException,
+                InternalBackupException, InternalBackupException, AliasNotFoundException, PointIndexToAliasException,
+                FetchIndexForAliasException, DeleteIndexFromAliasException) as e:
+                error = e.message
+        return status, error
