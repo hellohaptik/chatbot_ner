@@ -80,18 +80,6 @@ def create_index(connection, index_name, doc_type, logger, mapping_body, **kwarg
                                                         'wait_for_active_shards'])
         connection.indices.create(index=index_name, body=body, **create_kwargs)
 
-        mapping_body = {
-            doc_type: {
-                'properties': {
-                    'variants': {
-                        'type': 'string',
-                        'analyzer': 'my_analyzer',
-                        'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
-                    }
-                }
-            }
-        }
-
         put_mapping_kwargs = filter_kwargs(kwargs=kwargs, keep_kwargs_keys=['allow_no_indices', 'expand_wildcards',
                                                                             'ignore_unavailable',
                                                                             'master_timeout', 'timeout',
@@ -165,13 +153,20 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
     mapping_body = {
         doc_type: {
             'properties': {
-                'variants': {
-                    'type': 'string',
-                    'analyzer': 'my_analyzer',
-                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
+                    "entity_data": {
+                        "type": "keyword"
+                    },
+                    "text": {
+                        "enabled": "false"
+                    },
+                    "entities": {
+                        "enabled": "false"
+                    },
+                    "language_script": {
+                        "type": "keyword"
+                    }
                 }
             }
-        }
     }
 
     create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
