@@ -62,7 +62,7 @@ def get_current_live_index(alias_name):
 
 def get_es_url():
     engine = CHATBOT_NER_DATASTORE.get('engine')
-    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme')
+    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme', 'http://')
               + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
               CHATBOT_NER_DATASTORE.get(engine).get('port'))
     return es_url
