@@ -174,7 +174,7 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def get_entity_dictionary(self, entity_name, **kwargs):
+    def get_entity_dictionary(self, entity_name, training_config=False, **kwargs):
         """
         Args:
             entity_name: the name of the entity to get the stored data for
@@ -213,8 +213,13 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
+            if training_config:
+                index_name = self._training_store_name
+            else:
+                index_name = self._store_name
+
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=self._store_name,
+                                                                       index_name=index_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,

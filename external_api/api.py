@@ -99,4 +99,4 @@ def get_training_data(request):
         result = datastore_obj.get_entity_dictionary(training_config=True, entity_name=dictionary_name)
     except ValueError:
         return HttpResponse(status=500)
-    return HttpResponse(json.dumps({'result': result}), content_type='application/json')
+    return HttpResponse(json.dumps({'data': result}), content_type='application/json')
