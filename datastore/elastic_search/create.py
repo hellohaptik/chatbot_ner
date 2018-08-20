@@ -27,7 +27,7 @@ def delete_index(connection, index_name, logger, **kwargs):
         logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
 
 
-def create_index(connection, index_name, doc_type, logger, **kwargs):
+def create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs):
     """
     Creates an Elasticsearch index needed for similarity based searching
 
@@ -119,3 +119,59 @@ def exists(connection, index_name):
         boolean, True if index exists , False otherwise
     """
     return connection.indices.exists(index_name)
+
+
+def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
+    """
+
+    Args:
+        connection:
+        index_name:
+        doc_type:
+        logger:
+        **kwargs:
+
+    Returns:
+
+    """
+    mapping_body = {
+        doc_type: {
+            'properties': {
+                'variants': {
+                    'type': 'string',
+                    'analyzer': 'my_analyzer',
+                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
+                }
+            }
+        }
+    }
+
+    create_index(connection, index_name, doc_type, logger, mapping_body, ** kwargs)
+
+
+def create_training_index(connection, index_name, doc_type, logger, **kwargs):
+    """
+
+    Args:
+        connection:
+        index_name:
+        doc_type:
+        logger:
+        **kwargs:
+
+    Returns:
+
+    """
+    mapping_body = {
+        doc_type: {
+            'properties': {
+                'variants': {
+                    'type': 'string',
+                    'analyzer': 'my_analyzer',
+                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
+                }
+            }
+        }
+    }
+
+    create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
