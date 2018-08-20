@@ -31,8 +31,8 @@ def get_entity_word_variants(request):
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, ValueError) as error_message:
-        response['error'] = error_message
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
+        response['error'] = error_message.value
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     except BaseException:
@@ -65,8 +65,8 @@ def update_dictionary(request):
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, ValueError) as error_message:
-        response['error'] = error_message
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
+        response['error'] = error_message.value
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     except BaseException:
@@ -91,11 +91,11 @@ def transfer_entities(request):
         datastore_object = DataStore()
         datastore_object.transfer_entities(entity_list=entity_list)
         response['success'] = True
-    except (ValueError, IndexNotFoundException, InvalidESURLException,
+    except (IndexNotFoundException, InvalidESURLException,
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
             PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
             AliasForTransferException, IndexForTransferException) as error_message:
-        response['error'] = error_message
+        response['error'] = error_message.value
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
     except BaseException:
         response['error'] = "Base exception occured"

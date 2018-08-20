@@ -38,60 +38,93 @@ class AliasForTransferException(Exception):
     def __str__(self):
         return repr(self.value)
 
+
 class IndexNotFoundException(Exception):
     """
     This exception will be raised if index is not found in ES
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class InvalidESURLException(Exception):
     """
     This exception will be raised if the ES URL is invalid
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class SourceDestinationSimilarException(Exception):
     """
     This exception will be raised if source is the same as destination
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class InternalBackupException(Exception):
     """
     This exception will be raised for transfer of documents from one index to other within a ES URL
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class AliasNotFoundException(Exception):
     """
     This exception will be raised if alias not found in ES
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class PointIndexToAliasException(Exception):
     """
     This exception is raised if the assignment of an index to an alias fails
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class FetchIndexForAliasException(Exception):
     """
     This exception is raised if fetch for indices for an alias fails
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class DeleteIndexFromAliasException(Exception):
     """
     This exception is raised if deletion of an index from an alias fails
     """
-    pass
+    def __init__(self, message=None):
+        self.value = message
+
+    def __str__(self):
+        return repr(self.value)
 
 
 class ESTransfer(object):
