@@ -7,7 +7,7 @@ from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, 
 log_prefix = 'datastore.elastic_search.query'
 
 
-def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
+def dictionary_query(connection, index_name, doc_type, entity_name, training_config=False, **kwargs):
     """
     Get all variants data for a entity stored in the index as a dictionary
 
@@ -23,7 +23,6 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
         synonyms/variants of the key
     """
-    results_dictionary = {}
     data = {
         'query': {
             'term': {
@@ -39,8 +38,17 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
     # Parse hits
     results = search_results['hits']['hits']
-    for result in results:
-        results_dictionary[result['_source']['value']] = result['_source']['variants']
+    if training_config:
+        results_dictionary = {'text_list': [], 'entity_list': []}
+        for result in results:
+            results_dictionary['text_list'].append(result['_source']['text'])
+            results_dictionary['entity_list'].append(result['_source']['entities'])
+
+    # Parse hits
+    else:
+        results_dictionary = {}
+        for result in results:
+            results_dictionary[result['_source']['value']] = result['_source']['variants']
 
     return results_dictionary
 

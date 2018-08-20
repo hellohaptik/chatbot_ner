@@ -72,16 +72,18 @@ def transfer_entities(request):
 
 
 def update_training_data(request):
-
-    training_data = json.loads(request.GET.get('word_info'))
-    text_list = training_data.get('text_list')
-    entity_list = training_data.get('entity_list')
-    entity_name = training_data.get('entity_name')
-    language_script = training_data.get('language_script')
-    datastore_obj = DataStore()
-    datastore_obj.external_api_update_training_data(entity_name=entity_name, entity_list=entity_list,
-                                                    text_list=text_list, language_script=language_script)
-    return HttpResponse(json.dumps({"data": training_data}), content_type='application/json', status=200)
+    try:
+        training_data = json.loads(request.GET.get('word_info'))
+        text_list = training_data.get('text_list')
+        entity_list = training_data.get('entity_list')
+        entity_name = training_data.get('entity_name')
+        language_script = training_data.get('language_script')
+        datastore_obj = DataStore()
+        datastore_obj.external_api_update_training_data(entity_name=entity_name, entity_list=entity_list,
+                                                        text_list=text_list, language_script=language_script)
+    except ValueError:
+        HttpResponse(status=500)
+    return HttpResponse(status=200)
 
 
 def get_training_data(request):
