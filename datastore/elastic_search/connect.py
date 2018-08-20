@@ -48,6 +48,14 @@ class FetchIndexForAliasException(Exception):
 
 
 def get_current_live_index(alias_name):
+    """
+    This method is used to get the index the alias is currently pointing to.
+    Args:
+        alias_name (str): The alias which is pointing tothe indices.
+
+    Returns:
+        current_live_index (str): The index to which the alias is pointing.
+    """
     engine = CHATBOT_NER_DATASTORE.get('engine')
     es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme')
               + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +

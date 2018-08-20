@@ -1,7 +1,7 @@
 import json
 from django.http import HttpResponse
 from datastore.datastore import DataStore
-from external_api.external_api_utilities import structure_es_result, structure_external_api_json
+from external_api.external_api_utilities import structure_es_result
 from chatbot_ner.config import CHATBOT_NER_DATASTORE
 from external_api.es_transfer import ESTransfer
 
@@ -13,7 +13,7 @@ def get_entity_word_variants(request):
         request (HttpResponse): HTTP response from url
 
     Returns:
-
+        HttpResponse : With data consisting of a list of value variants.
     """
     try:
         dictionary_name = request.GET.get('dictionary_name')
@@ -22,7 +22,7 @@ def get_entity_word_variants(request):
         result = structure_es_result(result)
     except ValueError:
         return HttpResponse(status=500)
-    return HttpResponse(json.dumps({'result': result}), content_type='application/json', status=200)
+    return HttpResponse(json.dumps({'data': result}), content_type='application/json', status=200)
 
 
 def update_dictionary(request):
@@ -32,7 +32,7 @@ def update_dictionary(request):
         request (HttpResponse): HTTP response from url
 
     Returns:
-
+        HttpResponse : HttpResponse with appropriate status.
     """
     try:
         word_info = json.loads(request.GET.get('word_info'))
@@ -53,9 +53,8 @@ def transfer_entities(request):
     This method is used to transfer entities from the source to destination.
     Args:
         request (HttpResponse): HTTP response from url
-
     Returns:
-
+        HttpResponse : HttpResponse with appropriate status.
     """
     try:
         engine = CHATBOT_NER_DATASTORE.get('engine')

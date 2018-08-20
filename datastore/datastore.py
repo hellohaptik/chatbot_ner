@@ -356,6 +356,16 @@ class DataStore(object):
         return False
 
     def external_api_update_entity(self, dictionary_name, dictionary_data, language_script, **kwargs):
+        """
+        This method is used to populate the the entity dictionary
+        Args:
+            dictionary_name (str): Name of the dictionary that needs to be populated
+            dictionary_data (list): List of dicts consisting of value and variants
+            language_script (str): Language code for the language script used.
+            **kwargs:
+                For Elasticsearch:
+                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+        """
         if self._client_or_connection is None:
             self._connect()
 
