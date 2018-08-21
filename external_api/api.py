@@ -31,16 +31,6 @@ def get_entity_word_variants(request):
         response['result'] = result
         response['success'] = True
 
-    except ValueError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
-    except AttributeError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
             EngineConnectionException, FetchIndexForAliasException) as error_message:
@@ -76,15 +66,6 @@ def update_dictionary(request):
                                                  dictionary_data=dictionary_data,
                                                  language_script=language_script)
         response['success'] = True
-    except ValueError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
-    except AttributeError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
@@ -116,16 +97,6 @@ def transfer_entities(request):
         datastore_object = DataStore()
         datastore_object.transfer_entities(entity_list=entity_list)
         response['success'] = True
-
-    except ValueError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
-    except AttributeError as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     except (IndexNotFoundException, InvalidESURLException,
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
