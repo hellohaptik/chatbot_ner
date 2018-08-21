@@ -10,6 +10,7 @@ from external_api.es_transfer import IndexNotFoundException, InvalidESURLExcepti
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
+from external_api.constants import DICTIONARY_DATA, DICTIONARY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, EXTERNAL_API_DATA
 
 
 def get_entity_word_variants(request):
@@ -23,7 +24,7 @@ def get_entity_word_variants(request):
     """
     response = {"success": False, "error": "", "result": []}
     try:
-        dictionary_name = request.GET.get('dictionary_name')
+        dictionary_name = request.GET.get(DICTIONARY_NAME)
         datastore_obj = DataStore()
         result = datastore_obj.get_entity_dictionary(entity_name=dictionary_name)
         result = structure_es_result(result)
@@ -66,10 +67,10 @@ def update_dictionary(request):
     """
     response = {"success": False, "error": ""}
     try:
-        word_info = json.loads(request.GET.get('word_info'))
-        dictionary_name = word_info.get('dictionary_name')
-        dictionary_data = word_info.get('dictionary_data')
-        language_script = word_info.get('language_script')
+        external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
+        dictionary_name = external_api_data.get(DICTIONARY_NAME)
+        dictionary_data = external_api_data.get(DICTIONARY_DATA)
+        language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
         datastore_obj.external_api_update_entity(dictionary_name=dictionary_name,
                                                  dictionary_data=dictionary_data,
@@ -109,8 +110,8 @@ def transfer_entities(request):
     """
     response = {"success": False, "error": ""}
     try:
-        entity_list_dict = json.loads(request.GET.get('word_info'))
-        entity_list = entity_list_dict.get('entity_list')
+        external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
+        entity_list = external_api_data.get(ENTITY_LIST)
 
         datastore_object = DataStore()
         datastore_object.transfer_entities(entity_list=entity_list)
