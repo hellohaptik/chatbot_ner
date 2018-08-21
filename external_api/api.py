@@ -9,6 +9,7 @@ from external_api.es_transfer import IndexNotFoundException, InvalidESURLExcepti
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
+from chatbot_ner.config import ner_logger
 
 
 def get_entity_word_variants(request):
@@ -28,20 +29,27 @@ def get_entity_word_variants(request):
         result = structure_es_result(result)
         response['result'] = result
         response['success'] = True
-    except ValueError:
-        response['error'] = "Value Error"
+
+    except ValueError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-    except AttributeError:
-        response['error'] = "Attribute Error"
+
+    except AttributeError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
             EngineConnectionException, FetchIndexForAliasException) as error_message:
-        response['error'] = error_message.value
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException:
-        response['error'] = "Base exception has occured"
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
@@ -67,22 +75,26 @@ def update_dictionary(request):
                                                  dictionary_data=dictionary_data,
                                                  language_script=language_script)
         response['success'] = True
-    except ValueError:
-        response['error'] = "Value Error"
+    except ValueError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except AttributeError:
-        response['error'] = "Attribute Error"
+    except AttributeError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
             EngineConnectionException, FetchIndexForAliasException) as error_message:
-        response['error'] = error_message.value
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException:
-        response['error'] = "Base exception has occured"
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
@@ -103,20 +115,28 @@ def transfer_entities(request):
         datastore_object = DataStore()
         datastore_object.transfer_entities(entity_list=entity_list)
         response['success'] = True
-    except ValueError:
-        response['error'] = "Value Error"
+
+    except ValueError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-    except AttributeError:
-        response['error'] = "Attribute Error"
+
+    except AttributeError as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
     except (IndexNotFoundException, InvalidESURLException,
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
             PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
             AliasForTransferException, IndexForTransferException) as error_message:
-        response['error'] = error_message.value
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-    except BaseException:
-        response['error'] = "Base exception occured"
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
