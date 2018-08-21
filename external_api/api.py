@@ -53,7 +53,7 @@ def update_dictionary(request):
         request (HttpResponse): HTTP response from url
 
     Returns:
-        HttpResponse : HttpResponse with appropriate status.
+        HttpResponse : HttpResponse with appropriate status and error message.
     """
     response = {"success": False, "error": ""}
     try:
@@ -87,7 +87,7 @@ def transfer_entities(request):
     Args:
         request (HttpResponse): HTTP response from url
     Returns:
-        HttpResponse : HttpResponse with appropriate status.
+        HttpResponse : HttpResponse with appropriate status and error message.
     """
     response = {"success": False, "error": ""}
     try:

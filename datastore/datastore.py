@@ -382,7 +382,11 @@ class DataStore(object):
                                                                **kwargs)
 
     def transfer_entities(self, entity_list):
-
+        """
+        This method is used to transfer the entities from one environment to the other.
+        Args:
+            entity_list (list): List of entities that have to be transfered
+        """
         es_url = CHATBOT_NER_DATASTORE.get(self._engine).get('connection_url')
         if es_url is None:
             es_url = elastic_search.connect.get_es_url()
