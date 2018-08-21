@@ -1,11 +1,8 @@
 import requests
 import json
-import logging
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from elasticsearch import helpers
-from chatbot_ner.config import CHATBOT_NER_DATASTORE
-
-logger = logging.getLogger('exception')
+from chatbot_ner.config import CHATBOT_NER_DATASTORE, ner_logger
 
 
 class EngineNotImplementedException(Exception):
@@ -198,7 +195,7 @@ class ESTransfer(object):
         # check if index is present in source
         if " " + index_name + " " not in index_response.content:
             message = index_name + " does not exist in " + es_url
-            logger.debug("check_if_index_exits - " + str(message))
+            ner_logger.debug("check_if_index_exits - " + str(message))
             raise IndexNotFoundException(message)
 
     def _scroll_over_es_return_object(self, results):
@@ -476,18 +473,33 @@ class ESTransfer(object):
         Args
             list_of_entities (string): list of ES dictionary names to be transferred
         """
+        ner_logger.debug('Start _validate_source_destination_index_name '
+                         'source: %s, destination: %s' % (self.source, self.destination))
         self._validate_source_destination_index_name()
+        ner_logger.debug('End _validate_source_destination_index_name')
+
         # self._validate_alias_and_index()
-
+        ner_logger.debug('Start fetch_index_alias_points_to '
+                         'destination: %s, es_alias: %s' % (self.destination, self.es_alias))
         current_live_index = self.fetch_index_alias_points_to(self.destination, self.es_alias)
+        ner_logger.debug('End fetch_index_alias_points_to %s' % current_live_index)
 
+        ner_logger.debug('Start get_new_live_index')
         new_live_index = self.get_new_live_index(current_live_index)
+        ner_logger.debug('End get_new_live_index new_live_index: %s' % new_live_index)
 
         # Backup process
+        ner_logger.debug('Start transfer_data_internal')
         self.transfer_data_internal(self.destination, current_live_index, new_live_index)
+        ner_logger.debug('End transfer_data_internal')
 
         # call utils function to transfer specific entities
+        ner_logger.debug('Start fetch_index_alias_points_to '
+                         'new_live_index: %s, list_of_entities: %s' % (new_live_index, str(list_of_entities)))
         self._transfer_specific_documents(new_live_index, list_of_entities)
+        ner_logger.debug('End _transfer_specific_documents')
 
         # swap the index for the alias
+        ner_logger.debug('Start swap_index_in_es_url')
         self.swap_index_in_es_url(self.destination)
+        ner_logger.debug('End swap_index_in_es_url')
