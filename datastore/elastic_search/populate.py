@@ -1,5 +1,4 @@
 from elasticsearch import helpers
-from external_api.external_api_utilities import structure_external_api_json
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
@@ -252,7 +251,9 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
     logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
     if entity_data:
-        dictionary_value = structure_external_api_json(entity_data)
+        dictionary_value = {}
+        for temp_dict in entity_data:
+            dictionary_value[temp_dict['value']] = temp_dict['variants']
 
         logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
