@@ -10,7 +10,7 @@ from external_api.es_transfer import IndexNotFoundException, InvalidESURLExcepti
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
-from external_api.constants import DICTIONARY_DATA, DICTIONARY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, EXTERNAL_API_DATA
+from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, EXTERNAL_API_DATA
 
 
 def get_entity_word_variants(request):
@@ -24,9 +24,9 @@ def get_entity_word_variants(request):
     """
     response = {"success": False, "error": "", "result": []}
     try:
-        dictionary_name = request.GET.get(DICTIONARY_NAME)
+        entity_name = request.GET.get(ENTITY_NAME)
         datastore_obj = DataStore()
-        result = datastore_obj.get_entity_dictionary(entity_name=dictionary_name)
+        result = datastore_obj.get_entity_dictionary(entity_name=entity_name)
         result = structure_es_result(result)
         response['result'] = result
         response['success'] = True
@@ -58,12 +58,12 @@ def update_dictionary(request):
     response = {"success": False, "error": ""}
     try:
         external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
-        dictionary_name = external_api_data.get(DICTIONARY_NAME)
-        dictionary_data = external_api_data.get(DICTIONARY_DATA)
+        entity_name = external_api_data.get(ENTITY_NAME)
+        entity_data = external_api_data.get(ENTITY_DATA)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
-        datastore_obj.update_entity_data(dictionary_name=dictionary_name,
-                                         dictionary_data=dictionary_data,
+        datastore_obj.update_entity_data(entity_name=entity_name,
+                                         entity_data=entity_data,
                                          language_script=language_script)
         response['success'] = True
 

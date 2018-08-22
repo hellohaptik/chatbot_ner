@@ -354,12 +354,12 @@ class DataStore(object):
 
         return False
 
-    def update_entity_data(self, dictionary_name, dictionary_data, language_script, **kwargs):
+    def update_entity_data(self, entity_name, entity_data, language_script, **kwargs):
         """
         This method is used to populate the the entity dictionary
         Args:
-            dictionary_name (str): Name of the dictionary that needs to be populated
-            dictionary_data (list): List of dicts consisting of value and variants
+            entity_name (str): Name of the dictionary that needs to be populated
+            entity_data (list): List of dicts consisting of value and variants
             language_script (str): Language code for the language script used.
             **kwargs:
                 For Elasticsearch:
@@ -375,8 +375,8 @@ class DataStore(object):
                                                        doc_type=self._connection_settings[
                                                             ELASTICSEARCH_DOC_TYPE],
                                                        logger=ner_logger,
-                                                       dictionary_data=dictionary_data,
-                                                       dictionary_name=dictionary_name,
+                                                       entity_data=entity_data,
+                                                       entity_name=entity_name,
                                                        language_script=language_script,
                                                        **kwargs)
 

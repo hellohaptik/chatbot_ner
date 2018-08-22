@@ -231,7 +231,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
 
 
-def entity_data_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,
+def entity_data_update(connection, index_name, doc_type, entity_data, entity_name, language_script,
                        logger, **kwargs):
     """
     This method is used to populate the elastic search via the external api call.
@@ -239,8 +239,8 @@ def entity_data_update(connection, index_name, doc_type, dictionary_data, dictio
         connection: Elasticsearch client object
         index_name (str): The name of the index
         doc_type (str): The type of the documents being indexed
-        dictionary_data (list): List of dicts consisting of value and variants.
-        dictionary_name (str): Name of the dictionary
+        entity_data (list): List of dicts consisting of value and variants.
+        entity_name (str): Name of the dictionary
         language_script (str): The code for the language script
         logger: logging object to log at debug and exception levellogging object to log at debug and exception level
         **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
@@ -248,14 +248,14 @@ def entity_data_update(connection, index_name, doc_type, dictionary_data, dictio
     logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
     logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
     delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                          entity_name=dictionary_name, logger=logger, **kwargs)
+                          entity_name=entity_name, logger=logger, **kwargs)
     logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
-    if dictionary_data:
-        dictionary_value = structure_external_api_json(dictionary_data)
+    if entity_data:
+        dictionary_value = structure_external_api_json(entity_data)
 
         logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
-                                dictionary_key=dictionary_name,
-                                dictionary_value=dictionary_value, language_script=language_script,logger=logger, **kwargs)
+                                dictionary_key=entity_name,
+                                dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
