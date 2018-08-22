@@ -1,10 +1,10 @@
 import json
 from django.http import HttpResponse
 from datastore.datastore import DataStore
-from datastore_exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, IndexForTransferException,
                                   AliasForTransferException, NonESEngineTransferException)
-from datastore_exceptions import IndexNotFoundException, InvalidESURLException, \
+from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException

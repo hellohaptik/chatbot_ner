@@ -3,12 +3,12 @@ import json
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 from elasticsearch import helpers
 from chatbot_ner.config import CHATBOT_NER_DATASTORE, ner_logger
-from datastore_exceptions import IndexNotFoundException, InvalidESURLException, \
+from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
 
-from datastore_exceptions import AliasForTransferException, EngineNotImplementedException, \
+from datastore.exceptions import AliasForTransferException, EngineNotImplementedException, \
     IndexForTransferException
 
 

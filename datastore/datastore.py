@@ -3,7 +3,7 @@ from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
                         ELASTICSEARCH_DOC_TYPE)
-from datastore_exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, NonESEngineTransferException)
 
 
