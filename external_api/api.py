@@ -4,7 +4,7 @@ from datastore.datastore import DataStore
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, IndexForTransferException,
                                   AliasForTransferException, NonESEngineTransferException)
-from datastore.elastic_search.transfer import IndexNotFoundException, InvalidESURLException, \
+from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
