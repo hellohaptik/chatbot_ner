@@ -1,7 +1,6 @@
 import json
 from django.http import HttpResponse
 from datastore.datastore import DataStore
-from external_api.external_api_utilities import structure_es_result
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, IndexForTransferException,
                                   AliasForTransferException, NonESEngineTransferException)
@@ -27,7 +26,15 @@ def get_entity_word_variants(request):
         entity_name = request.GET.get(ENTITY_NAME)
         datastore_obj = DataStore()
         result = datastore_obj.get_entity_dictionary(entity_name=entity_name)
-        result = structure_es_result(result)
+
+        structured_result = []
+        # The list around result.keys() is to make it compatible to python3
+        key_list = list(result.keys())
+        key_list.sort()
+        for value in key_list:
+            structured_result.append({'value': value, 'variants': result[value]})
+        result = structured_result
+
         response['result'] = result
         response['success'] = True
 
