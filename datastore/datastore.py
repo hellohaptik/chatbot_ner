@@ -3,9 +3,8 @@ from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
                         ELASTICSEARCH_DOC_TYPE)
-from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException)
-from datastore.elastic_search.transfer import ESTransfer
+from datastore_exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+                                  EngineConnectionException, NonESEngineTransferException)
 
 
 class DataStore(object):
@@ -395,5 +394,5 @@ class DataStore(object):
         if es_url is None:
             raise DataStoreSettingsImproperlyConfiguredException()
         destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
-        es_object = ESTransfer(source=es_url, destination=destination)
+        es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
