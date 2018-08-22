@@ -62,9 +62,9 @@ def update_dictionary(request):
         dictionary_data = external_api_data.get(DICTIONARY_DATA)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
-        datastore_obj.external_api_update_entity(dictionary_name=dictionary_name,
-                                                 dictionary_data=dictionary_data,
-                                                 language_script=language_script)
+        datastore_obj.update_entity_data(dictionary_name=dictionary_name,
+                                         dictionary_data=dictionary_data,
+                                         language_script=language_script)
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,

@@ -354,7 +354,7 @@ class DataStore(object):
 
         return False
 
-    def external_api_update_entity(self, dictionary_name, dictionary_data, language_script, **kwargs):
+    def update_entity_data(self, dictionary_name, dictionary_data, language_script, **kwargs):
         """
         This method is used to populate the the entity dictionary
         Args:
@@ -370,15 +370,15 @@ class DataStore(object):
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.populate.external_api_entity_update(connection=self._client_or_connection,
-                                                               index_name=self._store_name,
-                                                               doc_type=self._connection_settings[
-                                                                    ELASTICSEARCH_DOC_TYPE],
-                                                               logger=ner_logger,
-                                                               dictionary_data=dictionary_data,
-                                                               dictionary_name=dictionary_name,
-                                                               language_script=language_script,
-                                                               **kwargs)
+            elastic_search.populate.entity_data_update(connection=self._client_or_connection,
+                                                       index_name=self._store_name,
+                                                       doc_type=self._connection_settings[
+                                                            ELASTICSEARCH_DOC_TYPE],
+                                                       logger=ner_logger,
+                                                       dictionary_data=dictionary_data,
+                                                       dictionary_name=dictionary_name,
+                                                       language_script=language_script,
+                                                       **kwargs)
 
     def transfer_entities(self, entity_list):
         """

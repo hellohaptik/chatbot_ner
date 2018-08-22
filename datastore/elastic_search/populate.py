@@ -231,8 +231,8 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
 
 
-def external_api_entity_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,
-                               logger, **kwargs):
+def entity_data_update(connection, index_name, doc_type, dictionary_data, dictionary_name, language_script,
+                       logger, **kwargs):
     """
     This method is used to populate the elastic search via the external api call.
     Args:
