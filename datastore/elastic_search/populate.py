@@ -111,7 +111,8 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
     return dictionary_value
 
 
-def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script,logger, **kwargs):
+def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script, logger,
+                            **kwargs):
     """
     Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
     of dictionary_value parameter generated from the csv file of this entity
@@ -125,6 +126,7 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
         dictionary_value: dictionary, mapping entity value to a list of its variants.
                             Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
         logger: logging object to log at debug and exception level
+        language_script (str): Language code of the entity script
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
