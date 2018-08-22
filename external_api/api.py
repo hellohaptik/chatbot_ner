@@ -4,7 +4,7 @@ from datastore.datastore import DataStore
 from external_api.external_api_utilities import structure_es_result
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, IndexForTransferException,
-                                  AliasForTransferException)
+                                  AliasForTransferException, NonESEngineTransferException)
 from datastore.elastic_search.transfer import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
@@ -95,13 +95,13 @@ def transfer_entities(request):
         entity_list = external_api_data.get(ENTITY_LIST)
 
         datastore_object = DataStore()
-        datastore_object.transfer_entities(entity_list=entity_list)
+        datastore_object.transfer_entities_elastic_search(entity_list=entity_list)
         response['success'] = True
 
     except (IndexNotFoundException, InvalidESURLException,
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
             PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
-            AliasForTransferException, IndexForTransferException) as error_message:
+            AliasForTransferException, IndexForTransferException, NonESEngineTransferException) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)

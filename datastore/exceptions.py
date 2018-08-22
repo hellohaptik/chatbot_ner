@@ -55,3 +55,13 @@ class AliasForTransferException(Exception):
 
     def __str__(self):
         return repr(self.value)
+
+
+class NonESEngineTransferException(Exception):
+    def __init__(self, message=None):
+        self.value = "Transfer has been triggered for datastore engone other than elastic search"
+        if message:
+            self.value = message
+
+    def __str__(self):
+        return repr(self.value)

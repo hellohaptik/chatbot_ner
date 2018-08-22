@@ -4,8 +4,9 @@ from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
                         ELASTICSEARCH_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException)
+                         EngineConnectionException, NonESEngineTransferException)
 from datastore.elastic_search.transfer import ESTransfer
+
 
 class DataStore(object):
     """
@@ -379,12 +380,15 @@ class DataStore(object):
                                                        language_script=language_script,
                                                        **kwargs)
 
-    def transfer_entities(self, entity_list):
+    def transfer_entities_elastic_search(self, entity_list):
         """
-        This method is used to transfer the entities from one environment to the other.
+        This method is used to transfer the entities from one environment to the other for elastic search engine
+        only.
         Args:
             entity_list (list): List of entities that have to be transfered
         """
+        if self._engine != ELASTICSEARCH:
+            raise NonESEngineTransferException
         es_url = CHATBOT_NER_DATASTORE.get(self._engine).get('connection_url')
         if es_url is None:
             es_url = elastic_search.connect.get_es_url()
