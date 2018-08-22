@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 from chatbot_ner.config import CHATBOT_NER_DATASTORE
-from external_api.es_transfer import ESTransfer
+from datastore.elastic_search.transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
 

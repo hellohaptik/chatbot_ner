@@ -5,8 +5,7 @@ from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT
                         ELASTICSEARCH_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException)
-from external_api.es_transfer import ESTransfer
-
+from datastore.elastic_search.transfer import ESTransfer
 
 class DataStore(object):
     """

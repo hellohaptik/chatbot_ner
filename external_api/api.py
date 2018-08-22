@@ -5,7 +5,7 @@ from external_api.external_api_utilities import structure_es_result
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, IndexForTransferException,
                                   AliasForTransferException)
-from external_api.es_transfer import IndexNotFoundException, InvalidESURLException, \
+from datastore.elastic_search.transfer import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException
