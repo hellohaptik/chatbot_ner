@@ -235,7 +235,7 @@ class DataStore(object):
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
         Returns:
-            dictionary mapping entity value variants to their entity value
+            collections.OrderedDict: dictionary mapping entity value variants to their entity value
 
         Example:
             db = DataStore()
