@@ -59,8 +59,7 @@ class DataStore(object):
             EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
-        engine = CHATBOT_NER_DATASTORE.get('engine')
-        alias_config = CHATBOT_NER_DATASTORE.get(engine).get('es_alias_config')
+        alias_config = CHATBOT_NER_DATASTORE.get(self._engine).get('es_alias_config')
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
             if alias_config:
