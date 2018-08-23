@@ -155,38 +155,38 @@ def get_training_data(request):
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
-# def update_training_data(request):
-#     """
-#     This function is used to update the dictionary entities.
-#     Args:
-#         request (HttpResponse): HTTP response from url
-#
-#     Returns:
-#         HttpResponse : HttpResponse with appropriate status and error message.
-#     """
-#     response = {"success": False, "error": ""}
-#     try:
-#         external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
-#         entity_name = external_api_data.get(ENTITY_NAME)
-#         text_list = external_api_data.get(TEXT_LIST)
-#         entity_list = external_api_data.get(ENTITY_LIST)
-#         language_script = external_api_data.get(LANGUAGE_SCRIPT)
-#         datastore_obj = DataStore()
-#         datastore_obj.update_entity_training_data(entity_name=entity_name,
-#                                                   entity_list=entity_list,
-#                                                   language_script=language_script,
-#                                                   text_list=text_list)
-#         response['success'] = True
-#
-#     except (DataStoreSettingsImproperlyConfiguredException,
-#             EngineNotImplementedException,
-#             EngineConnectionException, FetchIndexForAliasException) as error_message:
-#         response['error'] = str(error_message)
-#         ner_logger.exception('Error: %s' % error_message)
-#         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-#
-#     except BaseException as e:
-#         response['error'] = str(e)
-#         ner_logger.exception('Error: %s' % e)
-#         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-#     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+def update_training_data(request):
+    """
+    This function is used to update the dictionary entities.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse : HttpResponse with appropriate status and error message.
+    """
+    response = {"success": False, "error": ""}
+    try:
+        external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
+        entity_name = external_api_data.get(ENTITY_NAME)
+        text_list = external_api_data.get(TEXT_LIST)
+        entity_list = external_api_data.get(ENTITY_LIST)
+        language_script = external_api_data.get(LANGUAGE_SCRIPT)
+        datastore_obj = DataStore()
+        datastore_obj.update_entity_training_data(entity_name=entity_name,
+                                                  entity_list=entity_list,
+                                                  language_script=language_script,
+                                                  text_list=text_list)
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)

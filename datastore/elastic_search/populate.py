@@ -153,12 +153,59 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
                       }
         str_query.append(query_dict)
         if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-            logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
-            str_query = []
+            str_query = run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key, logger=logger, **kwargs)
     if str_query:
-        result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-        logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
+        run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key,
+                      logger=logger)
+
+
+def add_training_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script, logger,
+                                     **kwargs):
+    """
+    Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
+    of dictionary_value parameter generated from the csv file of this entity
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents being indexed
+        dictionary_key: file name of the csv file without the extension, also used as the entity name to index values
+                        of this type. Example - 'city'
+        dictionary_value: dictionary, mapping entity value to a list of its variants.
+                            Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
+        logger: logging object to log at debug and exception level
+        language_script (str): Language code of the entity script
+        kwargs:
+            Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+    Example of underlying index query
+        {'_index': 'index_name',
+         '_type': 'dictionary_data',
+         'dict_type': 'variants',
+         'entity_data': 'city',
+         'value': 'Baripada Town'',
+         'variants': ['Baripada', 'Baripada Town', '']
+         '_op_type': 'index'
+         }
+
+    """
+    str_query = []
+    for value in dictionary_value:
+        query_dict = {'_index': index_name,
+                      'entity_data': dictionary_key,
+                      'dict_type': DICTIONARY_DATA_VARIANTS,
+                      'value': value,
+                      'variants': dictionary_value[value],
+                      "language_script": language_script,
+                      '_type': doc_type,
+                      '_op_type': 'index'
+                      }
+        str_query.append(query_dict)
+        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            str_query = run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key, logger=logger, **kwargs)
+    if str_query:
+        run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key,
+                      logger=logger)
 
 
 def create_dictionary_data_from_file(connection, index_name, doc_type, csv_file_path, update, logger, **kwargs):
@@ -260,3 +307,69 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
                                 dictionary_key=entity_name,
                                 dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
+
+
+def entity_training_data_update(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
+                       logger, **kwargs):
+    """
+    This method is used to populate the elastic search via the external api call.
+    Args:
+        connection: Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents being indexed
+        entity_data (list): List of dicts consisting of value and variants.
+        entity_name (str): Name of the dictionary
+        language_script (str): The code for the language script
+        logger: logging object to log at debug and exception levellogging object to log at debug and exception level
+        **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+    """
+    logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
+    logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
+    delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
+                          entity_name=entity_name, logger=logger, **kwargs)
+    logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
+
+    if text_list:
+        dictionary_value = {}
+        for temp_dict in entity_data:
+            dictionary_value[temp_dict['value']] = temp_dict['variants']
+
+        logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
+        add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
+                                dictionary_key=entity_name,
+                                dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
+        logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
+
+
+def run_add_query(connection, dictionary_key, str_query, logger, **kwargs):
+    """
+    Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
+    of dictionary_value parameter generated from the csv file of this entity
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents being indexed
+        dictionary_key: file name of the csv file without the extension, also used as the entity name to index values
+                        of this type. Example - 'city'
+        dictionary_value: dictionary, mapping entity value to a list of its variants.
+                            Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
+        logger: logging object to log at debug and exception level
+        language_script (str): Language code of the entity script
+        kwargs:
+            Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+    Example of underlying index query
+        {'_index': 'index_name',
+         '_type': 'dictionary_data',
+         'dict_type': 'variants',
+         'entity_data': 'city',
+         'value': 'Baripada Town'',
+         'variants': ['Baripada', 'Baripada Town', '']
+         '_op_type': 'index'
+         }
+
+    """
+    result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+    logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
+    return []
