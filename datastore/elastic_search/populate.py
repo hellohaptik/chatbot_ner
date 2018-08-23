@@ -159,7 +159,7 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
                       logger=logger)
 
 
-def add_training_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script, logger,
+def add_training_data_elastic_search(connection, index_name, doc_type, entity_name, entity_list, text_list, language_script, logger,
                                      **kwargs):
     """
     Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
@@ -190,21 +190,20 @@ def add_training_data_elastic_search(connection, index_name, doc_type, dictionar
 
     """
     str_query = []
-    for value in dictionary_value:
+    for text, entities in zip(text_list, entity_list):
         query_dict = {'_index': index_name,
-                      'entity_data': dictionary_key,
-                      'dict_type': DICTIONARY_DATA_VARIANTS,
-                      'value': value,
-                      'variants': dictionary_value[value],
-                      "language_script": language_script,
+                      'entity_data': entity_name,
+                      'text': text,
+                      'entities': entities,
+                      'language_script': language_script,
                       '_type': doc_type,
                       '_op_type': 'index'
                       }
         str_query.append(query_dict)
         if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-            str_query = run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key, logger=logger, **kwargs)
+            str_query = run_add_query(connection=connection, str_query=str_query, dictionary_key=entity_name, logger=logger, **kwargs)
     if str_query:
-        run_add_query(connection=connection, str_query=str_query, dictionary_key=dictionary_key,
+        run_add_query(connection=connection, str_query=str_query, dictionary_key=entity_name,
                       logger=logger)
 
 
