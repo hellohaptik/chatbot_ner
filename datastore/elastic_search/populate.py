@@ -309,7 +309,7 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
 
 
 def entity_training_data_update(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
-                       logger, **kwargs):
+                                logger, **kwargs):
     """
     This method is used to populate the elastic search via the external api call.
     Args:
@@ -327,17 +327,15 @@ def entity_training_data_update(connection, index_name, doc_type, entity_list, e
     delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
                           entity_name=entity_name, logger=logger, **kwargs)
     logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
-
+    logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
     if text_list:
-        dictionary_value = {}
-        for temp_dict in entity_data:
-            dictionary_value[temp_dict['value']] = temp_dict['variants']
+        add_training_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
+                                         entity_name=entity_name,
+                                         text_list=text_list,
+                                         entity_list=entity_list,
+                                         language_script=language_script, logger=logger, **kwargs)
 
-        logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
-        add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
-                                dictionary_key=entity_name,
-                                dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
-        logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
+    logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
 def run_add_query(connection, dictionary_key, str_query, logger, **kwargs):
