@@ -187,6 +187,7 @@ class DataStore(object):
 
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
+            TrainingIndexNotConfigured if training index is configured
             All other exceptions raised by elasticsearch-py library
 
         Example:
