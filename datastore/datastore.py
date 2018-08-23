@@ -447,7 +447,7 @@ class DataStore(object):
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
                                                                        index_name=self._training_store_name,
                                                                        doc_type=
-                                                                       self._connection_settings[ES_TRAINING_INDEX],
+                                                                       self._connection_settings[ES_TRAINING_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        request_timeout=request_timeout,
                                                                        training_data=True,
