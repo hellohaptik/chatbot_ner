@@ -450,7 +450,6 @@ class DataStore(object):
                                                                         self._connection_settings[ES_TRAINING_DOC_TYPE],
                                                                         entity_name=entity_name,
                                                                         request_timeout=request_timeout,
-                                                                        training_data=True,
                                                                         **kwargs)
 
         return results_dictionary
