@@ -215,12 +215,12 @@ class DataStore(object):
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
 
-            results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=self._store_name,
-                                                                       doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                                                                       entity_name=entity_name,
-                                                                       request_timeout=request_timeout,
-                                                                       **kwargs)
+            results_dictionary = elastic_search.query.get_dictionary(connection=self._client_or_connection,
+                                                                     index_name=self._store_name,
+                                                                     doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                                                                     entity_name=entity_name,
+                                                                     request_timeout=request_timeout,
+                                                                     **kwargs)
 
         return results_dictionary
 
@@ -444,38 +444,13 @@ class DataStore(object):
 
             if self._training_store_name is None:
                 raise TrainingIndexNotConfigured
-            results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=self._training_store_name,
-                                                                       doc_type=
-                                                                       self._connection_settings[ES_TRAINING_DOC_TYPE],
-                                                                       entity_name=entity_name,
-                                                                       request_timeout=request_timeout,
-                                                                       training_data=True,
-                                                                       **kwargs)
+            results_dictionary = elastic_search.query.get_training_data(connection=self._client_or_connection,
+                                                                        index_name=self._training_store_name,
+                                                                        doc_type=
+                                                                        self._connection_settings[ES_TRAINING_DOC_TYPE],
+                                                                        entity_name=entity_name,
+                                                                        request_timeout=request_timeout,
+                                                                        training_data=True,
+                                                                        **kwargs)
 
         return results_dictionary
-
-    def update_entity_training_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
-        """
-        This method is used to populate the the entity dictionary
-        Args:
-            entity_name (str): Name of the dictionary that needs to be populated
-            entity_data (list): List of dicts consisting of value and variants
-            language_script (str): Language code for the language script used.
-            **kwargs:
-                For Elasticsearch:
-                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-        """
-        if self._client_or_connection is None:
-            self._connect()
-
-        if self._engine == ELASTICSEARCH:
-            self._check_doc_type_for_elasticsearch()
-            elastic_search.populate.entity_data_update(connection=self._client_or_connection,
-                                                       index_name=self._training_store_name,
-                                                       doc_type=self._connection_settings[ES_TRAINING_DOC_TYPE],
-                                                       logger=ner_logger,
-                                                       entity_data=entity_data,
-                                                       entity_name=entity_name,
-                                                       language_script=language_script,
-                                                       **kwargs)

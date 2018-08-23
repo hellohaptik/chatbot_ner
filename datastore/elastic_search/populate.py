@@ -260,35 +260,3 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
                                 dictionary_key=entity_name,
                                 dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
-
-
-def entity_data_update(connection, index_name, doc_type, entity_data, entity_name, language_script,
-                       logger, **kwargs):
-    """
-    This method is used to populate the elastic search via the external api call.
-    Args:
-        connection: Elasticsearch client object
-        index_name (str): The name of the index
-        doc_type (str): The type of the documents being indexed
-        entity_data (list): List of dicts consisting of value and variants.
-        entity_name (str): Name of the dictionary
-        language_script (str): The code for the language script
-        logger: logging object to log at debug and exception levellogging object to log at debug and exception level
-        **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-    """
-    logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
-    logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
-    delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                          entity_name=entity_name, logger=logger, **kwargs)
-    logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
-
-    if entity_data:
-        dictionary_value = {}
-        for temp_dict in entity_data:
-            dictionary_value[temp_dict['value']] = temp_dict['variants']
-
-        logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
-        add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
-                                dictionary_key=entity_name,
-                                dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
-        logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)

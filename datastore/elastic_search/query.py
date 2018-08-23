@@ -7,7 +7,7 @@ from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, 
 log_prefix = 'datastore.elastic_search.query'
 
 
-def dictionary_query(connection, index_name, doc_type, entity_name, training_data=False, **kwargs):
+def dictionary_query(connection, index_name, doc_type, data, **kwargs):
     """
     Get all variants data for a entity stored in the index as a dictionary
 
@@ -23,33 +23,11 @@ def dictionary_query(connection, index_name, doc_type, entity_name, training_dat
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
         synonyms/variants of the key
     """
-    data = {
-        'query': {
-            'term': {
-                'entity_data': {
-                    'value': entity_name
-                }
-            }
-        }
-    }
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
-    results = search_results['hits']['hits']
-    if training_data:
-        results_dictionary = {'text_list': [], 'entity_list': []}
-        for result in results:
-            results_dictionary['text_list'].append(result['_source']['text'])
-            results_dictionary['entity_list'].append(result['_source']['entities'])
-
-    # Parse hits
-    else:
-        results_dictionary = {}
-        for result in results:
-            results_dictionary[result['_source']['value']] = result['_source']['variants']
-
-    return results_dictionary
+    return search_results
 
 
 def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
@@ -297,3 +275,72 @@ def _parse_es_search_results(results):
                 variants_to_values[variant] = value
 
     return variants_to_values
+
+
+def get_dictionary(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    Get all variants data for a entity stored in the index as a dictionary
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name: name of the entity to perform a 'term' query on
+        kwargs:
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+    Returns:
+        dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
+        synonyms/variants of the key
+    """
+    data = {
+        'query': {
+            'term': {
+                'entity_data': {
+                    'value': entity_name
+                }
+            }
+        }
+    }
+    search_results = dictionary_query(connection, index_name, doc_type, data, **kwargs)
+    results = search_results['hits']['hits']
+    results_dictionary = {}
+    for result in results:
+        results_dictionary[result['_source']['value']] = result['_source']['variants']
+
+    return results_dictionary
+
+
+def get_training_data(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    Get all variants data for a entity stored in the index as a dictionary
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name: name of the entity to perform a 'term' query on
+        kwargs:
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+    Returns:
+        dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
+        synonyms/variants of the key
+    """
+    data = {
+        'query': {
+            'term': {
+                'entity_data': {
+                    'value': entity_name
+                }
+            }
+        }
+    }
+    search_results = dictionary_query(connection, index_name, doc_type, data, **kwargs)
+    results = search_results['hits']['hits']
+    results_dictionary = {'text_list': [], 'entity_list': []}
+    for result in results:
+        results_dictionary['text_list'].append(result['_source']['text'])
+        results_dictionary['entity_list'].append(result['_source']['entities'])
+
+    return results_dictionary
