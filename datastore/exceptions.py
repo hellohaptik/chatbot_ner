@@ -3,7 +3,7 @@ __all__ = [
     'IndexForTransferException', 'AliasForTransferException', 'NonESEngineTransferException',
     'IndexNotFoundException', 'InvalidESURLException', 'SourceDestinationSimilarException',
     'InternalBackupException', 'AliasNotFoundException', 'PointIndexToAliasException',
-    'FetchIndexForAliasException', 'DeleteIndexFromAliasException'
+    'FetchIndexForAliasException', 'DeleteIndexFromAliasException', 'TrainingIndexNotConfigured'
 
 ]
 
@@ -184,6 +184,19 @@ class DeleteIndexFromAliasException(Exception):
     """
     def __init__(self, message=None):
         self.value = message
+
+    def __str__(self):
+        return repr(self.value)
+
+
+class TrainingIndexNotConfigured(Exception):
+    """
+    This exception is raised if training data index is not setup
+    """
+    def __init__(self, message=None):
+        self.value = 'Training index has not been configured. Please configure the ES_TRAINING_INDEX.'
+        if message:
+            self.value = message
 
     def __str__(self):
         return repr(self.value)

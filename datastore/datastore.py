@@ -2,9 +2,9 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                                  EngineConnectionException, NonESEngineTransferException)
+                         EngineConnectionException, NonESEngineTransferException, TrainingIndexNotConfigured)
 
 
 class DataStore(object):
@@ -64,6 +64,7 @@ class DataStore(object):
             if alias_config:
                 self._store_name = elastic_search.connect.get_current_live_index(self._store_name)
 
+            self._training_store_name = self._connection_settings.get(ES_TRAINING_INDEX)
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None
@@ -172,10 +173,11 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def get_entity_dictionary(self, entity_name, **kwargs):
+    def get_entity_dictionary(self, entity_name, training_data=False, **kwargs):
         """
         Args:
             entity_name: the name of the entity to get the stored data for
+            training_data (bool): to direct if data has to been
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -211,8 +213,16 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
+
+            index_name = self._store_name
+
+            if training_data:
+                if self._training_store_name is None:
+                    raise TrainingIndexNotConfigured
+                else:
+                    index_name = self._training_store_name
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=self._store_name,
+                                                                       index_name=index_name,
                                                                        doc_type=self._connection_settings[
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
