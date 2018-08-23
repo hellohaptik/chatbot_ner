@@ -117,7 +117,6 @@ class ESTransfer(object):
                 2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
                                {'entity_name': 'extra_entity', 'entity_data': ['bye']}
 
-    Example with entity:
 
     """
     def __init__(self, source, destination):
