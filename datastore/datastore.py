@@ -173,7 +173,7 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def get_entity_dictionary(self, entity_name, training_data=False, **kwargs):
+    def get_entity_dictionary(self, entity_name, **kwargs):
         """
         Args:
             entity_name: the name of the entity to get the stored data for
@@ -215,17 +215,9 @@ class DataStore(object):
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
 
-            index_name = self._store_name
-            doc_type = self._connection_settings[ELASTICSEARCH_DOC_TYPE]
-            if training_data:
-                if self._training_store_name is None:
-                    raise TrainingIndexNotConfigured
-                else:
-                    doc_type = self._connection_settings[ES_TRAINING_DOC_TYPE]
-                    index_name = self._training_store_name
             results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=index_name,
-                                                                       doc_type=doc_type,
+                                                                       index_name=self._store_name,
+                                                                       doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        request_timeout=request_timeout,
                                                                        **kwargs)
@@ -407,3 +399,58 @@ class DataStore(object):
         destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
+
+    def get_entity_training_data(self, entity_name, **kwargs):
+        """
+        Args:
+            entity_name: the name of the entity to get the stored data for
+            training_data (bool): to direct if data has to been
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+        Returns:
+            dictionary mapping entity values to list of their variants
+
+        Raises:
+            DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
+            TrainingIndexNotConfigured if training index is configured
+            All other exceptions raised by elasticsearch-py library
+
+        Example:
+            db = DataStore()
+            get_entity_dictionary(entity_name='city')
+
+            Output:
+
+                {u'Ahmednagar': [u'', u'Ahmednagar'],
+                u'Alipurduar': [u'', u'Alipurduar'],
+                u'Amreli': [u'', u'Amreli'],
+                u'Baripada Town': [u'Baripada', u'Baripada Town', u''],
+                u'Bettiah': [u'', u'Bettiah'],
+                ...
+                u'Rajgarh Alwar': [u'', u'Rajgarh', u'Alwar'],
+                u'Rajgarh Churu': [u'Churu', u'', u'Rajgarh'],
+                u'Rajsamand': [u'', u'Rajsamand'],
+                ...
+                u'koramangala': [u'koramangala']}
+        """
+        if self._client_or_connection is None:
+            self._connect()
+        results_dictionary = {}
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+
+            if self._training_store_name is None:
+                raise TrainingIndexNotConfigured
+            results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
+                                                                       index_name=self._training_store_name,
+                                                                       doc_type=
+                                                                       self._connection_settings[ES_TRAINING_INDEX],
+                                                                       entity_name=entity_name,
+                                                                       request_timeout=request_timeout,
+                                                                       training_data=True,
+                                                                       **kwargs)
+
+        return results_dictionary

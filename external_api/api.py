@@ -134,7 +134,7 @@ def get_training_data(request):
     try:
         entity_name = request.GET.get(ENTITY_NAME)
         datastore_obj = DataStore()
-        result = datastore_obj.get_entity_dictionary(entity_name=entity_name)
+        result = datastore_obj.get_entity_training_data(entity_name=entity_name)
 
         response['result'] = result
         response['success'] = True
