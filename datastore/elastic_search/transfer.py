@@ -13,15 +13,122 @@ from datastore.exceptions import AliasForTransferException, EngineNotImplemented
 
 
 class ESTransfer(object):
+    """
+    The aim of the class is to transfer entities from source elastic search to destination elastic search.
+    It can be used to back up or update entities from source elasticsearch to destination.
+    In a professional setup these two elastic searches can be staging_elasticsearch (source) and
+    production_elasticsearch (destination)
+    This class is only aimed to aid the sync process of multiple elasticsearches if used.
+    (If only a single elasticsearch is used one can avoid use of this class)
 
+    Setup Required:
+    We setup two indexes es_index_1 and es_index_2 for each source_es and destination_es
+    source_es.
+    We setup  aliases for both the source and destination elasticsearch pointing to one index at a time.
+    The alias can point to any index at a given point in time for both source and destination
+
+    entity to be updated {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+
+        source_es
+    alias ----- >1. es_index_1 {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+                                {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+                 2. es_index_2
+
+    destination_es
+                 1. es_index_1
+    alias ----- >2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+
+    These index names and alias name can be stored and accessed from the config file.
+    (The alias and index configuration are for ease of backup)
+
+    Pass the class:
+    source_elasticsearch url eg. http://localhost:9200
+    destination_elasticsearch url eg. http://localhost:9400
+
+    The class with transfer the es_data from source_elasticsearch to destination_elasticsearch to the other.
+
+    Process of transfer:
+    The process is explained using examples of the above mentioned setup
+    1. _validate_source_destination_index_name
+        This method validates that source_es and destination_es urls are not same and both are present.
+        source_url = http://localhost:9200
+        destination_url http://localhost:9400
+
+    2. fetch_index_alias_points_to
+        This method returns the index to which the destination_es alias points to
+        es_index_2 (current_live_index)
+
+    3. get_new_live_index
+        This method is used to get back the new_index where our entities is going to be transferred.
+        es_index_1 (new_live_index)
+
+    4. transfer_data_internal
+        This method is used to transfer entities in destination_es from current_live_index (es_index_2)
+        to new_live_index (es_index_1)
+        This is achieved by deleting the new_live_index (es_index_1) and then reindexing it with data
+        from current_live_index (es_index_2)
+
+            destination_es
+                 1. es_index_1 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+    alias ----- >2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+
+    5. _transfer_specific_documents
+        We first  load all the data related to the entities that needs to be transferred (in form of
+        an update query*) form source_es
+        {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+
+        Delete the entities that need to be transferred from new_live_index (es_index_1) to avoid old or
+        duplicate entity entry.
+
+            destination_es
+                 1. es_index_1 {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+    alias ----- >2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+
+        Run the update query on new_live_index to populate new entities.
+
+            destination_es
+                 1. es_index_1 {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+                               {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+
+    alias ----- >2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+    6. _swap_index_in_es_url
+        We finally swap the alias pointer of the destination_es
+
+        source_es
+    alias ----- >1. es_index_1 {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+                                {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+                 2. es_index_2
+
+            destination_es
+    alias ----- > 1. es_index_1 {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+                               {'entity_name': 'example_entity', 'entity_data': ['hello world']}
+
+                2. es_index_2 {'entity_name': 'example_entity', 'entity_data': ['hi world']}
+                               {'entity_name': 'extra_entity', 'entity_data': ['bye']}
+
+    Example with entity:
+
+    """
     def __init__(self, source, destination):
         """
         Constructor to initialize the ESTransfer object
 
         Args
-            source (string): source elastic search url with port e.g. http://localhost:9200
-            destination (string): destination elastic search url with port e.g. http://localhost:9400
-            index_name (string): index to be transferred from source to destination
+            source (str): source elastic search url with port e.g. http://localhost:9200
+            destination (str): destination elastic search url with port e.g. http://localhost:9400
+            es_index_1 (str): index1 present in both source and destination elastic search
+            es_index_2 (str): index2 present in both source and destination elastic search.
         """
         self.source = source
         self.destination = destination
