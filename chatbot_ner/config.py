@@ -63,6 +63,7 @@ DESTINATION_URL = os.environ.get('DESTINATION_URL')
 ES_ALIAS = os.environ.get('ES_ALIAS')
 ES_SCHEME = os.environ.get('ES_SCHEME')
 ES_ALIAS_CONFIG = os.environ.get('ES_ALIAS_CONFIG')
+ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX')
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -93,6 +94,9 @@ CHATBOT_NER_DATASTORE = {
         'max_retries': 1,
         'timeout': 20,
         'request_timeout': 20,
+
+        # Training data Specific Constants
+        'es_training_index': ES_TRAINING_INDEX,
 
         # Transfer Specific constants (ignore if only one elasticsearch is setup)
         # For detailed explanation datastore.elastic_search.transfer.py
