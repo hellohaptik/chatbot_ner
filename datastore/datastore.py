@@ -471,12 +471,12 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             elastic_search.populate.entity_training_data_update(connection=self._client_or_connection,
-                                                               index_name=self._training_store_name,
-                                                               doc_type=self._connection_settings[
-                                                                    ES_TRAINING_DOC_TYPE],
-                                                               logger=ner_logger,
-                                                               entity_list=entity_list,
-                                                               entity_name=entity_name,
-                                                               text_list=text_list,
-                                                               language_script=language_script,
-                                                               **kwargs)
+                                                                index_name=self._training_store_name,
+                                                                doc_type=self._connection_settings[
+                                                                     ES_TRAINING_DOC_TYPE],
+                                                                logger=ner_logger,
+                                                                entity_list=entity_list,
+                                                                entity_name=entity_name,
+                                                                text_list=text_list,
+                                                                language_script=language_script,
+                                                                **kwargs)
