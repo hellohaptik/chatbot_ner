@@ -80,18 +80,6 @@ def create_index(connection, index_name, doc_type, logger, mapping_body, **kwarg
                                                         'wait_for_active_shards'])
         connection.indices.create(index=index_name, body=body, **create_kwargs)
 
-        # mapping_body = {
-        #     doc_type: {
-        #         'properties': {
-        #             'variants': {
-        #                 'type': 'string',
-        #                 'analyzer': 'my_analyzer',
-        #                 'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
-        #             }
-        #         }
-        #     }
-        # }
-
         put_mapping_kwargs = filter_kwargs(kwargs=kwargs, keep_kwargs_keys=['allow_no_indices', 'expand_wildcards',
                                                                             'ignore_unavailable',
                                                                             'master_timeout', 'timeout',
@@ -182,3 +170,10 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
     }
 
     create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+    return None
+
+
+def create_alias(connection, index_list, alias_name, logger, **kwargs):
+    logger.debug('Alias creation %s started %s' % alias_name)
+    connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
+    logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
