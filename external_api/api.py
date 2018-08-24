@@ -157,7 +157,7 @@ def get_training_data(request):
 
 def update_training_data(request):
     """
-    This function is used to update the dictionary entities.
+    This function is used to update the training data
     Args:
         request (HttpResponse): HTTP response from url
 

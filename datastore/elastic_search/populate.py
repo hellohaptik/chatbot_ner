@@ -169,25 +169,23 @@ def add_training_data_elastic_search(connection, index_name, doc_type, entity_na
         connection: Elasticsearch client object
         index_name: The name of the index
         doc_type:  The type of the documents being indexed
-        dictionary_key: file name of the csv file without the extension, also used as the entity name to index values
-                        of this type. Example - 'city'
-        dictionary_value: dictionary, mapping entity value to a list of its variants.
-                            Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
+        entity_name (str): The name of the entity that needs to be updated
+        text_list (list): List of sentences that are required for training
+        entity_list (list): list of entities that are present in the text_list
         logger: logging object to log at debug and exception level
         language_script (str): Language code of the entity script
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
     Example of underlying index query
-        {'_index': 'index_name',
-         '_type': 'dictionary_data',
-         'dict_type': 'variants',
-         'entity_data': 'city',
-         'value': 'Baripada Town'',
-         'variants': ['Baripada', 'Baripada Town', '']
-         '_op_type': 'index'
-         }
-
+                        {'_index': training,
+                      'entity_data': city,
+                      'text': I live in Mumbai but study in Pune.
+                      'entities': ['Mumbai', 'Pune']
+                      'language_script': 'en',
+                      '_type': 'training_doc',
+                      '_op_type': 'index'
+                      }
     """
     str_query = []
     for text, entities in zip(text_list, entity_list):
@@ -279,7 +277,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
 def entity_data_update(connection, index_name, doc_type, entity_data, entity_name, language_script,
                        logger, **kwargs):
     """
-    This method is used to populate the elastic search via the external api call.
+    This method is used to populate the elastic search.
     Args:
         connection: Elasticsearch client object
         index_name (str): The name of the index
@@ -311,12 +309,12 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
 def entity_training_data_update(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
                                 logger, **kwargs):
     """
-    This method is used to populate the elastic search via the external api call.
+    This method is used to populate the training data.
     Args:
         connection: Elasticsearch client object
         index_name (str): The name of the index
         doc_type (str): The type of the documents being indexed
-        entity_data (list): List of dicts consisting of value and variants.
+        entity_list (list): List of dicts consisting of value and variants.
         entity_name (str): Name of the dictionary
         language_script (str): The code for the language script
         logger: logging object to log at debug and exception levellogging object to log at debug and exception level
@@ -340,32 +338,15 @@ def entity_training_data_update(connection, index_name, doc_type, entity_list, e
 
 def run_add_query(connection, dictionary_key, str_query, logger, **kwargs):
     """
-    Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
-    of dictionary_value parameter generated from the csv file of this entity
-
+    This function is used to add data to elastic search by passing the queries.
     Args:
         connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type:  The type of the documents being indexed
         dictionary_key: file name of the csv file without the extension, also used as the entity name to index values
                         of this type. Example - 'city'
-        dictionary_value: dictionary, mapping entity value to a list of its variants.
-                            Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
         logger: logging object to log at debug and exception level
-        language_script (str): Language code of the entity script
+        str_query: the query that needs to be run
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-
-    Example of underlying index query
-        {'_index': 'index_name',
-         '_type': 'dictionary_data',
-         'dict_type': 'variants',
-         'entity_data': 'city',
-         'value': 'Baripada Town'',
-         'variants': ['Baripada', 'Baripada Town', '']
-         '_op_type': 'index'
-         }
-
     """
     result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
     logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))

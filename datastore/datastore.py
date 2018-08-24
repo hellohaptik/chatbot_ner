@@ -402,9 +402,9 @@ class DataStore(object):
 
     def get_entity_training_data(self, entity_name, **kwargs):
         """
+        This method is used to get the training data given the entity_name
         Args:
             entity_name: the name of the entity to get the stored data for
-            training_data (bool): to direct if data has to been
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -456,10 +456,11 @@ class DataStore(object):
 
     def update_entity_training_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
         """
-        This method is used to populate the the entity dictionary
+        This method is used to populate the training data
         Args:
             entity_name (str): Name of the dictionary that needs to be populated
-            entity_data (list): List of dicts consisting of value and variants
+            text_list (list): List of sentences used for training
+            entity_list (list): List of entities for the given text_list
             language_script (str): Language code for the language script used.
             **kwargs:
                 For Elasticsearch:

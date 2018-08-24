@@ -9,13 +9,12 @@ log_prefix = 'datastore.elastic_search.query'
 
 def dictionary_query(connection, index_name, doc_type, data, **kwargs):
     """
-    Get all variants data for a entity stored in the index as a dictionary
-
+    Run the search es_query
     Args:
+        data: The query which has to be searched
         connection: Elasticsearch client object
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
-        entity_name: name of the entity to perform a 'term' query on
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
@@ -313,7 +312,7 @@ def get_dictionary(connection, index_name, doc_type, entity_name, **kwargs):
 
 def get_training_data(connection, index_name, doc_type, entity_name, **kwargs):
     """
-    Get all variants data for a entity stored in the index as a dictionary
+    Get training data for the given entity_name
 
     Args:
         connection: Elasticsearch client object
