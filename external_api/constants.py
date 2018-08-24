@@ -1,0 +1,6 @@
+ENTITY_NAME = 'entity_name'
+EXTERNAL_API_DATA = 'external_api_data'
+ENTITY_DATA = 'entity_data'
+LANGUAGE_SCRIPT = 'language_script'
+ENTITY_LIST = 'entity_list'
+TEXT_LIST = 'text_list'

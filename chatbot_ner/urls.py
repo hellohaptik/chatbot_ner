@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-
 from django.contrib import admin
 admin.autodiscover()
 
@@ -19,4 +18,16 @@ urlpatterns = patterns('',
     url(r'^v1/combine_output/$', 'ner_v1.api.combine_output'),
     url(r'^v1/person_name/$', 'ner_v1.api.person_name'),
     url(r'^v1/regex/$', 'ner_v1.api.regex'),
+
+    # Dictionary Read Write
+    url(r'^entities/get_entity_word_variants', 'external_api.api.get_entity_word_variants'),
+    url(r'^entities/update_dictionary', 'external_api.api.update_dictionary'),
+
+    # Transfer Dictioanry
+    url(r'^entities/transfer_entities', 'external_api.api.transfer_entities'),
+
+    # Training Data Read Write
+    url(r'^entities/get_training_data', 'external_api.api.get_training_data'),
+    url(r'^entities/update_training_data', 'external_api.api.update_training_data'),
+
 )

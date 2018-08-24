@@ -1,11 +1,10 @@
 import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
-from ner_v1.language_utilities.constant import ENGLISH_LANG
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX, ES_TRAINING_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException)
+                         EngineConnectionException, NonESEngineTransferException, TrainingIndexNotConfigured)
 
 
 class DataStore(object):
@@ -59,8 +58,13 @@ class DataStore(object):
             EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
+        alias_config = CHATBOT_NER_DATASTORE.get(self._engine).get('es_alias_config')
         if self._engine == ELASTICSEARCH:
-            self._store_name = self._connection_settings[ELASTICSEARCH_INDEX_NAME]
+            self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
+            if alias_config:
+                self._store_name = elastic_search.connect.get_current_live_index(self._store_name)
+
+            self._training_store_name = self._connection_settings.get(ES_TRAINING_INDEX)
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None
@@ -173,6 +177,7 @@ class DataStore(object):
         """
         Args:
             entity_name: the name of the entity to get the stored data for
+            training_data (bool): to direct if data has to been
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
@@ -182,6 +187,7 @@ class DataStore(object):
 
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
+            TrainingIndexNotConfigured if training index is configured
             All other exceptions raised by elasticsearch-py library
 
         Example:
@@ -208,13 +214,13 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.dictionary_query(connection=self._client_or_connection,
-                                                                       index_name=self._store_name,
-                                                                       doc_type=self._connection_settings[
-                                                                           ELASTICSEARCH_DOC_TYPE],
-                                                                       entity_name=entity_name,
-                                                                       request_timeout=request_timeout,
-                                                                       **kwargs)
+
+            results_dictionary = elastic_search.query.get_dictionary(connection=self._client_or_connection,
+                                                                     index_name=self._store_name,
+                                                                     doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                                                                     entity_name=entity_name,
+                                                                     request_timeout=request_timeout,
+                                                                     **kwargs)
 
         return results_dictionary
 
@@ -258,7 +264,7 @@ class DataStore(object):
             results_dictionary = elastic_search.query.full_text_query(connection=self._client_or_connection,
                                                                       index_name=self._store_name,
                                                                       doc_type=self._connection_settings[
-                                                                         ELASTICSEARCH_DOC_TYPE],
+                                                                          ELASTICSEARCH_DOC_TYPE],
                                                                       entity_name=entity_name,
                                                                       sentence=text,
                                                                       fuzziness_threshold=fuzziness_threshold,
@@ -297,15 +303,15 @@ class DataStore(object):
         """
         Deletes the existing data and repopulates it for entities from csv files stored in directory path indicated by
         entity_data_directory_path and from csv files at file paths in csv_file_paths list
-        
-        Args:    
+
+        Args:
             entity_data_directory_path: Directory path containing CSV files to populate the datastore from.
                                         See the CSV file structure explanation in the datastore docs
             csv_file_paths: Optional, list of absolute file paths to csv files
             kwargs:
                 For Elasticsearch:
                     Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-        
+
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
@@ -328,7 +334,7 @@ class DataStore(object):
     def _check_doc_type_for_elasticsearch(self):
         """
         Checks if doc_type is present in connection settings, if not an exception is raised
-        
+
         Raises:
              DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
         """
@@ -349,3 +355,129 @@ class DataStore(object):
             return elastic_search.create.exists(connection=self._client_or_connection, index_name=self._store_name)
 
         return False
+
+    def update_entity_data(self, entity_name, entity_data, language_script, **kwargs):
+        """
+        This method is used to populate the the entity dictionary
+        Args:
+            entity_name (str): Name of the dictionary that needs to be populated
+            entity_data (list): List of dicts consisting of value and variants
+            language_script (str): Language code for the language script used.
+            **kwargs:
+                For Elasticsearch:
+                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+        """
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            elastic_search.populate.entity_data_update(connection=self._client_or_connection,
+                                                       index_name=self._store_name,
+                                                       doc_type=self._connection_settings[
+                                                            ELASTICSEARCH_DOC_TYPE],
+                                                       logger=ner_logger,
+                                                       entity_data=entity_data,
+                                                       entity_name=entity_name,
+                                                       language_script=language_script,
+                                                       **kwargs)
+
+    def transfer_entities_elastic_search(self, entity_list):
+        """
+        This method is used to transfer the entities from one environment to the other for elastic search engine
+        only.
+        Args:
+            entity_list (list): List of entities that have to be transfered
+        """
+        if self._engine != ELASTICSEARCH:
+            raise NonESEngineTransferException
+        es_url = CHATBOT_NER_DATASTORE.get(self._engine).get('connection_url')
+        if es_url is None:
+            es_url = elastic_search.connect.get_es_url()
+        if es_url is None:
+            raise DataStoreSettingsImproperlyConfiguredException()
+        destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
+        es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
+        es_object.transfer_specific_entities(list_of_entities=entity_list)
+
+    def get_entity_training_data(self, entity_name, **kwargs):
+        """
+        This method is used to get the training data given the entity_name
+        Args:
+            entity_name: the name of the entity to get the stored data for
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+        Returns:
+            dictionary mapping entity values to list of their variants
+
+        Raises:
+            DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
+            TrainingIndexNotConfigured if training index is configured
+            All other exceptions raised by elasticsearch-py library
+
+        Example:
+            db = DataStore()
+            get_entity_dictionary(entity_name='city')
+
+            Output:
+
+                {u'Ahmednagar': [u'', u'Ahmednagar'],
+                u'Alipurduar': [u'', u'Alipurduar'],
+                u'Amreli': [u'', u'Amreli'],
+                u'Baripada Town': [u'Baripada', u'Baripada Town', u''],
+                u'Bettiah': [u'', u'Bettiah'],
+                ...
+                u'Rajgarh Alwar': [u'', u'Rajgarh', u'Alwar'],
+                u'Rajgarh Churu': [u'Churu', u'', u'Rajgarh'],
+                u'Rajsamand': [u'', u'Rajsamand'],
+                ...
+                u'koramangala': [u'koramangala']}
+        """
+        if self._client_or_connection is None:
+            self._connect()
+        results_dictionary = {}
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+
+            if self._training_store_name is None:
+                raise TrainingIndexNotConfigured
+            results_dictionary = elastic_search.query.get_training_data(connection=self._client_or_connection,
+                                                                        index_name=self._training_store_name,
+                                                                        doc_type=
+                                                                        self._connection_settings[ES_TRAINING_DOC_TYPE],
+                                                                        entity_name=entity_name,
+                                                                        request_timeout=request_timeout,
+                                                                        **kwargs)
+
+        return results_dictionary
+
+    def update_entity_training_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
+        """
+        This method is used to populate the training data
+        Args:
+            entity_name (str): Name of the dictionary that needs to be populated
+            text_list (list): List of sentences used for training
+            entity_list (list): List of entities for the given text_list
+            language_script (str): Language code for the language script used.
+            **kwargs:
+                For Elasticsearch:
+                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+        """
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            elastic_search.populate.entity_training_data_update(connection=self._client_or_connection,
+                                                                index_name=self._training_store_name,
+                                                                doc_type=self._connection_settings[
+                                                                     ES_TRAINING_DOC_TYPE],
+                                                                logger=ner_logger,
+                                                                entity_list=entity_list,
+                                                                entity_name=entity_name,
+                                                                text_list=text_list,
+                                                                language_script=language_script,
+                                                                **kwargs)
