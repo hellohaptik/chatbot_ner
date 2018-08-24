@@ -1,7 +1,10 @@
 import re
 
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
-class EmailDetector(object):
+
+class EmailDetector(BaseDetector):
     """Detects email addresses in given text and tags them.
 
     Detects all email addresses in given text and replaces them by entity_name
@@ -33,7 +36,7 @@ class EmailDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a EmailDetector object
 
         Args:
@@ -41,6 +44,10 @@ class EmailDetector(object):
                        calling detect_entity()
 
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        super(EmailDetector, self).__init__(source_language_script, translation_enabled)
+
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
@@ -48,6 +55,10 @@ class EmailDetector(object):
         self.email = []
         self.original_email_text = []
         self.tag = '__' + self.entity_name + '__'
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def _detect_email(self):
         """Detects email addresses in the self.text
