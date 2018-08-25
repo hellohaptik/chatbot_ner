@@ -4,9 +4,11 @@ from word2number import w2n
 
 from lib.nlp.tokenizer import Tokenizer
 from ner_v1.constant import NUMERIC_VARIANTS, DIGIT_UNITS
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
-class NumberDetector(object):
+class NumberDetector(BaseDetector):
     """Detects number from the text  and tags them.
 
     Detects all numbers in given text and replaces them by entity_name
@@ -54,12 +56,18 @@ class NumberDetector(object):
         else any name can be passed as entity_name.
         We can detect numbers from 1 digit to 3 digit.
     """
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a NumberDetector object
 
         Args:
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(NumberDetector, self).__init__(source_language_script, translation_enabled)
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
@@ -78,11 +86,16 @@ class NumberDetector(object):
             'Default': self._detect_number_format
         }
 
-    def detect_entity(self, text):
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    def detect_entity(self, text, **kwargs):
         """Detects numbers in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future.
 
         Returns:
             A tuple of two lists with first list containing the detected numbers and second list containing their
