@@ -1,5 +1,10 @@
 import re
 
+from word2number import w2n
+
+from lib.nlp.tokenizer import Tokenizer
+from ner_v1.constant import NUMERIC_VARIANTS, DIGIT_UNITS
+
 
 class NumberDetector(object):
     """Detects number from the text  and tags them.
@@ -39,6 +44,8 @@ class NumberDetector(object):
         number: list of numbers detected
         original_number_text: list to store substrings of the text detected as numbers
         tag: entity_name prepended and appended with '__'
+        min_digit: minimum digit that a number can take
+        max_digit: maximum digit that a number can take
 
     Note:
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
@@ -60,8 +67,14 @@ class NumberDetector(object):
         self.number = []
         self.original_number_text = []
         self.tag = '__' + self.entity_name + '__'
+        self.min_digit = 1
+        self.max_digit = 3
         self.task_dict = {
             'number_of_people': self._detect_number_of_people_format,
+            'number_of_ticket': self._detect_number_of_people_format,
+            'no_of_guests': self._detect_number_of_people_format,
+            'no_of_adults': self._detect_number_of_people_format,
+            'travel_no_of_people': self._detect_number_of_people_format,
             'Default': self._detect_number_format
         }
 
@@ -83,7 +96,7 @@ class NumberDetector(object):
             respectively.
 
         """
-        self.text = ' ' + text + ' '
+        self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
         number_data = self._detect_number()
@@ -118,14 +131,18 @@ class NumberDetector(object):
                 input: "I want to purchase 30 units of mobile and 40 units of Television"
                 output: (['30', '40'], ['30','40'])
 
-        Note: Currently,we can detect numbers from 1 digit to 3 digit
+        Note: By default we detect numbers from 1 digit to 3 digit
         """
         number_list = []
         original_list = []
-        patterns = re.findall(r'\s([0-9]{1,3})[\s|,]', self.processed_text.lower())
+        patterns = re.findall(r'\s([0-9]{' + str(self.min_digit) + ',' + str(self.max_digit) + '})[\s|,]',
+                              self.processed_text.lower())
         for pattern in patterns:
             number_list.append(pattern)
             original_list.append(pattern)
+        word2number_number_list, word2number_original_list = self._detect_numerals()
+        number_list = number_list + word2number_number_list
+        original_list = original_list + word2number_original_list
         return number_list, original_list
 
     def _detect_number_of_people_format(self):
@@ -145,11 +162,15 @@ class NumberDetector(object):
         """
         number_list = []
         original_list = []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]{1,3})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)'
-                              r'*)\s', self.processed_text.lower())
+        patterns = re.findall(r'\s((fo?r)*\s*([0-9]{' + str(self.min_digit) + ',' + str(
+            self.max_digit) + '})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)*)\s',
+                              self.processed_text.lower())
         for pattern in patterns:
             number_list.append(pattern[2])
             original_list.append(pattern[0])
+        word2number_number_list, word2number_original_list = self._detect_numerals()
+        number_list = number_list + word2number_number_list
+        original_list = original_list + word2number_original_list
         return number_list, original_list
 
     def _update_processed_text(self, original_number_strings):
@@ -166,4 +187,87 @@ class NumberDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
+    def min_max_digit(self, min_digit, max_digit):
+        """
+        Update min max digit
 
+        Args:
+            min_digit (int): min digit
+            max_digit (int): max digit
+        """
+        self.min_digit = min_digit
+        self.max_digit = max_digit
+
+    def _detect_numerals(self):
+        """
+        1. Detects numerals from the given text
+        2. Makes a call to convert_numerals_to_numbers which return a tuple consisting of two lists
+            a.number_list consisting of numbers obtained from detected numerals
+            b.original_list consisting of original detected numerals
+
+        Returns:
+                (number_list, original_list) (tuple)
+                number_list (list): a list consisting of numbers obtained from detected numerals
+                original_list (list): a list consisting of detected numerals
+
+        Example:
+                self.text = "My favorite number is seven but jersey number is twenty five"
+                >>print(detect_numerals())
+                (['7', '25'], ['seven', 'twenty five'])
+        """
+        original_list = []
+        temp_str = ""
+        tokenizer = Tokenizer()
+
+        for word in tokenizer.tokenize(self.text.lower()):
+            if word in NUMERIC_VARIANTS:
+                temp_str = (temp_str + " " + word).strip()
+            else:
+                if temp_str.startswith('and') or temp_str.endswith('and'):
+                    temp_str = temp_str.replace('and', "")
+                original_list.append(temp_str.strip())
+                temp_str = ""
+        if temp_str.startswith('and') or temp_str.endswith('and'):
+            temp_str = temp_str.replace('and', "")
+        original_list.append(temp_str.strip())
+        original_list = [w for w in original_list if w != ""]
+
+        for i in range(len(original_list)):
+            original_list_split = original_list[i].split()
+            original_list_split_len = len(original_list_split)
+            unit_count = len([unit for unit in original_list_split if unit in DIGIT_UNITS])
+
+            if original_list_split_len == unit_count:
+                original_list = original_list[:i] + original_list_split + original_list[i + 1:]
+
+        original_list_counter = 0
+        while original_list_counter < len(original_list):
+            number_len = len((str(w2n.word_to_num(str(original_list[original_list_counter])))))
+            if not self.max_digit >= number_len >= self.min_digit:
+                del original_list[original_list_counter]
+            original_list_counter = original_list_counter + 1
+        return self._convert_numerals_to_numbers(original_list)
+
+    @staticmethod
+    def _convert_numerals_to_numbers(original_list):
+        """
+        It converts the detected numerals using the python package word2number to numbers.
+        word2number takes input as numerals or number and returns the number.
+
+        Args:
+                original_list (list): consists of list of numerals detected from given text.
+
+        Returns:
+                (number_list, original_list) (tuple)
+                number_list (list): a list consisting of numbers obtained from detected numerals
+                original_list (list): a list consisting of detected numerals
+
+        Example:
+                original_list = ['seven', 'twenty five']
+                >>print(convert_numerals_to_numbers())
+                (['7', '25'], ['seven', 'twenty five'])
+        """
+        number_list = []
+        for original_numbers in original_list:
+            number_list.append(str(w2n.word_to_num(str(original_numbers))))
+        return number_list, original_list
