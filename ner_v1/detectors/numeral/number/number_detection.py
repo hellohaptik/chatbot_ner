@@ -229,21 +229,21 @@ class NumberDetector(BaseDetector):
                 (['7', '25'], ['seven', 'twenty five'])
         """
         original_list = []
-        temp_str = ""
+        temp_str = ''
         tokenizer = Tokenizer()
 
         for word in tokenizer.tokenize(self.text.lower()):
             if word in NUMERIC_VARIANTS:
-                temp_str = (temp_str + " " + word).strip()
+                temp_str = (temp_str + ' ' + word).strip()
             else:
-                if temp_str.startswith('and') or temp_str.endswith('and'):
-                    temp_str = temp_str.replace('and', "")
+                if temp_str.startswith('and') or (temp_str.endswith('and') and not temp_str.endswith('thousand')):
+                    temp_str = temp_str.replace('and', '')
                 original_list.append(temp_str.strip())
-                temp_str = ""
-        if temp_str.startswith('and') or temp_str.endswith('and'):
-            temp_str = temp_str.replace('and', "")
+                temp_str = ''
+        if temp_str.startswith('and') or (temp_str.endswith('and') and not temp_str.endswith('thousand')):
+            temp_str = temp_str.replace('and', '')
         original_list.append(temp_str.strip())
-        original_list = [w for w in original_list if w != ""]
+        original_list = [w for w in original_list if w != '']
 
         for i in range(len(original_list)):
             original_list_split = original_list[i].split()
