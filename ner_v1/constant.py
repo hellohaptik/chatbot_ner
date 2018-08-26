@@ -60,6 +60,8 @@ NUMERIC_VARIANTS = DIGIT_UNITS + [
     "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
     "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
 ]
+PARAMETER_MIN = 'min'
+PARAMETER_MAX = 'max'
 
 #**********************constants used for name detection************************************
 
