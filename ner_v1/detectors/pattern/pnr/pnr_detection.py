@@ -1,7 +1,10 @@
 import re
 
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
-class PNRDetector(object):
+
+class PNRDetector(BaseDetector):
     """Detects PNR (serial) codes (Passenger Record Number, usually present with train or flight bookings) in given text
      and tags them. Usually flight pnr codes are 5 to 8 characters long.
 
@@ -60,12 +63,19 @@ class PNRDetector(object):
             (['sgxsgx'], ['sgxsgx'])
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a PNRDetector object
 
         Args:
             entity_name: A string by which the detected pnr codes would be replaced with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(PNRDetector, self).__init__(source_language_script, translation_enabled)
+
         self.entity_name = entity_name
         self.task_dict = {
             'train_pnr': self._detect_railway_pnr,
@@ -78,11 +88,16 @@ class PNRDetector(object):
         self.original_pnr_text = []
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text):
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    def detect_entity(self, text, **kwargs):
         """Detects pnr codes in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future
 
         Returns:
             A tuple of two lists with first list containing the detected pnr codes and second list containing their
