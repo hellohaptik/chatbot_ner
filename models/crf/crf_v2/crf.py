@@ -402,19 +402,17 @@ class CrfWordEmbeddings(object):
         x, _ = self.get_processed_x_y([text], [[]])
         tagger = pycrfsuite.Tagger()
         tagger.open(self.entity_name)
-        y_prediction = [tagger.tag(xseq) for xseq in x]
+        y_prediction = [tagger.tag(xseq) for xseq in x][0]
         tokenized_text = word_tokenize(text)
-        previous = False
         original_text = []
-        temp = []
-        for prediction, token in zip(y_prediction[0], tokenized_text):
-            global previous
-            if prediction == 'B':
-                temp.append(token)
-            elif prediction == 'I':
-                temp.append(token)
-            else:
-                if temp:
-                    original_text.append(' '.join(temp))
-                    temp = []
+
+        for i in range(len(y_prediction)):
+            temp = []
+            if y_prediction[i] == 'B':
+                temp.append(tokenized_text[i])
+                for j in range(i, len(y_prediction)):
+                    if y_prediction[j] == 'I':
+                        temp.append(tokenized_text[j])
+                original_text.append(' '.join(temp))
+
         return original_text
