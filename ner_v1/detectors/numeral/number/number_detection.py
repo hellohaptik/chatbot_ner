@@ -221,14 +221,14 @@ class NumberDetector(BaseDetector):
             b.original_list consisting of original detected numerals
 
         Returns:
-                (number_list, original_list) (tuple)
-                number_list (list): a list consisting of numbers obtained from detected numerals
-                original_list (list): a list consisting of detected numerals
+            (number_list, original_list) (tuple)
+            number_list (list): a list consisting of numbers obtained from detected numerals
+            original_list (list): a list consisting of detected numerals
 
         Example:
-                self.text = "My favorite number is seven but jersey number is twenty five"
-                >>print(detect_numerals())
-                (['7', '25'], ['seven', 'twenty five'])
+            self.text = "My favorite number is seven but jersey number is twenty five"
+            >>print(detect_numerals())
+            (['7', '25'], ['seven', 'twenty five'])
         """
         original_list = []
         temp_str = ''
@@ -270,17 +270,17 @@ class NumberDetector(BaseDetector):
         word2number takes input as numerals or number and returns the number.
 
         Args:
-                original_list (list): consists of list of numerals detected from given text.
+            original_list (list): consists of list of numerals detected from given text.
 
         Returns:
-                (number_list, original_list) (tuple)
-                number_list (list): a list consisting of numbers obtained from detected numerals
-                original_list (list): a list consisting of detected numerals
+            (number_list, original_list) (tuple)
+            number_list (list): a list consisting of numbers obtained from detected numerals
+            original_list (list): a list consisting of detected numerals
 
         Example:
-                original_list = ['seven', 'twenty five']
-                >>print(convert_numerals_to_numbers())
-                (['7', '25'], ['seven', 'twenty five'])
+            original_list = ['seven', 'twenty five']
+            >>print(convert_numerals_to_numbers())
+            (['7', '25'], ['seven', 'twenty five'])
         """
         number_list = []
         for original_numbers in original_list:
