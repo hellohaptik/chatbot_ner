@@ -709,7 +709,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
     if min_digit and max_digit:
         min_digit = int(min_digit)
         max_digit = int(max_digit)
-        number_detection.min_max_digit(min_digit=min_digit, max_digit=max_digit)
+        number_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
     return number_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                    bot_message=bot_message)
 

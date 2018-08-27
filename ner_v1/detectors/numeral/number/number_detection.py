@@ -200,7 +200,7 @@ class NumberDetector(BaseDetector):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def min_max_digit(self, min_digit, max_digit):
+    def set_min_max_digits(self, min_digit, max_digit):
         """
         Update min max digit
 
