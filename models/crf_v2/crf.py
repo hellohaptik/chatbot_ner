@@ -1,11 +1,12 @@
 import pickle
 import numpy as np
 import nltk
-#from nltk.tokenize import word_tokenize
 import pycrfsuite
 import re
 from chatbot_ner.config import ner_logger
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
+from datastore.datastore import DataStore
+from .constants import TEXT_LIST, ENTITY_LIST
 
 
 class CrfWordEmbeddings(object):
@@ -363,7 +364,7 @@ class CrfWordEmbeddings(object):
         labels = [CrfWordEmbeddings.get_labels(doc) for doc in pre_processed_data]
         return features, labels
 
-    def train_model(self, c1, c2, max_iterations, text_list, entity_list):
+    def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000):
         """
         This model is used to train the crf model. It performs the pre processing steps
         and trains the models
@@ -419,3 +420,11 @@ class CrfWordEmbeddings(object):
                 original_text.append(' '.join(temp))
 
         return original_text
+
+    def train_model_from_es_data(self):
+        datastore_object = DataStore()
+        result = datastore_object.get_entity_training_data(entity_name=self.entity_name)
+        text_list = result.get(TEXT_LIST, [])
+        entity_list = result.get(ENTITY_LIST, [])
+        self.train_model(entity_list=entity_list, text_list=text_list)
+        return result
