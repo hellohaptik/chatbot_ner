@@ -263,8 +263,7 @@ class NumberDetector(BaseDetector):
             original_list_counter = original_list_counter + 1
         return self._convert_numerals_to_numbers(original_list)
 
-    @staticmethod
-    def _convert_numerals_to_numbers(original_list):
+    def _convert_numerals_to_numbers(self, original_list):
         """
         It converts the detected numerals using the python package word2number to numbers.
         word2number takes input as numerals or number and returns the number.
