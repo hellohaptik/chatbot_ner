@@ -211,7 +211,7 @@ class PNRDetector(BaseDetector):
         Returns:
             pnr: PNR with special characters removed
         """
-        return re.sub('[-\s.\(\)]+', '', pnr)
+        return re.sub('[\-\s\.\(\)]+', '', pnr)
 
     def _detect_serial_pnr(self):
         """
