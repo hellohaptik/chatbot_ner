@@ -1,10 +1,11 @@
 import pickle
 import numpy as np
 import nltk
-from nltk.tokenize import word_tokenize
+#from nltk.tokenize import word_tokenize
 import pycrfsuite
 import re
 from chatbot_ner.config import ner_logger
+from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 
 
 class CrfWordEmbeddings(object):
@@ -56,7 +57,7 @@ class CrfWordEmbeddings(object):
             >> [('Book', 'O'), ('a', 'O'), ('flight', 'O'), ('from', 'O'), ('New', 'B'), ('York', 'I'),
                 ('to', 'O'), ('California', 'B')]
         """
-        def IOB_prefixes(entity_value):
+        def IOB_prefixes(entity_value, word_tokenize):
             """
             This entity takes the input as the entity and returns the entity with its respective
             IOB-prefixes
@@ -72,15 +73,16 @@ class CrfWordEmbeddings(object):
                 >> 'B_city_New I_city_York'
             """
             iob_entities = ' '.join(['B_en_'+token_ if i_ == 0 else 'I_en_'+token_ for i_, token_
-                             in enumerate(word_tokenize(entity_value))])
+                                    in enumerate(word_tokenize.tokenize(entity_value))])
             return iob_entities
 
-        entities.sort(key=lambda s: len(word_tokenize(s)), reverse=True)
+        word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
+        entities.sort(key=lambda s: len(word_tokenize.tokenize(s)), reverse=True)
         for entity in entities:
-            text = re.sub(r'\b%s\b' % entity, IOB_prefixes(entity), text)
+            text = re.sub(r'\b%s\b' % entity, IOB_prefixes(entity, word_tokenize), text)
 
         return [(g[0], 'O') if len(g) <= 1 else (g[1], g[0]) for g in
-                [w.split('_en_') for w in word_tokenize(text)]]
+                [w.split('_en_') for w in word_tokenize.tokenize(text)]]
 
     @staticmethod
     def word_embeddings(processed_pos_tag_data, vocab, word_vectors):
@@ -403,7 +405,8 @@ class CrfWordEmbeddings(object):
         tagger = pycrfsuite.Tagger()
         tagger.open(self.entity_name)
         y_prediction = [tagger.tag(xseq) for xseq in x][0]
-        tokenized_text = word_tokenize(text)
+        word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
+        tokenized_text = word_tokenize.tokenize(text)
         original_text = []
 
         for i in range(len(y_prediction)):
