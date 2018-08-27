@@ -30,4 +30,6 @@ urlpatterns = patterns('',
     url(r'^entities/get_training_data', 'external_api.api.get_training_data'),
     url(r'^entities/update_training_data', 'external_api.api.update_training_data'),
 
+    # Train Crf Model
+    url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
 )
