@@ -11,17 +11,17 @@ def read_model_dict_from_s3(bucket_name, model_path_location=None):
     :param model_path_location: model path location for domain
     :return:
     """
-    model_dict = None
+    model = None
     try:
         s3 = boto3.resource('s3')
         bucket = s3.Bucket(bucket_name)
-        pickle_file_handle = bucket.Object(model_path_location.lstrip('/'))
+        file_handler = bucket.Object(model_path_location.lstrip('/'))
         # note read() will return str and hence cPickle.loads
-        model_dict = pickle.loads(pickle_file_handle.get()['Body'].read())
+        model = file_handler.get()['Body'].read()
         ner_logger.debug("Model Read Successfully From s3")
     except Exception as e:
         ner_logger.exception("Error Reading model from s3 for domain %s " % e)
-    return model_dict
+    return model
 
 
 def write_file_to_s3(bucket_name, address, disk_filepath, bucket_region=None):

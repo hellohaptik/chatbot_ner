@@ -3,13 +3,11 @@ import numpy as np
 import nltk
 import pycrfsuite
 import re
-from chatbot_ner.config import ner_logger
+from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from datastore.datastore import DataStore
 from .constants import TEXT_LIST, ENTITY_LIST, EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
-import boto3
-import boto
-
+from .crf_s3_storage import write_file_to_s3, read_model_dict_from_s3
 
 class CrfWordEmbeddings(object):
     """
@@ -428,3 +426,6 @@ class CrfWordEmbeddings(object):
         text_list = result.get(TEXT_LIST, [])
         entity_list = result.get(ENTITY_LIST, [])
         self.train_model(entity_list=entity_list, text_list=text_list)
+
+    def read_model_s3(self):
+
