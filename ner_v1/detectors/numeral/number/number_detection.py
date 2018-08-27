@@ -148,7 +148,7 @@ class NumberDetector(BaseDetector):
         """
         number_list = []
         original_list = []
-        patterns = re.findall(r'\s([0-9]{' + str(self.min_digit) + ',' + str(self.max_digit) + '})[\s|,]',
+        patterns = re.findall(r'\s([0-9]{{{0},{1}}})[\s|,]'.format(self.min_digit, self.max_digit),
                               self.processed_text.lower())
         for pattern in patterns:
             number_list.append(pattern)
@@ -175,9 +175,11 @@ class NumberDetector(BaseDetector):
         """
         number_list = []
         original_list = []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]{' + str(self.min_digit) + ',' + str(
-            self.max_digit) + '})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)*)\s',
-                              self.processed_text.lower())
+        patterns = re.findall(
+            r'\s((fo?r)*\s*([0-9]{{{0},{1}}})\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)*)\s'.format(
+                self.min_digit, self.max_digit),
+            self.processed_text.lower()
+        )
         for pattern in patterns:
             number_list.append(pattern[2])
             original_list.append(pattern[0])
