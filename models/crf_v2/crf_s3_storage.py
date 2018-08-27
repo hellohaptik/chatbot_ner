@@ -4,7 +4,7 @@ from chatbot_ner.config import ner_logger
 import pickle
 
 
-def read_model_dict_from_s3(bucket_name, model_path_location=None):
+def read_model_dict_from_s3(bucket_name, bucket_region, model_path_location=None):
     """
     Read model dict from s3 for given model path location
     :param bucket_name: s3 bucket name
@@ -13,11 +13,11 @@ def read_model_dict_from_s3(bucket_name, model_path_location=None):
     """
     model_dict = None
     try:
-        s3 = boto3.resource('s3')
+        s3 = boto3.resource('s3', region_name=bucket_region)
         bucket = s3.Bucket(bucket_name)
         pickle_file_handle = bucket.Object(model_path_location.lstrip('/'))
         # note read() will return str and hence cPickle.loads
-        model_dict = pickle.loads(pickle_file_handle.get()['Body'].read())
+        model_dict = (pickle_file_handle.get()['Body'].read())
         ner_logger.debug("Model Read Successfully From s3")
     except Exception as e:
         ner_logger.exception("Error Reading model from s3 for domain %s " % e)
