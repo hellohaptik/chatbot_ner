@@ -11,6 +11,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, \
     ENTITY_LIST, EXTERNAL_API_DATA, TEXT_LIST
+from models.crf_v2.crf import CrfWordEmbeddings
 
 
 def get_entity_word_variants(request):
@@ -189,4 +190,28 @@ def update_training_data(request):
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+def train_crf_model(request):
+    """
+    This function is used obtain the training data given the entity_name.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse : With data consisting of a list of value variants.
+    """
+    response = {"success": False, "error": ""}
+    try:
+        entity_name = request.GET.get(ENTITY_NAME)
+        crf_model = CrfWordEmbeddings(entity_name=entity_name)
+        crf_model.train_model_from_es_data()
+        response['success'] = True
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)

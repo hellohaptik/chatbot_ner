@@ -6,7 +6,7 @@ import re
 from chatbot_ner.config import ner_logger
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from datastore.datastore import DataStore
-from .constants import TEXT_LIST, ENTITY_LIST
+from .constants import TEXT_LIST, ENTITY_LIST, EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
 
 
 class CrfWordEmbeddings(object):
@@ -15,7 +15,7 @@ class CrfWordEmbeddings(object):
     Named Entity Recognition (NER).
 
     """
-    def __init__(self, entity_name, embeddings_path_vocab, embeddings_path_vectors):
+    def __init__(self, entity_name):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
@@ -23,19 +23,18 @@ class CrfWordEmbeddings(object):
             embeddings_path_vectors (str): The path where the vectors are stored.
         """
         self.entity_name = entity_name
-        self.embeddings_path_vocab = embeddings_path_vocab
-        self.embeddings_path_vectors = embeddings_path_vectors
 
-    def load_word_vectors(self):
+    @staticmethod
+    def load_word_vectors():
         """
         Thus function is used to load the word_list and word_vectors from the specified paths.
         Returns:
         vocab (list): word_list present at the specified path.
         word_vectors (numpy.ndarray): word_vectors present at the specified path.
         """
-        file_handler = open(self.embeddings_path_vocab, 'rb')
+        file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
         vocab = pickle.load(file_handler)
-        file_handler = open(self.embeddings_path_vectors, 'rb')
+        file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
         word_vectors = np.array(pickle.load(file_handler))
         return vocab, word_vectors
 
@@ -356,7 +355,7 @@ class CrfWordEmbeddings(object):
         """
         processed_text = CrfWordEmbeddings.pre_process_text(text_list, entity_list)
         processed_text_pos_tag = CrfWordEmbeddings.pos_tag(processed_text)
-        vocab, word_vectors = self.load_word_vectors()
+        vocab, word_vectors = CrfWordEmbeddings.load_word_vectors()
         pre_processed_data = [CrfWordEmbeddings.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                                 word_vectors=word_vectors)
                               for each in processed_text_pos_tag]
@@ -427,4 +426,3 @@ class CrfWordEmbeddings(object):
         text_list = result.get(TEXT_LIST, [])
         entity_list = result.get(ENTITY_LIST, [])
         self.train_model(entity_list=entity_list, text_list=text_list)
-        return result
