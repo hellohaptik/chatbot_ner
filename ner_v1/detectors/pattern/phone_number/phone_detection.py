@@ -132,7 +132,7 @@ class PhoneDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        patterns = self.mobile_number_regx(self.processed_text.lower())
+        patterns = self._detect_mobile_number_pattern(self.processed_text.lower())
 
         for pattern in patterns:
             original = pattern
@@ -141,8 +141,7 @@ class PhoneDetector(BaseDetector):
             original_list.append(original)
         return phone_list, original_list
 
-    @staticmethod
-    def mobile_number_regx(text):
+    def _detect_mobile_number_pattern(self, text):
         """
         Detects phone numbers from text that match the defined regex pattern
 
