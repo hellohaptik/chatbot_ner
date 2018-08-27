@@ -140,8 +140,11 @@ class PNRDetector(BaseDetector):
         # print 'detection for default task'
         railway_pnr_list = []
         original_list = []
+
         railway_pnr_list, original_list = self._detect_railway_pnr_format(railway_pnr_list, original_list)
         self._update_processed_text(original_list)
+        railway_pnr_list, original_list = self._detect_railway_pnr_clean_format(railway_pnr_list, original_list)
+        self.update_processed_text(original_list)
         return railway_pnr_list, original_list
 
     def _detect_railway_pnr_format(self, railway_pnr_list=None, original_list=None):
@@ -173,6 +176,42 @@ class PNRDetector(BaseDetector):
             railway_pnr_list.append(pattern)
             original_list.append(pattern)
         return railway_pnr_list, original_list
+
+    def _detect_railway_pnr_clean_format(self, railway_pnr_list=[], original_list=[]):
+        """
+        Detects railway PNR 10 digit number with special characters
+
+        Args:
+            railway_pnr_list: Optional, list to store detected pnr codeses
+            original_list: Optional, list to store corresponding original substrings of text which were detected as
+                            pnr codeses
+        Returns:
+            A tuple of two lists with first list containing the detected pnr codeses and second list containing
+            their corresponding substrings in the given text.
+
+            For example:
+                (['2459547855'], ['2459547855'])
+        """
+
+        patterns = re.findall(r'\b([0-9\-\s\(\)\.]{10,20})\b', self.processed_text.lower())
+        for pattern in patterns:
+            clean_pnr = self._clean_pnr(pattern)
+            if len(clean_pnr) == 10:
+                railway_pnr_list.append(clean_pnr)
+                original_list.append(pattern)
+        return railway_pnr_list, original_list
+
+    def _clean_pnr(self, pnr):
+        """
+        This function clean special character from pnr text
+
+        Args:
+            pnr: PNR containing special characters
+
+        Returns:
+            pnr: PNR with special characters removed
+        """
+        return re.sub('[-\s.\(\)]+', '', pnr)
 
     def _detect_serial_pnr(self):
         """
