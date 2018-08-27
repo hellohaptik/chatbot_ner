@@ -2,7 +2,7 @@ import re
 
 from word2number import w2n
 
-from lib.nlp.tokenizer import Tokenizer
+from lib.nlp.const import nltk_tokenizer
 from ner_v1.constant import NUMERIC_VARIANTS, DIGIT_UNITS
 from ner_v1.detectors.base_detector import BaseDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
@@ -230,7 +230,7 @@ class NumberDetector(BaseDetector):
         """
         original_list = []
         temp_str = ''
-        tokenizer = Tokenizer()
+        tokenizer = nltk_tokenizer
 
         for word in tokenizer.tokenize(self.text.lower()):
             if word in NUMERIC_VARIANTS:
