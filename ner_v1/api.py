@@ -10,7 +10,8 @@ from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
-    PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN, PARAMETER_MAX
+    PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
+    PARAMETER_MAX_DIGITS
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
@@ -36,8 +37,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
                        PARAMETER_FUZZINESS: request.GET.get('fuzziness'),
                        PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness'),
-                       PARAMETER_MIN: request.GET.get('min_number_digits'),
-                       PARAMETER_MAX: request.GET.get('max_number_digits'),
+                       PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
+                       PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        }
 
     return parameters_dict
@@ -270,8 +271,8 @@ def number(request):
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
                                    parameters_dict[PARAMETER_BOT_MESSAGE],
-                                   parameters_dict[PARAMETER_MIN],
-                                   parameters_dict[PARAMETER_MAX]
+                                   parameters_dict[PARAMETER_MIN_DIGITS],
+                                   parameters_dict[PARAMETER_MAX_DIGITS]
                                    )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
