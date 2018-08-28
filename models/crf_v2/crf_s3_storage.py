@@ -1,7 +1,6 @@
 import boto
 import boto3
 from chatbot_ner.config import ner_logger
-import pickle
 
 
 def read_model_dict_from_s3(bucket_name, bucket_region, model_path_location=None):
@@ -17,7 +16,7 @@ def read_model_dict_from_s3(bucket_name, bucket_region, model_path_location=None
         bucket = s3.Bucket(bucket_name)
         pickle_file_handle = bucket.Object(model_path_location.lstrip('/'))
         # note read() will return str and hence cPickle.loads
-        model_dict = (pickle_file_handle.get()['Body'].read())
+        model_dict = pickle_file_handle.get()['Body'].read()
         ner_logger.debug("Model Read Successfully From s3")
     except Exception as e:
         ner_logger.exception("Error Reading model from s3 for domain %s " % e)

@@ -9,6 +9,7 @@ from datastore.datastore import DataStore
 from .constants import TEXT_LIST, ENTITY_LIST, EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
 from .crf_s3_storage import write_file_to_s3, read_model_dict_from_s3
 
+
 class CrfWordEmbeddings(object):
     """
     This class is used to construct a Linear Chain Crf Model using Word Embeddings to carry out
@@ -427,5 +428,13 @@ class CrfWordEmbeddings(object):
         entity_list = result.get(ENTITY_LIST, [])
         self.train_model(entity_list=entity_list, text_list=text_list)
 
-    def read_model_s3(self):
+    @staticmethod
+    def read_model_from_s3():
+        model_dict = read_model_dict_from_s3(bucket_name=AWS_MODEL_BUCKET,
+                                             bucket_region=AWS_MODEL_REGION,
+                                             model_path_location='',
+                                             )
+        tagger = pycrfsuite.Tagger()
+        tagger.open_inmemory(model_dict)
 
+        return tagger
