@@ -67,7 +67,8 @@ def get_es_url():
         es_url (str): returns es_url currently pointed at
     """
     engine = CHATBOT_NER_DATASTORE.get('engine')
-    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme', 'http://')
+    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme', 'http')
+              + '://'
               + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
               CHATBOT_NER_DATASTORE.get(engine).get('port'))
     return es_url
