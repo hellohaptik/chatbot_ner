@@ -267,16 +267,18 @@ class NumberDetector(BaseDetector):
         Returns:
             (number_list, original_list) (tuple)
             number_list (list): a list consisting of numbers obtained from detected numerals
-            original_list (list): a list consisting of detected numerals
+            final_original_list (list): a list consisting of detected numerals
 
         Example:
             original_list = ['seven', 'twenty five']
             >>print(convert_numerals_to_numbers())
             (['7', '25'], ['seven', 'twenty five'])
         """
+        final_original_list = []
         number_list = []
         for original_numbers in original_list:
             suggestion = str(w2n.word_to_num(str(original_numbers)))
             if self.max_digit >= len(suggestion) >= self.min_digit:
                 number_list.append(suggestion)
-        return number_list, original_list
+                final_original_list.append(original_numbers)
+        return number_list, final_original_list
