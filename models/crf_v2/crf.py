@@ -341,6 +341,7 @@ class CrfWordEmbeddings(object):
         # Provide a file name as a parameter to the train function, such that
         # the model will be saved to the file when training is finished
         trainer.train(self.entity_name)
+        self.write_model_to_s3()
 
     def get_processed_x_y(self, text_list, entity_list):
         """
@@ -438,3 +439,9 @@ class CrfWordEmbeddings(object):
         tagger.open_inmemory(model_dict)
 
         return tagger
+
+    def write_model_to_s3(self):
+        write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
+                         bucket_region=AWS_MODEL_REGION,
+                         address='',
+                         disk_filepath=self.entity_name)
