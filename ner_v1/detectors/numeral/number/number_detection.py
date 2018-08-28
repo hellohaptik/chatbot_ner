@@ -245,22 +245,15 @@ class NumberDetector(BaseDetector):
         if temp_str.startswith('and') or (temp_str.endswith('and') and not temp_str.endswith('thousand')):
             temp_str = temp_str.replace('and', '')
         original_list.append(temp_str.strip())
-        original_list = [w for w in original_list if w != '']
+        original_list = [w.strip() for w in original_list if w.strip()]
 
-        for i in range(len(original_list)):
-            original_list_split = original_list[i].split()
-            original_list_split_len = len(original_list_split)
-            unit_count = len([unit for unit in original_list_split if unit in DIGIT_UNITS])
-
-            if original_list_split_len == unit_count:
-                original_list = original_list[:i] + original_list_split + original_list[i + 1:]
-
-        original_list_counter = 0
-        while original_list_counter < len(original_list):
-            number_len = len((str(w2n.word_to_num(str(original_list[original_list_counter])))))
-            if not self.max_digit >= number_len >= self.min_digit:
-                del original_list[original_list_counter]
-            original_list_counter = original_list_counter + 1
+        _original_list = []
+        for part in original_list:
+            if all(unit in DIGIT_UNITS for unit in part.split()):
+                _original_list.extend(part.split())
+            else:
+                _original_list.append(part)
+        original_list = _original_list
         return self._convert_numerals_to_numbers(original_list)
 
     def _convert_numerals_to_numbers(self, original_list):
@@ -283,5 +276,7 @@ class NumberDetector(BaseDetector):
         """
         number_list = []
         for original_numbers in original_list:
-            number_list.append(str(w2n.word_to_num(str(original_numbers))))
+            suggestion = str(w2n.word_to_num(str(original_numbers)))
+            if self.max_digit >= len(suggestion) >= self.min_digit:
+                number_list.append(suggestion)
         return number_list, original_list
