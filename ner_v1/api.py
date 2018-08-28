@@ -289,7 +289,8 @@ def time(request):
         entity_output = get_time(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                 parameters_dict[PARAMETER_BOT_MESSAGE])
+                                 parameters_dict[PARAMETER_BOT_MESSAGE],
+                                 parameters_dict[PARAMETER_TIMEZONE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for time: %s ' % e)
