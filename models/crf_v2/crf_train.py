@@ -6,7 +6,7 @@ from .crf_s3_storage import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
 
 
-class CrfWordEmbeddings(object):
+class CrfTrain(object):
     """
     This class is used to construct a Linear Chain Crf Model using Word Embeddings to carry out
     Named Entity Recognition (NER).

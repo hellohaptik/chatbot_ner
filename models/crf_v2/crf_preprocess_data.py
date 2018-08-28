@@ -331,8 +331,3 @@ class CrfPreprocessData(object):
         features = [CrfPreprocessData.extract_features(doc) for doc in pre_processed_data]
         labels = [CrfPreprocessData.get_labels(doc) for doc in pre_processed_data]
         return features, labels
-
-
-
-
-
