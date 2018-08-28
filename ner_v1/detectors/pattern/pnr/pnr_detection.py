@@ -177,7 +177,7 @@ class PNRDetector(BaseDetector):
             original_list.append(pattern)
         return railway_pnr_list, original_list
 
-    def _detect_railway_pnr_long_format(self, railway_pnr_list=[], original_list=[]):
+    def _detect_railway_pnr_long_format(self, railway_pnr_list=None, original_list=None):
         """
         Detects railway PNR 10 digit number with special characters
 
@@ -192,6 +192,10 @@ class PNRDetector(BaseDetector):
             For example:
                 (['2459547855'], ['2459547855'])
         """
+        if railway_pnr_list is None:
+            railway_pnr_list = []
+        if original_list is None:
+            original_list = []
 
         patterns = re.findall(r'\b([0-9\-\s\(\)\.]{10,20})\b', self.processed_text.lower())
         for pattern in patterns:
