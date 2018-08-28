@@ -1,6 +1,6 @@
 import pickle
 import numpy as np
-import nltk
+import nltk # Remove this
 import pycrfsuite
 import re
 from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION
@@ -343,7 +343,8 @@ class CrfWordEmbeddings(object):
         trainer.train(self.entity_name)
         self.write_model_to_s3()
 
-    def get_processed_x_y(self, text_list, entity_list):
+    @staticmethod
+    def get_processed_x_y(text_list, entity_list):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.
@@ -381,7 +382,7 @@ class CrfWordEmbeddings(object):
         """
         status = False
         try:
-            x, y = self.get_processed_x_y(text_list, entity_list)
+            x, y = CrfWordEmbeddings.get_processed_x_y(text_list, entity_list)
             self.train_crf_model(x, y, c1, c2, max_iterations)
             status = True
             ner_logger.debug('Training Completed')
@@ -390,37 +391,6 @@ class CrfWordEmbeddings(object):
 
         return status
 
-    def get_predictions(self, text):
-        """
-        This method is used to predict the Entities present in the text.
-        Args:
-            text (str): Text on which the NER has to be carried out.
-        Returns:
-            original_text (list): List of entities detected in the text.
-        Examples:
-            Shopping cart Entity
-            text = 'I wish to buy brown rice and apples'
-            get_predictions(text)
-            >> ['brown rice', 'apples']
-        """
-        x, _ = self.get_processed_x_y([text], [[]])
-        tagger = pycrfsuite.Tagger()
-        tagger.open(self.entity_name)
-        y_prediction = [tagger.tag(xseq) for xseq in x][0]
-        word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
-        tokenized_text = word_tokenize.tokenize(text)
-        original_text = []
-
-        for i in range(len(y_prediction)):
-            temp = []
-            if y_prediction[i] == 'B':
-                temp.append(tokenized_text[i])
-                for j in range(i, len(y_prediction)):
-                    if y_prediction[j] == 'I':
-                        temp.append(tokenized_text[j])
-                original_text.append(' '.join(temp))
-
-        return original_text
 
     def train_model_from_es_data(self):
         datastore_object = DataStore()
@@ -429,16 +399,6 @@ class CrfWordEmbeddings(object):
         entity_list = result.get(ENTITY_LIST, [])
         self.train_model(entity_list=entity_list, text_list=text_list)
 
-    @staticmethod
-    def read_model_from_s3():
-        model_dict = read_model_dict_from_s3(bucket_name=AWS_MODEL_BUCKET,
-                                             bucket_region=AWS_MODEL_REGION,
-                                             model_path_location='',
-                                             )
-        tagger = pycrfsuite.Tagger()
-        tagger.open_inmemory(model_dict)
-
-        return tagger
 
     def write_model_to_s3(self):
         write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
