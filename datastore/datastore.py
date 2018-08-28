@@ -60,7 +60,6 @@ class DataStore(object):
         """
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
-            self.update_index = elastic_search.connect.get_current_live_index(self._store_name)
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None
@@ -366,8 +365,9 @@ class DataStore(object):
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
+            update_index = elastic_search.connect.get_current_live_index(self._store_name)
             elastic_search.populate.entity_data_update(connection=self._client_or_connection,
-                                                       index_name=self.update_index,
+                                                       index_name=update_index,
                                                        doc_type=self._connection_settings[
                                                             ELASTICSEARCH_DOC_TYPE],
                                                        logger=ner_logger,
