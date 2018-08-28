@@ -11,7 +11,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, \
     ENTITY_LIST, EXTERNAL_API_DATA, TEXT_LIST
-from models.crf_v2.crf import CrfWordEmbeddings
+from models.crf_v2.crf_train import CrfWordEmbeddings
 
 
 def get_entity_word_variants(request):
@@ -206,7 +206,7 @@ def train_crf_model(request):
     try:
         entity_name = request.GET.get(ENTITY_NAME)
         crf_model = CrfWordEmbeddings(entity_name=entity_name)
-        crf_model.train_model_from_es_data()
+        crf_model.train_model_from_es_data(cloud_storage=True)
         response['success'] = True
 
     except BaseException as e:

@@ -1,8 +1,8 @@
-from .crf import CrfWordEmbeddings
 from .crf_s3_storage import read_model_dict_from_s3
-from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION
+from chatbot_ner.config import  AWS_MODEL_BUCKET, AWS_MODEL_REGION
 import pycrfsuite
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
+from .crf_preprocess_data import CrfPreprocessData
 
 
 class CrfDetection(object):
@@ -37,7 +37,7 @@ class CrfDetection(object):
     def get_entity_path(self):
         return ''
 
-    def get_predictions(self, text, cloud_storage=False):
+    def detect_entity(self, text, cloud_storage=False):
         """
         This method is used to predict the Entities present in the text.
         Args:
@@ -50,7 +50,7 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfWordEmbeddings.get_processed_x_y([text], [[]])
+        x, _ = CrfPreprocessData.get_processed_x_y([text], [[]])
         y_prediction = [self.tagger.tag(xseq) for xseq in x][0]
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
