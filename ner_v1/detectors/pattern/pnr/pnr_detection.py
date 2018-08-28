@@ -144,7 +144,7 @@ class PNRDetector(BaseDetector):
         railway_pnr_list, original_list = self._detect_railway_pnr_format(railway_pnr_list, original_list)
         self._update_processed_text(original_list)
         railway_pnr_list, original_list = self._detect_railway_pnr_long_format(railway_pnr_list, original_list)
-        self.update_processed_text(original_list)
+        self._update_processed_text(original_list)
         return railway_pnr_list, original_list
 
     def _detect_railway_pnr_format(self, railway_pnr_list=None, original_list=None):
