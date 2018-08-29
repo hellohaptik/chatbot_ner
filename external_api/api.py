@@ -53,6 +53,7 @@ def get_entity_word_variants(request):
 
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
+
 @csrf_exempt
 def update_dictionary(request):
     """
@@ -89,6 +90,7 @@ def update_dictionary(request):
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
+@csrf_exempt
 def transfer_entities(request):
     """
     This method is used to transfer entities from the source to destination.
