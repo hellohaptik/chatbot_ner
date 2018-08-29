@@ -57,7 +57,16 @@ ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
-
+ES_INDEX_1 = os.environ.get('ES_INDEX_1', '')
+ES_INDEX_2 = os.environ.get('ES_INDEX_2', '')
+DESTINATION_ES_SCHEME = os.environ.get('DESTINATION_ES_SCHEME', '')
+DESTINATION_HOST = os.environ.get('DESTINATION_HOST', '')
+DESTINATION_PORT = os.environ.get('DESTINATION_PORT', '')
+DESTINATION_URL = (DESTINATION_ES_SCHEME + "://" +
+                   DESTINATION_HOST + ":" +
+                   DESTINATION_PORT)
+ES_ALIAS = os.environ.get('ES_ALIAS', '')
+ES_SCHEME = os.environ.get('ES_SCHEME', '')
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -78,16 +87,24 @@ if not GOOGLE_TRANSLATE_API_KEY:
 CHATBOT_NER_DATASTORE = {
     'engine': ENGINE,
     'elasticsearch': {
-        'connection_url': ES_URL,
-        'name': ES_INDEX_NAME,
-        'host': ES_HOST,
-        'port': ES_PORT,
+        'connection_url': ES_URL,  # Elastic Search URL
+        'name': ES_INDEX_NAME,  # Index name used
+        'host': ES_HOST,  # Elastic Search Host
+        'port': ES_PORT,  # Port of elastic search
         'user': ES_AUTH_NAME,
         'password': ES_AUTH_PASSWORD,
         'retry_on_timeout': False,
         'max_retries': 1,
         'timeout': 20,
         'request_timeout': 20,
+
+        # Transfer Specific constants (ignore if only one elasticsearch is setup)
+        # For detailed explanation datastore.elastic_search.transfer.py
+        'es_index_1': ES_INDEX_1,  # Index 1 used for transfer
+        'es_index_2': ES_INDEX_2,  # Index 2 used for transfer
+        'destination_url': DESTINATION_URL,  # Elastic search destination  URL
+        'es_alias': ES_ALIAS,  # Elastic search alias used in transfer
+        'es_scheme': ES_SCHEME,  # The scheme used in ES default value is http://
     }
 }
 
