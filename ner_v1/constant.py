@@ -51,6 +51,18 @@ PARAMETER_SOURCE_LANGUAGE = 'source_language'  # ISO 639 code vocabulary.  For e
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
 
+# **********************constants used for number detection************************************
+
+DIGIT_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+NUMERIC_VARIANTS = DIGIT_UNITS + [
+    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+    "sixteen", "seventeen", "eighteen", "nineteen", "and",
+    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+    "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
+]
+PARAMETER_MIN_DIGITS = 'min_number_digits'
+PARAMETER_MAX_DIGITS = 'max_number_digits'
+
 #**********************constants used for name detection************************************
 
 FIRST_NAME='first_name'

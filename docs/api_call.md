@@ -530,13 +530,15 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = None
+      min_digit = 1
+      max_digit = 2
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -548,7 +550,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20purchase%2030%20units%20of%20mobile%20and%2040%20units%20of%20Television&entity_name=number_of_unit&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20purchase%2030%20units%20of%20mobile%20and%2040%20units%20of%20Television&entity_name=number_of_unit&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2'
       ```
 
     - *CURL Output:*
@@ -582,13 +584,15 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = None
+      min_digit = 1
+      max_digit = 2
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -600,7 +604,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20reserve%20a%20table%20for%203%20people&entity_name=number_of_people&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/number/?message=I%20want%20to%20reserve%20a%20table%20for%203%20people&entity_name=number_of_people&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2'
       ```
 
     - *CURL Output:*
