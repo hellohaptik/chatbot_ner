@@ -253,20 +253,8 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
     """
 
     phone_detection = PhoneDetector(entity_name=entity_name)
-    if structured_value:
-        entity_list, original_text_list = phone_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = phone_detection.detect_entity(text=message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
-
-    return None
+    return phone_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                  bot_message=bot_message)
 
 
 def get_email(message, entity_name, structured_value, fallback_value, bot_message):
