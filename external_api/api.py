@@ -64,7 +64,7 @@ def update_dictionary(request):
     """
     response = {"success": False, "error": ""}
     try:
-        external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
+        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
         entity_data = external_api_data.get(ENTITY_DATA)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
