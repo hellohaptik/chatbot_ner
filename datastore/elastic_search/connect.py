@@ -1,5 +1,6 @@
 from elasticsearch import Elasticsearch
-
+from chatbot_ner.config import CHATBOT_NER_DATASTORE
+from datastore.elastic_search.transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
 
@@ -35,3 +36,39 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
         connection = None
 
     return connection
+
+
+class FetchIndexForAliasException(Exception):
+    """
+    This exception is raised if fetch for indices for an alias fails
+    """
+    pass
+
+
+def get_current_live_index(alias_name):
+    """
+    This method is used to get the index the alias is currently pointing to.
+    Args:
+        alias_name (str): The alias which is pointing tothe indices.
+
+    Returns:
+        current_live_index (str): The index to which the alias is pointing.
+    """
+    es_url = get_es_url()
+    es_object = ESTransfer(source=es_url, destination=None)
+    current_live_index = es_object.fetch_index_alias_points_to(es_url, alias_name)
+    return current_live_index
+
+
+def get_es_url():
+    """
+    This method is used to obtain the es_url
+    Returns:
+        es_url (str): returns es_url currently pointed at
+    """
+    engine = CHATBOT_NER_DATASTORE.get('engine')
+    es_url = (CHATBOT_NER_DATASTORE.get(engine).get('es_scheme', 'http')
+              + '://'
+              + CHATBOT_NER_DATASTORE.get(engine).get('host') + ":" +
+              CHATBOT_NER_DATASTORE.get(engine).get('port'))
+    return es_url

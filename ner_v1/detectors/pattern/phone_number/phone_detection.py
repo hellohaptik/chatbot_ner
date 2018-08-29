@@ -1,7 +1,11 @@
 import re
 
 
-class PhoneDetector(object):
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
+
+
+class PhoneDetector(BaseDetector):
     """Detects phone numbers in given text and tags them.
 
     Detects all phone numbers in given text and replaces them by entity_name
@@ -34,12 +38,18 @@ class PhoneDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a PhoneDetector object
 
         Args:
             entity_name: A string by which the detected phone numbers would be replaced with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(PhoneDetector, self).__init__(source_language_script, translation_enabled)
         self.text = ''
         self.entity_name = entity_name
         self.tagged_text = ''
@@ -47,6 +57,10 @@ class PhoneDetector(object):
         self.phone = []
         self.original_phone_text = []
         self.tag = '__' + self.entity_name + '__'
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def _detect_phone(self):
         """Detects phone numbers in the self.text
@@ -67,11 +81,12 @@ class PhoneDetector(object):
         self._update_processed_text(original_list)
         return phone_list, original_list
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, **kwargs):
         """Detects phone numbers in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future.
 
         Returns:
             A tuple of two lists with first list containing the detected phone numbers and second list containing their
@@ -117,7 +132,7 @@ class PhoneDetector(object):
         if original_list is None:
             original_list = []
 
-        patterns = self.mobile_number_regx(self.processed_text.lower())
+        patterns = self._detect_mobile_number_pattern(self.processed_text.lower())
 
         for pattern in patterns:
             original = pattern
@@ -126,7 +141,7 @@ class PhoneDetector(object):
             original_list.append(original)
         return phone_list, original_list
 
-    def mobile_number_regx(self, text):
+    def _detect_mobile_number_pattern(self, text):
         """
         Detects phone numbers from text that match the defined regex pattern
 
@@ -156,4 +171,3 @@ class PhoneDetector(object):
         for detected_text in original_phone_strings:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
-
