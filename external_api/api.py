@@ -99,7 +99,7 @@ def transfer_entities(request):
     """
     response = {"success": False, "error": ""}
     try:
-        external_api_data = json.loads(request.GET.get(EXTERNAL_API_DATA))
+        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_list = external_api_data.get(ENTITY_LIST)
 
         datastore_object = DataStore()
