@@ -377,7 +377,8 @@ class ESTransfer(object):
                 "index": backup_index
             }
         }
-        reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict)
+        reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
+                                         params={"refresh": "true", "wait_for_completion": "true"})
         if reindex_response.status_code != 200:
             message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
             raise InternalBackupException(message)
