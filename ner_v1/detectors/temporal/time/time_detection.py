@@ -40,6 +40,20 @@ class TimeDetector(BaseDetector):
     8. 24 hour without format                                   _detect_24_hour_without_format
     9. Before / After / By / At / Exactly hhmm 12 hour format   _detect_time_without_format
     10. o'clock 12 hour format                                  _detect_time_without_format_preceeding
+    11. 12 hour range format                                    _detect_range_12_hour_format
+    12. 12 hour range format without minutes                    _detect_range_12_hour_format_without_min
+    13. 12 hour start range format                              _detect_start_range_12_hour_format
+    14. 12 hour end range format time                           _detect_end_range_12_hour_format
+    15. 12 hour start range format without minutes              _detect_start_range_12_hour_format_without_min
+    16. 12 hour end range format without minutes                _detect_end_range_12_hour_format_without_min
+    17. X hour/mins later format                                _detect_time_with_difference_later
+    18. every x hour, every x mins format                       _detect_time_with_every_x_hour
+    19. once in x day format                                    _detect_time_with_once_in_x_day
+    20. morning time range format                               _get_morning_time_range
+    21. afternoon time range format                             _get_afternoon_time_range
+    22. evening time range format                               _get_evening_time_range
+    23. night time range format                                 _get_night_time_range
+    24. No time preference format                               _get_default_time_range
 
     See respective methods for detail on structures of these formats
 
