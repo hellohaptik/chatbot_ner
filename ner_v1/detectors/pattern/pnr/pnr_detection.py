@@ -1,7 +1,10 @@
 import re
 
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
-class PNRDetector(object):
+
+class PNRDetector(BaseDetector):
     """Detects PNR (serial) codes (Passenger Record Number, usually present with train or flight bookings) in given text
      and tags them. Usually flight pnr codes are 5 to 8 characters long.
 
@@ -60,12 +63,19 @@ class PNRDetector(object):
             (['sgxsgx'], ['sgxsgx'])
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a PNRDetector object
 
         Args:
             entity_name: A string by which the detected pnr codes would be replaced with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(PNRDetector, self).__init__(source_language_script, translation_enabled)
+
         self.entity_name = entity_name
         self.task_dict = {
             'train_pnr': self._detect_railway_pnr,
@@ -78,11 +88,16 @@ class PNRDetector(object):
         self.original_pnr_text = []
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text):
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    def detect_entity(self, text, **kwargs):
         """Detects pnr codes in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future
 
         Returns:
             A tuple of two lists with first list containing the detected pnr codes and second list containing their
@@ -125,7 +140,10 @@ class PNRDetector(object):
         # print 'detection for default task'
         railway_pnr_list = []
         original_list = []
+
         railway_pnr_list, original_list = self._detect_railway_pnr_format(railway_pnr_list, original_list)
+        self._update_processed_text(original_list)
+        railway_pnr_list, original_list = self._detect_railway_pnr_long_format(railway_pnr_list, original_list)
         self._update_processed_text(original_list)
         return railway_pnr_list, original_list
 
@@ -158,6 +176,46 @@ class PNRDetector(object):
             railway_pnr_list.append(pattern)
             original_list.append(pattern)
         return railway_pnr_list, original_list
+
+    def _detect_railway_pnr_long_format(self, railway_pnr_list=None, original_list=None):
+        """
+        Detects railway PNR 10 digit number with special characters
+
+        Args:
+            railway_pnr_list: Optional, list to store detected pnr codeses
+            original_list: Optional, list to store corresponding original substrings of text which were detected as
+                            pnr codeses
+        Returns:
+            A tuple of two lists with first list containing the detected pnr codeses and second list containing
+            their corresponding substrings in the given text.
+
+            For example:
+                (['2459547855'], ['2459547855'])
+        """
+        if railway_pnr_list is None:
+            railway_pnr_list = []
+        if original_list is None:
+            original_list = []
+
+        patterns = re.findall(r'\b([0-9\-\s\(\)\.]{10,20})\b', self.processed_text.lower())
+        for pattern in patterns:
+            clean_pnr = self._clean_pnr(pattern)
+            if len(clean_pnr) == 10:
+                railway_pnr_list.append(clean_pnr)
+                original_list.append(pattern)
+        return railway_pnr_list, original_list
+
+    def _clean_pnr(self, pnr):
+        """
+        This function clean special character from pnr text
+
+        Args:
+            pnr: PNR containing special characters
+
+        Returns:
+            pnr: PNR with special characters removed
+        """
+        return re.sub('[\-\s\.\(\)]+', '', pnr)
 
     def _detect_serial_pnr(self):
         """
