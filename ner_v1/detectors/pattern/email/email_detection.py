@@ -1,7 +1,11 @@
 import re
 
 
-class EmailDetector(object):
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
+
+
+class EmailDetector(BaseDetector):
     """Detects email addresses in given text and tags them.
 
     Detects all email addresses in given text and replaces them by entity_name
@@ -33,14 +37,21 @@ class EmailDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a EmailDetector object
 
         Args:
            entity_name: A string by which the detected email addresses would be replaced with on
                        calling detect_entity()
+           source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+           translation_enabled: True if messages needs to be translated in case detector does not support a
+                                particular language, else False
 
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(EmailDetector, self).__init__(source_language_script, translation_enabled)
+
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
@@ -48,6 +59,10 @@ class EmailDetector(object):
         self.email = []
         self.original_email_text = []
         self.tag = '__' + self.entity_name + '__'
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def _detect_email(self):
         """Detects email addresses in the self.text
@@ -69,11 +84,12 @@ class EmailDetector(object):
 
         return email_list, original_list
 
-    def detect_entity(self, text):
+    def detect_entity(self, text, **kwargs):
         """Detects email addresses in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future
 
         Returns:
             A tuple of two lists with first list containing the detected email addresses and second list containing

@@ -92,6 +92,7 @@ ENV/
 .ropeproject
 
 .idea/
+.realsync
 
 Dockerfile
 post-merge
