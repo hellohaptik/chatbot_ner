@@ -290,3 +290,45 @@ def _parse_es_search_results(results):
                 variants_to_values[variant] = value
 
     return variants_to_values
+
+
+def training_data_query(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    Get all variants data for a entity stored in the index as a dictionary
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name: name of the entity to perform a 'term' query on
+        kwargs:
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+    Returns:
+        dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
+        synonyms/variants of the key
+    """
+    results_dictionary = {}
+    data = {
+        'query': {
+            'term': {
+                'entity_data': {
+                    'value': entity_name
+                }
+            }
+        }
+    }
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                  scroll='1m')
+    search_results = _run_es_search(connection, **kwargs)
+
+    # Parse hits
+    results = search_results['hits']['hits']
+
+    results_dictionary = {'text_list': [], 'entity_list': []}
+
+    for result in results:
+        results_dictionary['text_list'].append(result['_source']['text'])
+        results_dictionary['entity_list'].append(result['_source']['entities'])
+
+    return results_dictionary
