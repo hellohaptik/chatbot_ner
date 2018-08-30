@@ -2,9 +2,9 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX, ES_TRAINING_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException)
+                         EngineConnectionException, NonESEngineTransferException, TrainingIndexNotConfigured)
 
 
 class DataStore(object):
@@ -335,6 +335,18 @@ class DataStore(object):
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
 
+    def _check_doc_type_for_training_data_elasticsearch(self):
+        """
+        Checks if doc_type is present in connection settings, if not an exception is raised
+
+        Raises:
+             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
+        """
+        if ES_TRAINING_DOC_TYPE not in self._connection_settings:
+            raise DataStoreSettingsImproperlyConfiguredException(
+                'Elasticsearch training data needs doc_type. Please configure '
+                'ES_TRAINING_DATA_DOC_TYPE in your environment')
+
     def exists(self):
         """
         Checks if DataStore is already created
@@ -393,3 +405,23 @@ class DataStore(object):
         destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
+
+    def get_entity_training_data(self, entity_name, **kwargs):
+        if self._client_or_connection is None:
+            self._connect()
+        results_dictionary = {}
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_training_data_elasticsearch()
+            es_training_index = self._connection_settings.get('es_training_index')
+            if es_training_index is None:
+                raise TrainingIndexNotConfigured()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.training_data_query(connection=self._client_or_connection,
+                                                                          index_name=es_training_index,
+                                                                          doc_type=
+                                                                          self._connection_settings[ES_TRAINING_DOC_TYPE],
+                                                                          entity_name=entity_name,
+                                                                          request_timeout=request_timeout,
+                                                                          **kwargs)
+        return results_dictionary
+

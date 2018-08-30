@@ -57,17 +57,19 @@ ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
-ES_INDEX_1 = os.environ.get('ES_INDEX_1', '')
-ES_INDEX_2 = os.environ.get('ES_INDEX_2', '')
-DESTINATION_ES_SCHEME = os.environ.get('DESTINATION_ES_SCHEME', '')
-DESTINATION_HOST = os.environ.get('DESTINATION_HOST', '')
-DESTINATION_PORT = os.environ.get('DESTINATION_PORT', '')
+ES_INDEX_1 = os.environ.get('ES_INDEX_1')
+ES_INDEX_2 = os.environ.get('ES_INDEX_2')
+DESTINATION_ES_SCHEME = os.environ.get('DESTINATION_ES_SCHEME')
+DESTINATION_HOST = os.environ.get('DESTINATION_HOST')
+DESTINATION_PORT = os.environ.get('DESTINATION_PORT')
 DESTINATION_URL = (DESTINATION_ES_SCHEME + "://" +
                    DESTINATION_HOST + ":" +
                    DESTINATION_PORT)
-ES_ALIAS = os.environ.get('ES_ALIAS', '')
-ES_SCHEME = os.environ.get('ES_SCHEME', '')
-ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX', '')
+ES_ALIAS = os.environ.get('ES_ALIAS')
+ES_SCHEME = os.environ.get('ES_SCHEME')
+ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX')
+ES_TRAINING_DOC_TYPE = os.environ.get('ES_TRAINING_DOC_TYPE')
+
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -109,6 +111,7 @@ CHATBOT_NER_DATASTORE = {
 
         # Training Data ES constants
         'es_training_index': ES_TRAINING_INDEX,
+        'es_training_doc_type': ES_TRAINING_DOC_TYPE,
     }
 }
 
