@@ -7,7 +7,7 @@ from .crf_preprocess_data import CrfPreprocessData
 
 class CrfDetection(object):
 
-    def __int__(self, entity_name, cloud_storage=False):
+    def __init__(self, entity_name, cloud_storage=False):
         self.entity_name = entity_name
         self.cloud_storage = cloud_storage
         self.entity_path = ''
