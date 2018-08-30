@@ -12,7 +12,7 @@ class CrfTrain(object):
     Named Entity Recognition (NER).
 
     """
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, vocab_path, word_vectors_path):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
@@ -20,6 +20,8 @@ class CrfTrain(object):
             embeddings_path_vectors (str): The path where the vectors are stored.
         """
         self.entity_name = entity_name
+        self.vocab_path = vocab_path
+        self.word_vectors_path = word_vectors_path
 
     def train_crf_model(self, x, y, c1, c2, max_iterations, cloud_storage=False):
         """
@@ -76,7 +78,8 @@ class CrfTrain(object):
         """
         status = False
         try:
-            x, y = CrfPreprocessData.get_processed_x_y(text_list, entity_list)
+            x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list)
+
             self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
             status = True
             ner_logger.debug('Training Completed')

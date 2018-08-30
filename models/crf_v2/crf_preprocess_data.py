@@ -1,26 +1,11 @@
-from .constants import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
-import pickle
 import numpy as np
 import nltk # Remove this
 import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
+from .word_embeddings import LoadWordEmbeddings
 
 
 class CrfPreprocessData(object):
-
-    @staticmethod
-    def load_word_vectors():
-        """
-        Thus function is used to load the word_list and word_vectors from the specified paths.
-        Returns:
-        vocab (list): word_list present at the specified path.
-        word_vectors (numpy.ndarray): word_vectors present at the specified path.
-        """
-        file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
-        vocab = pickle.load(file_handler)
-        file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
-        word_vectors = np.array(pickle.load(file_handler))
-        return vocab, word_vectors
 
     @staticmethod
     def pre_process_text_(text, entities):
@@ -144,27 +129,6 @@ class CrfPreprocessData(object):
             # Take the word, POS tag, and its label
             data.append([(w, pos, label) for (w, label), (word, pos) in zip(doc, tagged)])
         return data
-
-    @staticmethod
-    def convert_wordvec_features(prefix, word_vec):
-        """
-        This method is used to unroll the word_vectors
-        Args:
-            prefix (str): Relative position of the word with respect to the current pointer.
-            word_vec (np.ndarray): The word vector which has to be unrolled
-
-        Returns:
-            features (list): List of word_vectors with appropriate format.
-        Example:
-             prefix = -1
-             word_vec = [0.23, 0.45,0.11]
-             convert_wordvec_features(prefix, word_vec)
-             >> ['-1word_vec0=0.23', '-1word_vec1=0.45', '-1word_vec2=0.11']
-        """
-        features = []
-        for i, each in enumerate(word_vec):
-            features.append(prefix + 'word_vec' + str(i) + '=' + str(each))
-        return features
 
     @staticmethod
     def convert_wordvec_features(prefix, word_vec):
@@ -324,7 +288,9 @@ class CrfPreprocessData(object):
         """
         processed_text = CrfPreprocessData.pre_process_text(text_list, entity_list)
         processed_text_pos_tag = CrfPreprocessData.pos_tag(processed_text)
-        vocab, word_vectors = CrfPreprocessData.load_word_vectors()
+        word_embeddings = LoadWordEmbeddings()
+        vocab = word_embeddings.vocab
+        word_vectors = word_embeddings.word_vectors
         pre_processed_data = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                                 word_vectors=word_vectors)
                               for each in processed_text_pos_tag]
