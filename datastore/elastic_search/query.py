@@ -308,7 +308,7 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
         synonyms/variants of the key
     """
-    results_dictionary = {}
+    results_dictionary = {'text_list': [], 'entity_list': []}
     data = {
         'query': {
             'term': {
@@ -324,8 +324,6 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
 
     # Parse hits
     results = search_results['hits']['hits']
-
-    results_dictionary = {'text_list': [], 'entity_list': []}
 
     for result in results:
         results_dictionary['text_list'].append(result['_source']['text'])

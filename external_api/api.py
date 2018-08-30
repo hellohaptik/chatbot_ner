@@ -7,7 +7,7 @@ from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException
 from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
-    FetchIndexForAliasException, DeleteIndexFromAliasException
+    FetchIndexForAliasException, DeleteIndexFromAliasException, TrainingIndexNotConfigured
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, EXTERNAL_API_DATA
 from django.views.decorators.csrf import csrf_exempt
@@ -112,6 +112,38 @@ def transfer_entities(request):
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
             PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
             AliasForTransferException, IndexForTransferException, NonESEngineTransferException) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+def get_training_data(request):
+    """
+    This function is used obtain the entity dictionary given the dictionary name.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse : With data consisting of a list of value variants.
+    """
+    response = {"success": False, "error": "", "result": []}
+    try:
+        entity_name = request.GET.get(ENTITY_NAME)
+        datastore_obj = DataStore()
+        result = datastore_obj.get_entity_training_data(entity_name=entity_name)
+        response['result'] = result
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)

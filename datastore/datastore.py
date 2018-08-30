@@ -407,6 +407,7 @@ class DataStore(object):
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
     def get_entity_training_data(self, entity_name, **kwargs):
+        ner_logger.debug('Datastore, get_entity_training_data, entity_name %s' % entity_name)
         if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
@@ -423,5 +424,6 @@ class DataStore(object):
                                                                           entity_name=entity_name,
                                                                           request_timeout=request_timeout,
                                                                           **kwargs)
+            ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
