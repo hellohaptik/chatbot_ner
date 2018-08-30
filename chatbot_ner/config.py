@@ -69,6 +69,8 @@ ES_ALIAS = os.environ.get('ES_ALIAS')
 ES_SCHEME = os.environ.get('ES_SCHEME')
 ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX')
 ES_TRAINING_DOC_TYPE = os.environ.get('ES_TRAINING_DOC_TYPE')
+AWS_MODEL_BUCKET = os.environ.get('AWS_MODEL_BUCKET')
+AWS_MODEL_REGION = os.environ.get('AWS_MODEL_REGION')
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
