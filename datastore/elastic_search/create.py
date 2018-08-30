@@ -167,3 +167,9 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
     }
 
     create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+
+
+def create_alias(connection, index_list, alias_name, logger, **kwargs):
+    logger.debug('Alias creation %s started %s' % alias_name)
+    connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
+    logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
