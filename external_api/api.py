@@ -9,7 +9,8 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
     FetchIndexForAliasException, DeleteIndexFromAliasException, TrainingIndexNotConfigured
 from chatbot_ner.config import ner_logger
-from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, EXTERNAL_API_DATA
+from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
+    EXTERNAL_API_DATA, TEXT_LIST
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -153,4 +154,42 @@ def get_training_data(request):
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+@csrf_exempt
+def update_training_data(request):
+    """
+    This function is used to update the dictionary entities.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse : HttpResponse with appropriate status and error message.
+    """
+    response = {"success": False, "error": ""}
+    try:
+        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        entity_name = external_api_data.get(ENTITY_NAME)
+        entity_list = external_api_data.get(ENTITY_LIST)
+        text_list = external_api_data.get(TEXT_LIST)
+        language_script = external_api_data.get(LANGUAGE_SCRIPT)
+        datastore_obj = DataStore()
+        datastore_obj.update_entity_training_data(entity_name=entity_name,
+                                                  entity_list=entity_list,
+                                                  text_list=text_list,
+                                                  language_script=language_script)
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
