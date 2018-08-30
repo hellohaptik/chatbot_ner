@@ -12,9 +12,9 @@ class CrfDetection(object):
         self.cloud_storage = cloud_storage
         self.entity_path = ''
         if self.cloud_storage:
-            self.model_dict = CrfDetection.load_model_from_s3()
+            self.model_dict = self.load_model_from_s3()
         else:
-            self.model_dict = CrfDetection.load_model_from_local()
+            self.model_dict = self.load_model_from_local()
         self.tagger = self.initialize_tagger()
 
     def load_model_from_s3(self):
