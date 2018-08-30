@@ -67,6 +67,7 @@ DESTINATION_URL = (DESTINATION_ES_SCHEME + "://" +
                    DESTINATION_PORT)
 ES_ALIAS = os.environ.get('ES_ALIAS', '')
 ES_SCHEME = os.environ.get('ES_SCHEME', '')
+ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX', '')
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -105,6 +106,9 @@ CHATBOT_NER_DATASTORE = {
         'destination_url': DESTINATION_URL,  # Elastic search destination  URL
         'es_alias': ES_ALIAS,  # Elastic search alias used in transfer
         'es_scheme': ES_SCHEME,  # The scheme used in ES default value is http://
+
+        # Training Data ES constants
+        'es_training_index': ES_TRAINING_INDEX,
     }
 }
 
