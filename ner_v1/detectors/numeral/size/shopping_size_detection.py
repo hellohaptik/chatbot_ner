@@ -1,9 +1,11 @@
 import re
 
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
-class ShoppingSizeDetector(object):
+class ShoppingSizeDetector(BaseDetector):
     """Detects size which are used for shopping from the text  and tags them.
 
     Detects the sizes from the text and replaces them by entity_name.
@@ -39,12 +41,18 @@ class ShoppingSizeDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a ShoppingSizeDetector object
 
         Args:
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
+                                 particular language, else False
         """
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(ShoppingSizeDetector, self).__init__(source_language_script, translation_enabled)
         self.entity_name = entity_name
         self.dictionary_name = 'shopping_size'
         self.text = ''
@@ -53,14 +61,19 @@ class ShoppingSizeDetector(object):
         self.processed_text = ''
         self.size = []
         self.original_size_text = []
-        self.text_detection_object = TextDetector(entity_name=dictionary_name)
+        self.text_detection_object = TextDetector(entity_name=self.dictionary_name)
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text):
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    def detect_entity(self, text, **kwargs):
         """Detects size in the text string
 
         Args:
             text: string to extract entities from
+            **kwargs: it can be used to send specific arguments in future.
 
         Returns:
             A tuple of two lists with first list containing the detected sizes and second list containing their
