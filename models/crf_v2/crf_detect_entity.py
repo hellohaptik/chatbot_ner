@@ -1,7 +1,6 @@
-import pycrfsuite
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
-from .get_crf_model_dict import CrfModel
+from .get_crf_tagger import CrfModel
 from chatbot_ner.config import MODELS_PATH
 
 
@@ -14,15 +13,9 @@ class CrfDetection(object):
         crf_model = CrfModel(entity_name=self.entity_name)
 
         if self.cloud_storage:
-            self.model_dict = crf_model.load_model()
+            self.tagger = crf_model.load_model()
         else:
-            self.model_dict = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
-        self.tagger = self.initialize_tagger()
-
-    def initialize_tagger(self):
-        tagger = pycrfsuite.Tagger()
-        tagger.open_inmemory(self.model_dict)
-        return tagger
+            self.tagger = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
 
     def detect_entity(self, text):
         """
