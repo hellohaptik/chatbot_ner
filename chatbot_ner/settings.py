@@ -78,3 +78,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+REDIS_REPLICA_HOST = '127.0.0.1'
+REDIS_HOST='127.0.0.1'
+REDIS_PORT = '6379'
+REDIS_DB = '0'
+REDIS_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
+REDIS_REPLICA_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    },
+
+    "redis_ml": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": [REDIS_LOCATION, REDIS_REPLICA_LOCATION],
+        "OPTIONS": {'MASTER_CACHE': REDIS_LOCATION},
+    },
+}
