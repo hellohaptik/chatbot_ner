@@ -3,6 +3,7 @@ import nltk # Remove this
 import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .word_embeddings import LoadWordEmbeddings
+from chatbot_ner.config import ner_logger
 
 
 class CrfPreprocessData(object):
@@ -286,14 +287,31 @@ class CrfPreprocessData(object):
             features (list): List of features required for training the CRF Model
             labels (list): Labels corresponding in IOB format.
         """
+        ner_logger.debug('pre_process_text Started')
         processed_text = CrfPreprocessData.pre_process_text(text_list, entity_list)
+        ner_logger.debug('pre_process_text Completed')
+
+        ner_logger.debug('pos_tag Started')
         processed_text_pos_tag = CrfPreprocessData.pos_tag(processed_text)
+        ner_logger.debug('pos_tag Completed')
+
+        ner_logger.debug('LoadWordEmbeddings Started')
         word_embeddings = LoadWordEmbeddings()
+        ner_logger.debug('LoadingWordEmbeddings Completed')
         vocab = word_embeddings.vocab
         word_vectors = word_embeddings.word_vectors
+
+        ner_logger.debug('Loading Word Embeddings Started')
         pre_processed_data = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                                 word_vectors=word_vectors)
                               for each in processed_text_pos_tag]
+        ner_logger.debug('Loading Word Embeddings Completed')
+
+        ner_logger.debug('CrfPreprocessData.extract_features Started')
         features = [CrfPreprocessData.extract_features(doc) for doc in pre_processed_data]
+        ner_logger.debug('CrfPreprocessData.extract_features Completed')
+
+        ner_logger.debug('CrfPreprocessData.get_labels Started')
         labels = [CrfPreprocessData.get_labels(doc) for doc in pre_processed_data]
+        ner_logger.debug('CrfPreprocessData.get_labels Completed')
         return features, labels

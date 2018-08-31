@@ -6,8 +6,10 @@ from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
 from lib.redis_utils import set_cache_ml
 from .constants import ENTITY_REDIS_MODELS_PATH
-from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail
+from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail, ESTrainingEntityListError, \
+    ESTrainingTextListError
 from datetime import datetime
+
 
 class CrfTrain(object):
     """
@@ -23,6 +25,7 @@ class CrfTrain(object):
             embeddings_path_vectors (str): The path where the vectors are stored.
         """
         self.entity_name = entity_name
+        self.model_dir = None
 
     def train_crf_model(self, x, y, c1, c2, max_iterations, cloud_storage=False):
         """
@@ -59,7 +62,13 @@ class CrfTrain(object):
 
         # Provide a file name as a parameter to the train function, such that
         # the model will be saved to the file when training is finished
-        trainer.train(self.generate_model_path())
+        ner_logger.debug('Training for entity %s started' % self.entity_name)
+
+        self.model_dir = self.generate_model_path()
+        trainer.train(self.model_dir)
+        ner_logger.debug('Training for entity %s completed' % self.entity_name)
+
+        ner_logger.debug('Model locally saved at %s' % self.model_dir)
         if cloud_storage:
             self.write_model_to_s3()
 
@@ -77,41 +86,47 @@ class CrfTrain(object):
         Returns:
             status (bool): Returns true if the training is successful.
         """
-        status = False
-        try:
-            x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list)
 
-            self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
-            status = True
-            ner_logger.debug('Training Completed')
-        except Exception as e:
-            ner_logger.debug('Value Error %s' % e)
-
-        return status
+        ner_logger.debug('Preprocessing for Entity: %s started' % self.entity_name)
+        x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list)
+        ner_logger.debug('Preprocessing for Entity: %s completed' % self.entity_name)
+        self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
 
     def train_model_from_es_data(self, cloud_storage=False):
         datastore_object = DataStore()
+        ner_logger.debug('Fetch of data from ES for ENTITY: %s started' % self.entity_name)
         result = datastore_object.get_entity_training_data(entity_name=self.entity_name)
+
         text_list = result.get(TEXT_LIST, [])
         entity_list = result.get(ENTITY_LIST, [])
+
+        if not text_list:
+            raise ESTrainingTextListError()
+        if not entity_list:
+            raise ESTrainingEntityListError()
+
+        ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
+        ner_logger.debug('Length of text_list %s' % str(len(text_list)))
+
         self.train_model(entity_list=entity_list, text_list=text_list, cloud_storage=cloud_storage)
 
     def write_model_to_s3(self):
+        ner_logger('Model %s saving at AWS started' % self.model_dir)
         result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
                                   bucket_region=AWS_MODEL_REGION,
-                                  address=self.generate_model_path(),
+                                  address=self.model_dir,
                                   disk_filepath=self.entity_name)
         if result:
-            ner_logger.debug('Entity : %s written to s3' % self.entity_name)
+            ner_logger.debug('Model : %s written to s3' % self.model_dir)
         else:
-            ner_logger.debug('Failure in saving entity to s3 %s' % self.entity_name)
+            ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
             raise AwsWriteEntityFail()
 
-        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, self.generate_model_path())
+        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, self.model_dir)
         if result:
-            ner_logger.debug('Entity path : %s written to Redis ' % self.entity_name)
+            ner_logger.debug('Model path : %s written to Redis ' % self.model_dir)
         else:
-            ner_logger.debug('Failure in saving entity path to Redis %s' % self.entity_name)
+            ner_logger.debug('Failure in saving Model path to Redis %s' % self.model_dir)
             raise RedisWriteEntityFail()
 
     def generate_model_path(self):
