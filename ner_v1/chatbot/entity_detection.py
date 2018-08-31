@@ -188,20 +188,8 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
     """
 
     text_detection = TextDetector(entity_name=entity_name)
-    if structured_value:
-        text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        text_entity_list, original_text_list = text_detection.detect_entity(message)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
-
-    return None
+    return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                 bot_message=bot_message)
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
