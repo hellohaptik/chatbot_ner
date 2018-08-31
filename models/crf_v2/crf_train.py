@@ -7,7 +7,7 @@ from .crf_preprocess_data import CrfPreprocessData
 from lib.redis_utils import set_cache_ml
 from .constants import ENTITY_REDIS_MODELS_PATH
 from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail
-
+from datetime import datetime
 
 class CrfTrain(object):
     """
@@ -59,7 +59,7 @@ class CrfTrain(object):
 
         # Provide a file name as a parameter to the train function, such that
         # the model will be saved to the file when training is finished
-        trainer.train(MODELS_PATH + self.entity_name)
+        trainer.train(self.generate_model_path())
         if cloud_storage:
             self.write_model_to_s3()
 
@@ -99,7 +99,7 @@ class CrfTrain(object):
     def write_model_to_s3(self):
         result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
                                   bucket_region=AWS_MODEL_REGION,
-                                  address=MODELS_PATH + self.entity_name,
+                                  address=self.generate_model_path(),
                                   disk_filepath=self.entity_name)
         if result:
             ner_logger.debug('Entity : %s written to s3' % self.entity_name)
@@ -107,9 +107,15 @@ class CrfTrain(object):
             ner_logger.debug('Failure in saving entity to s3 %s' % self.entity_name)
             raise AwsWriteEntityFail()
 
-        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, MODELS_PATH + self.entity_name)
+        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, self.generate_model_path())
         if result:
             ner_logger.debug('Entity path : %s written to Redis ' % self.entity_name)
         else:
             ner_logger.debug('Failure in saving entity path to Redis %s' % self.entity_name)
             raise RedisWriteEntityFail()
+
+    def generate_model_path(self):
+        output_directory_prefix = MODELS_PATH
+        output_directory_postfix = datetime.now().strftime("%d%m%Y-%H%M%S")
+
+        return output_directory_prefix + self.entity_name + output_directory_postfix
