@@ -71,7 +71,11 @@ ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX')
 ES_TRAINING_DOC_TYPE = os.environ.get('ES_TRAINING_DOC_TYPE')
 AWS_MODEL_BUCKET = os.environ.get('AWS_MODEL_BUCKET')
 AWS_MODEL_REGION = os.environ.get('AWS_MODEL_REGION')
-
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_DB = os.environ.get('REDIS_PORT')
+REDIS_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
+REDIS_REPLICA_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
@@ -152,3 +156,16 @@ if not CITY_MODEL_PATH:
     CITY_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'city', 'model_13062017.crf')
 if not DATE_MODEL_PATH:
     DATE_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'date', 'model_date.crf')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/var/tmp/django_cache',
+    },
+
+    "redis_ml": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": [REDIS_LOCATION, REDIS_REPLICA_LOCATION],
+        "OPTIONS": {'MASTER_CACHE': REDIS_LOCATION},
+    },
+}
