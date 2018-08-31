@@ -2,7 +2,7 @@ import pycrfsuite
 from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION
 from datastore.datastore import DataStore
 from .constants import TEXT_LIST, ENTITY_LIST
-from .crf_s3_storage import write_file_to_s3
+from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
 
 

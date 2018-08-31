@@ -2,3 +2,5 @@ ENTITY_LIST = 'entity_list'
 TEXT_LIST = 'text_list'
 EMBEDDINGS_PATH_VOCAB = ''
 EMBEDDINGS_PATH_VECTORS = ''
+
+ENTITY_REDIS_MODELS_PATH = 'entity_model_path|'

@@ -1,4 +1,4 @@
-from .crf_s3_storage import read_model_dict_from_s3
+from lib.aws_utils import read_model_dict_from_s3
 from chatbot_ner.config import AWS_MODEL_BUCKET, AWS_MODEL_REGION
 import pycrfsuite
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
