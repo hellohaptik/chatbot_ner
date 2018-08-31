@@ -10,8 +10,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CONFIG_PATH = os.path.join(BASE_DIR, 'config')
+
+if os.path.exists(CONFIG_PATH):
+    dotenv.read_dotenv(CONFIG_PATH)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -79,10 +84,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-REDIS_REPLICA_HOST = '127.0.0.1'
-REDIS_HOST='127.0.0.1'
-REDIS_PORT = '6379'
-REDIS_DB = '0'
+REDIS_REPLICA_HOST = os.environ.get('REDIS_REPLICA_HOST')
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_DB = os.environ.get('REDIS_DB')
 REDIS_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
 REDIS_REPLICA_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
 
