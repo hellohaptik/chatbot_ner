@@ -1,9 +1,12 @@
 import pycrfsuite
-from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION
+from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION, MODELS_PATH
 from datastore.datastore import DataStore
 from .constants import TEXT_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
+from lib.redis_utils import set_cache_ml
+from .constants import ENTITY_REDIS_MODELS_PATH
+from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail
 
 
 class CrfTrain(object):
@@ -12,7 +15,7 @@ class CrfTrain(object):
     Named Entity Recognition (NER).
 
     """
-    def __init__(self, entity_name, vocab_path, word_vectors_path):
+    def __init__(self, entity_name):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
@@ -20,8 +23,6 @@ class CrfTrain(object):
             embeddings_path_vectors (str): The path where the vectors are stored.
         """
         self.entity_name = entity_name
-        self.vocab_path = vocab_path
-        self.word_vectors_path = word_vectors_path
 
     def train_crf_model(self, x, y, c1, c2, max_iterations, cloud_storage=False):
         """
@@ -58,7 +59,7 @@ class CrfTrain(object):
 
         # Provide a file name as a parameter to the train function, such that
         # the model will be saved to the file when training is finished
-        trainer.train(self.entity_name)
+        trainer.train(MODELS_PATH + self.entity_name)
         if cloud_storage:
             self.write_model_to_s3()
 
@@ -83,8 +84,8 @@ class CrfTrain(object):
             self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
             status = True
             ner_logger.debug('Training Completed')
-        except ValueError:
-            ner_logger.debug('Value Error %s' % ValueError)
+        except Exception as e:
+            ner_logger.debug('Value Error %s' % e)
 
         return status
 
@@ -96,7 +97,19 @@ class CrfTrain(object):
         self.train_model(entity_list=entity_list, text_list=text_list, cloud_storage=cloud_storage)
 
     def write_model_to_s3(self):
-        write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
-                         bucket_region=AWS_MODEL_REGION,
-                         address='',
-                         disk_filepath=self.entity_name)
+        result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
+                                  bucket_region=AWS_MODEL_REGION,
+                                  address=MODELS_PATH + self.entity_name,
+                                  disk_filepath=self.entity_name)
+        if result:
+            ner_logger.debug('Entity : %s written to s3' % self.entity_name)
+        else:
+            ner_logger.debug('Failure in saving entity to s3 %s' % self.entity_name)
+            raise AwsWriteEntityFail()
+
+        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, MODELS_PATH + self.entity_name)
+        if result:
+            ner_logger.debug('Entity path : %s written to Redis ' % self.entity_name)
+        else:
+            ner_logger.debug('Failure in saving entity path to Redis %s' % self.entity_name)
+            raise RedisWriteEntityFail()

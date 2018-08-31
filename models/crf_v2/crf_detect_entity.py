@@ -1,8 +1,8 @@
-from lib.aws_utils import read_model_dict_from_s3
-from chatbot_ner.config import AWS_MODEL_BUCKET, AWS_MODEL_REGION
 import pycrfsuite
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
+from .get_crf_model_dict import CrfModel
+from chatbot_ner.config import MODELS_PATH
 
 
 class CrfDetection(object):
@@ -10,34 +10,21 @@ class CrfDetection(object):
     def __init__(self, entity_name, cloud_storage=False):
         self.entity_name = entity_name
         self.cloud_storage = cloud_storage
-        self.entity_path = ''
+
+        crf_model = CrfModel(entity_name=self.entity_name)
+
         if self.cloud_storage:
-            self.model_dict = self.load_model_from_s3()
+            self.model_dict = crf_model.load_model()
         else:
-            self.model_dict = self.load_model_from_local()
+            self.model_dict = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
         self.tagger = self.initialize_tagger()
-
-    def load_model_from_s3(self):
-        model_dict = read_model_dict_from_s3(bucket_name=AWS_MODEL_BUCKET,
-                                             bucket_region=AWS_MODEL_REGION,
-                                             model_path_location=self.entity_path,
-                                             )
-        return model_dict
-
-    def load_model_from_local(self):
-        file_handler = open(self.entity_path, 'r')
-        model_dict = file_handler.read()
-        return model_dict
 
     def initialize_tagger(self):
         tagger = pycrfsuite.Tagger()
         tagger.open_inmemory(self.model_dict)
         return tagger
 
-    def get_entity_path(self):
-        return ''
-
-    def detect_entity(self, text, cloud_storage=False):
+    def detect_entity(self, text):
         """
         This method is used to predict the Entities present in the text.
         Args:
