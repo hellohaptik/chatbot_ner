@@ -94,7 +94,7 @@ CACHES = {
     },
 
     "redis_ml": {
-        "BACKEND": "django_redis.cache.RedisCache",
+        "BACKEND": "redis_cache.RedisCache",
         "LOCATION": [REDIS_LOCATION, REDIS_REPLICA_LOCATION],
         "OPTIONS": {'MASTER_CACHE': REDIS_LOCATION},
     },
