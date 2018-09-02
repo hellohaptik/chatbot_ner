@@ -670,11 +670,11 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
     """Use TimeDetector to detect time
 
     Args:
-        message (str): natural text on which detection logic is to be run. Note if structured value is
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
                                 detection is run on structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
-        structured_value (str): Value obtained from any structured elements. Note if structured value is
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
                                 detection is run on structured value instead of message
                                 (For example, UI elements like form, payload, etc)
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
@@ -714,11 +714,11 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
     """Use TimeDetector to detect time with range
 
     Args:
-        message (str): natural text on which detection logic is to be run. Note if structured value is
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
                                 detection is run on structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
-        structured_value (str): Value obtained from any structured elements. Note if structured value is
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
                                 detection is run on structured value instead of message
                                 (For example, UI elements like form, payload, etc)
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
