@@ -6,7 +6,7 @@ def set_cache_ml(variable_name, variable_value, expiry_time=172800):
     """
     Stores the cache data in a cache
     """
-    cached_ml.set(variable_name, variable_value, expiry_time)
+    return cached_ml.set(variable_name, variable_value, expiry_time)
 
 
 def get_cache_ml(variable_name):

@@ -111,11 +111,11 @@ class CrfTrain(object):
         self.train_model(entity_list=entity_list, text_list=text_list, cloud_storage=cloud_storage)
 
     def write_model_to_s3(self):
-        ner_logger('Model %s saving at AWS started' % self.model_dir)
+        ner_logger.debug('Model %s saving at AWS started' % self.model_dir)
         result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
                                   bucket_region=AWS_MODEL_REGION,
                                   address=self.model_dir,
-                                  disk_filepath=self.entity_name)
+                                  disk_filepath=self.model_dir)
         if result:
             ner_logger.debug('Model : %s written to s3' % self.model_dir)
         else:
