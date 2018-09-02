@@ -64,12 +64,14 @@ class CrfTrain(object):
         # the model will be saved to the file when training is finished
         ner_logger.debug('Training for entity %s started' % self.entity_name)
 
-        self.model_dir = self.generate_model_path()
-        trainer.train(self.model_dir)
+        trainer.train(self.entity_name)
         ner_logger.debug('Training for entity %s completed' % self.entity_name)
+        ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
-        ner_logger.debug('Model locally saved at %s' % self.model_dir)
         if cloud_storage:
+            self.model_dir = self.generate_model_path()
+            trainer.train(self.model_dir)
+            ner_logger.debug('Training for entity %s completed' % self.entity_name)
             self.write_model_to_s3()
 
     def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000, cloud_storage=False):
