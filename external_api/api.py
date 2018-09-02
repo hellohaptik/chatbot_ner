@@ -10,7 +10,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException, TrainingIndexNotConfigured
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, TEXT_LIST
+    EXTERNAL_API_DATA, TEXT_LIST, CLOUD_STORAGE, ES_CONFIG
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
 
@@ -208,8 +208,16 @@ def train_crf_model(request):
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
+        cloud_storage = external_api_data.get(CLOUD_STORAGE)
+        es_config = external_api_data.get(ES_CONFIG)
         crf_model = CrfTrain(entity_name=entity_name)
-        crf_model.train_model_from_es_data(cloud_storage=True)
+
+        if es_config:
+            crf_model.train_model_from_es_data(cloud_storage=cloud_storage)
+        else:
+            text_list = external_api_data.get(TEXT_LIST)
+            entity_list = external_api_data.get(ENTITY_LIST)
+            crf_model.train_model(text_list=text_list, entity_list=entity_list, cloud_storage=cloud_storage)
         response['success'] = True
 
     except (IndexNotFoundException, InvalidESURLException,
