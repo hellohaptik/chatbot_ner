@@ -733,7 +733,7 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
 
     """
 
-    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone)
+    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone, range_enabled=True)
     return time_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                  bot_message=bot_message)
 

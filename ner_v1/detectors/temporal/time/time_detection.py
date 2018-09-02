@@ -26,7 +26,8 @@ class TimeDetector(BaseDetector):
         form_check: boolean, set to True at initialization, used when passed text is a form type message
         bot_message: str, set as the outgoing bot text/message
         departure_flag: bool, whether departure time is being detected
-        return_flag, bool, whether return time is being detected
+        return_flag: bool, whether return time is being detected
+        range_enabled: bool, whether time range needs to be detected
 
     SUPPORTED FORMAT                                            METHOD NAME
     ------------------------------------------------------------------------------------------------------------
@@ -61,7 +62,8 @@ class TimeDetector(BaseDetector):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, entity_name, timezone='UTC', range_enabled=False, source_language_script=ENGLISH_LANG,
+                 translation_enabled=False):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:
@@ -69,6 +71,7 @@ class TimeDetector(BaseDetector):
                         detect_entity()
             timezone (str): timezone identifier string that is used to create a pytz timezone object
                             default is UTC
+            range_enabled (bool): whether time range needs to be detected
             source_language_script (str): ISO 639 code for language of entities to be detected by the instance of this
                                           class
             translation_enabled (bool): True if messages needs to be translated in case detector does not support a
@@ -90,6 +93,7 @@ class TimeDetector(BaseDetector):
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
         self.timezone = timezone or 'UTC'
+        self.range_enabled = range_enabled
 
     @property
     def supported_languages(self):
@@ -109,18 +113,19 @@ class TimeDetector(BaseDetector):
         """
         time_list = []
         original_list = []
-        time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_start_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_start_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_end_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_end_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
+        if self.range_enabled:
+            time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
+            self._update_processed_text(original_list)
+            time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
+            self._update_processed_text(original_list)
+            time_list, original_list = self._detect_start_range_12_hour_format(time_list, original_list)
+            self._update_processed_text(original_list)
+            time_list, original_list = self._detect_start_range_12_hour_format_without_min(time_list, original_list)
+            self._update_processed_text(original_list)
+            time_list, original_list = self._detect_end_range_12_hour_format(time_list, original_list)
+            self._update_processed_text(original_list)
+            time_list, original_list = self._detect_end_range_12_hour_format_without_min(time_list, original_list)
+            self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_without_min(time_list, original_list)
@@ -147,7 +152,7 @@ class TimeDetector(BaseDetector):
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_time_without_format_preceeding(time_list, original_list)
         self._update_processed_text(original_list)
-        if not time_list:
+        if not time_list and self.range_enabled:
             time_list, original_list = self._get_morning_time_range(time_list, original_list)
             self._update_processed_text(original_list)
             time_list, original_list = self._get_afternoon_time_range(time_list, original_list)
