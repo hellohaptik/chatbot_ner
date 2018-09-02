@@ -1,5 +1,5 @@
 import numpy as np
-import nltk # Remove this
+from lib.nlp.pos import POS
 import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .word_embeddings import LoadWordEmbeddings
@@ -122,11 +122,12 @@ class CrfPreprocessData(object):
                 ('to', 'TO', 'O'),  ('fly', 'RB', 'O'),  ('to', 'TO', 'O'),  ('California', 'NNP', 'B')]]
         """
         data = []
+        pos_tagger = POS()
         for i, doc in enumerate(docs):
             # Obtain the list of tokens in the document
             tokens = [t for t, label in doc]
             # Perform POS tagging
-            tagged = nltk.pos_tag(tokens)
+            tagged = pos_tagger.tagger.tag(tokens)
             # Take the word, POS tag, and its label
             data.append([(w, pos, label) for (w, label), (word, pos) in zip(doc, tagged)])
         return data
