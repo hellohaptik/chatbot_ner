@@ -29,7 +29,6 @@ class ShoppingSizeDetector(BaseDetector):
     Attributes:
         text: string to extract entities from
         entity_name: string by which the detected size would be replaced with on calling detect_entity()
-        dictionary_name: name of a dictionary that stores the string data. For example: XL, L, Large, etc.
         This is constant and its value is size_detector
         tagged_text: string with size replaced with tag defined by entity name
         processed_text: string with sizes detected removed
@@ -54,14 +53,13 @@ class ShoppingSizeDetector(BaseDetector):
         self._supported_languages = [ENGLISH_LANG]
         super(ShoppingSizeDetector, self).__init__(source_language_script, translation_enabled)
         self.entity_name = entity_name
-        self.dictionary_name = 'shopping_size'
         self.text = ''
         self.text_dict = {}
         self.tagged_text = ''
         self.processed_text = ''
         self.size = []
         self.original_size_text = []
-        self.text_detection_object = TextDetector(entity_name=self.dictionary_name)
+        self.text_detection_object = TextDetector(entity_name=self.entity_name)
         self.tag = '__' + self.entity_name + '__'
 
     @property
