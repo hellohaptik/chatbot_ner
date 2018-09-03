@@ -653,7 +653,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
                                    bot_message=bot_message)
 
 
-def get_time(message, entity_name, structured_value, fallback_value, bot_message, timezone):
+def get_time(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
     """Use TimeDetector to detect time
 
     Args:
@@ -697,7 +697,7 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
                                  bot_message=bot_message)
 
 
-def get_time_with_range(message, entity_name, structured_value, fallback_value, bot_message, timezone):
+def get_time_with_range(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
     """Use TimeDetector to detect time with range
 
     Args:
