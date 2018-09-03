@@ -84,6 +84,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+#  Transfer Crf Model Specific (optional)
 REDIS_REPLICA_HOST = os.environ.get('REDIS_REPLICA_HOST')
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')

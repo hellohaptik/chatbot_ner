@@ -1,7 +1,7 @@
 import numpy as np
 from lib.singleton import Singleton
 import pickle
-from .constants import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
+from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
 
 
 class LoadWordEmbeddings(object):
