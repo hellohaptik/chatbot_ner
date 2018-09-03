@@ -70,7 +70,7 @@ class CrfTrain(object):
 
         if cloud_storage:
             self.model_dir = self.generate_model_path()
-            trainer.train(MODELS_PATH + self.model_dir)
+            trainer.train(self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             self.write_model_to_s3()
         else:
@@ -137,9 +137,11 @@ class CrfTrain(object):
 
     def generate_model_path(self):
         file_path = MODELS_PATH + self.entity_name
-        directory = os.path.dirname(file_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        entity_path = MODELS_PATH + self.entity_name + '/' + self.entity_name
+        entity_directory = os.path.dirname(entity_path)
+        file_directory = os.path.dirname(entity_path)
+        if not os.path.exists(entity_directory):
+            os.makedirs(file_directory)
             ner_logger.debug('creating new directory %s' % file_path)
 
         output_directory_prefix = MODELS_PATH + self.entity_name + '/'
