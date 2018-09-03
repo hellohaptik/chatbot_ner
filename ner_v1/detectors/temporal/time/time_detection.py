@@ -27,6 +27,7 @@ class TimeDetector(BaseDetector):
         bot_message: str, set as the outgoing bot text/message
         departure_flag: bool, whether departure time is being detected
         return_flag: bool, whether return time is being detected
+        range_enabled: bool, whether time range needs to be detected
 
     SUPPORTED FORMAT                                            METHOD NAME
     ------------------------------------------------------------------------------------------------------------
@@ -61,7 +62,8 @@ class TimeDetector(BaseDetector):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', source_language_script=ENGLISH_LANG,
+    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
+                 source_language_script=ENGLISH_LANG,
                  translation_enabled=False):
         """Initializes a TimeDetector object with given entity_name and timezone
 
@@ -70,6 +72,8 @@ class TimeDetector(BaseDetector):
                         detect_entity()
             timezone (str): timezone identifier string that is used to create a pytz timezone object
                             default is UTC
+            range_enabled (bool): whether time range needs to be detected
+            form_check (bool): Optional, boolean set to False, used when passed text is a form type message
             source_language_script (str): ISO 639 code for language of entities to be detected by the instance of this
                                           class
             translation_enabled (bool): True if messages needs to be translated in case detector does not support a
@@ -87,10 +91,11 @@ class TimeDetector(BaseDetector):
         self.processed_text = ''
         self.time = []
         self.original_time_text = []
-        self.form_check = True
+        self.form_check = form_check
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
         self.timezone = timezone or 'UTC'
+        self.range_enabled = range_enabled
 
     @property
     def supported_languages(self):
@@ -134,8 +139,9 @@ class TimeDetector(BaseDetector):
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_time_with_once_in_x_day(time_list, original_list)
         self._update_processed_text(original_list)
-        time_list, original_list = self._detect_24_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
+        if self.form_check:
+            time_list, original_list = self._detect_24_hour_format(time_list, original_list)
+            self._update_processed_text(original_list)
         time_list, original_list = self._detect_restricted_24_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_word_format(time_list, original_list)
@@ -159,17 +165,18 @@ class TimeDetector(BaseDetector):
             self._update_processed_text(original_list)
             time_list, original_list = self._get_default_time_range(time_list, original_list)
             self._update_processed_text(original_list)
-
+        if not self.range_enabled and time_list:
+            time_list, original_list = self._remove_time_range_entities(time_list=time_list,
+                                                                        original_list=original_list)
         return time_list, original_list
 
-    def detect_entity(self, text, form_check=False, **kwargs):
+    def detect_entity(self, text, **kwargs):
         """
         Detects all time strings in text and returns two lists of detected time entities and their corresponding
         original substrings in text respectively.
 
         Args:
             text (str): string to extract time entities from
-            form_check (bool): Optional, boolean set to False, used when passed text is a form type message
             **kwargs: it can be used to send specific arguments in future.
 
         Returns:
@@ -197,7 +204,6 @@ class TimeDetector(BaseDetector):
         respectively.
 
         """
-        self.form_check = form_check
         self.text = ' ' + text + ' '
         self.processed_text = self.text.lower()
         self.departure_flag = True if re.search(r'depart', self.text.lower()) else False
@@ -1436,3 +1442,28 @@ class TimeDetector(BaseDetector):
             bot_message (str): previous message that is sent by the bot
         """
         self.bot_message = bot_message
+
+    def _remove_time_range_entities(self, time_list, original_list):
+        """
+        This function removes time ranges from the time list and keeps only absolute time
+        for example - it will keep patterns like 'at 8 pm' but remove patterns like 'anytime after 8pm'
+
+        Args:
+            time_list (list): list of detected time entities dict
+            original_list (list): list of corresponding substrings of given text which were detected as
+                                  time entities
+
+        Returns:
+            A tuple of two lists with first list containing the detected time entities and second list containing their
+            corresponding substrings in the given text.
+        """
+        time_list_final = []
+        original_list_final = []
+        for i, entity in enumerate(time_list):
+            if 'range' not in entity.keys():
+                time_list_final.append(entity)
+                original_list_final.append(original_list[i])
+            elif not entity['range']:
+                time_list_final.append(entity)
+                original_list_final.append(original_list[i])
+        return time_list_final, original_list_final

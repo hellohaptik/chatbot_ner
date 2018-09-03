@@ -690,8 +690,8 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
             {'detection': 'message', 'original_text': 'in 15 mins', 'entity_value': {'mm': '15', 'hh': 0, 'nn': 'df'}},
             {'detection': 'message', 'original_text': '13:50', 'entity_value': {'mm': 50, 'hh': 13, 'nn': 'hrs'}}]
     """
-
-    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone)
+    form_check = True if structured_value else False
+    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone, form_check=form_check)
     time_detection.set_bot_message(bot_message=bot_message)
     return time_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                  bot_message=bot_message)
@@ -719,8 +719,9 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
                       entity_value is in itself a dict with its keys varying from entity to entity
 
     """
-
-    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone)
+    form_check = True if structured_value else False
+    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone, range_enabled=True,
+                                  form_check=form_check)
     return time_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                  bot_message=bot_message)
 
