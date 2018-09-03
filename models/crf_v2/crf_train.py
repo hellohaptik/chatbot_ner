@@ -64,7 +64,7 @@ class CrfTrain(object):
         # the model will be saved to the file when training is finished
         ner_logger.debug('Training for entity %s started' % self.entity_name)
 
-        trainer.train(self.entity_name)
+        trainer.train(MODELS_PATH + self.entity_name + '/' + self.entity_name)
         ner_logger.debug('Training for entity %s completed' % self.entity_name)
         ner_logger.debug('Model locally saved at %s' % self.entity_name)
 

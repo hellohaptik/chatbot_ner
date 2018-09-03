@@ -15,7 +15,7 @@ class CrfDetection(object):
         if self.cloud_storage:
             self.tagger = crf_model.load_model()
         else:
-            self.tagger = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
+            self.tagger = crf_model.load_model(model_path=MODELS_PATH + self.entity_name + '/' + self.entity_name)
 
     def detect_entity(self, text):
         """
