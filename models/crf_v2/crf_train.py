@@ -70,7 +70,7 @@ class CrfTrain(object):
 
         if cloud_storage:
             self.model_dir = self.generate_model_path()
-            trainer.train(self.model_dir)
+            trainer.train(MODELS_PATH + self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             self.write_model_to_s3()
 
