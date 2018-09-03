@@ -132,7 +132,6 @@ class CrfTrain(object):
             raise RedisWriteEntityFail()
 
     def generate_model_path(self):
-        output_directory_prefix = MODELS_PATH
+        output_directory_prefix = MODELS_PATH + self.entity_name + '/'
         output_directory_postfix = datetime.now().strftime("%d%m%Y-%H%M%S")
-
         return output_directory_prefix + self.entity_name + output_directory_postfix
