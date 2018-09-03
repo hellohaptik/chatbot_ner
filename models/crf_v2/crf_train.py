@@ -9,7 +9,7 @@ from .constants import ENTITY_REDIS_MODELS_PATH
 from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail, ESTrainingEntityListError, \
     ESTrainingTextListError
 from datetime import datetime
-
+import os
 
 class CrfTrain(object):
     """
@@ -73,6 +73,10 @@ class CrfTrain(object):
             trainer.train(MODELS_PATH + self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             self.write_model_to_s3()
+        else:
+            trainer.train(MODELS_PATH + self.entity_name)
+            ner_logger.debug('Training for entity %s completed' % self.entity_name)
+            ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
     def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000, cloud_storage=False):
         """
@@ -132,6 +136,12 @@ class CrfTrain(object):
             raise RedisWriteEntityFail()
 
     def generate_model_path(self):
+        file_path = MODELS_PATH + self.entity_name
+        directory = os.path.dirname(file_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            ner_logger.debug('creating new directory %s' % file_path)
+
         output_directory_prefix = MODELS_PATH + self.entity_name + '/'
         output_directory_postfix = datetime.now().strftime("%d%m%Y-%H%M%S")
         return output_directory_prefix + self.entity_name + output_directory_postfix
