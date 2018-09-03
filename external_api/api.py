@@ -13,6 +13,8 @@ from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, EN
     EXTERNAL_API_DATA, TEXT_LIST, CLOUD_STORAGE, ES_CONFIG
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
+from models.crf_v2.transfer_model import TransferCrfModel
+
 
 def get_entity_word_variants(request):
     """
@@ -219,6 +221,40 @@ def train_crf_model(request):
             entity_list = external_api_data.get(ENTITY_LIST)
             crf_model.train_model(text_list=text_list, entity_list=entity_list, cloud_storage=cloud_storage)
         response['success'] = True
+
+    except (IndexNotFoundException, InvalidESURLException,
+            SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
+            PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
+            AliasForTransferException, IndexForTransferException, NonESEngineTransferException) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+@csrf_exempt
+def transfer_crf_model(request):
+    """
+    This method is used to transfer entities from the source to destination.
+    Args:
+        request (HttpResponse): HTTP response from url
+    Returns:
+        HttpResponse : HttpResponse with appropriate status and error message.
+    """
+    response = {"success": False, "error": ""}
+    try:
+        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        entity_list = external_api_data.get(ENTITY_LIST)
+
+        transfer_crf_model_object = TransferCrfModel(entity_list=entity_list)
+        result = transfer_crf_model_object.transfer_model()
+        response['success'] = result
 
     except (IndexNotFoundException, InvalidESURLException,
             SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
