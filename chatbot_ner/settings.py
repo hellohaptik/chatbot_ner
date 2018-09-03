@@ -90,7 +90,10 @@ REDIS_PORT = os.environ.get('REDIS_PORT')
 REDIS_DB = os.environ.get('REDIS_DB')
 REDIS_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
 REDIS_REPLICA_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
-
+REDIS_HOST_DEST = os.environ.get('REDIS_HOST_DEST')
+REDIS_PORT_DEST = os.environ.get('REDIS_PORT_DEST')
+REDIS_DB_DEST = os.environ.get('REDIS_DB_DEST')
+REDIS_LOCATION_DEST = 'redis://' + REDIS_HOST_DEST + ":" + REDIS_PORT_DEST + "/" + REDIS_DB_DEST
 
 CACHES = {
     'default': {
@@ -103,4 +106,10 @@ CACHES = {
         "LOCATION": [REDIS_LOCATION, REDIS_REPLICA_LOCATION],
         "OPTIONS": {'MASTER_CACHE': REDIS_LOCATION},
     },
+
+    "redis_ml_dest": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_LOCATION_DEST,
+    }
+
 }
