@@ -335,7 +335,7 @@ class DataStore(object):
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
 
-    def _check_doc_type_for_training_data_elasticsearch(self):
+    def _check_doc_type_for_crf_data_elasticsearch(self):
         """
         Checks if doc_type is present in connection settings, if not an exception is raised
 
@@ -443,7 +443,7 @@ class DataStore(object):
             self._connect()
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
-            self._check_doc_type_for_training_data_elasticsearch()
+            self._check_doc_type_for_crf_data_elasticsearch()
 
             es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
             if es_training_index is None:
@@ -481,7 +481,7 @@ class DataStore(object):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            self._check_doc_type_for_training_data_elasticsearch()
+            self._check_doc_type_for_crf_data_elasticsearch()
 
             es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
             if es_training_index is None:
