@@ -3,7 +3,7 @@ import re
 import collections
 from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
-from external_api.constants import TEXT_LIST, ENTITY_LIST
+from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 log_prefix = 'datastore.elastic_search.query'
 
 
@@ -326,7 +326,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             }
 
     """
-    results_dictionary = {TEXT_LIST: [], ENTITY_LIST: []}
+    results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
     data = {
         'query': {
             'term': {
@@ -344,7 +344,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     results = search_results['hits']['hits']
 
     for result in results:
-        results_dictionary[TEXT_LIST].append(result['_source']['text'])
+        results_dictionary[SENTENCE_LIST].append(result['_source']['text'])
         results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
 
     return results_dictionary

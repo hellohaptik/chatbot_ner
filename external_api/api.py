@@ -10,7 +10,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, TEXT_LIST
+    EXTERNAL_API_DATA, SENTENCE_LIST
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -172,7 +172,7 @@ def update_crf_training_data(request):
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
         entity_list = external_api_data.get(ENTITY_LIST)
-        text_list = external_api_data.get(TEXT_LIST)
+        text_list = external_api_data.get(SENTENCE_LIST)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
         datastore_obj.update_entity_crf_data(entity_name=entity_name,
