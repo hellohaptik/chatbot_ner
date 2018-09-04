@@ -108,7 +108,8 @@ def exists(connection, index_name):
 
 def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     """
-    Creates an Elasticsearch index needed for similarity based searching
+    Creates an mapping specific to entity storage in elasticsearch and makes a call to create_index
+    to create the index with the given mapping body
     Args:
         connection: Elasticsearch client object
         index_name: The name of the index
@@ -145,7 +146,7 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
 
 
-def create_training_index(connection, index_name, doc_type, logger, **kwargs):
+def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
     """
     This method is used to create an index with mapping suited for story training_data
     Args:
