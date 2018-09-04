@@ -1044,6 +1044,59 @@ Following are the list of different entity types along with its API call:
         ]
       }
       ```      
+      
+### location
+
+- This functionality calls the TextDetector class to detect location.
+
+- Example:
+
+  - Example 1:
+
+    - ```python
+
+      message = 'atm in andheri west'
+      entity_name = 'locality_list'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_location
+      output = get_location(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/location/?message=atm+in+andheri+west&entity_name=locality_list&structured_value=&fallback_value=&bot_message='
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "andheri west", 
+            "entity_value": {
+              "value": "Andheri West"
+            }, 
+            "language": "en"
+          }
+        ]
+      }
+      ```  
 
 ### person_name
 
