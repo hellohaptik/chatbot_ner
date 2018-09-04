@@ -408,7 +408,7 @@ class DataStore(object):
 
     def get_entity_training_data(self, entity_name, **kwargs):
         """
-        This method is used to obtain the training data for the entity given entity name
+        This method is used to obtain the sentences and entities from sentences given entity name
         Args:
             entity_name (str): Entity name for which training data needs to be obtained
             kwargs:
@@ -488,13 +488,13 @@ class DataStore(object):
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
 
-            elastic_search.populate.entity_training_data_update(connection=self._client_or_connection,
-                                                                index_name=es_training_index,
-                                                                doc_type=self._connection_settings
-                                                                [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
-                                                                logger=ner_logger,
-                                                                entity_list=entity_list,
-                                                                text_list=text_list,
-                                                                entity_name=entity_name,
-                                                                language_script=language_script,
-                                                                **kwargs)
+            elastic_search.populate.update_entity_crf_data(connection=self._client_or_connection,
+                                                           index_name=es_training_index,
+                                                           doc_type=self._connection_settings
+                                                           [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                           logger=ner_logger,
+                                                           entity_list=entity_list,
+                                                           text_list=text_list,
+                                                           entity_name=entity_name,
+                                                           language_script=language_script,
+                                                           **kwargs)

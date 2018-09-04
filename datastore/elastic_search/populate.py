@@ -262,8 +262,8 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
-def entity_training_data_update(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
-                                logger, **kwargs):
+def update_entity_crf_data(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
+                           logger, **kwargs):
     """
     This method is used to populate the elastic search traininf data.
     Args:
