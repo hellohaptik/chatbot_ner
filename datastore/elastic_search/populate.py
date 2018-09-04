@@ -265,13 +265,14 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
 def entity_training_data_update(connection, index_name, doc_type, entity_list, entity_name, text_list,language_script,
                                 logger, **kwargs):
     """
-    This method is used to populate the elastic search via the external api call.
+    This method is used to populate the elastic search traininf data.
     Args:
         connection: Elasticsearch client object
         index_name (str): The name of the index
         doc_type (str): The type of the documents being indexed
-        entity_data (list): List of dicts consisting of value and variants.
-        entity_name (str): Name of the dictionary
+        entity_name (str): Name of the entity for which the training data has to be populated
+        entity_list (list): List consisting of the entities corresponding to the text_list
+        text_list (list): List of sentences for training
         language_script (str): The code for the language script
         logger: logging object to log at debug and exception levellogging object to log at debug and exception level
         **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
@@ -300,23 +301,22 @@ def add_training_data_elastic_search(connection, index_name, doc_type, entity_na
         connection: Elasticsearch client object
         index_name: The name of the index
         doc_type:  The type of the documents being indexed
-        dictionary_key: file name of the csv file without the extension, also used as the entity name to index values
-                        of this type. Example - 'city'
-        dictionary_value: dictionary, mapping entity value to a list of its variants.
-                            Example - 'New Delhi': ['Delhi', 'new deli', 'New Delhi']
+        entity_name (str): Name of the entity for which the training data has to be populated
+        entity_list (list): List consisting of the entities corresponding to the text_list
+        text_list (list): List of sentences for training
         logger: logging object to log at debug and exception level
         language_script (str): Language code of the entity script
         kwargs:
             Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
     Example of underlying index query
-        {'_index': 'index_name',
-         '_type': 'dictionary_data',
-         'dict_type': 'variants',
-         'entity_data': 'city',
-         'value': 'Baripada Town'',
-         'variants': ['Baripada', 'Baripada Town', '']
-         '_op_type': 'index'
-         }
+            {'_index': 'training_index',
+            'entity_data': 'name',
+            'text': ['My name is Ajay and this is my friend Hardik'],
+            'entities': ['Ajay', 'Hardik'],
+            'language_script': 'en',
+            '_type': 'training_index',
+            '_op_type': 'index'
+              }
     """
     str_query = []
     for text, entities in zip(text_list, entity_list):

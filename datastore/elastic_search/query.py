@@ -294,7 +294,7 @@ def _parse_es_search_results(results):
 
 def training_data_query(connection, index_name, doc_type, entity_name, **kwargs):
     """
-    Get all variants data for a entity stored in the index as a dictionary
+    Get all text_list and entity_list for a entity stored in the index
 
     Args:
         connection: Elasticsearch client object
@@ -306,7 +306,24 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
 
     Returns:
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
-        synonyms/variants of the key
+        text_list and entity_list of the key
+
+    Examples:
+                {
+        'text_list': [
+            'My name is hardik',
+            'This is my friend Ajay'
+                        ],
+        'entity_list': [
+            [
+                'hardik'
+            ],
+            [
+                'Ajay'
+            ]
+                        ]
+            }
+
     """
     results_dictionary = {'text_list': [], 'entity_list': []}
     data = {
