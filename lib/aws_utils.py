@@ -5,10 +5,9 @@ from chatbot_ner.config import ner_logger
 
 def read_model_dict_from_s3(bucket_name, bucket_region, model_path_location=None):
     """
-    Read model dict from s3 for given model path location
-    :param bucket_name: s3 bucket name
-    :param model_path_location: model path location for domain
-    :return:
+    bucket_name (str): name of the bucket to upload file to
+    model_path_location (str): full path including filename on disk of the file to download
+    bucket_region (str, Optional): region of the s3 bucket, defaults to None
     """
     model_dict = None
     try:
