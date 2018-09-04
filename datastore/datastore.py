@@ -462,13 +462,13 @@ class DataStore(object):
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
-    def update_entity_crf_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
+    def update_entity_crf_data(self, entity_name, entity_list, language_script, sentence_list, **kwargs):
         """
         This method is used to populate the training data for a given entity
         Args:
             entity_name (str): Name of the entity for which the training data has to be populated
-            entity_list (list): List consisting of the entities corresponding to the text_list
-            text_list (list): List of sentences for training
+            entity_list (list): List consisting of the entities corresponding to the sentence_list
+            sentence_list (list): List of sentences for training
             language_script (str): Language code for the language script used.
             **kwargs:
                 For Elasticsearch:
@@ -494,7 +494,7 @@ class DataStore(object):
                                                            [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                                                            logger=ner_logger,
                                                            entity_list=entity_list,
-                                                           text_list=text_list,
+                                                           sentence_list=sentence_list,
                                                            entity_name=entity_name,
                                                            language_script=language_script,
                                                            **kwargs)

@@ -294,7 +294,7 @@ def _parse_es_search_results(results):
 
 def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):
     """
-    Get all text_list and entity_list for a entity stored in the index
+    Get all sentence_list and entity_list for a entity stored in the index
 
     Args:
         connection: Elasticsearch client object
@@ -306,7 +306,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
 
     Returns:
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
-        text_list and entity_list of the key
+        sentence_list and entity_list of the key
 
     Examples:
         training_data_query(connection, index_name, doc_type, entity_name, **kwargs)

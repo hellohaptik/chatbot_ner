@@ -132,7 +132,7 @@ def get_crf_training_data(request):
          request (HttpResponse): HTTP response from url
 
      Returns:
-         HttpResponse : With data consisting of a dictionary consisting of text_list and entity_list
+         HttpResponse : With data consisting of a dictionary consisting of sentence_list and entity_list
     """
     response = {"success": False, "error": "", "result": []}
     try:
@@ -172,13 +172,13 @@ def update_crf_training_data(request):
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
         entity_list = external_api_data.get(ENTITY_LIST)
-        text_list = external_api_data.get(SENTENCE_LIST)
+        sentence_list = external_api_data.get(SENTENCE_LIST)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
         datastore_obj.update_entity_crf_data(entity_name=entity_name,
-                                                  entity_list=entity_list,
-                                                  text_list=text_list,
-                                                  language_script=language_script)
+                                             entity_list=entity_list,
+                                             sentence_list=sentence_list,
+                                             language_script=language_script)
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,
