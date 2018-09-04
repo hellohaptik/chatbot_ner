@@ -200,7 +200,7 @@ def update_training_data(request):
 @csrf_exempt
 def train_crf_model(request):
     """
-    This method is used to transfer entities from the source to destination.
+    This method is used to train crf model.
     Args:
         request (HttpResponse): HTTP response from url
     Returns:
@@ -241,7 +241,7 @@ def train_crf_model(request):
 @csrf_exempt
 def transfer_crf_model(request):
     """
-    This method is used to transfer entities from the source to destination.
+    This method is used to transfer crf model from the source to destination.
     Args:
         request (HttpResponse): HTTP response from url
     Returns:

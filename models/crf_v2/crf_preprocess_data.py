@@ -7,7 +7,9 @@ from chatbot_ner.config import ner_logger
 
 
 class CrfPreprocessData(object):
-
+    """
+    This class is used to pre_process_data for the Crf model.
+    """
     @staticmethod
     def pre_process_text_(text, entities):
         """

@@ -11,9 +11,10 @@ from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail, ESTrainingEnti
 from datetime import datetime
 import os
 
+
 class CrfTrain(object):
     """
-    This class is used to construct a Linear Chain Crf Model using Word Embeddings to carry out
+    This class is used to train a Linear Chain Crf Model using Word Embeddings to carry out
     Named Entity Recognition (NER).
 
     """
@@ -21,8 +22,6 @@ class CrfTrain(object):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
-            embeddings_path_vocab (str): The path where the word_list for the embeddings are stored.
-            embeddings_path_vectors (str): The path where the vectors are stored.
         """
         self.entity_name = entity_name
         self.model_dir = None
@@ -37,6 +36,7 @@ class CrfTrain(object):
             c1 (int): Coefficient of regularization to control variance and bias.
             c2 (int): Coeffiecnt of regularization to control variance and bias.
             max_iterations (int): Max number of iterations to be carried out.
+            cloud_storage (bool): To indicate if cloud storage settings is required.
         """
         trainer = pycrfsuite.Trainer(verbose=False)
 
@@ -88,7 +88,7 @@ class CrfTrain(object):
             max_iterations (int): Max number of iterations to be carried out.
             text_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
-
+            cloud_storage (bool): To indicate if cloud storage settings is required.
         Returns:
             status (bool): Returns true if the training is successful.
         """
@@ -99,6 +99,12 @@ class CrfTrain(object):
         self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
 
     def train_model_from_es_data(self, cloud_storage=False):
+        """
+        This method is used to train the crf model by first extracting training data from ES
+        for the entity and training the crf model for the same.
+        Args:
+            cloud_storage (bool): To indicate if cloud storage settings is required.
+        """
         datastore_object = DataStore()
         ner_logger.debug('Fetch of data from ES for ENTITY: %s started' % self.entity_name)
         result = datastore_object.get_entity_training_data(entity_name=self.entity_name)
@@ -117,6 +123,14 @@ class CrfTrain(object):
         self.train_model(entity_list=entity_list, text_list=text_list, cloud_storage=cloud_storage)
 
     def write_model_to_s3(self):
+        """
+        This method is used to write data to S3 and add the path in redis_cache
+        Returns:
+
+        Raises:
+            AwsWriteEntityFail if writing to Aws fails
+            RedisWriteEntityFail if writing to Redis fails
+        """
         ner_logger.debug('Model %s saving at AWS started' % self.model_dir)
         result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
                                   bucket_region=AWS_MODEL_REGION,
@@ -136,6 +150,11 @@ class CrfTrain(object):
             raise RedisWriteEntityFail()
 
     def generate_model_path(self):
+        """
+        This method is used to generate the directory to store the entity along with the timestamp
+        Returns:
+            output_directory (str): The path where the model needs to be stored.
+        """
         file_path = MODELS_PATH + self.entity_name
         entity_path = MODELS_PATH + self.entity_name + '/' + self.entity_name
         entity_directory = os.path.dirname(entity_path)

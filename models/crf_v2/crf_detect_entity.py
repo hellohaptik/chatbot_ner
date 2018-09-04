@@ -5,8 +5,16 @@ from chatbot_ner.config import MODELS_PATH
 
 
 class CrfDetection(object):
-
+    """
+    This method is used to detect a text entity using the Crf model.
+    """
     def __init__(self, entity_name, cloud_storage=False):
+        """
+        This method is used to detect text entities using the Crf model
+        Args:
+            entity_name (str): Name of the entity for which the entity has to be detected
+            cloud_storage (bool): To indicate if cloud storage settings is required.
+        """
         self.entity_name = entity_name
         self.cloud_storage = cloud_storage
 

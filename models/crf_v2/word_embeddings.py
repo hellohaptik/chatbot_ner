@@ -5,10 +5,15 @@ from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
 
 
 class LoadWordEmbeddings(object):
-
+    """
+    This method is used to load the word_embeddings into the memory
+    """
     __metaclass__ = Singleton
 
     def __init__(self):
+        """
+        This method is used to load the word_embeddings into the memory
+        """
         self.vocab, self.word_vectors = LoadWordEmbeddings.load_word_vectors_local()
 
     @staticmethod
