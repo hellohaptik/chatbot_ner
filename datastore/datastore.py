@@ -4,7 +4,7 @@ from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
                         ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX, ES_TRAINING_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException, TrainingIndexNotConfigured)
+                         EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 
 
 class DataStore(object):
@@ -418,7 +418,7 @@ class DataStore(object):
             results_dictionary(dict): Dictionary consisting of the training data for the the given entity.
 
         Raises:
-             TrainingIndexNotConfigured if es_training_index was not found in connection settings
+             IndexNotFoundException if es_training_index was not found in connection settings
 
         Example:
             db = Datastore()
@@ -447,7 +447,8 @@ class DataStore(object):
 
             es_training_index = self._connection_settings.get('es_training_index')
             if es_training_index is None:
-                raise TrainingIndexNotConfigured()
+                raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
+                                             'Please configure the same')
 
             request_timeout = self._connection_settings.get('request_timeout', 20)
             results_dictionary = elastic_search.query.training_data_query(connection=self._client_or_connection,
@@ -473,7 +474,7 @@ class DataStore(object):
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
         Raises:
-            TrainingIndexNotConfigured if es_training_index was not found in connection settings
+            IndexNotFoundException if es_training_index was not found in connection settings
         """
         if self._client_or_connection is None:
             self._connect()
@@ -483,7 +484,8 @@ class DataStore(object):
 
             es_training_index = self._connection_settings.get('es_training_index')
             if es_training_index is None:
-                raise TrainingIndexNotConfigured()
+                raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
+                                             'Please configure the same')
 
             elastic_search.populate.entity_training_data_update(connection=self._client_or_connection,
                                                                 index_name=es_training_index,

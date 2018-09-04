@@ -7,7 +7,7 @@ from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException
 from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
-    FetchIndexForAliasException, DeleteIndexFromAliasException, TrainingIndexNotConfigured
+    FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
     EXTERNAL_API_DATA, TEXT_LIST
@@ -144,7 +144,7 @@ def get_training_data(request):
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -183,7 +183,7 @@ def update_training_data(request):
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
