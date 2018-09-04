@@ -697,6 +697,76 @@ Following are the list of different entity types along with its API call:
         ]
       }
       ```
+### time with range
+
+- This functionality calls the TimeDetector class to detect time with range.
+
+- Example:
+
+  - Example 1:
+  
+    - Use the **timezone** parameter to pass your current timezone to time detection
+
+    - ```python
+      message = 'Set a drink water reminder for tomorrow from 7:00 AM to 6:00 PM'
+      entity_name = 'time_with_range'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      timezone = 'UTC'  
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_time_with_range
+      output = get_time_with_range(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
+      print output
+      ```
+
+    - CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/time_with_range/?message=Set+a+drink+water+reminder+for+tomorrow+from+7%3A00+AM+to+6%3A00+PM&entity_name=time_with_range&structured_value=&fallback_value=&bot_message=&timezone=UTC'
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "7:00 am to 6:00 pm", 
+            "entity_value": {
+               "mm": 0, 
+               "hh": 7, 
+               "range": "start", 
+               "nn": "am", 
+               "time_type": null
+            }, 
+            "language": "en"
+            }, 
+          {
+            "detection": "message",
+            "original_text": "7:00 am to 6:00 pm", 
+            "entity_value": {
+              "mm": 0, 
+              "hh": 6, 
+              "range": "end", 
+              "nn": "pm", 
+              "time_type": null
+            }, 
+            "language": "en"
+            }
+          ]
+      }
+      ```
 
 ### date
 
