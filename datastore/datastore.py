@@ -421,7 +421,9 @@ class DataStore(object):
              TrainingIndexNotConfigured if es_training_index was not found in connection settings
 
         Example:
-            {
+            db = Datastore()
+            db.get_entity_training_data(entity_name, **kwargs):
+            >> {
         'text_list': [
             'My name is hardik',
             'This is my friend Ajay'

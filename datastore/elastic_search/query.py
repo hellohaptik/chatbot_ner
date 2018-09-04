@@ -309,7 +309,8 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
         text_list and entity_list of the key
 
     Examples:
-                {
+        training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
+        >>{
         'text_list': [
             'My name is hardik',
             'This is my friend Ajay'
