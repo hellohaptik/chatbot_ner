@@ -138,7 +138,7 @@ def get_training_data(request):
     try:
         entity_name = request.GET.get(ENTITY_NAME)
         datastore_obj = DataStore()
-        result = datastore_obj.get_entity_training_data(entity_name=entity_name)
+        result = datastore_obj.get_crf_data_for_entity_name(entity_name=entity_name)
         response['result'] = result
         response['success'] = True
 
@@ -175,7 +175,7 @@ def update_training_data(request):
         text_list = external_api_data.get(TEXT_LIST)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
-        datastore_obj.update_entity_training_data(entity_name=entity_name,
+        datastore_obj.update_entity_crf_data(entity_name=entity_name,
                                                   entity_list=entity_list,
                                                   text_list=text_list,
                                                   language_script=language_script)

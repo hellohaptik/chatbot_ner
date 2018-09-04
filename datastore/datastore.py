@@ -406,7 +406,7 @@ class DataStore(object):
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
-    def get_entity_training_data(self, entity_name, **kwargs):
+    def get_crf_data_for_entity_name(self, entity_name, **kwargs):
         """
         This method is used to obtain the sentences and entities from sentences given entity name
         Args:
@@ -451,18 +451,18 @@ class DataStore(object):
                                              'Please configure the same')
 
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.training_data_query(connection=self._client_or_connection,
-                                                                          index_name=es_training_index,
-                                                                          doc_type=
-                                                                          self._connection_settings
-                                                                          [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
-                                                                          entity_name=entity_name,
-                                                                          request_timeout=request_timeout,
-                                                                          **kwargs)
+            results_dictionary = elastic_search.query.get_crf_data_for_entity_name(connection=self._client_or_connection,
+                                                                                   index_name=es_training_index,
+                                                                                   doc_type=
+                                                                                   self._connection_settings
+                                                                                   [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                                                   entity_name=entity_name,
+                                                                                   request_timeout=request_timeout,
+                                                                                   **kwargs)
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
-    def update_entity_training_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
+    def update_entity_crf_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
         """
         This method is used to populate the training data for a given entity
         Args:
