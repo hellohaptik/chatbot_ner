@@ -322,7 +322,7 @@ def add_training_data_elastic_search(connection, index_name, doc_type, entity_na
     for text, entities in zip(text_list, entity_list):
         query_dict = {'_index': index_name,
                       'entity_data': entity_name,
-                      'text': text,
+                      'sentence': text,
                       'entities': entities,
                       'language_script': language_script,
                       '_type': doc_type,

@@ -424,7 +424,7 @@ class DataStore(object):
             db = Datastore()
             db.get_entity_training_data(entity_name, **kwargs):
             >> {
-        'text_list': [
+        'sentence_list': [
             'My name is hardik',
             'This is my friend Ajay'
                         ],

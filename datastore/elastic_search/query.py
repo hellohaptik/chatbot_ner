@@ -311,7 +311,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     Examples:
         training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
         >>{
-        'text_list': [
+        'sentence_list': [
             'My name is hardik',
             'This is my friend Ajay'
                         ],
@@ -344,7 +344,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     results = search_results['hits']['hits']
 
     for result in results:
-        results_dictionary[SENTENCE_LIST].append(result['_source']['text'])
+        results_dictionary[SENTENCE_LIST].append(result['_source']['sentence'])
         results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
 
     return results_dictionary

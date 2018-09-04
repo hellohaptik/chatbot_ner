@@ -176,7 +176,7 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
                 "entity_data": {
                     "type": "text"
                 },
-                "text": {
+                "sentence": {
                     "enabled": "false"
                 },
                 "entities": {
