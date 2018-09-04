@@ -125,7 +125,7 @@ def transfer_entities(request):
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
-def get_training_data(request):
+def get_crf_training_data(request):
     """
     This function is used obtain the training data given the entity_name.
      Args:
@@ -158,7 +158,7 @@ def get_training_data(request):
 
 
 @csrf_exempt
-def update_training_data(request):
+def update_crf_training_data(request):
     """
     This function is used to update the training data
      Args:
