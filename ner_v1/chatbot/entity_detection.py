@@ -2,6 +2,7 @@ from ner_v1.constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE
                              FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
+from ner_v1.detectors.numeral.number.passenger_detection import PassengerDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
@@ -592,6 +593,46 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
     return size_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                  bot_message=bot_message)
+
+
+def get_passenger_count(message, entity_name, structured_value, fallback_value, bot_message):
+    """Use PassengerDetector to detect passenger_count
+
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
+                       detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                              or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
+
+
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'Can you please help me to book tickets for 3 people'
+        entity_name = 'no_of_adults'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_passenger_count(message=message, entity_name=entity_name, structured_value=structured_value,
+                                    fallback_value=fallback_value, bot_message=bot_message)
+        print output
+
+            >> [{'detection': 'message', 'entity_value': {'value': '3'}, 'language': 'en', 'original_text': '3'}]
+
+    """
+    passenger_detection = PassengerDetector(entity_name=entity_name)
+    passenger_detection.set_bot_message(bot_message=bot_message)
+    return passenger_detection.detect(message=message, structured_value=structured_value,
+                                      fallback_value=fallback_value, bot_message=bot_message)
 
 
 def get_number(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
