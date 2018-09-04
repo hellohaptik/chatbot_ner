@@ -124,7 +124,7 @@ class PassengerDetector(BaseDetector):
         original_list = []
         regex_adult = re.compile(r'((\w*\s*\w+)\s*(adult|people|passenger|log|person|ppl|'r'traveller))')
         patterns = regex_adult.findall(self.processed_text)
-        if len(patterns) == 0 and self.bot_message:
+        if not patterns and self.bot_message:
             adult_regex = re.compile(r'((number|no|no.|how many)\W*(of)?\W*(adult|passenger|people|person|ppl| '
                                      r'traveller))')
             if adult_regex.search(self.bot_message) is not None:
@@ -135,7 +135,7 @@ class PassengerDetector(BaseDetector):
                     if number_list:
                         no_of_adults.append(number_list[0])
                         original_list.append(original_number_list[0])
-        elif len(patterns):
+        elif patterns:
             for pattern in patterns:
                 number_list, original_number_list = self.number_detection.detect_entity(pattern[1].strip())
                 if number_list:
@@ -156,7 +156,7 @@ class PassengerDetector(BaseDetector):
         original_list = []
         regex_child = re.compile(r'((\w*\s*\w+)\s*(child|children|kid))')
         patterns = regex_child.findall(self.processed_text)
-        if len(patterns) == 0 and self.bot_message:
+        if not patterns and self.bot_message:
             child_regex = re.compile(r'((number|no|no.|how many)\W*(of)?\W*(child|children|kid))')
             if child_regex.search(self.bot_message) is not None:
                 patterns = re.findall(r'([\w]+)', self.processed_text)
@@ -165,7 +165,7 @@ class PassengerDetector(BaseDetector):
                     if number_list:
                         no_of_childs.append(number_list[0])
                         original_list.append(original_number_list[0])
-        elif len(patterns):
+        elif patterns:
             for pattern in patterns:
                 number_list, original_number_list = self.number_detection.detect_entity(pattern[1].strip())
                 if number_list:
@@ -186,7 +186,7 @@ class PassengerDetector(BaseDetector):
         original_list = []
         regex_infant = re.compile(r'((\w*\s*\w+)\s*(infant|bachcha))')
         patterns = regex_infant.findall(self.processed_text)
-        if len(patterns) == 0 and self.bot_message:
+        if not patterns and self.bot_message:
             infant_regex = re.compile(r'((number|no|no.|how many)\W*(of)?\W*(infant|baby))')
             if infant_regex.search(self.bot_message) is not None:
                 patterns = re.findall(r'([\w]+)', self.processed_text)
@@ -195,7 +195,7 @@ class PassengerDetector(BaseDetector):
                     if number_list:
                         no_of_infants.append(number_list[0])
                         original_list.append(original_number_list[0])
-        elif len(patterns):
+        elif patterns:
             for pattern in patterns:
                 number_list, original_number_list = self.number_detection.detect_entity(pattern[1].strip())
                 if number_list:
