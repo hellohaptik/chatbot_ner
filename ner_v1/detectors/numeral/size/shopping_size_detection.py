@@ -14,7 +14,7 @@ class ShoppingSizeDetector(BaseDetector):
 
     For Example:
 
-        size_detector = ShoppingSizeDetector("shopping_size")
+        size_detector = ShoppingSizeDetector("shopping_clothes_size")
         message = "Suggest me Medium size tshirt and jeans of 34 waist"
         size, original_numbers = size_detector.detect_entity(message)
         tagged_text = size_detector.tagged_text
