@@ -135,7 +135,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_phone_number
-      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -180,7 +180,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_phone_number
-      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
+      output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -538,7 +538,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -592,7 +592,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -630,6 +630,8 @@ Following are the list of different entity types along with its API call:
 - Example:
 
   - Example 1:
+  
+    - Use the **timezone** parameter to pass your current timezone to time detection
 
     - ```python
       message = "John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. \
@@ -638,13 +640,14 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = None
+      timezone = 'UTC'  
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_time
-      output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_time(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
       print output
       ```
 
@@ -656,7 +659,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC'
       ```
 
     - *CURL Output:*
@@ -871,7 +874,7 @@ Following are the list of different entity types along with its API call:
     - ```python
 
       message = "I want to buy Large shirt and jeans of 36 waist"
-      entity_name = 'shopping_size'
+      entity_name = 'shopping_clothes_size'
       structured_value = None
       fallback_value = None
       bot_message = None
@@ -893,7 +896,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=budget&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=shopping_clothes_size&structured_value=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -939,7 +942,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_person_name
-      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_person_name(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -987,7 +990,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_person_name
-      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_person_name(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
