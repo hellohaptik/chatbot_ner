@@ -578,7 +578,7 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
     Example:
 
         message = "I want to buy Large shirt and jeans of 36 waist"
-        entity_name = 'shopping_size'
+        entity_name = 'shopping_clothes_size'
         structured_value = None
         fallback_value = None
         bot_message = None
@@ -665,7 +665,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value = None
         bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                          fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
         print output
 
             >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
