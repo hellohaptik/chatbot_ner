@@ -697,7 +697,7 @@ Following are the list of different entity types along with its API call:
         ]
       }
       ```
-### time with range
+### time_with_range
 
 - This functionality calls the TimeDetector class to detect time with range.
 
@@ -751,7 +751,7 @@ Following are the list of different entity types along with its API call:
                "time_type": null
             }, 
             "language": "en"
-            }, 
+          }, 
           {
             "detection": "message",
             "original_text": "7:00 am to 6:00 pm", 
@@ -763,7 +763,7 @@ Following are the list of different entity types along with its API call:
               "time_type": null
             }, 
             "language": "en"
-            }
+          }
           ]
       }
       ```
@@ -991,6 +991,59 @@ Following are the list of different entity types along with its API call:
         ]
       }
       ```
+
+### passenger_count
+
+- This functionality calls the PassengerDetector class to detect passenger count.
+
+- Example:
+
+  - Example 1:
+
+    - ```python
+
+      message = 'Can you please help me to book tickets for 3 people'
+      entity_name = 'no_of_adults'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_passenger_count
+      output = get_passenger_count(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/passenger_count/?message=Can+you+please+help+me+to+book+tickets+for+3+people&entity_name=no_of_adults&structured_value=&fallback_value=&bot_message='
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "3", 
+            "entity_value": {
+              "value": "3"
+            }, 
+            "language": "en"
+          }
+        ]
+      }
+      ```      
 
 ### person_name
 
