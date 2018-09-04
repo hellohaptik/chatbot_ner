@@ -186,6 +186,20 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
                       entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'atm in andheri west'
+        entity_name = 'locality_list'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_location(message=message, entity_name=entity_name, structured_value=structured_value,
+                              fallback_value=fallback_value, bot_message=bot_message)
+        print output
+
+            >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
+                 'original_text': 'andheri west'}]
     """
 
     text_detection = TextDetector(entity_name=entity_name)
@@ -221,7 +235,7 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
         fallback_value = None
         bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '9049961794', 'entity_value': {'value': '9049961794'}}]
@@ -232,11 +246,11 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
         fallback_value = '9049961794'
         bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'fallback_value', 'original_text': '9049961794',
-            'entity_value': {'value': '9049961794'}}]
+                 'entity_value': {'value': '9049961794'}}]
 
 
     """
@@ -583,11 +597,11 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
         fallback_value = None
         bot_message = None
         output = get_shopping_size(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                   fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}}, 
-            {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
+                {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
 
     """
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
@@ -665,11 +679,11 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value = None
         bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
+                           fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
         print output
 
             >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
-            {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
+                {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
 
 
         message = "I want to reserve a table for 3 people"
@@ -678,7 +692,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value = None
         bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                           fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
         print output
 
             >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
@@ -723,8 +737,9 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
         structured_value = None
         fallback_value = None
         bot_message = None
+        timezone = 'UTC'
         output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                          fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
         print output
 
         >>  [{'detection': 'message', 'original_text': '12:30 pm', 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}},
@@ -758,6 +773,23 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
                       entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'Set a drink water reminder for tomorrow from 7:00 AM to 6:00 PM'
+        entity_name = 'time_with_range'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        timezone = 'UTC'
+        output = get_time_with_range(message=message, entity_name=entity_name, structured_value=structured_value,
+                                     fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
+        print output
+
+            >> [{'detection': 'message', 'original_text': '7:00 am to 6:00 pm', 'entity_value': {'mm': 0, 'hh': 7,
+                 'range': 'start', 'nn': 'am', 'time_type': None}, 'language': 'en'}, {'detection': 'message',
+                 'original_text': '7:00 am to 6:00 pm', 'entity_value': {'mm': 0, 'hh': 6, 'range': 'end', 'nn': 'pm',
+                 'time_type': None}, 'language': 'en'}]
 
     """
     form_check = True if structured_value else False
