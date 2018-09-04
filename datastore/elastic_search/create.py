@@ -108,16 +108,27 @@ def exists(connection, index_name):
 
 def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     """
-
+    Creates an Elasticsearch index needed for similarity based searching
     Args:
-        connection:
-        index_name:
-        doc_type:
-        logger:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents that will be indexed
+        logger: logging object to log at debug and exception level
         **kwargs:
+            master_timeout: Specify timeout for connection to master
+            timeout: Explicit operation timeout
+            update_all_types: Whether to update the mapping for all fields with the same name across all types or not
+            wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
+            doc_type: The name of the document type
+            allow_no_indices: Whether to ignore if a wildcard indices expression resolves into no concrete indices.
+                              (This includes _all string or when no indices have been specified)
+            expand_wildcards: Whether to expand wildcard expression to concrete indices that are open, closed or both.,
+                              default 'open', valid choices are: 'open', 'closed', 'none', 'all'
+            ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
+                                (missing or closed)
 
-    Returns:
-
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
     """
     mapping_body = {
         doc_type: {
@@ -136,16 +147,27 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
 
 def create_training_index(connection, index_name, doc_type, logger, **kwargs):
     """
-
+    This method is used to create an index with mapping suited for story training_data
     Args:
-        connection:
-        index_name:
-        doc_type:
-        logger:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents that will be indexed
+        logger: logging object to log at debug and exception level
         **kwargs:
+            master_timeout: Specify timeout for connection to master
+            timeout: Explicit operation timeout
+            update_all_types: Whether to update the mapping for all fields with the same name across all types or not
+            wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
+            doc_type: The name of the document type
+            allow_no_indices: Whether to ignore if a wildcard indices expression resolves into no concrete indices.
+                              (This includes _all string or when no indices have been specified)
+            expand_wildcards: Whether to expand wildcard expression to concrete indices that are open, closed or both.,
+                              default 'open', valid choices are: 'open', 'closed', 'none', 'all'
+            ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
+                                (missing or closed)
 
-    Returns:
-
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
     """
     mapping_body = {
         doc_type: {
@@ -170,6 +192,17 @@ def create_training_index(connection, index_name, doc_type, logger, **kwargs):
 
 
 def create_alias(connection, index_list, alias_name, logger, **kwargs):
+    """
+    This method is used to create alias for list of indices
+    Args:
+        connection:
+        index_list (list): List of indices the alias has to point to
+        alias_name (str): Name of the alias
+        logger: logging object to log at debug and exception level
+
+        **kwargs:
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
+    """
     logger.debug('Alias creation %s started %s' % alias_name)
     connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
     logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))

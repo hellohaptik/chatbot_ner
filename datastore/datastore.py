@@ -407,6 +407,37 @@ class DataStore(object):
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
     def get_entity_training_data(self, entity_name, **kwargs):
+        """
+        This method is used to obtain the training data for the entity given entity name
+        Args:
+            entity_name (str): Entity name for which training data needs to be obtained
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+        Returns:
+            results_dictionary(dict): Dictionary consisting of the training data for the the given entity.
+
+        Raises:
+             TrainingIndexNotConfigured if es_training_index was not found in connection settings
+
+        Example:
+            db = Datastore()
+            db.get_entity_training_data(entity_name, **kwargs):
+            >> {
+        'text_list': [
+            'My name is hardik',
+            'This is my friend Ajay'
+                        ],
+        'entity_list': [
+            [
+                'hardik'
+            ],
+            [
+                'Ajay'
+            ]
+                        ]
+            }
+        """
         ner_logger.debug('Datastore, get_entity_training_data, entity_name %s' % entity_name)
         if self._client_or_connection is None:
             self._connect()
@@ -431,14 +462,18 @@ class DataStore(object):
 
     def update_entity_training_data(self, entity_name, entity_list, language_script, text_list, **kwargs):
         """
-        This method is used to populate the the entity dictionary
+        This method is used to populate the training data for a given entity
         Args:
-            entity_name (str): Name of the dictionary that needs to be populated
-            entity_data (list): List of dicts consisting of value and variants
+            entity_name (str): Name of the entity for which the training data has to be populated
+            entity_list (list): List consisting of the entities corresponding to the text_list
+            text_list (list): List of sentences for training
             language_script (str): Language code for the language script used.
             **kwargs:
                 For Elasticsearch:
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+        Raises:
+            TrainingIndexNotConfigured if es_training_index was not found in connection settings
         """
         if self._client_or_connection is None:
             self._connect()

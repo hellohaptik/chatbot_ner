@@ -129,12 +129,12 @@ def transfer_entities(request):
 
 def get_training_data(request):
     """
-    This function is used obtain the entity dictionary given the dictionary name.
-    Args:
-        request (HttpResponse): HTTP response from url
+    This function is used obtain the training data given the entity_name.
+     Args:
+         request (HttpResponse): HTTP response from url
 
-    Returns:
-        HttpResponse : With data consisting of a list of value variants.
+     Returns:
+         HttpResponse : With data consisting of a dictionary consisting of text_list and entity_list
     """
     response = {"success": False, "error": "", "result": []}
     try:
@@ -162,12 +162,12 @@ def get_training_data(request):
 @csrf_exempt
 def update_training_data(request):
     """
-    This function is used to update the dictionary entities.
-    Args:
-        request (HttpResponse): HTTP response from url
+    This function is used to update the training data
+     Args:
+         request (HttpResponse): HTTP response from url
 
-    Returns:
-        HttpResponse : HttpResponse with appropriate status and error message.
+     Returns:
+         HttpResponse : HttpResponse with appropriate status and error message.
     """
     response = {"success": False, "error": ""}
     try:
