@@ -2,7 +2,7 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE, ES_TRAINING_INDEX, ES_TRAINING_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 
@@ -342,7 +342,7 @@ class DataStore(object):
         Raises:
              DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
         """
-        if ES_TRAINING_DOC_TYPE not in self._connection_settings:
+        if ELASTICSEARCH_CRF_DATA_DOC_TYPE not in self._connection_settings:
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch training data needs doc_type. Please configure '
                 'ES_TRAINING_DATA_DOC_TYPE in your environment')
@@ -445,7 +445,7 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_training_data_elasticsearch()
 
-            es_training_index = self._connection_settings.get('es_training_index')
+            es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
             if es_training_index is None:
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
@@ -454,7 +454,8 @@ class DataStore(object):
             results_dictionary = elastic_search.query.training_data_query(connection=self._client_or_connection,
                                                                           index_name=es_training_index,
                                                                           doc_type=
-                                                                          self._connection_settings[ES_TRAINING_DOC_TYPE],
+                                                                          self._connection_settings
+                                                                          [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                                                                           entity_name=entity_name,
                                                                           request_timeout=request_timeout,
                                                                           **kwargs)
@@ -482,14 +483,15 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_training_data_elasticsearch()
 
-            es_training_index = self._connection_settings.get('es_training_index')
+            es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
             if es_training_index is None:
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
 
             elastic_search.populate.entity_training_data_update(connection=self._client_or_connection,
                                                                 index_name=es_training_index,
-                                                                doc_type=self._connection_settings[ES_TRAINING_DOC_TYPE],
+                                                                doc_type=self._connection_settings
+                                                                [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                                                                 logger=ner_logger,
                                                                 entity_list=entity_list,
                                                                 text_list=text_list,
