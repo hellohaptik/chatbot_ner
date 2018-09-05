@@ -133,6 +133,11 @@ def get_crf_training_data(request):
 
      Returns:
          HttpResponse : With data consisting of a dictionary consisting of sentence_list and entity_list
+
+     Examples:
+         get request params
+         key: "entity_name"
+         value: "city"
     """
     response = {"success": False, "error": "", "result": []}
     try:
@@ -163,9 +168,13 @@ def update_crf_training_data(request):
     This function is used to update the training data
      Args:
          request (HttpResponse): HTTP response from url
-
      Returns:
          HttpResponse : HttpResponse with appropriate status and error message.
+    Example for data present in
+    Post request body
+    key: "external_api_data"
+    value: {"sentence_list":["hello pratik","hello hardik"], "entity_list":[["pratik"], ["hardik"]],
+    "entity_name":"training_try3", "language_script": "en"}
     """
     response = {"success": False, "error": ""}
     try:
