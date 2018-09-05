@@ -199,9 +199,8 @@ class BudgetDetector(BaseDetector):
             original_list = []
         patterns = re.findall(
             r'(\s(above|more? than|more?|greater than|greater|abv|abov|more? den|\>\s*\=?)\s+'
-            r'(rs.|rs|rupees|rupee)*\s*([\d.,]{' + str(self.min_digit) + ',' + str(self.max_digit) +
-            '}\s*[klmct]?[a-z]*|[\d.,]{1,' + str(self.max_digit - 3) +
-            '}\s*[klmct]?[a-z]*)\s*(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
+            r'(rs.|rs|rupees|rupee)*\s*([\d.,]+\s*[klmct]?[a-z]*|[\d.,]+\s*[klmct]?[a-z]*)\s*'
+            r'(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
             budget = {
@@ -212,13 +211,16 @@ class BudgetDetector(BaseDetector):
 
             if any([unit in pattern[3] for unit in self.unit_present_list]):
                 replace_comma = re.sub(',', '', pattern[3])
-                budget['min_budget'] = int(self.regex_object.unit_substitute(replace_comma))
+                amount = int(self.regex_object.unit_substitute(replace_comma))
             else:
                 replace_comma = re.sub(',', '', pattern[3])
-                budget['min_budget'] = int(replace_comma)
+                amount = int(replace_comma)
 
-            budget_list.append(budget)
-            original_list.append(original)
+            if self.min_digit <= len(str(amount)) <= self.max_digit:
+                budget['min_budget'] = amount
+                budget_list.append(budget)
+                original_list.append(original)
+
         return budget_list, original_list
 
     def _detect_max_budget(self, budget_list=None, original_list=None):
@@ -241,10 +243,9 @@ class BudgetDetector(BaseDetector):
             original_list = []
 
         patterns = re.findall(
-            r'(\s(max|upto|o?nly|around|below|less than|less|less den|\<\s*\=?)\s+(rs.|rs|rupees|rupee)?\s*([\d.,]{' +
-            str(self.min_digit) + ',' + str(self.max_digit) +
-            '}\s*[klmct]?[a-z]*|[\d.,]{1,' + str(self.max_digit - 3) +
-            '}\s*[klmct]?[a-z]*)\s*(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
+            r'(\s(max|upto|o?nly|around|below|less than|less|less den|\<\s*\=?)\s+(rs.|rs|rupees|rupee)'
+            r'?\s*([\d.,]+\s*[klmct]?[a-z]*|[\d.,]+\s*[klmct]?[a-z]*)\s*(rs.|rs|rupees|rupee|\.)?\s)',
+            self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
 
@@ -256,13 +257,16 @@ class BudgetDetector(BaseDetector):
 
             if any([unit in pattern[3] for unit in self.unit_present_list]):
                 comma_removed_unit_text = pattern[3].replace(',', '')
-                budget['max_budget'] = int(self.regex_object.unit_substitute(comma_removed_unit_text))
+                amount = int(self.regex_object.unit_substitute(comma_removed_unit_text))
             else:
                 comma_removed_number = pattern[3].replace(',', '')
-                budget['max_budget'] = int(comma_removed_number)
+                amount = int(comma_removed_number)
 
-            budget_list.append(budget)
-            original_list.append(original)
+            if self.min_digit <= len(str(amount)) <= self.max_digit:
+                budget['max_budget'] = amount
+                budget_list.append(budget)
+                original_list.append(original)
+
         return budget_list, original_list
 
     def _detect_min_max_budget(self, budget_list=None, original_list=None):
@@ -283,11 +287,9 @@ class BudgetDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        patterns = re.findall(r'(\s(([\d,.]{1,' + str(self.max_digit - 3) + '}\s*[klmct]?[a-z]*)|([\d,.]{' +
-                              str(self.min_digit) + ',' + str(self.max_digit) +
-                              '}\s*[klmct]?[a-z]*))\s*(\-|to|and)\s*(([\d,.]{1,' + str(self.max_digit - 3) +
-                              '}\s*[klmct]?[a-z]*)|([\d,.]{' + str(self.min_digit) + ',' +
-                              str(self.max_digit) + '}\s*[klmct]?[a-z]*))\.?\s)', self.processed_text.lower())
+        patterns = re.findall(r'(\s(([\d,.]+\s*[klmct]?[a-z]*)|([\d,.]+\s*[klmct]?[a-z]*))\s*(\-|to|and)\s*'
+                              r'(([\d,.]+\s*[klmct]?[a-z]*)|([\d,.]+\s*[klmct]?[a-z]*))\.?\s)',
+                              self.processed_text.lower())
         for pattern in patterns:
             original = None
             pattern = list(pattern)
