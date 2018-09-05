@@ -320,22 +320,41 @@ class BudgetDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        patterns = re.findall(
-            r'\s((rs.|rs|rupees|rupee)?\s?(\d{' + str(self.min_digit) + ',' + str(self.max_digit) + '}|\d{1,' + str(
-                self.max_digit - 3) + '}\s*k)\s?(rs.|rs|rupees|rupee)?\.?)\s', self.processed_text.lower())
-        for pattern in patterns:
-            original = pattern[0].strip()
+        text = self.processed_text.lower().strip()
+
+        units_patterns = [r'k|hazaa?r|haja?ar|thousand', r'l|lacs?|lakh?|lakhs?',
+                          r'm|million|mill?', r'cro?|cror?|crore?|crores?']
+        units_order = [1e3, 1e5, 1e6, 1e7]
+        full = re.compile(r'((rs.|rs|rupees|rupee)?\s*((\d+((\,|\.)\d+)+)|(0|[1-9]\d*)?(\.\d+)?(?<=\d))'
+                          r'\s*(' + r'|'.join(units_patterns) + r')?\s*(rs.|rs|rupees|rupee)?)\b')
+        units_patterns = map(lambda s: '^' + s, units_patterns)
+        units_patterns = map(re.compile, units_patterns)
+        matches = full.findall(text)
+        for match in matches:
+            original = match[0].strip()
             budget = {
                 'min_budget': 0,
                 'max_budget': 0,
                 'type': BUDGET_TYPE_NORMAL
             }
-            if 'k' in pattern[2]:
-                budget['max_budget'] = int(self.regex_object.text_substitute(pattern[2]))
-            else:
-                budget['max_budget'] = int(pattern[2])
-            budget_list.append(budget)
-            original_list.append(original)
+            amount, unit = match[2], match[-2]
+            if not amount:
+                continue
+            amount = amount.replace(',', '')
+            _amount = amount.split('.')
+            if len(_amount) > 1:
+                amount = ''.join(_amount[:-1]) + '.' + _amount[-1]
+            amount = float(amount)
+            for i, pattern in enumerate(units_patterns):
+                if pattern.findall(unit):
+                    amount = int(amount * units_order[i])
+                    break
+            amount = int(amount)
+            if self.min_digit <= len(str(amount)) <= self.max_digit:
+                budget['max_budget'] = amount
+                budget_list.append(budget)
+                original_list.append(original)
+
         return budget_list, original_list
 
     def _detect_text_budget(self, budget_list=None, original_list=None):
