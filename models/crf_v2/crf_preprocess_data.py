@@ -328,6 +328,6 @@ class CrfPreprocessData(object):
             for token_tuple in tuple_text:
                 words_list.append(token_tuple[0])
 
-        word_vectors = LoadWordEmbeddings.load_word_vectors_remote(text_list=wordsList)
+        word_vectors = LoadWordEmbeddings.load_word_vectors_remote(text_list=words_list)
 
         return words_list, word_vectors
