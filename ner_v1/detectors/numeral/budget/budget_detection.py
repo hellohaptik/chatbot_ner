@@ -1,6 +1,6 @@
 import re
 
-from ner_v1.detectors.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
+from ner_v1.detectors.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT
 from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.base_detector import BaseDetector
@@ -101,11 +101,24 @@ class BudgetDetector(BaseDetector):
         self.processed_text = ''
         self.budget = []
         self.original_budget_text = []
-
-        regex_for_thousand = [(r'(\d+)k', r'\g<1>000')]
-        self.regex_object = RegexReplace(regex_for_thousand)
+        self.unit_present_list = ['k', 'l', 'm', 'c', 'h', 'th']
+        regx_for_units = [(r'([\d,.]+)\s*k', 1000),
+                          (r'([\d,.]+)\s*h', 1000),
+                          (r'([\d,.]+)\s*th', 1000),
+                          (r'([\d,.]+)\s*l', 100000),
+                          (r'([\d,.]+)\s*lacs?', 100000),
+                          (r'([\d,.]+)\s*lakh?', 100000),
+                          (r'([\d,.]+)\s*lakhs?', 100000),
+                          (r'([\d,.]+)\s*m', 1000000),
+                          (r'([\d,.]+)\s*million', 1000000),
+                          (r'([\d,.]+)\s*mill?', 1000000),
+                          (r'([\d,.]+)\s*c', 10000000),
+                          (r'([\d,.]+)\s*cro?', 10000000),
+                          (r'([\d,.]+)\s*crore?', 10000000),
+                          (r'([\d,.]+)\s*crores?', 10000000)]
+        self.regex_object = RegexReplace(regx_for_units)
         self.tag = '__' + self.entity_name + '__'
-        self.text_detection_object = TextDetector(entity_name=ES_BUDGET_LIST)
+        self.text_detection_object = TextDetector(entity_name=entity_name)
 
     def detect_entity(self, text):
         """Detects budget in the text string
@@ -160,8 +173,9 @@ class BudgetDetector(BaseDetector):
         self._update_processed_text(original_list)
         budget_list, original_list = self._detect_any_budget(budget_list, original_list)
         self._update_processed_text(original_list)
-        budget_list, original_list = self._detect_text_budget(budget_list, original_list)
-        self._update_processed_text(original_list)
+        if not budget_list:
+            budget_list, original_list = self._detect_text_budget(budget_list, original_list)
+            self._update_processed_text(original_list)
 
         return budget_list, original_list
 
@@ -183,10 +197,11 @@ class BudgetDetector(BaseDetector):
             budget_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'(\s(above|more? than|more?|greater than|greater|abv|abov|more? den|\>\s*\=?)\s+'
-                              r'(rs.|rs|rupees|rupee)*\s*(\d{' + str(self.min_digit) + ',' + str(self.max_digit) + 
-                              '}|\d{1,' + str(self.max_digit - 3) + '}\s*k)\s*(rs.|rs|rupees|rupee|\.)?\s)', 
-                              self.processed_text.lower())
+        patterns = re.findall(
+            r'(\s(above|more? than|more?|greater than|greater|abv|abov|more? den|\>\s*\=?)\s+'
+            r'(rs.|rs|rupees|rupee)*\s*([\d.,]{' + str(self.min_digit) + ',' + str(self.max_digit) +
+            '}\s*[klmct]?[a-z]*|[\d.,]{1,' + str(self.max_digit - 3) +
+            '}\s*[klmct]?[a-z]*)\s*(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
             budget = {
@@ -195,10 +210,12 @@ class BudgetDetector(BaseDetector):
                 'type': BUDGET_TYPE_NORMAL
             }
 
-            if 'k' in pattern[3]:
-                budget['min_budget'] = int(self.regex_object.text_substitute(pattern[3]))
+            if any([unit in pattern[3] for unit in self.unit_present_list]):
+                replace_comma = re.sub(',', '', pattern[3])
+                budget['min_budget'] = int(self.regex_object.unit_substitute(replace_comma))
             else:
-                budget['min_budget'] = int(pattern[3])
+                replace_comma = re.sub(',', '', pattern[3])
+                budget['min_budget'] = int(replace_comma)
 
             budget_list.append(budget)
             original_list.append(original)
@@ -224,9 +241,10 @@ class BudgetDetector(BaseDetector):
             original_list = []
 
         patterns = re.findall(
-            r'(\s(max|upto|o?nly|around|below|less than|less|less den|\<\s*\=?)\s+(rs.|rs|rupees|rupee)?\s*(\d{' + str(
-                self.min_digit) + ',' + str(self.max_digit) + '}|\d{1,' + str(
-                self.max_digit - 3) + '}\s*k)\s*(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
+            r'(\s(max|upto|o?nly|around|below|less than|less|less den|\<\s*\=?)\s+(rs.|rs|rupees|rupee)?\s*([\d.,]{' +
+            str(self.min_digit) + ',' + str(self.max_digit) +
+            '}\s*[klmct]?[a-z]*|[\d.,]{1,' + str(self.max_digit - 3) +
+            '}\s*[klmct]?[a-z]*)\s*(rs.|rs|rupees|rupee|\.)?\s)', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
 
@@ -236,10 +254,12 @@ class BudgetDetector(BaseDetector):
                 'type': BUDGET_TYPE_NORMAL
             }
 
-            if 'k' in pattern[3]:
-                budget['max_budget'] = int(self.regex_object.text_substitute(pattern[3]))
+            if any([unit in pattern[3] for unit in self.unit_present_list]):
+                comma_removed_unit_text = pattern[3].replace(',', '')
+                budget['max_budget'] = int(self.regex_object.unit_substitute(comma_removed_unit_text))
             else:
-                budget['max_budget'] = int(pattern[3])
+                comma_removed_number = pattern[3].replace(',', '')
+                budget['max_budget'] = int(comma_removed_number)
 
             budget_list.append(budget)
             original_list.append(original)
@@ -263,10 +283,11 @@ class BudgetDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        patterns = re.findall(
-            r'(\s((\d{1,' + str(self.max_digit - 3) + '}\s*k?)|(\d{' + str(self.min_digit) + ',' + str(
-                self.max_digit) + '}))\s*(\-|to|and)\s*((\d{1,' + str(self.max_digit - 3) + '}\s*k?)|(\d{' + str(
-                self.min_digit) + ',' + str(self.max_digit) + '}))\.?\s)', self.processed_text.lower())
+        patterns = re.findall(r'(\s(([\d,.]{1,' + str(self.max_digit - 3) + '}\s*[klmct]?[a-z]*)|([\d,.]{' +
+                              str(self.min_digit) + ',' + str(self.max_digit) +
+                              '}\s*[klmct]?[a-z]*))\s*(\-|to|and)\s*(([\d,.]{1,' + str(self.max_digit - 3) +
+                              '}\s*[klmct]?[a-z]*)|([\d,.]{' + str(self.min_digit) + ',' +
+                              str(self.max_digit) + '}\s*[klmct]?[a-z]*))\.?\s)', self.processed_text.lower())
         for pattern in patterns:
             original = None
             pattern = list(pattern)
@@ -278,20 +299,37 @@ class BudgetDetector(BaseDetector):
 
             flag_contains_k = False
             max_budget = 0
-            if pattern[6]:
-                flag_contains_k = True if 'k' in pattern[6] else False
-                max_budget = int(self.regex_object.text_substitute(pattern[6]))
-            elif pattern[7]:
-                max_budget = int(pattern[7])
             min_budget = 0
+            _min_budget = 0
+            if pattern[6]:
+                if any([unit in pattern[6] for unit in self.unit_present_list]):
+                    flag_contains_k = True
+                else:
+                    flag_contains_k = False
+                comma_removed_unit_text = pattern[6].replace(',', '')
+                max_budget = int(self.regex_object.unit_substitute(comma_removed_unit_text))
+            elif pattern[7]:
+                comma_removed_number = pattern[7].replace(',', '')
+                max_budget = int(comma_removed_number)
+                min_budget = 0
+
             if pattern[2]:
-                if flag_contains_k and 'k' not in pattern[2]:
-                    pattern[2] = str(pattern[2]).strip() + 'k'
-                min_budget = int(self.regex_object.text_substitute(pattern[2]))
+                _comma_removed_unit_text = pattern[2].replace(',', '')
+                _min_budget = int(self.regex_object.unit_substitute(_comma_removed_unit_text))
+                if flag_contains_k:
+                    for u in self.unit_present_list:
+                        if u in pattern[6]:
+                            pattern[2] = str(pattern[2]).strip() + u
+                            break
+                comma_removed_unit_text = pattern[2].replace(',', '')
+                min_budget = int(self.regex_object.unit_substitute(comma_removed_unit_text))
             elif pattern[3]:
-                min_budget = int(pattern[3])
-            min_budget = min_budget if self.min_digit <= min_budget.__str__().__len__() <= self.max_digit else 0
-            max_budget = max_budget if self.min_digit <= max_budget.__str__().__len__() <= self.max_digit else 0
+                comma_removed_number = pattern[3].replace(',', '')
+                min_budget = int(comma_removed_number)
+            if min_budget > max_budget:
+                min_budget = _min_budget
+            min_budget = min_budget if self.min_digit <= len(str(min_budget)) <= self.max_digit else 0
+            max_budget = max_budget if self.min_digit <= len(str(max_budget)) <= self.max_digit else 0
             if min_budget != 0 and max_budget != 0 and min_budget <= max_budget:
                 original = pattern[0].strip()
                 budget['min_budget'] = min_budget
@@ -384,8 +422,7 @@ class BudgetDetector(BaseDetector):
 
             budget_list.append(budget)
             count += 1
-        if original_text_list:
-            original_list.extend(original_text_list)
+
         return budget_list, original_list
 
     def _update_processed_text(self, original_budget_strings):
