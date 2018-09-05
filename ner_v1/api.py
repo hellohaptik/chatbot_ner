@@ -352,7 +352,7 @@ def time_with_range(request):
                                             parameters_dict[PARAMETER_TIMEZONE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception as e:
-        ner_logger.exception('Exception for time: %s ' % e)
+        ner_logger.exception('Exception for time_with_range: %s ' % e)
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
