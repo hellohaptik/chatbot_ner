@@ -881,7 +881,7 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_budget(message, entity_name, structured_value, fallback_value, bot_message):
+def get_budget(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
     """Use BudgetDetector to detect budget
 
     Args:
@@ -895,6 +895,8 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        min_digit (str): min digit
+        max_digit (str): max digit
 
 
     Returns:
@@ -918,6 +920,10 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
 
     """
     budget_detection = BudgetDetector(entity_name=entity_name)
+    if min_digit and max_digit:
+        min_digit = int(min_digit)
+        max_digit = int(max_digit)
+        budget_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
     return budget_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                    bot_message=bot_message)
 
