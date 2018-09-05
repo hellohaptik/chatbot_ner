@@ -61,7 +61,7 @@ class RegexReplace(object):
             if d:
                 try:
                     processed_text = str(int(float(d[0]) * self.pattern_list[count][1]))
-                except Exception:
+                except (IndexError, ValueError):
                     pass
             count += 1
         return processed_text
