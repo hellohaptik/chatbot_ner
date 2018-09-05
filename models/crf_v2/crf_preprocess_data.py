@@ -299,12 +299,14 @@ class CrfPreprocessData(object):
         ner_logger.debug('pos_tag Completed')
 
         ner_logger.debug('LoadWordEmbeddings Started')
-        word_embeddings = LoadWordEmbeddings()
+#        word_embeddings = LoadWordEmbeddings()
         ner_logger.debug('LoadingWordEmbeddings Completed')
-        vocab = word_embeddings.vocab
-        word_vectors = word_embeddings.word_vectors
+#        vocab = word_embeddings.vocab
+#        word_vectors = word_embeddings.word_vectors
+        vocab, word_vectors = CrfPreprocessData.remote_word_embeddings(processed_text_pos_tag)
 
         ner_logger.debug('Loading Word Embeddings Started')
+
         pre_processed_data = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                                 word_vectors=word_vectors)
                               for each in processed_text_pos_tag]
@@ -318,3 +320,14 @@ class CrfPreprocessData(object):
         labels = [CrfPreprocessData.get_labels(doc) for doc in pre_processed_data]
         ner_logger.debug('CrfPreprocessData.get_labels Completed')
         return features, labels
+
+    @staticmethod
+    def remote_word_embeddings(processed_text_pos_tag):
+        words_list = []
+        for tuple_text in processed_text_pos_tag:
+            for token_tuple in tuple_text:
+                words_list.append(token_tuple[0])
+
+        word_vectors = LoadWordEmbeddings.load_word_vectors_remote(text_list=wordsList)
+
+        return words_list, word_vectors

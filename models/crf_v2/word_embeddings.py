@@ -2,6 +2,8 @@ import numpy as np
 from lib.singleton import Singleton
 import pickle
 from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
+import requests
+import json
 
 
 class LoadWordEmbeddings(object):
@@ -29,3 +31,13 @@ class LoadWordEmbeddings(object):
         file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
         word_vectors = np.array(pickle.load(file_handler))
         return vocab, word_vectors
+
+    @staticmethod
+    def load_word_vectors_remote(text_list):
+        url = ''
+        json_dict = {'text_list': text_list}
+        word_vectors = json.loads(requests.get(url=url, json=json_dict, timeout=120).text)
+        result = word_vectors['text_list']
+        if result:
+            word_vectors = np.array(result[0])
+        return word_vectors
