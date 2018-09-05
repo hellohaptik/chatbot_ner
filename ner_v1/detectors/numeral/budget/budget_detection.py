@@ -3,9 +3,11 @@ import re
 from ner_v1.detectors.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT, ES_BUDGET_LIST
 from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
-class BudgetDetector(object):
+class BudgetDetector(BaseDetector):
     """Detects budget from the text  and tags them.
 
     Detects the budget from the text and replaces them by entity_name.
@@ -79,12 +81,16 @@ class BudgetDetector(object):
 
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """Initializes a BudgetDetector object
 
         Args:
             entity_name: A string by which the detected budget would be replaced with on calling detect_entity()
         """
+
+        # assigning values to superclass attributes
+        self._supported_languages = [ENGLISH_LANG]
+        super(BudgetDetector, self).__init__(source_language_script, translation_enabled)
 
         self.min_digit = 2
         self.max_digit = 5
@@ -126,6 +132,10 @@ class BudgetDetector(object):
         self.budget = budget_data[0]
         self.original_budget_text = budget_data[1]
         return budget_data
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def _detect_budget(self):
         """Detects budget in the self.text
