@@ -35,6 +35,7 @@ API_NAME = 'api_name'
 AM_MERIDIEM = 'am'
 PM_MERIDIEM = 'pm'
 TWELVE_HOUR = 12
+EVERY_TIME_TYPE = 'ev'
 
 # WEEK DETECTION
 WEEKDAYS = 'weekdays'
