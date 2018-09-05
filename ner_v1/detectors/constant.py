@@ -26,7 +26,6 @@ TYPE_POSSIBLE_DAY = 'possible_day'
 
 BUDGET_TYPE_NORMAL = 'normal_budget'
 BUDGET_TYPE_TEXT = 'text_budget'
-ES_BUDGET_LIST = 'budget'
 
 # CAROUSEL DETECTION
 API_NAME = 'api_name'
