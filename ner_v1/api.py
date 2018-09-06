@@ -352,7 +352,7 @@ def time_with_range(request):
                                             parameters_dict[PARAMETER_TIMEZONE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except Exception as e:
-        ner_logger.exception('Exception for time: %s ' % e)
+        ner_logger.exception('Exception for time_with_range: %s ' % e)
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
@@ -394,7 +394,9 @@ def budget(request):
         entity_output = get_budget(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                   parameters_dict[PARAMETER_BOT_MESSAGE])
+                                   parameters_dict[PARAMETER_BOT_MESSAGE],
+                                   parameters_dict[PARAMETER_MIN_DIGITS],
+                                   parameters_dict[PARAMETER_MAX_DIGITS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for budget: %s ' % e)
