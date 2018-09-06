@@ -37,7 +37,7 @@ class LoadWordEmbeddings(object):
         url = ''
         json_dict = {'text_list': [text_list]}
         result = json.loads(requests.get(url=url, json=json_dict, timeout=120).text)
-        word_vectors = result['text_list']
+        word_vectors = result['word_embeddings_list']
         if word_vectors:
             word_vectors = np.vstack(word_vectors)
         return word_vectors
