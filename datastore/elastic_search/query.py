@@ -3,7 +3,7 @@ import re
 import collections
 from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
-
+from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 log_prefix = 'datastore.elastic_search.query'
 
 
@@ -292,9 +292,9 @@ def _parse_es_search_results(results):
     return variants_to_values
 
 
-def training_data_query(connection, index_name, doc_type, entity_name, **kwargs):
+def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):
     """
-    Get all text_list and entity_list for a entity stored in the index
+    Get all sentence_list and entity_list for a entity stored in the index
 
     Args:
         connection: Elasticsearch client object
@@ -306,12 +306,12 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
 
     Returns:
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
-        text_list and entity_list of the key
+        sentence_list and entity_list of the key
 
     Examples:
         training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
         >>{
-        'text_list': [
+        'sentence_list': [
             'My name is hardik',
             'This is my friend Ajay'
                         ],
@@ -326,7 +326,7 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
             }
 
     """
-    results_dictionary = {'text_list': [], 'entity_list': []}
+    results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
     data = {
         'query': {
             'term': {
@@ -344,7 +344,7 @@ def training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
     results = search_results['hits']['hits']
 
     for result in results:
-        results_dictionary['text_list'].append(result['_source']['text'])
-        results_dictionary['entity_list'].append(result['_source']['entities'])
+        results_dictionary[SENTENCE_LIST].append(result['_source']['sentence'])
+        results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
 
     return results_dictionary

@@ -7,10 +7,11 @@ from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException
 from datastore.exceptions import IndexNotFoundException, InvalidESURLException, \
     SourceDestinationSimilarException, \
     InternalBackupException, AliasNotFoundException, PointIndexToAliasException, \
-    FetchIndexForAliasException, DeleteIndexFromAliasException, TrainingIndexNotConfigured
+    FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, TEXT_LIST, CLOUD_STORAGE, ES_CONFIG
+EXTERNAL_API_DATA, SENTENCE_LIST, CLOUD_STORAGE, ES_CONFIG
+
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
 from models.crf_v2.transfer_model import TransferCrfModel
@@ -104,7 +105,7 @@ def transfer_entities(request):
     """
     response = {"success": False, "error": ""}
     try:
-        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        external_api_data = json.loads(request.POST.get(SENTENCE_LIST))
         entity_list = external_api_data.get(ENTITY_LIST)
 
         datastore_object = DataStore()
@@ -127,26 +128,31 @@ def transfer_entities(request):
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
-def get_training_data(request):
+def get_crf_training_data(request):
     """
     This function is used obtain the training data given the entity_name.
      Args:
          request (HttpResponse): HTTP response from url
 
      Returns:
-         HttpResponse : With data consisting of a dictionary consisting of text_list and entity_list
+         HttpResponse : With data consisting of a dictionary consisting of sentence_list and entity_list
+
+     Examples:
+         get request params
+         key: "entity_name"
+         value: "city"
     """
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
         datastore_obj = DataStore()
-        result = datastore_obj.get_entity_training_data(entity_name=entity_name)
+        result = datastore_obj.get_crf_data_for_entity_name(entity_name=entity_name)
         response['result'] = result
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -160,32 +166,36 @@ def get_training_data(request):
 
 
 @csrf_exempt
-def update_training_data(request):
+def update_crf_training_data(request):
     """
     This function is used to update the training data
      Args:
          request (HttpResponse): HTTP response from url
-
      Returns:
          HttpResponse : HttpResponse with appropriate status and error message.
+    Example for data present in
+    Post request body
+    key: "external_api_data"
+    value: {"sentence_list":["hello pratik","hello hardik"], "entity_list":[["pratik"], ["hardik"]],
+    "entity_name":"training_try3", "language_script": "en"}
     """
     response = {"success": False, "error": ""}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
         entity_list = external_api_data.get(ENTITY_LIST)
-        text_list = external_api_data.get(TEXT_LIST)
+        sentence_list = external_api_data.get(SENTENCE_LIST)
         language_script = external_api_data.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
-        datastore_obj.update_entity_training_data(entity_name=entity_name,
-                                                  entity_list=entity_list,
-                                                  text_list=text_list,
-                                                  language_script=language_script)
+        datastore_obj.update_entity_crf_data(entity_name=entity_name,
+                                             entity_list=entity_list,
+                                             sentence_list=sentence_list,
+                                             language_script=language_script)
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,
             EngineNotImplementedException,
-            EngineConnectionException, FetchIndexForAliasException, TrainingIndexNotConfigured) as error_message:
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
         response['error'] = str(error_message)
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -217,7 +227,7 @@ def train_crf_model(request):
         if es_config:
             crf_model.train_model_from_es_data(cloud_storage=cloud_storage)
         else:
-            text_list = external_api_data.get(TEXT_LIST)
+            text_list = external_api_data.get(SENTENCE_LIST)
             entity_list = external_api_data.get(ENTITY_LIST)
             crf_model.train_model(text_list=text_list, entity_list=entity_list, cloud_storage=cloud_storage)
         response['success'] = True

@@ -1,7 +1,7 @@
 import pycrfsuite
 from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION, MODELS_PATH
 from datastore.datastore import DataStore
-from .constants import TEXT_LIST, ENTITY_LIST
+from .constants import SENTENCE_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
 from lib.redis_utils import set_cache_ml
@@ -107,9 +107,9 @@ class CrfTrain(object):
         """
         datastore_object = DataStore()
         ner_logger.debug('Fetch of data from ES for ENTITY: %s started' % self.entity_name)
-        result = datastore_object.get_entity_training_data(entity_name=self.entity_name)
+        result = datastore_object.get_crf_data_for_entity_name(entity_name=self.entity_name)
 
-        text_list = result.get(TEXT_LIST, [])
+        text_list = result.get(SENTENCE_LIST, [])
         entity_list = result.get(ENTITY_LIST, [])
 
         if not text_list:

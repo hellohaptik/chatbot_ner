@@ -13,5 +13,5 @@ ENGINE = 'engine'
 ELASTICSEARCH_INDEX_NAME = 'name'
 ELASTICSEARCH_DOC_TYPE = 'doc_type'
 ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR, ELASTICSEARCH_VERSION_OTHER = elasticsearch.VERSION
-ES_TRAINING_INDEX = 'es_training_index'
-ES_TRAINING_DOC_TYPE = 'es_training_doc_type'
+ELASTICSEARCH_CRF_DATA_INDEX_NAME = 'elasticsearch_crf_data_index_name'
+ELASTICSEARCH_CRF_DATA_DOC_TYPE = 'elasticsearch_crf_data_doc_type'

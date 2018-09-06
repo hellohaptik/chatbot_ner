@@ -77,11 +77,9 @@ DESTINATION_URL = (DESTINATION_ES_SCHEME + "://" +
                    DESTINATION_PORT)
 ES_ALIAS = os.environ.get('ES_ALIAS')
 ES_SCHEME = os.environ.get('ES_SCHEME')
+ELASTICSEARCH_CRF_DATA_INDEX_NAME = os.environ.get('ELASTICSEARCH_CRF_DATA_INDEX_NAME')
+ELASTICSEARCH_CRF_DATA_DOC_TYPE = os.environ.get('ELASTICSEARCH_CRF_DATA_DOC_TYPE')
 
-
-# Crf Model Specific with additional ES capability (optional)
-ES_TRAINING_INDEX = os.environ.get('ES_TRAINING_INDEX')
-ES_TRAINING_DOC_TYPE = os.environ.get('ES_TRAINING_DOC_TYPE')
 
 # Crf Model Specific with additional AWS storage (optional)
 AWS_MODEL_BUCKET = os.environ.get('AWS_MODEL_BUCKET')
@@ -128,8 +126,8 @@ CHATBOT_NER_DATASTORE = {
         'es_scheme': ES_SCHEME,  # The scheme used in ES default value is http://
 
         # Training Data ES constants
-        'es_training_index': ES_TRAINING_INDEX,
-        'es_training_doc_type': ES_TRAINING_DOC_TYPE,
+        'elasticsearch_crf_data_index_name': ELASTICSEARCH_CRF_DATA_INDEX_NAME,
+        'elasticsearch_crf_data_doc_type': ELASTICSEARCH_CRF_DATA_DOC_TYPE,
     }
 }
 
