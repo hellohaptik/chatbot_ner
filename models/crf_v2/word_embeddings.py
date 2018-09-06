@@ -34,7 +34,7 @@ class LoadWordEmbeddings(object):
 
     @staticmethod
     def load_word_vectors_remote(text_list):
-        url = ''
+        url = 'http://aman.hellohaptik.com:8081/encoders/glove25'
         json_dict = {'text_list': [text_list]}
         result = json.loads(requests.get(url=url, json=json_dict, timeout=120).text)
         word_vectors = result['word_embeddings_list']
