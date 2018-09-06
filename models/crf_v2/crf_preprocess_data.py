@@ -278,14 +278,14 @@ class CrfPreprocessData(object):
         return [label for (token, postag, label, word_emb) in doc]
 
     @staticmethod
-    def get_processed_x_y(text_list, entity_list):
+    def get_processed_x_y(text_list, entity_list, cloud_storage=False):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.
         Args:
             text_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
-
+            cloud_storage (bool): To indicate if cloud storage settings is required.
         Returns:
             features (list): List of features required for training the CRF Model
             labels (list): Labels corresponding in IOB format.
@@ -299,13 +299,14 @@ class CrfPreprocessData(object):
         ner_logger.debug('pos_tag Completed')
 
         ner_logger.debug('LoadWordEmbeddings Started')
-#        word_embeddings = LoadWordEmbeddings()
-        ner_logger.debug('LoadingWordEmbeddings Completed')
-#        vocab = word_embeddings.vocab
-#        word_vectors = word_embeddings.word_vectors
-        vocab, word_vectors = CrfPreprocessData.remote_word_embeddings(processed_text_pos_tag)
+        if cloud_storage:
+            vocab, word_vectors = CrfPreprocessData.remote_word_embeddings(processed_text_pos_tag)
+        else:
+            word_embeddings = LoadWordEmbeddings()
+            vocab = word_embeddings.vocab
+            word_vectors = word_embeddings.word_vectors
 
-        ner_logger.debug('Loading Word Embeddings Started')
+        ner_logger.debug('LoadingWordEmbeddings Completed')
 
         pre_processed_data = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                                 word_vectors=word_vectors)

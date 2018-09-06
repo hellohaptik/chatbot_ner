@@ -94,7 +94,7 @@ class CrfTrain(object):
         """
 
         ner_logger.debug('Preprocessing for Entity: %s started' % self.entity_name)
-        x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list)
+        x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list, cloud_storage=cloud_storage)
         ner_logger.debug('Preprocessing for Entity: %s completed' % self.entity_name)
         self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
 
