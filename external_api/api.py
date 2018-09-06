@@ -10,7 +10,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-EXTERNAL_API_DATA, SENTENCE_LIST, CLOUD_STORAGE, ES_CONFIG
+    EXTERNAL_API_DATA, SENTENCE_LIST, CLOUD_STORAGE, ES_CONFIG
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -68,7 +68,7 @@ def update_dictionary(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -103,7 +103,7 @@ def transfer_entities(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(SENTENCE_LIST))
         entity_list = external_api_data.get(ENTITY_LIST)
@@ -179,7 +179,7 @@ def update_crf_training_data(request):
     value: {"sentence_list":["hello pratik","hello hardik"], "entity_list":[["pratik"], ["hardik"]],
     "entity_name":"training_try3", "language_script": "en"}
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -216,7 +216,7 @@ def train_crf_model(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -257,7 +257,7 @@ def transfer_crf_model(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_list = external_api_data.get(ENTITY_LIST)
