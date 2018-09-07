@@ -10,7 +10,8 @@ class TextModelDetector(TextDetector):
     def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
-        returns two lists of detected text entities and their corresponding original substrings in text respectively.
+        returns two lists of detected text entities  and their corresponding original substrings in text respectively.
+        The first list being a list of dicts with the verification source and the values.
         Note that datastore stores number of values under a entity_name and each entity_value has its own list of
         variants, whenever a variant is matched successfully, the entity_value whose list the variant belongs to,
         is returned. For more information on how data is stored, see Datastore docs.
