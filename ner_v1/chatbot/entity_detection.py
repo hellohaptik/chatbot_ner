@@ -150,13 +150,17 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """
     text_detection = TextDetector(entity_name=entity_name)
     if structured_value:
-        text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
+        text_entity_verified_values, original_text_list = text_detection.detect_entity(structured_value)
+        text_entity_list = TextDetector.get_text_entity_values(text_entity_verified_values=
+                                                               text_entity_verified_values)
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
             return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        text_entity_list, original_text_list = text_detection.detect_entity(message)
+        text_entity_verified_values, original_text_list = text_detection.detect_entity(message)
+        text_entity_list = TextDetector.get_text_entity_values(text_entity_verified_values=
+                                                               text_entity_verified_values)
         if text_entity_list:
             return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
