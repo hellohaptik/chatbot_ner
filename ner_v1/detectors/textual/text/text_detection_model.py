@@ -38,7 +38,7 @@ class TextModelDetector(TextDetector):
                         u'koramangala': [u'koramangala']
                     }
 
-            text_detection = TextDetector('city')
+            text_detection = TextModelDetector('city')
             text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
 
                 Output:
