@@ -3,9 +3,54 @@ from ner_v1.constant import ENTITY_VALUE_DICT_KEY, ES_VERIFIED
 
 
 class TextModelDetector(TextDetector):
-
     def detect_entity(self, text, **kwargs):
-        self._process_text()
+        """
+        Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
+        returns two lists of detected text entities and their corresponding original substrings in text respectively.
+        Note that datastore stores number of values under a entity_name and each entity_value has its own list of
+        variants, whenever a variant is matched successfully, the entity_value whose list the variant belongs to,
+        is returned. For more information on how data is stored, see Datastore docs.
+
+        Args:
+            text (unicode): string to extract textual entities from
+            **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
+        Returns:
+            tuple:
+                list: containing list of dicts with the source of detection for the entity value and
+                entity value as defined into datastore
+                list: containing corresponding original substrings in text
+
+        Example:
+            DataStore().get_entity_dictionary('city')
+
+                Output:
+                    {
+                        u'Agartala': [u'', u'Agartala'],
+                        u'Barnala': [u'', u'Barnala'],
+                        ...
+                        u'chennai': [u'', u'chennai', u'tamilnadu', u'madras'],
+                        u'hyderabad': [u'hyderabad'],
+                        u'koramangala': [u'koramangala']
+                    }
+
+            text_detection = TextDetector('city')
+            text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
+
+                Output:
+                    ([{'es_verified': True, 'model_verified': False, 'value': u'Chennai'},
+                      {'es_verified': True, 'model_verified': False, 'value': u'New Delhi'},
+                      {'es_verified': True, 'model_verified': False, 'value': u'chennai'}]
+                    , ['chennai', 'delhi', 'tamilnadu'])
+
+            text_detection.tagged_text
+
+                Output:
+                    ' come to __city__, __city__,  i will visit __city__ next year '
+
+        Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
+        respectively.
+        """
+        self._process_text(text)
         values, original_texts = self._text_detection_with_variants()
 
         text_entity_verified_values = TextModelDetector.add_verification_source(values=values,
