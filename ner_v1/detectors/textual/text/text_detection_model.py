@@ -3,6 +3,10 @@ from ner_v1.constant import ENTITY_VALUE_DICT_KEY, ES_VERIFIED
 
 
 class TextModelDetector(TextDetector):
+    """
+    This class is inherited from the TextDetector class. Additionally this class is used to detect text type
+    entities using the the datastore as well as the Crf Model if trained.
+    """
     def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and

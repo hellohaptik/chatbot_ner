@@ -13,7 +13,7 @@ from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
     PARAMETER_MAX_DIGITS
-from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
@@ -57,8 +57,8 @@ def text(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         fuzziness = parameters_dict[PARAMETER_FUZZINESS]
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
-        text_detector = TextDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
-                                     source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
+        text_detector = TextModelDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+                                          source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
         ner_logger.debug('fuzziness: %s min_token_len_fuzziness %s' % (str(fuzziness), str(min_token_len_fuzziness)))
         if fuzziness:
             fuzziness = parse_fuzziness_parameter(fuzziness)
