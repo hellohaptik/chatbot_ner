@@ -433,3 +433,28 @@ class TextDetector(BaseDetector):
                 text_entity_dict[verification_source_key] = verification_source_dict[verification_source_key]
             text_entity_verified_values.append(text_entity_dict)
         return text_entity_verified_values
+
+    @staticmethod
+    def get_text_entity_values(text_entity_verified_values):
+        """
+        This method is used to uwrap the text_entity_verified_values (a list of dicts) where each dict consists of
+        the verification sources and value of the text detected from the method
+         detect_entity to a text_list consisting of a list of only the the values
+        Args:
+            text_entity_verified_values (list): List of dicts obtained from the text_detection method detect_entity
+
+        Returns:
+            text_list (list): List of text detected from text detection for budget
+
+        Example
+            text_entity_verified_values = [{'es_verified': True, 'value': u'Chennai'},
+                                         {'es_verified': True, 'value': u'New Delhi'},
+                                         {'es_verified': True, 'value': u'chennai'}]
+            >>get_text_entity_values(text_entity_verified_values):
+            >>[u'Chennai', u'New Delhi', u'chennai']
+        """
+        text_list = []
+        for text_dict in text_entity_verified_values:
+            text_list.append(text_dict[ENTITY_VALUE_DICT_KEY])
+
+        return text_list
