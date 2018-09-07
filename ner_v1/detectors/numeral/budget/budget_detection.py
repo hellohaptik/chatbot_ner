@@ -411,7 +411,8 @@ class BudgetDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        budget_text_list, original_text_list = self.text_detection_object.detect_entity(self.text)
+        budget_entity_verified_values, original_text_list = self.text_detection_object.detect_entity(self.text)
+        budget_text_list = TextDetector.get_text_entity_values(text_entity_verified_values=budget_entity_verified_values)
         self.tagged_text = self.text_detection_object.tagged_text
         self.processed_text = self.text_detection_object.processed_text
         count = 0
