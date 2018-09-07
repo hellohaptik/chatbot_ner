@@ -437,9 +437,9 @@ class TextDetector(BaseDetector):
     @staticmethod
     def get_text_entity_values(text_entity_verified_values):
         """
-        This method is used to uwrap the text_entity_verified_values (a list of dicts) where each dict consists of
-        the verification sources and value of the text detected from the method
-         detect_entity to a text_list consisting of a list of only the the values
+        This method is used to unwrap the text_entity_verified_values (a list of dicts) where each dict consists of
+        the verification sources and value for the text detected (from the method detect_entity) to a text_list
+        consisting of a list of only the the values
         Args:
             text_entity_verified_values (list): List of dicts obtained from the text_detection method detect_entity
 
