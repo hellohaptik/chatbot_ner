@@ -72,3 +72,4 @@ LAST_NAME='last_name'
 
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
+ES_VERIFIED = 'es_verified'
