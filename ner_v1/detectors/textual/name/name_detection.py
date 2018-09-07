@@ -147,8 +147,10 @@ class NameDetector(object):
                 return [], []
         self.text = text
         self.tagged_text = self.text
-        text_detection_result = self.text_detection_name()
-        replaced_text = self.replace_detected_text(text_detection_result)
+        text_entity_verified_values, text_entity_original_text = self.text_detection_name()
+        text_entity_values = TextDetector.get_text_entity_values(text_entity_verified_values
+                                                                 =text_entity_verified_values)
+        replaced_text = self.replace_detected_text(text_entity_original_text)
         entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
@@ -174,7 +176,7 @@ class NameDetector(object):
         """
 
         replaced_text = nltk_tokenizer.tokenize(self.text.lower())
-        for detected_original_text in (text_detection_result[1]):
+        for detected_original_text in text_detection_result:
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
 
