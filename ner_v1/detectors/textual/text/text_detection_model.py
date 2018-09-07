@@ -41,9 +41,9 @@ class TextModelDetector(TextDetector):
             text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
 
                 Output:
-                    ([{'es_verified': True, 'model_verified': False, 'value': u'Chennai'},
-                      {'es_verified': True, 'model_verified': False, 'value': u'New Delhi'},
-                      {'es_verified': True, 'model_verified': False, 'value': u'chennai'}]
+                    ([{'datastore_verified': True, 'value': u'Chennai'},
+                      {'datastore_verified': True, 'value': u'New Delhi'},
+                      {'datastore_verified': True, 'value': u'chennai'}]
                     , ['chennai', 'delhi', 'tamilnadu'])
 
             text_detection.tagged_text
