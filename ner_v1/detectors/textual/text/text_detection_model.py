@@ -55,18 +55,14 @@ class TextModelDetector(TextDetector):
         Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        self._process_text(text)
-        values, original_texts = self._text_detection_with_variants()
-
-        text_entity_verified_values = TextModelDetector.add_verification_source(values=values,
-                                                                                verification_source_dict=
-                                                                                {DATASTORE_VERIFIED: True})
+        values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
+        text_entity_verified_values = self._add_verification_source(values=values,
+                                                                    verification_source_dict=
+                                                                    {DATASTORE_VERIFIED: True})
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
-
         return self.text_entity_values, self.original_texts
 
-    @staticmethod
-    def add_verification_source(values, verification_source_dict):
+    def _add_verification_source(self, values, verification_source_dict):
         """
         Add the verification source for the detected entities
         Args:
@@ -87,7 +83,6 @@ class TextModelDetector(TextDetector):
         text_entity_verified_values = []
         for text_entity_value in values:
             text_entity_dict = {ENTITY_VALUE_DICT_KEY: text_entity_value}
-            for verification_source_key in list(verification_source_dict.keys()):
-                text_entity_dict[verification_source_key] = verification_source_dict[verification_source_key]
+            text_entity_dict.update(verification_source_dict)
             text_entity_verified_values.append(text_entity_dict)
         return text_entity_verified_values
