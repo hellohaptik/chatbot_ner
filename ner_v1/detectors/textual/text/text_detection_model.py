@@ -1,11 +1,11 @@
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import ENTITY_VALUE_DICT_KEY, ES_VERIFIED
+from ner_v1.constant import ENTITY_VALUE_DICT_KEY, DATASTORE_VERIFIED
 
 
 class TextModelDetector(TextDetector):
     """
-    This class is inherited from the TextDetector class. Additionally this class is used to detect text type
-    entities using the the datastore as well as the Crf Model if trained.
+    This class is inherited from the TextDetector class.
+    This class is primarily used to detect text type entities and additionally return the detection source for the same.
     """
     def detect_entity(self, text, **kwargs):
         """
@@ -59,7 +59,7 @@ class TextModelDetector(TextDetector):
 
         text_entity_verified_values = TextModelDetector.add_verification_source(values=values,
                                                                                 verification_source_dict=
-                                                                                {ES_VERIFIED: True})
+                                                                                {DATASTORE_VERIFIED: True})
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
 
         return self.text_entity_values, self.original_texts
@@ -76,12 +76,12 @@ class TextModelDetector(TextDetector):
             value and verification source
         Example:
             values = [u'Chennai', u'New Delhi', u'chennai']
-            verification_source_dict = {"es_verified": True}
+            verification_source_dict = {"datastore_verified": True}
 
             >> add_verification_source(values, verification_source_dict)
-                [{'es_verified': True, 'value': u'Chennai'},
-                 {'es_verified': True, 'value': u'New Delhi'},
-                 {'es_verified': True, 'value': u'chennai'}]
+                [{'datastore_verified': True, 'value': u'Chennai'},
+                 {'datastore_verified': True, 'value': u'New Delhi'},
+                 {'datastore_verified': True, 'value': u'chennai'}]
         """
         text_entity_verified_values = []
         for text_entity_value in values:

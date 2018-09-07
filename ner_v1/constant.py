@@ -63,13 +63,13 @@ NUMERIC_VARIANTS = DIGIT_UNITS + [
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 
-#**********************constants used for name detection************************************
+#  **********************constants used for name detection************************************
 
-FIRST_NAME='first_name'
-MIDDLE_NAME='middle_name'
-LAST_NAME='last_name'
+FIRST_NAME = 'first_name'
+MIDDLE_NAME = 'middle_name'
+LAST_NAME = 'last_name'
 
 
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
-ES_VERIFIED = 'es_verified'
+DATASTORE_VERIFIED = 'datastore_verified'
