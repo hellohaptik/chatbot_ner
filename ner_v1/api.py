@@ -6,13 +6,14 @@ from django.http import HttpResponse
 from chatbot_ner.config import ner_logger
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_email, get_city, get_pnr, \
-    get_number, get_shopping_size, get_time, get_date, get_budget, get_person_name, get_regex
+    get_number, get_passenger_count, get_shopping_size, get_time, get_time_with_range, get_date, get_budget, \
+    get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
     PARAMETER_MAX_DIGITS
-from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
@@ -56,21 +57,21 @@ def text(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         fuzziness = parameters_dict[PARAMETER_FUZZINESS]
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
-        text_detector = TextDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
-                                     source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
+        text_model_detector = TextModelDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+                                                source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT])
         ner_logger.debug('fuzziness: %s min_token_len_fuzziness %s' % (str(fuzziness), str(min_token_len_fuzziness)))
         if fuzziness:
             fuzziness = parse_fuzziness_parameter(fuzziness)
-            text_detector.set_fuzziness_threshold(fuzziness)
+            text_model_detector.set_fuzziness_threshold(fuzziness)
 
         if min_token_len_fuzziness:
             min_token_len_fuzziness = int(min_token_len_fuzziness)
-            text_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+            text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-        entity_output = text_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                             structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                             fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                             bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        entity_output = text_model_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
+                                                   structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                   fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                   bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for text_synonym: %s ' % e)
@@ -282,12 +283,40 @@ def number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+def passenger_count(request):
+    """This functionality calls the get_passenger_count() functionality to detect passenger count.
+    It is called through api call
+
+    Args:
+        request (django.http.request.HttpRequest): HttpRequest object
+
+    Returns:
+        response (django.http.response.HttpResponse): HttpResponse object
+
+    """
+    try:
+        parameters_dict = get_parameters_dictionary(request)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        entity_output = get_passenger_count(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
+                                            parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                            parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                            parameters_dict[PARAMETER_BOT_MESSAGE]
+                                            )
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+    except TypeError as e:
+        ner_logger.exception('Exception for passenger count: %s ' % e)
+        return HttpResponse(status=500)
+
+    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
 def time(request):
     """This functionality calls the get_time() functionality to detect time. It is called through api call
 
-    Attributes:
-        request: url parameters
-
+    Args:
+        request (django.http.request.HttpRequest): HttpRequest object
+    Returns:
+        response (django.http.response.HttpResponse): HttpResponse object
     """
     try:
         parameters_dict = get_parameters_dictionary(request)
@@ -295,10 +324,35 @@ def time(request):
         entity_output = get_time(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                 parameters_dict[PARAMETER_BOT_MESSAGE])
+                                 parameters_dict[PARAMETER_BOT_MESSAGE],
+                                 parameters_dict[PARAMETER_TIMEZONE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for time: %s ' % e)
+        return HttpResponse(status=500)
+
+    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
+def time_with_range(request):
+    """This functionality calls the get_time_with_range() functionality to detect time. It is called through api call
+
+    Args:
+        request (django.http.request.HttpRequest): HttpRequest object
+    Returns:
+        response (django.http.response.HttpResponse): HttpResponse object
+    """
+    try:
+        parameters_dict = get_parameters_dictionary(request)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        entity_output = get_time_with_range(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
+                                            parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                            parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                            parameters_dict[PARAMETER_BOT_MESSAGE],
+                                            parameters_dict[PARAMETER_TIMEZONE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+    except Exception as e:
+        ner_logger.exception('Exception for time_with_range: %s ' % e)
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
@@ -340,7 +394,9 @@ def budget(request):
         entity_output = get_budget(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                   parameters_dict[PARAMETER_BOT_MESSAGE])
+                                   parameters_dict[PARAMETER_BOT_MESSAGE],
+                                   parameters_dict[PARAMETER_MIN_DIGITS],
+                                   parameters_dict[PARAMETER_MAX_DIGITS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for budget: %s ' % e)

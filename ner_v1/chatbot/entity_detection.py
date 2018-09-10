@@ -2,6 +2,7 @@ from ner_v1.constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE
                              FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
+from ner_v1.detectors.numeral.number.passenger_detection import PassengerDetector
 from ner_v1.detectors.numeral.size.shopping_size_detection import ShoppingSizeDetector
 from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
@@ -185,23 +186,25 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
                       entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'atm in andheri west'
+        entity_name = 'locality_list'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_location(message=message, entity_name=entity_name, structured_value=structured_value,
+                              fallback_value=fallback_value, bot_message=bot_message)
+        print output
+
+            >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
+                 'original_text': 'andheri west'}]
     """
 
     text_detection = TextDetector(entity_name=entity_name)
-    if structured_value:
-        text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        text_entity_list, original_text_list = text_detection.detect_entity(message)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
-
-    return None
+    return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                 bot_message=bot_message)
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
@@ -232,7 +235,7 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
         fallback_value = None
         bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': '9049961794', 'entity_value': {'value': '9049961794'}}]
@@ -243,11 +246,11 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
         fallback_value = '9049961794'
         bot_message = None
         output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'fallback_value', 'original_text': '9049961794',
-            'entity_value': {'value': '9049961794'}}]
+                 'entity_value': {'value': '9049961794'}}]
 
 
     """
@@ -589,34 +592,61 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
     Example:
 
         message = "I want to buy Large shirt and jeans of 36 waist"
-        entity_name = 'shopping_size'
+        entity_name = 'shopping_clothes_size'
         structured_value = None
         fallback_value = None
         bot_message = None
         output = get_shopping_size(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                                   fallback_value=fallback_value, bot_message=bot_message)
         print output
 
             >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}}, 
-            {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
+                {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
 
     """
     size_detection = ShoppingSizeDetector(entity_name=entity_name)
+    return size_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                 bot_message=bot_message)
 
-    if structured_value:
-        entity_list, original_text_list = size_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = size_detection.detect_entity(text=message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
-    return None
+def get_passenger_count(message, entity_name, structured_value, fallback_value, bot_message):
+    """Use PassengerDetector to detect passenger_count
+
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
+                       detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                              or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
+
+
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'Can you please help me to book tickets for 3 people'
+        entity_name = 'no_of_adults'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_passenger_count(message=message, entity_name=entity_name, structured_value=structured_value,
+                                    fallback_value=fallback_value, bot_message=bot_message)
+        print output
+
+            >> [{'detection': 'message', 'entity_value': {'value': '3'}, 'language': 'en', 'original_text': '3'}]
+
+    """
+    passenger_detection = PassengerDetector(entity_name=entity_name)
+    passenger_detection.set_bot_message(bot_message=bot_message)
+    return passenger_detection.detect(message=message, structured_value=structured_value,
+                                      fallback_value=fallback_value, bot_message=bot_message)
 
 
 def get_number(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
@@ -649,11 +679,11 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value = None
         bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                           fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
         print output
 
             >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
-            {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
+                {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
 
 
         message = "I want to reserve a table for 3 people"
@@ -662,7 +692,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value = None
         bot_message = None
         output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                           fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
         print output
 
             >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
@@ -678,20 +708,21 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
                                    bot_message=bot_message)
 
 
-def get_time(message, entity_name, structured_value, fallback_value, bot_message):
+def get_time(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
     """Use TimeDetector to detect time
 
     Args:
-        message (str): natural text on which detection logic is to be run. Note if structured value is
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
                                 detection is run on structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
-        structured_value (str): Value obtained from any structured elements. Note if structured value is
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
                                 detection is run on structured value instead of message
                                 (For example, UI elements like form, payload, etc)
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        timezone (str): timezone of the user
 
 
     Returns:
@@ -706,30 +737,66 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
         structured_value = None
         fallback_value = None
         bot_message = None
+        timezone = 'UTC'
         output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
+                          fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
         print output
 
         >>  [{'detection': 'message', 'original_text': '12:30 pm', 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}},
             {'detection': 'message', 'original_text': 'in 15 mins', 'entity_value': {'mm': '15', 'hh': 0, 'nn': 'df'}},
             {'detection': 'message', 'original_text': '13:50', 'entity_value': {'mm': 50, 'hh': 13, 'nn': 'hrs'}}]
     """
+    form_check = True if structured_value else False
+    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone, form_check=form_check)
+    time_detection.set_bot_message(bot_message=bot_message)
+    return time_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                 bot_message=bot_message)
 
-    time_detection = TimeDetector(entity_name=entity_name)
-    if structured_value:
-        entity_list, original_text_list = time_detection.detect_entity(text=structured_value, form_check=True)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = time_detection.detect_entity(text=message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
 
-    return None
+def get_time_with_range(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
+    """Use TimeDetector to detect time with range
+
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is present
+                                detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        structured_value (str): Value obtained from any structured elements. Note if structured value is present
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
+        timezone (str): timezone of the user
+
+
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'Set a drink water reminder for tomorrow from 7:00 AM to 6:00 PM'
+        entity_name = 'time_with_range'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        timezone = 'UTC'
+        output = get_time_with_range(message=message, entity_name=entity_name, structured_value=structured_value,
+                                     fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
+        print output
+
+            >> [{'detection': 'message', 'original_text': '7:00 am to 6:00 pm', 'entity_value': {'mm': 0, 'hh': 7,
+                 'range': 'start', 'nn': 'am', 'time_type': None}, 'language': 'en'}, {'detection': 'message',
+                 'original_text': '7:00 am to 6:00 pm', 'entity_value': {'mm': 0, 'hh': 6, 'range': 'end', 'nn': 'pm',
+                 'time_type': None}, 'language': 'en'}]
+
+    """
+    form_check = True if structured_value else False
+    time_detection = TimeDetector(entity_name=entity_name, timezone=timezone, range_enabled=True,
+                                  form_check=form_check)
+    return time_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                 bot_message=bot_message)
 
 
 def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC'):
@@ -814,7 +881,7 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_budget(message, entity_name, structured_value, fallback_value, bot_message):
+def get_budget(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
     """Use BudgetDetector to detect budget
 
     Args:
@@ -828,6 +895,8 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        min_digit (str): min digit
+        max_digit (str): max digit
 
 
     Returns:
@@ -851,20 +920,12 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
 
     """
     budget_detection = BudgetDetector(entity_name=entity_name)
-    if structured_value:
-        entity_list, original_text_list = budget_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = budget_detection.detect_entity(text=message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
-
-    return None
+    if min_digit and max_digit:
+        min_digit = int(min_digit)
+        max_digit = int(max_digit)
+        budget_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
+    return budget_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
+                                   bot_message=bot_message)
 
 
 def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
