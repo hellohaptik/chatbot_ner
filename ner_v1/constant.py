@@ -79,3 +79,4 @@ CRF_MODEL_VERIFIED = 'crf_model_verified'
 
 PARAMETER_CLOUD_STORAGE = 'cloud_storage'
 PARAMETER_CLOUD_EMBEDDINGS = 'cloud_embeddings'
+PARAMETER_LIVE_CRF_MODEL_PATH = 'live_crf_model_path'

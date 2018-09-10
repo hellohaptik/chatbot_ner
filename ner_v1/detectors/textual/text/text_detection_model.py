@@ -8,10 +8,12 @@ class TextModelDetector(TextDetector):
     This class is inherited from the TextDetector class.
     This class is primarily used to detect text type entities and additionally return the detection source for the same.
     """
-    def __init__(self, entity_name, source_language_script, cloud_storage=False, cloud_embeddings=False):
+    def __init__(self, entity_name, source_language_script, cloud_storage=False, cloud_embeddings=False,
+                 live_crf_model_path=''):
         super(TextModelDetector, self).__init__(entity_name=entity_name, source_language_script=source_language_script)
         self.cloud_storage = cloud_storage
         self.cloud_embeddings = cloud_embeddings
+        self.live_crf_model_s3_path = live_crf_model_path
 
     def detect_entity(self, text, **kwargs):
         """
@@ -66,7 +68,8 @@ class TextModelDetector(TextDetector):
                                                                     verification_source_dict=
                                                                     {DATASTORE_VERIFIED: True})
         crf_model = CrfDetection(entity_name=self.entity_name, cloud_storage=self.cloud_storage,
-                                 cloud_embeddings=self.cloud_embeddings)
+                                 cloud_embeddings=self.cloud_embeddings,
+                                 live_crf_model_path=self.live_crf_model_s3_path)
         crf_original_text = crf_model.detect_entity(text=text)
 
         crf_entity_verified_values = self._add_verification_source(values=crf_original_text,
