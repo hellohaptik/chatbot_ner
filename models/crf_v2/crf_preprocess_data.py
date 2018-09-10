@@ -159,19 +159,19 @@ class CrfPreprocessData(object):
         return features
 
     @staticmethod
-    def word_to_features(doc, i):
+    def word_to_features(doc, i, j):
         """
         This class is used to convert the doc to CRF trainable features.
         Args:
-            doc (list): List of tuples consisting of the token and label in (token, pos_tag,word_emb ,label) form.
+            doc (dict): List of tuples consisting of the token and label in (token, pos_tag,word_emb ,label) form.
             i (int): Pointer to the current time_step.
 
         Returns:
             features (list): List of CRF trainable features.
         """
 
-        word = doc[i][0]
-        pos_tag = doc[i][1]
+        word = doc['text_list'][i][j]
+        pos_tag = doc['pos_tags'][i][j]
         # word_embedding = doc[i][3]
         # Common features for all words
         features = [
@@ -183,15 +183,15 @@ class CrfPreprocessData(object):
             'pos_tag=' + pos_tag
         ]
 
-        word_embedding = doc[i][3]
+        word_embedding = doc['word_embeddings'][i][j]
         features.extend(CrfPreprocessData.convert_wordvec_features('', word_embedding))
 
         # Features for words that are not
         # at the beginning of a document
 
-        if i > 1:
-            word1 = doc[i - 2][0]
-            postag1 = doc[i - 2][1]
+        if j > 1:
+            word1 = doc['text_list'][i][j - 2]
+            postag1 = doc['pos_tags'][i][j - 2]
             features.extend([
                 '-2:word.lower=' + word1.lower(),
                 '-2:word.istitle=%s' % word1.istitle(),
@@ -202,12 +202,12 @@ class CrfPreprocessData(object):
 
             ])
 
-            word_embedding = doc[i - 2][3]
+            word_embedding = doc['word_embeddings'][i][j - 2]
             features.extend(CrfPreprocessData.convert_wordvec_features('-2', word_embedding))
 
-        if i > 0:
-            word1 = doc[i - 1][0]
-            postag1 = doc[i - 1][1]
+        if j > 0:
+            word1 = doc['text_list'][i][j - 1]
+            postag1 = doc['pos_tags'][i][j - 1]
             features.extend([
                 '-1:word.lower=' + word1.lower(),
                 '-1:word.istitle=%s' % word1.istitle(),
@@ -216,7 +216,7 @@ class CrfPreprocessData(object):
                 '-1:pos_tag=' + postag1,
 
             ])
-            word_embedding = doc[i - 1][3]
+            word_embedding = doc['word_embeddings'][i][j - 1]
             features.extend(CrfPreprocessData.convert_wordvec_features('-1', word_embedding))
         else:
             # Indicate that it is the 'beginning of a document'
@@ -224,9 +224,9 @@ class CrfPreprocessData(object):
 
         # Features for words that are not
         # at the end of a document
-        if i < len(doc) - 2:
-            word1 = doc[i + 2][0]
-            postag1 = doc[i + 2][1]
+        if j < len(doc['text_list'][i]) - 2:
+            word1 = doc['text_list'][i][j + 2]
+            postag1 = doc['pos_tags'][i][j + 2]
             features.extend([
                 '+2:word.lower=' + word1.lower(),
                 '+2:word.istitle=%s' % word1.istitle(),
@@ -234,12 +234,12 @@ class CrfPreprocessData(object):
                 '+2:word.isdigit=%s' % word1.isdigit(),
                 '+2:pos_tag=' + postag1,
             ])
-            word_embedding = doc[i + 2][3]
+            word_embedding = doc['word_embeddings'][i][j + 2]
             features.extend(CrfPreprocessData.convert_wordvec_features('+2', word_embedding))
 
-        if i < len(doc) - 1:
-            word1 = doc[i + 1][0]
-            postag1 = doc[i + 1][1]
+        if j < len(doc['text_list'][i]) - 1:
+            word1 = doc['text_list'][i][j + 1]
+            postag1 = doc['pos_tags'][i][j + 1]
             features.extend([
                 '+1:word.lower=' + word1.lower(),
                 '+1:word.istitle=%s' % word1.istitle(),
@@ -247,7 +247,7 @@ class CrfPreprocessData(object):
                 '+1:word.isdigit=%s' % word1.isdigit(),
                 '+1:pos_tag=' + postag1,
             ])
-            word_embedding = doc[i + 1][3]
+            word_embedding = doc['word_embeddings'][i][j + 1]
             features.extend(CrfPreprocessData.convert_wordvec_features('+1', word_embedding))
         else:
             # Indicate that it is the 'end of a document'
@@ -261,24 +261,14 @@ class CrfPreprocessData(object):
         This method is used to extract features from the doc and it accomplishes this by calling the
         word_to_feature method.
         Args:
-            doc (list): List of tuples consisting of the token and label in (token, pos_tag,word_emb ,label) form.
+            doc (dict): List of tuples consisting of the token and label in (token, pos_tag,word_emb ,label) form.
         Returns:
             (list): List consisting of the features used to train the CRF model.
         """
-        return [CrfPreprocessData.word_to_features(doc, i) for i in range(len(doc))]
-
-    @staticmethod
-    # A function fo generating the list of labels for each document
-    def get_labels(doc):
-        """
-        This method is used to obtain the labels from the doc.
-        Args:
-            doc (list): doc (list): List of tuples consisting of the token and label
-                        in (token, pos_tag,word_emb ,label) form.
-        Returns:
-            (list): List of tuples consisting of the lables in IOB format.
-        """
-        return [label for (token, postag, label, word_emb) in doc]
+        features = []
+        for i in range(len(doc['text_list'])):
+            features.append([CrfPreprocessData.word_to_features(doc, i, j) for j in range(len(doc['text_list'][i]))])
+        return features
 
     @staticmethod
     def get_processed_x_y(text_list, entity_list, cloud_storage=False):
@@ -314,15 +304,14 @@ class CrfPreprocessData(object):
         processed_text_pos_tag['word_embeddings'] = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
                                                      word_vectors=word_vectors)
                                                      for each in processed_text_pos_tag['text_list']]
-        pre_processed_data = processed_text_pos_tag
         ner_logger.debug('Loading Word Embeddings Completed')
 
         ner_logger.debug('CrfPreprocessData.extract_features Started')
-        features = [CrfPreprocessData.extract_features(doc) for doc in pre_processed_data]
+        features = CrfPreprocessData.extract_features(processed_text_pos_tag)
         ner_logger.debug('CrfPreprocessData.extract_features Completed')
 
         ner_logger.debug('CrfPreprocessData.get_labels Started')
-        labels = [CrfPreprocessData.get_labels(doc) for doc in pre_processed_data]
+        labels = processed_text_pos_tag['labels']
         ner_logger.debug('CrfPreprocessData.get_labels Completed')
         return features, labels
 
