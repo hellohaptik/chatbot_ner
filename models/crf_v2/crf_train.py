@@ -4,9 +4,7 @@ from datastore.datastore import DataStore
 from .constants import SENTENCE_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
-from lib.redis_utils import set_cache_ml
-from .constants import ENTITY_REDIS_MODELS_PATH
-from .exceptions import AwsWriteEntityFail, RedisWriteEntityFail, ESTrainingEntityListError, \
+from .exceptions import AwsWriteEntityFail, ESTrainingEntityListError, \
     ESTrainingTextListError
 from datetime import datetime
 import os
@@ -149,13 +147,6 @@ class CrfTrain(object):
         else:
             ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
             raise AwsWriteEntityFail()
-
-        result = set_cache_ml(ENTITY_REDIS_MODELS_PATH + self.entity_name, self.model_dir)
-        if result:
-            ner_logger.debug('Model path : %s written to Redis ' % self.model_dir)
-        else:
-            ner_logger.debug('Failure in saving Model path to Redis %s' % self.model_dir)
-            raise RedisWriteEntityFail()
 
     def generate_model_path(self):
         """
