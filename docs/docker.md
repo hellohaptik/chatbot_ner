@@ -5,7 +5,7 @@
 
 Following are the steps to create the Docker image and run NER via Docker.
 
-1. Install Docker 
+1. Install Docker & Docker Compose
 
    - Ubuntu:
 
@@ -15,42 +15,72 @@ Following are the steps to create the Docker image and run NER via Docker.
      # add your current user to Docker group
      $ sudo usermod -aG docker $USER
      ```
+   - If the above does not work try:
+     ````shell
+     sudo apt-get -y \
+     update
+     sudo apt-get install \
+     apt-transport-https \
+     ca-certificates \
+     curl \
+     software-properties-common
+     
+     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+     
+     sudo apt-key fingerprint 0EBFCD88
+     
+     sudo add-apt-repository \
+     "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+     $(lsb_release -cs) \
+     Stable"
+     
+     sudo apt-get update
+     sudo apt-get install docker-ce
+     ````
+    
+   - Docker Compose
+     ```shell
+      sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+      sudo chmod +x /usr/local/bin/docker-compose
+
+     ``` 
+
 
    - Mac OSX:
 
      Follow the installation document: https://docs.docker.com/docker-for-mac/install/
+     
 
-2. Pull and run Chatbot NER via Docker use the following command:
 
-   ```shell
-   $ sudo docker pull mlhaptik/chatbot_ner
-   ```
+
+Bring up chatbot_ner:
+      
+    ```shell
+       cd chatbot_ner 
+       docker-compose up -d 
+    ```
+
+
 
    > **NOTE**: make sure that nothing is running on port 80 on your server or your local environment. If anything is running on port 80 run the following command
    >
    > `sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill`
-
-   ```shell
-   $ sudo docker run -itd -p 80:80 --name ner mlhaptik/chatbot_ner
-   ```
-
+   
    > We have mapped port 80 of the docker container to  port 80 of your machine. Now, on your local machine curl the chatbot api as shown shown below, host can be your local machine or a server IP on which you have been running docker on.
+   
+   > Port mapping can be changed in docker-compose yml 
 
-3. To get inside container execute the following:
-
-   ```shell
-   $ sudo docker exec -it ner bash
-   ```
-
-4. Start the Chatbot NER inside the container
+Container commands:
 
    ```shell
-   $ cd ~/chatbot_ner
-   $ ./start_server.sh &
+   $ docker-compose ps (shows list of running container)
+   $ sudo docker exec -it (container-name) bash
    ```
-
+   Check logs 
+   ```shell
+   $ docker logs -f (container-name)
+   ```
    ​
-
    Following is the API call to test our service on your local system:
 
    ```python
@@ -151,7 +181,7 @@ Following are the steps to create the Docker image and run NER via Docker.
    **NOTE:**
 
    - You can also have a look at our [API call document](/docs/api_call.md) to test and use different NER functionalities.
-   - To access GUI, go to http://localhost:80/gui/ 
+   - To access GUI, go to http://localhost:80/gui/ or http://host-ip/gui/
 
    ​
 
@@ -162,7 +192,6 @@ If you want to create a custom Docker image execute the following commands after
 
 ```shell
 $ cd chatbot_ner
-$ cd docker
 $ sudo docker build -t ner_image .
 $ sudo docker run -itd -p 80:80 --name ner ner_image
 ```

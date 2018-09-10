@@ -24,6 +24,8 @@ status = nltk.download('averaged_perceptron_tagger')
 if not status:
     print "AP POS Tagger Download was unsucessful"
 
+# Below needs to be committed if you want to use existing data in the Elasticsearch Setup
+
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"
 print "Deleting any stale data ..."
