@@ -56,3 +56,38 @@ class CrfDetection(object):
                 original_text.append(' '.join(temp))
 
         return original_text
+
+c = 0
+for e in temp:
+    print(e)
+    x = text[e[0] + c:e[1] + c]
+    tx = word_tokenize(x)
+    print(tx)
+    for i in range(len(tx)):
+        if i == 0:
+            tx[i] = 'B_en_' + tx[i]
+        else:
+            tx[i] = 'I_en_' + tx[i]
+    dtx = detokenizer.detokenize(tx, return_str=True)
+    print(dtx)
+    text = text[:e[0] + c] + dtx + text[e[1] + c:]
+    c += len(tx) * 5
+    print(text)
+
+c = 0
+for e in temp:
+    print(e)
+    x = text[e[0] + c:e[1] + c]
+    tx = x.split()
+    len_tx = len(tx)
+    print(tx)
+    for i in range(len(tx)):
+        if i == 0:
+            tx[i] = 'B_en_' + tx[i]
+        else:
+            tx[i] = 'I_en_' + tx[i]
+    dtx = detokenizer.detokenize(tx, return_str=True)
+    print(dtx)
+    text = text[:e[0] + c] + dtx + text[e[1] + c:]
+    c += len_tx * 5
+    print(text)

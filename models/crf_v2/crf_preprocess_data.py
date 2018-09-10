@@ -2,7 +2,7 @@ import numpy as np
 from lib.nlp.pos import POS
 import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
-from .word_embeddings import LoadWordEmbeddings
+from models.crf_v2.word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
 
 
@@ -50,11 +50,20 @@ class CrfPreprocessData(object):
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
         entities.sort(key=lambda s: len(word_tokenize.tokenize(s)), reverse=True)
+        tokenized_original_text = word_tokenize.tokenize(text)
+
         for entity in entities:
             text = re.sub(r'\b%s\b' % entity, IOB_prefixes(entity, word_tokenize), text)
 
-        return [(g[0], 'O') if len(g) <= 1 else (g[1], g[0]) for g in
-                [w.split('_en_') for w in word_tokenize.tokenize(text)]]
+        tokenized_text = word_tokenize.tokenize(text)
+
+        labels = ['B' if 'B_en_' in tokenized_text[i]
+                  else 'I' if 'I_en_' in tokenized_text[i]
+                  else 'O' for i in range(len(tokenized_original_text))]
+
+        return tokenized_original_text, labels
+        # return [(g[0], 'O') if len(g) <= 1 else (g[1], g[0]) for g in
+        #         [w.split('_en_') for w in word_tokenize.tokenize(text)]]
 
     @staticmethod
     def word_embeddings(processed_pos_tag_data, vocab, word_vectors):
@@ -68,18 +77,13 @@ class CrfPreprocessData(object):
             sentence (list): List of list of tuples where each tuple is of the form (token, pos_tag,
             label, word_emb)
         """
-        sentence = []
-
-        for tuple_token in processed_pos_tag_data:
+        word_embeddings = []
+        for token in processed_pos_tag_data:
             word_vec = np.zeros([word_vectors.shape[1]])
-            if tuple_token[0].lower() in vocab:
-                word_vec = word_vectors[vocab.index(tuple_token[0].lower())]
-            sentence.append((tuple_token[0],
-                             tuple_token[1],
-                             tuple_token[2],
-                             word_vec))
-
-        return sentence
+            if token.lower() in vocab:
+                word_vec = word_vectors[vocab.index(token.lower())]
+            word_embeddings.append(word_vec)
+        return word_embeddings
 
     @staticmethod
     def pre_process_text(text_list, entity_list):
@@ -89,7 +93,7 @@ class CrfPreprocessData(object):
             text_list (list): List of text on which NER has to be performed
             entity_list (list): List of entities present in text_list for every text occurenece.
         Returns:
-            processed_list (list): Nested list each being a list of tuples of the form (token, label)
+            processed_list (dict): Nested list each being a list of tuples of the form (token, label)
         Examples:
             For city entity
             text_list = ['Book a flight to New York', 'I want to fly to California']
@@ -99,10 +103,13 @@ class CrfPreprocessData(object):
                 [('I', 'O'),  ('want', 'O'),  ('to', 'O'),  ('fly', 'O'),  ('to', 'O'),  ('California', 'B')]]
         """
 
-        processed_list = []
-        for text, entities in zip(text_list, entity_list):
-            processed_list.append(CrfPreprocessData.pre_process_text_(text, entities))
+        processed_list = {'text_list': [],
+                          'labels': []}
 
+        for text, entities in zip(text_list, entity_list):
+            tokenzied_text, labels = CrfPreprocessData.pre_process_text_(text, entities)
+            processed_list['labels'].append(labels)
+            processed_list['text_list'].append(tokenzied_text)
         return processed_list
 
     @staticmethod
@@ -110,9 +117,9 @@ class CrfPreprocessData(object):
         """
         This method is used to apply pos_tags to every token
         Args:
-            docs (list): List of tuples consisting of the token and label in (token, label) form.
+            docs (dict): List of tuples consisting of the token and label in (token, label) form.
         Returns:
-            data (list): List of tuples consisting of (token, pos_tag, label)
+            data (dict): List of tuples consisting of (token, pos_tag, label)
         Example:
             For city entity
             docs = [[('Book', 'O'),  ('a', 'O'),  ('flight', 'O'),  ('to', 'O'),  ('New', 'B'),  ('York', 'I')],
@@ -123,16 +130,12 @@ class CrfPreprocessData(object):
               ('New', 'NNP', 'B'),  ('York', 'NNP', 'I')], [('I', 'PRP', 'O'),  ('want', 'VBP', 'O'),
                 ('to', 'TO', 'O'),  ('fly', 'RB', 'O'),  ('to', 'TO', 'O'),  ('California', 'NNP', 'B')]]
         """
-        data = []
+        docs['pos_tags'] = []
         pos_tagger = POS()
-        for i, doc in enumerate(docs):
-            # Obtain the list of tokens in the document
-            tokens = [t for t, label in doc]
-            # Perform POS tagging
-            tagged = pos_tagger.tagger.tag(tokens)
-            # Take the word, POS tag, and its label
-            data.append([(w, pos, label) for (w, label), (word, pos) in zip(doc, tagged)])
-        return data
+        for text in docs['text_list']:
+            docs['pos_tags'].append([tag[1] for tag in pos_tagger.tagger.tag(text)])
+
+        return docs
 
     @staticmethod
     def convert_wordvec_features(prefix, word_vec):
@@ -308,9 +311,10 @@ class CrfPreprocessData(object):
 
         ner_logger.debug('LoadingWordEmbeddings Completed')
 
-        pre_processed_data = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
-                                                                word_vectors=word_vectors)
-                              for each in processed_text_pos_tag]
+        processed_text_pos_tag['word_embeddings'] = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each, vocab=vocab,
+                                                     word_vectors=word_vectors)
+                                                     for each in processed_text_pos_tag['text_list']]
+        pre_processed_data = processed_text_pos_tag
         ner_logger.debug('Loading Word Embeddings Completed')
 
         ner_logger.debug('CrfPreprocessData.extract_features Started')
@@ -325,9 +329,9 @@ class CrfPreprocessData(object):
     @staticmethod
     def remote_word_embeddings(processed_text_pos_tag):
         words_list = []
-        for tuple_text in processed_text_pos_tag:
-            for token_tuple in tuple_text:
-                words_list.append(token_tuple[0])
+        for text in processed_text_pos_tag['text_list']:
+            for token in text:
+                words_list.append(token)
 
         word_vectors = LoadWordEmbeddings.load_word_vectors_remote(text_list=words_list)
 
