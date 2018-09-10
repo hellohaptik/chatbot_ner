@@ -15,6 +15,7 @@ if not os.path.exists(LOG_PATH):
 
 
 # LOGGING
+# TODO - Make this much generic & simpler in the future
 LOG_LEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'error').upper()
 
 # Common formatter
