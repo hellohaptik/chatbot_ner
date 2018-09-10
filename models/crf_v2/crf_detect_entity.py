@@ -8,7 +8,7 @@ class CrfDetection(object):
     """
     This method is used to detect a text entity using the Crf model.
     """
-    def __init__(self, entity_name, cloud_storage=False):
+    def __init__(self, entity_name, cloud_storage=False, cloud_embeddings=False):
         """
         This method is used to detect text entities using the Crf model
         Args:
@@ -17,6 +17,7 @@ class CrfDetection(object):
         """
         self.entity_name = entity_name
         self.cloud_storage = cloud_storage
+        self.cloud_embeddings = cloud_embeddings
 
         crf_model = CrfModel(entity_name=self.entity_name)
 
@@ -38,7 +39,7 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfPreprocessData.get_processed_x_y([text], [[]], cloud_storage=self.cloud_storage)
+        x, _ = CrfPreprocessData.get_processed_x_y([text], [[]], cloud_embeddings=self.cloud_embeddings)
         y_prediction = [self.tagger.tag(xseq) for xseq in x][0]
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)

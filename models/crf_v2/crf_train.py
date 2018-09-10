@@ -18,15 +18,17 @@ class CrfTrain(object):
     Named Entity Recognition (NER).
 
     """
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, cloud_storage=False, cloud_embeddings=False):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
         """
         self.entity_name = entity_name
         self.model_dir = None
+        self.cloud_storage = cloud_storage
+        self.cloud_embeddings = cloud_embeddings
 
-    def train_crf_model(self, x, y, c1, c2, max_iterations, cloud_storage=False):
+    def train_crf_model(self, x, y, c1, c2, max_iterations):
         """
         This is the main function where training of the model is carried out. The model post
         training is then saved to the specified.
@@ -68,7 +70,7 @@ class CrfTrain(object):
         ner_logger.debug('Training for entity %s completed' % self.entity_name)
         ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
-        if cloud_storage:
+        if self.cloud_storage:
             self.model_dir = self.generate_model_path()
             trainer.train(self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
@@ -78,7 +80,7 @@ class CrfTrain(object):
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
-    def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000, cloud_storage=False):
+    def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000):
         """
         This model is used to train the crf model. It performs the pre processing steps
         and trains the models
@@ -94,11 +96,12 @@ class CrfTrain(object):
         """
 
         ner_logger.debug('Preprocessing for Entity: %s started' % self.entity_name)
-        x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list, cloud_storage=cloud_storage)
+        x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list,
+                                                   cloud_embeddings=self.cloud_embeddings)
         ner_logger.debug('Preprocessing for Entity: %s completed' % self.entity_name)
-        self.train_crf_model(x, y, c1, c2, max_iterations, cloud_storage)
+        self.train_crf_model(x, y, c1, c2, max_iterations)
 
-    def train_model_from_es_data(self, cloud_storage=False):
+    def train_model_from_es_data(self):
         """
         This method is used to train the crf model by first extracting training data from ES
         for the entity and training the crf model for the same.
@@ -120,7 +123,7 @@ class CrfTrain(object):
         ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
         ner_logger.debug('Length of text_list %s' % str(len(text_list)))
 
-        self.train_model(entity_list=entity_list, text_list=text_list, cloud_storage=cloud_storage)
+        self.train_model(entity_list=entity_list, text_list=text_list)
 
     def write_model_to_s3(self):
         """
