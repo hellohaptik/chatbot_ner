@@ -40,8 +40,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness'),
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
-                       PARAMETER_CLOUD_EMBEDDINGS: request.GET.get('cloud_embeddings'),
-                       PARAMETER_CLOUD_STORAGE: request.GET.get('cloud_storage')
+                       PARAMETER_CLOUD_EMBEDDINGS: request.GET.get('cloud_embeddings', 'False'),
+                       PARAMETER_CLOUD_STORAGE: request.GET.get('cloud_storage', 'False')
                        }
 
     return parameters_dict
