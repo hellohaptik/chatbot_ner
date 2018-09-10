@@ -1,6 +1,5 @@
 import logging.handlers
 import os
-
 import dotenv
 from elasticsearch import RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
@@ -14,26 +13,41 @@ LOG_PATH = BASE_DIR + '/logs/'
 if not os.path.exists(LOG_PATH):
     os.makedirs(LOG_PATH)
 
+
+# LOGGING
+LOG_LEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'error').upper()
+
+# Common formatter
+formatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(message)s", "%Y-%m-%d %H:%M:%S")
+
+# Handler for Docker stdout
+handler_stdout = logging.StreamHandler()
+handler_stdout.setLevel(LOG_LEVEL)
+handler_stdout.setFormatter(formatter)
+
+# SETUP NER LOGGING
 NER_LOG_FILENAME = LOG_PATH + 'ner_log.log'
 # Set up a specific logger with our desired output level
 ner_logger = logging.getLogger('NERLogger')
-ner_logger.setLevel(logging.DEBUG)
+ner_logger.setLevel(LOG_LEVEL)
 # Add the log message handler to the logger
 handler = logging.handlers.RotatingFileHandler(NER_LOG_FILENAME, maxBytes=10 * 1024 * 1024, backupCount=5)
-formatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(message)s", "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 ner_logger.addHandler(handler)
+ner_logger.addHandler(handler_stdout)
 
-# SET UP NLP LIB LOGGING
+
+# SETUP NLP LIB LOGGING
 NLP_LIB_LOG_FILENAME = LOG_PATH + 'nlp_log.log'
 # Set up a specific logger with our desired output level
 nlp_logger = logging.getLogger('NLPLibLogger')
-nlp_logger.setLevel(logging.DEBUG)
+nlp_logger.setLevel(LOG_LEVEL)
 # Add the log message handler to the logger
 handler = logging.handlers.RotatingFileHandler(NLP_LIB_LOG_FILENAME, maxBytes=10 * 1024 * 1024, backupCount=5)
-formatter = logging.Formatter("%(asctime)s\t%(levelname)s\t%(message)s", "%Y-%m-%d %H:%M:%S")
 handler.setFormatter(formatter)
 nlp_logger.addHandler(handler)
+nlp_logger.addHandler(handler_stdout)
+
 
 if os.path.exists(CONFIG_PATH):
     dotenv.read_dotenv(CONFIG_PATH)
