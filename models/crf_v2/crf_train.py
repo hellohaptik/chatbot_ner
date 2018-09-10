@@ -130,12 +130,11 @@ class CrfTrain(object):
 
     def write_model_to_s3(self):
         """
-        This method is used to write data to S3 and add the path in redis_cache
+        This method is used to write data to S3 and
         Returns:
 
         Raises:
             AwsWriteEntityFail if writing to Aws fails
-            RedisWriteEntityFail if writing to Redis fails
         """
         ner_logger.debug('Model %s saving at AWS started' % self.model_dir)
         result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,

@@ -15,5 +15,3 @@ word2number==1.1
 python-crfsuite==0.9.6
 boto==2.49.0
 boto3==1.8.4
-redis==2.10.6
-django-redis-cache==1.7.1

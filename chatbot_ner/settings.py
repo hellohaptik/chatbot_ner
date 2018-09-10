@@ -83,34 +83,3 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
-#  Transfer Crf Model Specific (optional)
-REDIS_REPLICA_HOST = os.environ.get('REDIS_REPLICA_HOST')
-REDIS_HOST = os.environ.get('REDIS_HOST')
-REDIS_PORT = os.environ.get('REDIS_PORT')
-REDIS_DB = os.environ.get('REDIS_DB')
-REDIS_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
-REDIS_REPLICA_LOCATION = 'redis://' + REDIS_HOST + ":" + REDIS_PORT + "/" + REDIS_DB
-REDIS_HOST_DEST = os.environ.get('REDIS_HOST_DEST')
-REDIS_PORT_DEST = os.environ.get('REDIS_PORT_DEST')
-REDIS_DB_DEST = os.environ.get('REDIS_DB_DEST')
-REDIS_LOCATION_DEST = 'redis://' + REDIS_HOST_DEST + ":" + REDIS_PORT_DEST + "/" + REDIS_DB_DEST
-
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-        'LOCATION': '/var/tmp/django_cache',
-    },
-
-    "redis_ml": {
-        "BACKEND": "redis_cache.RedisCache",
-        "LOCATION": [REDIS_LOCATION, REDIS_REPLICA_LOCATION],
-        "OPTIONS": {'MASTER_CACHE': REDIS_LOCATION},
-    },
-
-    "redis_ml_dest": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_LOCATION_DEST,
-    }
-
-}
