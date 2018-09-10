@@ -7,6 +7,11 @@ class TextModelDetector(TextDetector):
     This class is inherited from the TextDetector class.
     This class is primarily used to detect text type entities and additionally return the detection source for the same.
     """
+    def __init__(self, entity_name, source_language_script, cloud_storage=False, cloud_embeddings=False):
+        super(TextModelDetector, self).__init__(entity_name=entity_name, source_language_script=source_language_script)
+        self.cloud_storage = cloud_storage
+        self.cloud_embeddings = cloud_embeddings
+
     def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and

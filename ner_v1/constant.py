@@ -73,3 +73,8 @@ LAST_NAME = 'last_name'
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
 DATASTORE_VERIFIED = 'datastore_verified'
+
+#  **********************constants used for text detection************************************
+
+PARAMETER_CLOUD_STORAGE = 'cloud_storage'
+PARAMETER_CLOUD_EMBEDDINGS = 'cloud_embeddings'
