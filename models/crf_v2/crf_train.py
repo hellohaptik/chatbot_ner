@@ -75,10 +75,13 @@ class CrfTrain(object):
             trainer.train(self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             self.write_model_to_s3()
+            return self.model_dir
         else:
-            trainer.train(MODELS_PATH + self.entity_name)
+            local_path = MODELS_PATH + self.entity_name
+            trainer.train(local_path)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
+            return local_path
 
     def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000):
         """
@@ -99,7 +102,8 @@ class CrfTrain(object):
         x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list,
                                                    cloud_embeddings=self.cloud_embeddings)
         ner_logger.debug('Preprocessing for Entity: %s completed' % self.entity_name)
-        self.train_crf_model(x, y, c1, c2, max_iterations)
+        model_path = self.train_crf_model(x, y, c1, c2, max_iterations)
+        return model_path
 
     def train_model_from_es_data(self):
         """
@@ -123,7 +127,8 @@ class CrfTrain(object):
         ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
         ner_logger.debug('Length of text_list %s' % str(len(text_list)))
 
-        self.train_model(entity_list=entity_list, text_list=text_list)
+        model_path = self.train_model(entity_list=entity_list, text_list=text_list)
+        return model_path
 
     def write_model_to_s3(self):
         """

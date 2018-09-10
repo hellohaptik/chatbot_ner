@@ -216,7 +216,7 @@ def train_crf_model(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": "", "result": []}
+    response = {"success": False, "error": "", "result": {}}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -228,11 +228,13 @@ def train_crf_model(request):
                              cloud_embeddings=cloud_embeddings)
 
         if es_config:
-            crf_model.train_model_from_es_data()
+            model_path = crf_model.train_model_from_es_data()
         else:
             text_list = external_api_data.get(SENTENCE_LIST)
             entity_list = external_api_data.get(ENTITY_LIST)
-            crf_model.train_model(text_list=text_list, entity_list=entity_list)
+            model_path = crf_model.train_model(text_list=text_list, entity_list=entity_list)
+
+        response['result'] = {'model_path': model_path}
         response['success'] = True
 
     except (IndexNotFoundException, InvalidESURLException,
