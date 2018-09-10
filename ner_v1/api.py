@@ -59,10 +59,12 @@ def text(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         fuzziness = parameters_dict[PARAMETER_FUZZINESS]
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
+        cloud_storage = json.loads(parameters_dict[PARAMETER_CLOUD_STORAGE].lower())
+        cloud_embeddings = json.loads(parameters_dict[PARAMETER_CLOUD_STORAGE].lower())
         text_model_detector = TextModelDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                                 source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT],
-                                                cloud_storage=parameters_dict[PARAMETER_CLOUD_STORAGE],
-                                                cloud_embeddings=parameters_dict[PARAMETER_CLOUD_EMBEDDINGS]
+                                                cloud_storage=cloud_storage,
+                                                cloud_embeddings=cloud_embeddings
                                                 )
         ner_logger.debug('fuzziness: %s min_token_len_fuzziness %s' % (str(fuzziness), str(min_token_len_fuzziness)))
         if fuzziness:
