@@ -1,5 +1,6 @@
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import ENTITY_VALUE_DICT_KEY, DATASTORE_VERIFIED
+from ner_v1.constant import ENTITY_VALUE_DICT_KEY, DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
+from models.crf_v2.crf_detect_entity import CrfDetection
 
 
 class TextModelDetector(TextDetector):
@@ -64,6 +65,15 @@ class TextModelDetector(TextDetector):
         text_entity_verified_values = self._add_verification_source(values=values,
                                                                     verification_source_dict=
                                                                     {DATASTORE_VERIFIED: True})
+        crf_model = CrfDetection(entity_name=self.entity_name, cloud_storage=self.cloud_storage,
+                                 cloud_embeddings=self.cloud_embeddings)
+        crf_original_text = crf_model.detect_entity(text=text)
+
+        crf_entity_verified_values = self._add_verification_source(values=crf_original_text,
+                                                                   verification_source_dict=
+                                                                   {CRF_MODEL_VERIFIED: True})
+        text_entity_verified_values.extend(crf_entity_verified_values)
+        original_texts.extend(crf_original_text)
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
         return self.text_entity_values, self.original_texts
 

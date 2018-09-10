@@ -73,6 +73,7 @@ LAST_NAME = 'last_name'
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
 DATASTORE_VERIFIED = 'datastore_verified'
+CRF_MODEL_VERIFIED = 'crf_model_verified'
 
 #  **********************constants used for text detection************************************
 
