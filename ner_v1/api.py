@@ -60,7 +60,7 @@ def text(request):
         fuzziness = parameters_dict[PARAMETER_FUZZINESS]
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
         cloud_storage = json.loads(parameters_dict[PARAMETER_CLOUD_STORAGE].lower())
-        cloud_embeddings = json.loads(parameters_dict[PARAMETER_CLOUD_STORAGE].lower())
+        cloud_embeddings = json.loads(parameters_dict[PARAMETER_CLOUD_EMBEDDINGS].lower())
         text_model_detector = TextModelDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                                 source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT],
                                                 cloud_storage=cloud_storage,
