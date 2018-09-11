@@ -9,11 +9,11 @@ class TextModelDetector(TextDetector):
     This class is primarily used to detect text type entities and additionally return the detection source for the same.
     """
     def __init__(self, entity_name, source_language_script, cloud_storage=False, cloud_embeddings=False,
-                 live_crf_model_path=''):
+                 live_crf_model_path=None):
         super(TextModelDetector, self).__init__(entity_name=entity_name, source_language_script=source_language_script)
         self.cloud_storage = cloud_storage
         self.cloud_embeddings = cloud_embeddings
-        self.live_crf_model_s3_path = live_crf_model_path
+        self.live_crf_model_path = live_crf_model_path
 
     def detect_entity(self, text, **kwargs):
         """
@@ -63,21 +63,20 @@ class TextModelDetector(TextDetector):
         Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
-        text_entity_verified_values = self._add_verification_source(values=values,
-                                                                    verification_source_dict=
-                                                                    {DATASTORE_VERIFIED: True})
-        crf_model = CrfDetection(entity_name=self.entity_name, cloud_storage=self.cloud_storage,
-                                 cloud_embeddings=self.cloud_embeddings,
-                                 live_crf_model_path=self.live_crf_model_s3_path)
-        crf_original_text = crf_model.detect_entity(text=text)
+        crf_original_texts = []
+        if self.live_crf_model_path:
+            crf_model = CrfDetection(entity_name=self.entity_name, cloud_storage=self.cloud_storage,
+                                     cloud_embeddings=self.cloud_embeddings,
+                                     live_crf_model_path=self.live_crf_model_path)
 
-        crf_entity_verified_values = self._add_verification_source(values=crf_original_text,
-                                                                   verification_source_dict=
-                                                                   {CRF_MODEL_VERIFIED: True})
-        text_entity_verified_values.extend(crf_entity_verified_values)
-        original_texts.extend(crf_original_text)
+            crf_original_texts = crf_model.detect_entity(text=text)
+
+        values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
+
+        text_entity_verified_values, original_texts = self.combine_results(values=values, original_texts=original_texts,
+                                                                           crf_original_texts=crf_original_texts)
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
+
         return self.text_entity_values, self.original_texts
 
     def _add_verification_source(self, values, verification_source_dict):
@@ -104,3 +103,33 @@ class TextModelDetector(TextDetector):
             text_entity_dict.update(verification_source_dict)
             text_entity_verified_values.append(text_entity_dict)
         return text_entity_verified_values
+
+    def combine_results(self, values, original_texts, crf_original_texts):
+        unprocessed_crf_original_texts = []
+
+        combined_values = self._add_verification_source(values=values,
+                                                        verification_source_dict=
+                                                        {DATASTORE_VERIFIED: True,
+                                                         CRF_MODEL_VERIFIED: False}
+                                                        )
+        combined_original_texts = original_texts
+        for i in range(len(crf_original_texts)):
+            match = False
+            for j in range(len(original_texts)):
+                if crf_original_texts[i] == original_texts[j]:
+                    combined_values[j][CRF_MODEL_VERIFIED] = True
+                    match = True
+                elif crf_original_texts[i] in original_texts[j]:
+                    match = True
+            if not match:
+                unprocessed_crf_original_texts.append(crf_original_texts[i])
+
+        unprocessed_crf_original_texts_verified = self._add_verification_source(values=unprocessed_crf_original_texts,
+                                                                                verification_source_dict=
+                                                                                {DATASTORE_VERIFIED: False,
+                                                                                 CRF_MODEL_VERIFIED: True}
+                                                                                )
+        combined_values.extend(unprocessed_crf_original_texts_verified)
+        combined_original_texts.extend(unprocessed_crf_original_texts)
+
+        return combined_values, combined_original_texts
