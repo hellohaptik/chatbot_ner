@@ -18,6 +18,7 @@ services:
       - "NAME=chatbot_ner"
       - "DJANGODIR=/app"
       - "NUM_WORKERS=1"
+      - "MAX_REQUESTS=1000"
       - "DJANGO_SETTINGS_MODULE=chatbot_ner.settings"
       - "DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py"
       - "PORT=8081"

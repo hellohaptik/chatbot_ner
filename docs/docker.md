@@ -58,7 +58,7 @@ Bring up chatbot_ner:
     ```shell
        cd chatbot_ner 
        cd docker
-       docker-compose up -d 
+       docker-compose up --build -d 
     ```
 
 The above will also mount local repo root directory inside the containers /app directory
