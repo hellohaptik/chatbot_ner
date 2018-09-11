@@ -9,6 +9,8 @@ from lib.nlp.levenshtein_distance import edit_distance
 # from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.base_detector import BaseDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
+from ner_v1.detectors.constant import ES_VERIFIED
+from ner_v1.constant import ENTITY_VALUE_DICT_KEY
 
 
 class TextDetector(BaseDetector):
@@ -295,7 +297,9 @@ class TextDetector(BaseDetector):
 
         values, original_texts = self._text_detection_with_variants()
 
-        self.text_entity_values, self.original_texts = values, original_texts
+        text_entity_verified_values = TextDetector.add_verification_source(values=values,
+                                                                           verification_source_dict={ES_VERIFIED: True})
+        self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
 
         return self.text_entity_values, self.original_texts
 
@@ -402,3 +406,55 @@ class TextDetector(BaseDetector):
                 original_text_tokens = []
                 variant_token_i = 0
         return None
+
+    @staticmethod
+    def add_verification_source(values, verification_source_dict):
+        """
+        Add the verification source for the detected entities
+        Args:
+            values (list): List of detected text type entities
+            verification_source_dict (dict): Dict consisting of the verification source and value.
+        Returns:
+            text_entity_verified_values (list): List of dicts consisting of the key and values for the keys
+            value and verification source
+        Example:
+            values = [u'Chennai', u'New Delhi', u'chennai']
+            verification_source_dict = {"es_verified": True}
+
+            >> add_verification_source(values, verification_source_dict)
+                [{'es_verified': True, 'value': u'Chennai'},
+                 {'es_verified': True, 'value': u'New Delhi'},
+                 {'es_verified': True, 'value': u'chennai'}]
+        """
+        text_entity_verified_values = []
+        for text_entity_value in values:
+            text_entity_dict = {ENTITY_VALUE_DICT_KEY: text_entity_value}
+            for verification_source_key in list(verification_source_dict.keys()):
+                text_entity_dict[verification_source_key] = verification_source_dict[verification_source_key]
+            text_entity_verified_values.append(text_entity_dict)
+        return text_entity_verified_values
+
+    @staticmethod
+    def get_text_entity_values(text_entity_verified_values):
+        """
+        This method is used to unwrap the text_entity_verified_values (a list of dicts) where each dict consists of
+        the verification sources and value for the text detected (from the method detect_entity) to a text_list
+        consisting of a list of only the the values
+        Args:
+            text_entity_verified_values (list): List of dicts obtained from the text_detection method detect_entity
+
+        Returns:
+            text_list (list): List of text detected from text detection for budget
+
+        Example
+            text_entity_verified_values = [{'es_verified': True, 'value': u'Chennai'},
+                                         {'es_verified': True, 'value': u'New Delhi'},
+                                         {'es_verified': True, 'value': u'chennai'}]
+            >>get_text_entity_values(text_entity_verified_values):
+            >>[u'Chennai', u'New Delhi', u'chennai']
+        """
+        text_list = []
+        for text_dict in text_entity_verified_values:
+            text_list.append(text_dict[ENTITY_VALUE_DICT_KEY])
+
+        return text_list
