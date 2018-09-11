@@ -94,12 +94,12 @@ ENV/
 .idea/
 .realsync
 
-Dockerfile
-post-merge
-entrypoint.sh
-setup.py
-docker-compose.yml
-newrelic.ini
+/Dockerfile
+/post-merge
+/entrypoint.sh
+/setup.py
+/docker-compose.yml
+/newrelic.ini
 
 .DS_Store
 # Log path
