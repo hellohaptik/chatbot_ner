@@ -61,7 +61,7 @@ Bring up chatbot_ner:
        docker-compose up -d 
     ```
 
-
+The above will also mount local repo root directory inside the containers /app directory
 
    > **NOTE**: make sure that nothing is running on port 80 on your server or your local environment. If anything is running on port 80 run the following command
    >
@@ -75,15 +75,16 @@ Container commands:
 
    ```shell
    $ cd ~/chatbot_ner/docker  (all compose commands from docker directory of repo)
-   $ docker-compose ps (shows list of running container)
+   $ docker-compose ps or docker ps (shows list of running container)
    $ sudo docker exec -it (container-name) bash
    ```
    Check logs 
    ```shell
    $ docker logs -f (container-name)
    ```
-   ​
-   Following is the API call to test our service on your local system:
+   ​-f is for tail
+   
+   Following is the API call to test our service on your local system/server:
 
    ```python
    entities = ['date','time','restaurant']

@@ -24,15 +24,14 @@ Following are the list of different entity types along with its API call:
       ```
 
     - *Python:* 
-
       ```python
       from ner_v1.chatbot.entity_detection import get_text
       output = get_text(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
-
+      The above can also be done from within the Docker container's shell. Setup is in docker.md file.
+      
     - *CURL command:*
-
       ```shell
       URL='localhost'
       PORT=8081
