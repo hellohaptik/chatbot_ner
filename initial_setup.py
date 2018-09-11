@@ -2,7 +2,7 @@ import os
 import nltk
 from datastore import DataStore
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(__file__)
 
 print "Downloading nltk corpus: punkt ..."
 status = nltk.download('punkt')

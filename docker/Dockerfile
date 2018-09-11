@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y wget build-essential curl nginx
 WORKDIR /app
 
 
-COPY docker/install.sh initial_setup.py /app
+COPY docker/install.sh initial_setup.py /app/
 
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \
@@ -34,10 +34,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 #ENV DATE_MODEL_TYPE=crf
 #ENV DATE_MODEL_PATH=/root/models/models_live/date/crf/model.crf
 
-
 EXPOSE 8081
 
 ADD . /app
 
 # entrypoint/cmd script
-CMD /app/cmd.sh
+CMD /app/docker/cmd.sh
