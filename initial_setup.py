@@ -29,7 +29,9 @@ if not status:
 time.sleep(20)
 # waiting for Elasticsearch to come up properly, if you have a self hosted ES and not using via docker-compose
 # You can remove this sleep
+# TODO move this part to a different script and run on-demand
 # POPULATING DATASTORE
+# Comment out entire section if you want to reuse existing data
 from datastore import DataStore
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"

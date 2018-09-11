@@ -2,7 +2,7 @@
 
 FROM python:2.7.15
 
-RUN apt-get update && apt-get install -y wget build-essential curl nginx
+RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
 
 WORKDIR /app
 

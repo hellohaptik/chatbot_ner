@@ -17,7 +17,7 @@ services:
 # ENV vars defined in Dockerfile can be overwritten here before docker-compose up
       - "NAME=chatbot_ner"
       - "DJANGODIR=/app"
-      - "NUM_WORKERS=4"
+      - "NUM_WORKERS=1"
       - "DJANGO_SETTINGS_MODULE=chatbot_ner.settings"
       - "DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py"
       - "PORT=8081"

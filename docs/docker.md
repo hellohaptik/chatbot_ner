@@ -76,7 +76,9 @@ Container commands:
    ```shell
    $ cd ~/chatbot_ner/docker  (all compose commands from docker directory of repo)
    $ docker-compose ps or docker ps (shows list of running container)
-   $ sudo docker exec -it (container-name) bash
+   $ docker exec -it container-name bash  (login to container shell)
+   $ docker-compose down (to kill containers)
+   $ docker-compose restart (to restart containers, probably when you make code changes) 
    ```
    Check logs 
    ```shell
@@ -187,7 +189,7 @@ Container commands:
    - To access GUI, go to http://localhost:80/gui/ or http://host-ip/gui/
 
    ​
-
+### NOTE: If you bring down the container and bring it up again, initial_setup will run again. If you added some data and do not want it to get reset on ELASTICSEARCH, comment out DataStore section in initial_setup.py
 
 ## To Create Custom Docker Images
 
