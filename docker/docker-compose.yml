@@ -3,7 +3,7 @@
 # This will also bring up local Elasticsearch, you could even use your already setup ES
 # I have defined a common network for these 2 services so that containers can communicate with each other
 
-# TODO move Nginx also into compose
+# TODO move Nginx also into docker-compose
 #
 version: '3.1'
 
