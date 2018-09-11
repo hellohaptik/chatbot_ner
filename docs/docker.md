@@ -57,6 +57,7 @@ Bring up chatbot_ner:
       
     ```shell
        cd chatbot_ner 
+       cd docker
        docker-compose up -d 
     ```
 
@@ -73,6 +74,7 @@ Bring up chatbot_ner:
 Container commands:
 
    ```shell
+   $ cd ~/chatbot_ner/docker  (all compose commands from docker directory of repo)
    $ docker-compose ps (shows list of running container)
    $ sudo docker exec -it (container-name) bash
    ```
@@ -192,6 +194,7 @@ If you want to create a custom Docker image execute the following commands after
 
 ```shell
 $ cd chatbot_ner
+$ cd docker
 $ sudo docker build -t ner_image .
 $ sudo docker run -itd -p 80:80 --name ner ner_image
 ```
