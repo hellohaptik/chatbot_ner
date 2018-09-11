@@ -7,14 +7,14 @@ RUN apt-get update && apt-get install -y wget build-essential curl nginx
 WORKDIR /app
 
 
-COPY install.sh nginx.sh /app
+COPY install.sh /app
 
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \
-    /app/install_CRF.sh && \
-    /app/nginx.sh && \
+    /app/install.sh && \
     touch /app/config && \
-    touch /app/model_config
+    touch /app/model_config && \
+    pip install --no-cache-dir -I uwsgi
 
 COPY requirements.txt /app/requirements.txt
 
@@ -39,6 +39,5 @@ EXPOSE 8081
 
 ADD . /app
 
-RUN chmod +x /app/entrypoint.sh
-
-CMD /app/entrypoint.sh
+# entrypoint/cmd script
+CMD /app/cmd.sh

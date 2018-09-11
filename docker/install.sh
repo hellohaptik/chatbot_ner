@@ -14,7 +14,6 @@ cd python
 python setup.py build
 python setup.py install
 
-
 # Get sample Nginx file for routing and GUI
 
 cd /tmp
