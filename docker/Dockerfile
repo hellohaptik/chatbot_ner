@@ -8,6 +8,7 @@ WORKDIR /app
 
 
 COPY docker/install.sh initial_setup.py /app/
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \
