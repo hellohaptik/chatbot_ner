@@ -63,12 +63,20 @@ NUMERIC_VARIANTS = DIGIT_UNITS + [
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 
-#**********************constants used for name detection************************************
+#  **********************constants used for name detection************************************
 
-FIRST_NAME='first_name'
-MIDDLE_NAME='middle_name'
-LAST_NAME='last_name'
+FIRST_NAME = 'first_name'
+MIDDLE_NAME = 'middle_name'
+LAST_NAME = 'last_name'
 
 
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
+DATASTORE_VERIFIED = 'datastore_verified'
+CRF_MODEL_VERIFIED = 'crf_model_verified'
+
+#  **********************constants used for text detection************************************
+
+PARAMETER_CLOUD_STORAGE = 'cloud_storage'
+PARAMETER_CLOUD_EMBEDDINGS = 'cloud_embeddings'
+PARAMETER_LIVE_CRF_MODEL_PATH = 'live_crf_model_path'

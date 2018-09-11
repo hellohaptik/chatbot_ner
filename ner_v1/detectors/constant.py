@@ -26,7 +26,6 @@ TYPE_POSSIBLE_DAY = 'possible_day'
 
 BUDGET_TYPE_NORMAL = 'normal_budget'
 BUDGET_TYPE_TEXT = 'text_budget'
-ES_BUDGET_LIST = 'budget'
 
 # CAROUSEL DETECTION
 API_NAME = 'api_name'
@@ -35,6 +34,7 @@ API_NAME = 'api_name'
 AM_MERIDIEM = 'am'
 PM_MERIDIEM = 'pm'
 TWELVE_HOUR = 12
+EVERY_TIME_TYPE = 'ev'
 
 # WEEK DETECTION
 WEEKDAYS = 'weekdays'

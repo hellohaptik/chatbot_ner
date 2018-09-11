@@ -48,6 +48,7 @@ else:
 ENGINE = os.environ.get('ENGINE')
 if ENGINE:
     ENGINE = ENGINE.lower()
+# ES settings (Mandatory to use Text type entities)
 ES_URL = os.environ.get('ES_URL')
 ES_HOST = os.environ.get('ES_HOST')
 ES_PORT = os.environ.get('ES_PORT')
@@ -57,6 +58,15 @@ ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
+
+
+# Crf Model Specific (Mandatory to use CRF Model)
+MODELS_PATH = os.environ.get('MODELS_PATH')
+EMBEDDINGS_PATH_VOCAB = os.environ.get('EMBEDDINGS_PATH_VOCAB')
+EMBEDDINGS_PATH_VECTORS = os.environ.get('EMBEDDINGS_PATH_VECTORS')
+
+
+# Transfer Specific (optional)
 ES_INDEX_1 = os.environ.get('ES_INDEX_1')
 ES_INDEX_2 = os.environ.get('ES_INDEX_2')
 DESTINATION_ES_SCHEME = os.environ.get('DESTINATION_ES_SCHEME')
@@ -69,6 +79,12 @@ ES_ALIAS = os.environ.get('ES_ALIAS')
 ES_SCHEME = os.environ.get('ES_SCHEME')
 ELASTICSEARCH_CRF_DATA_INDEX_NAME = os.environ.get('ELASTICSEARCH_CRF_DATA_INDEX_NAME')
 ELASTICSEARCH_CRF_DATA_DOC_TYPE = os.environ.get('ELASTICSEARCH_CRF_DATA_DOC_TYPE')
+
+
+# Crf Model Specific with additional AWS storage (optional)
+AWS_MODEL_BUCKET = os.environ.get('AWS_MODEL_BUCKET')
+AWS_MODEL_REGION = os.environ.get('AWS_MODEL_REGION')
+
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)

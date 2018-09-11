@@ -10,8 +10,10 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, SENTENCE_LIST
+    EXTERNAL_API_DATA, SENTENCE_LIST, CLOUD_STORAGE, ES_CONFIG, CLOUD_EMBEDDINGS, LIVE_CRF_MODEL_PATH
+
 from django.views.decorators.csrf import csrf_exempt
+from models.crf_v2.crf_train import CrfTrain
 
 
 def get_entity_word_variants(request):
@@ -65,7 +67,7 @@ def update_dictionary(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -100,9 +102,9 @@ def transfer_entities(request):
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
-        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        external_api_data = json.loads(request.POST.get(SENTENCE_LIST))
         entity_list = external_api_data.get(ENTITY_LIST)
 
         datastore_object = DataStore()
@@ -176,7 +178,7 @@ def update_crf_training_data(request):
     value: {"sentence_list":["hello pratik","hello hardik"], "entity_list":[["pratik"], ["hardik"]],
     "entity_name":"training_try3", "language_script": "en"}
     """
-    response = {"success": False, "error": ""}
+    response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         entity_name = external_api_data.get(ENTITY_NAME)
@@ -201,4 +203,50 @@ def update_crf_training_data(request):
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+@csrf_exempt
+def train_crf_model(request):
+    """
+    This method is used to train crf model.
+    Args:
+        request (HttpResponse): HTTP response from url
+    Returns:
+        HttpResponse : HttpResponse with appropriate status and error message.
+    """
+    response = {"success": False, "error": "", "result": {}}
+    try:
+        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        entity_name = external_api_data.get(ENTITY_NAME)
+        cloud_storage = external_api_data.get(CLOUD_STORAGE)
+        es_config = external_api_data.get(ES_CONFIG)
+        cloud_embeddings = external_api_data.get(CLOUD_EMBEDDINGS)
+        crf_model = CrfTrain(entity_name=entity_name,
+                             cloud_storage=cloud_storage,
+                             cloud_embeddings=cloud_embeddings)
+
+        if es_config:
+            model_path = crf_model.train_model_from_es_data()
+        else:
+            text_list = external_api_data.get(SENTENCE_LIST)
+            entity_list = external_api_data.get(ENTITY_LIST)
+            model_path = crf_model.train_model(text_list=text_list, entity_list=entity_list)
+
+        response['result'] = {LIVE_CRF_MODEL_PATH: model_path}
+        response['success'] = True
+
+    except (IndexNotFoundException, InvalidESURLException,
+            SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
+            PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
+            AliasForTransferException, IndexForTransferException, NonESEngineTransferException) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)

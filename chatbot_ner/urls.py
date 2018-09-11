@@ -10,8 +10,10 @@ urlpatterns = patterns('',
     url(r'^v1/city/$', 'ner_v1.api.city'),
     url(r'^v1/pnr/$', 'ner_v1.api.pnr'),
     url(r'^v1/shopping_size/$', 'ner_v1.api.shopping_size'),
+    url(r'^v1/passenger_count/$', 'ner_v1.api.passenger_count'),
     url(r'^v1/number/$', 'ner_v1.api.number'),
     url(r'^v1/time/$', 'ner_v1.api.time'),
+    url(r'^v1/time_with_range/$', 'ner_v1.api.time_with_range'),
     url(r'^v1/date/$', 'ner_v1.api.date'),
     url(r'^v1/budget/$', 'ner_v1.api.budget'),
     url(r'^v1/ner/$', 'ner_v1.api.ner'),
@@ -29,5 +31,11 @@ urlpatterns = patterns('',
     # Training Data Read Write
     url(r'^entities/get_crf_training_data', 'external_api.api.get_crf_training_data'),
     url(r'^entities/update_crf_training_data', 'external_api.api.update_crf_training_data'),
+
+    #  Train Crf Model
+    url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
+
+    #  Transfer Crf Model
+    url(r'^entities/transfer_crf_model', 'external_api.api.transfer_crf_model'),
 
 )

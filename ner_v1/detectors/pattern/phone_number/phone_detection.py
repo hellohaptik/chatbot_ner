@@ -65,8 +65,6 @@ class PhoneDetector(BaseDetector):
     def _detect_phone(self):
         """Detects phone numbers in the self.text
 
-        
-
         Returns:
             A tuple of two lists with first list containing the detected phone numbers and second list containing their
             corresponding substrings in the given text.
@@ -111,8 +109,6 @@ class PhoneDetector(BaseDetector):
     def _detect_phone_format(self, phone_list=None, original_list=None):
         """
         Detects phone numbers from self.text conforming to formats defined by regex pattern.
-
-        
 
         Args:
             phone_list: Optional, list to store detected phone numbers
