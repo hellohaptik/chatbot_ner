@@ -135,7 +135,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_phone_number
-      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -180,7 +180,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_phone_number
-      output = get_phone_number(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value, bot_message=bot_message)
+      output = get_phone_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -538,7 +538,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -592,7 +592,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_number
-      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
+      output = get_number(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, min_digit=min_digit, max_digit=max_digit)
       print output
       ```
 
@@ -630,6 +630,8 @@ Following are the list of different entity types along with its API call:
 - Example:
 
   - Example 1:
+  
+    - Use the **timezone** parameter to pass your current timezone to time detection
 
     - ```python
       message = "John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. \
@@ -638,13 +640,14 @@ Following are the list of different entity types along with its API call:
       structured_value = None
       fallback_value = None
       bot_message = None
+      timezone = 'UTC'  
       ```
 
     - *Python:*
 
       ```python
       from ner_v1.chatbot.entity_detection import get_time
-      output = get_time(message=message, entity_name=entity_name, structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_time(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
       print output
       ```
 
@@ -656,7 +659,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC'
       ```
 
     - *CURL Output:*
@@ -692,6 +695,76 @@ Following are the list of different entity types along with its API call:
             }
           }
         ]
+      }
+      ```
+### time_with_range
+
+- This functionality calls the TimeDetector class to detect time with range.
+
+- Example:
+
+  - Example 1:
+  
+    - Use the **timezone** parameter to pass your current timezone to time detection
+
+    - ```python
+      message = 'Set a drink water reminder for tomorrow from 7:00 AM to 6:00 PM'
+      entity_name = 'time_with_range'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      timezone = 'UTC'  
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_time_with_range
+      output = get_time_with_range(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message, timezone=timezone)
+      print output
+      ```
+
+    - CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/time_with_range/?message=Set+a+drink+water+reminder+for+tomorrow+from+7%3A00+AM+to+6%3A00+PM&entity_name=time_with_range&structured_value=&fallback_value=&bot_message=&timezone=UTC'
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "7:00 am to 6:00 pm", 
+            "entity_value": {
+               "mm": 0, 
+               "hh": 7, 
+               "range": "start", 
+               "nn": "am", 
+               "time_type": null
+            }, 
+            "language": "en"
+          }, 
+          {
+            "detection": "message",
+            "original_text": "7:00 am to 6:00 pm", 
+            "entity_value": {
+              "mm": 0, 
+              "hh": 6, 
+              "range": "end", 
+              "nn": "pm", 
+              "time_type": null
+            }, 
+            "language": "en"
+          }
+          ]
       }
       ```
 
@@ -871,7 +944,7 @@ Following are the list of different entity types along with its API call:
     - ```python
 
       message = "I want to buy Large shirt and jeans of 36 waist"
-      entity_name = 'shopping_size'
+      entity_name = 'shopping_clothes_size'
       structured_value = None
       fallback_value = None
       bot_message = None
@@ -893,7 +966,7 @@ Following are the list of different entity types along with its API call:
       ```
 
       ```shell
-      curl -i 'http://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=budget&structured_value=&fallback_value=&bot_message='
+      curl -i 'http://'$URL':'$PORT'/v1/shopping_size/?message=I%20want%20to%20buy%20Large%20shirt%20and%20jeans%20of%2036%20waist&entity_name=shopping_clothes_size&structured_value=&fallback_value=&bot_message='
       ```
 
     - *CURL Output:*
@@ -919,6 +992,112 @@ Following are the list of different entity types along with its API call:
       }
       ```
 
+### passenger_count
+
+- This functionality calls the PassengerDetector class to detect passenger count.
+
+- Example:
+
+  - Example 1:
+
+    - ```python
+
+      message = 'Can you please help me to book tickets for 3 people'
+      entity_name = 'no_of_adults'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_passenger_count
+      output = get_passenger_count(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/passenger_count/?message=Can+you+please+help+me+to+book+tickets+for+3+people&entity_name=no_of_adults&structured_value=&fallback_value=&bot_message='
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "3", 
+            "entity_value": {
+              "value": "3"
+            }, 
+            "language": "en"
+          }
+        ]
+      }
+      ```      
+      
+### location
+
+- This functionality calls the TextDetector class to detect location.
+
+- Example:
+
+  - Example 1:
+
+    - ```python
+
+      message = 'atm in andheri west'
+      entity_name = 'locality_list'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      ```
+
+    - *Python:*
+
+      ```python
+      from ner_v1.chatbot.entity_detection import get_location
+      output = get_location(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
+      print output
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      ```
+
+      ```shell
+      curl -i 'http://'$URL':'$PORT'/v1/location/?message=atm+in+andheri+west&entity_name=locality_list&structured_value=&fallback_value=&bot_message='
+      ```
+
+    - *CURL Output:*
+
+      ```json
+      {
+        "data": [
+          {
+            "detection": "message", 
+            "original_text": "andheri west", 
+            "entity_value": {
+              "value": "Andheri West"
+            }, 
+            "language": "en"
+          }
+        ]
+      }
+      ```  
+
 ### person_name
 
 - This functionality calls the NameDetector class to detect Name entities.
@@ -939,7 +1118,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_person_name
-      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_person_name(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
@@ -987,7 +1166,7 @@ Following are the list of different entity types along with its API call:
 
       ```python
       from ner_v1.chatbot.entity_detection import get_person_name
-      output = get_person_name(message=message,entity_name=entity_name,                   structured_value=structured_value,fallback_value=fallback_value,bot_message=bot_message)
+      output = get_person_name(message=message, entity_name=entity_name, structured_value=structured_value, fallback_value=fallback_value, bot_message=bot_message)
       print output
       ```
 
