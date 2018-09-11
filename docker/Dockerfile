@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y wget build-essential curl nginx
 WORKDIR /app
 
 
-COPY install.sh /app
+COPY docker/install.sh initial_setup.py /app
 
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \

@@ -31,7 +31,7 @@ services:
       - "ES_BULK_MSG_SIZE=1000"
       - "ES_SEARCH_SIZE=10"
       - "CITY_MODEL_TYPE=crf"
-      - "CITY_MODEL_PATH=/app/models//crf/city.crf"
+      - "CITY_MODEL_PATH="
       - "GOOGLE_TRANSLATE_API_KEY="
 
     restart: always
