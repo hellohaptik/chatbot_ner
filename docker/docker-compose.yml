@@ -36,7 +36,7 @@ services:
 
     restart: always
     volumes:
-      - .:/app/
+      - ..:/app/
 
 # Map port 80 of host machine to port 80 of container inside which Nginx and chatbot_ner app are running
 # Nginx proxy passes to backend Chatbot_ner app running on 8081

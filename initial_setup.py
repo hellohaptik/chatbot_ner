@@ -1,5 +1,6 @@
 import os
 import nltk
+import time
 from datastore import DataStore
 
 BASE_DIR = os.path.dirname(__file__)
@@ -25,6 +26,10 @@ if not status:
     print "AP POS Tagger Download was unsucessful"
 
 # Below needs to be committed if you want to use existing data in the Elasticsearch Setup
+
+time.sleep(20)
+# waiting for Elasticsearch to come up properly, if you have a self hosted ES and not using via docker-compose
+# You can remove this sleep
 
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"
