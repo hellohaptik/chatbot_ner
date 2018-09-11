@@ -1,7 +1,6 @@
 import os
 import nltk
 import time
-from datastore import DataStore
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -30,7 +29,8 @@ if not status:
 time.sleep(20)
 # waiting for Elasticsearch to come up properly, if you have a self hosted ES and not using via docker-compose
 # You can remove this sleep
-
+# POPULATING DATASTORE
+from datastore import DataStore
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"
 print "Deleting any stale data ..."
