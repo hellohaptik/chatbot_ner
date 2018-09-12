@@ -62,7 +62,7 @@ Bring up chatbot_ner:
     ```
 
 The above will also mount local repo root directory inside the containers /app directory
-
+Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
    > **NOTE**: make sure that nothing is running on port 80 on your server or your local environment. If anything is running on port 80 run the following command
    >
    > `sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill`
@@ -82,9 +82,16 @@ Container commands:
    ```
    Check logs 
    ```shell
-   $ docker logs -f (container-name)
+   $ docker logs -f docker_chatbot-ner_1
    ```
+   ```shell
+   $ cd ~/chatbot_ner/logs
+   $ tail -f *.log
+   ```
+   
    ​-f is for tail
+   docker_chatbot-ner_1 - Docker container name
+   LOG_LEVEL can be changes in compose or config.py
    
    Following is the API call to test our service on your local system/server:
 
