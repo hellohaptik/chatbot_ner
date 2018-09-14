@@ -143,7 +143,7 @@ class CityDetector(object):
             Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
-        patterns = re.findall(r'\s(([A-Za-z]+)\s+(\-|to|2|and)\s+([A-Za-z\s]+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(r'\s(([A-Za-z]+)\s+(\-|to|2|se|and)\s+([A-Za-z\s]+))\.?\b', self.processed_text.lower())
         for pattern in patterns:
             city_dict_list.extend(
                 self._city_dict_from_text(text=pattern[1], from_property=True)
@@ -172,7 +172,7 @@ class CityDetector(object):
         """
         city_dict_list = []
         patterns = re.findall(r'\s((?:from|frm|departing|depart|leaving|leave)\s+([A-Za-z]+)'
-                              r'\s+(?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s+([A-Za-z]+))\.?\b',
+                              r'\s+(?:and|to|se|2|for|fr|arriving|arrive|reaching|reach|rch)\s+([A-Za-z]+))\.?\b',
                               self.processed_text.lower())
 
         for pattern in patterns:
