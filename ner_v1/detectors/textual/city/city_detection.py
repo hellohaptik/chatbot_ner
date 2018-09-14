@@ -292,18 +292,11 @@ class CityDetector(object):
         departure_city_flag = False
         arrival_city_flag = False
         if self.bot_message:
-
-            departure_regex = r'departure city|origin city|origin|traveling from|leaving from'
-            r'|flying from|travelling from|'
-            hinglish_departure = u'कहां से'
-            departure_regex = departure_regex + hinglish_departure
-            departure_regexp = re.compile(departure_regex)
-
-            hinglish_arrival = u'कहां जाना'
-            arrival_regex = r'traveling to|travelling to|arrival city|arrival|destination city'
-            r'|destination|leaving to|flying to|'
-            arrival_regex = arrival_regex + hinglish_arrival
-            arrival_regexp = re.compile(arrival_regex)
+            hinglish_departure = u'जाना'
+            departure_regexp = re.compile(
+                r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from' + hinglish_departure)
+            arrival_regexp = re.compile(
+                r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to')
             if departure_regexp.search(self.bot_message) is not None:
                 departure_city_flag = True
             elif arrival_regexp.search(self.bot_message) is not None:
