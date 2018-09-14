@@ -9,7 +9,7 @@ dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_d
               'january': [1, "month"], 'february': [2, "month"], 'march': [3, "month"], 'april': [4, "month"],
               'may': [5, "month"], 'june': [6, "month"], 'july': [7, "month"], 'august': [8, "month"],
               'september': [9, "month"], 'october': [10, "month"], 'november': [11, "month"],
-              'december': [12, "month"]}
+              'december': [12, "month"], 'itwar': [6, "weekday"], 'itvar': [6, "weekday"]}
 
 times_dict = {'abhi': 0, 'turant': 0, 'bje': 1, 'bajkr': 1, 'bajkar': 1, 'baje': 1, 'baj': 1, 'ghante': 1, 'ghanta': 1,
               'ghanton': 1, 'subah': 0, 'shaam': 0, 'sandhya': 0, 'dopahar': 0, 'raat': 0, 'minutes': 2, 'minute': 2,

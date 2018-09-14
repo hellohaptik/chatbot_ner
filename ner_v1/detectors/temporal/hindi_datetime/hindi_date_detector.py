@@ -77,7 +77,7 @@ c3 = re.compile(r'(\d+)\s*' + tarikh_ref)
 d1 = re.compile(r'(\d+)\s*' + day_ref + r'\s+' + ref_datetime)
 
 e1 = re.compile(r'(\d+)\s*' + weekday_ref + '\\s*' + ref_datetime + r'\s+' + months_ref)
-e2 = re.compile(ref_datetime + r'\s+' + months_ref + r'\s+(\d+)\s*' + weekday_ref)
+e2 = re.compile(ref_datetime + r'\s+' + months_ref + r'\s+[a-z]*\s*(\d+)\s*' + weekday_ref)
 
 f1 = re.compile(ref_datetime + r'\s*' + weekday_ref)
 f2 = re.compile(weekday_ref)
