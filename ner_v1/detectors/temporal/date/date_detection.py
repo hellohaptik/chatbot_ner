@@ -254,13 +254,22 @@ class DateAdvancedDetector(object):
         """
 
         date_dict_list = []
-        regex_pattern = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
-                                   r'arriving|arrive|return|returning at)\s+(.+))\.?\s?')
-        patterns = regex_pattern.findall(self.processed_text.lower())
-        for pattern in patterns:
-            date_dict_list.extend(
-                self._date_dict_from_text(text=pattern[2], to_property=True)
-            )
+        regex_pattern_1 = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
+                                     r'arriving|arrive|return|returning at)\s+(.+))\.?\s?')
+        regex_pattern_2 = re.compile(r'(.+)\s+(ko|k|)\s*(aana|ana|aunga|aaun)')
+        patterns_1 = regex_pattern_1.findall(self.processed_text.lower())
+        patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
+        if patterns_1:
+            for pattern in patterns_1:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[2], to_property=True)
+                )
+        elif patterns_2:
+            for pattern in patterns_2:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[0], to_property=True)
+                )
+
         return date_dict_list
 
     def _detect_any_date(self):
