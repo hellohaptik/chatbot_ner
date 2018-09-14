@@ -298,12 +298,12 @@ class DateAdvancedDetector(object):
             departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
                                      r'check in date|check-in date|date of check-in|' \
                                      r'date of departure\.|'
-            hinglish_departure = u'जाने'
+            hinglish_departure = u'जाने|जाऊँगा|जाना'
             departure_regex_string = departure_regex_string + hinglish_departure
             arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
                                    r'|arrival date|check out date|check-out date|date of check-out' \
                                    r'|check out|'
-            hinglish_arrival = u'आने'
+            hinglish_arrival = u'आने|आगमन|अनेका'
             arrival_regex_string = arrival_regex_string + hinglish_arrival
             departure_regexp = re.compile(departure_regex_string)
             arrival_regexp = re.compile(arrival_regex_string)
