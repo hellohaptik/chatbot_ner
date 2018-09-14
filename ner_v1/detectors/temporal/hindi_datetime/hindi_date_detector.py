@@ -67,7 +67,7 @@ weekday_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'week
 month_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'month']) + ")"
 ref_datetime = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 0]) + ")"
 
-a1 = re.compile(date_ref)
+a1 = re.compile(r'\b' + date_ref + r'\b')
 b1 = re.compile(r'(\d+)\s*' + month_ref)
 
 c1 = re.compile(r'(\d+)\s*' + tarikh_ref + '\\s*' + ref_datetime + r'\s*' + months_ref)
