@@ -1,4 +1,5 @@
 dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_day"], 'narson': [3, "ref_day"],
+              'parso': [2, "ref_day"], 'narso': [3, "ref_day"],
               'din': [0, "date"], 'dino': [0, "day"], 'month': [0, "months"], 'tarikh': [0, None], 'tareekh': [0, None],
               'mahine': [0, "months"], 'mahina': [0, "months"], 'monday': [0, "weekday"], 'tuesday': [1, "weekday"],
               'wednesday': [2, "weekday"], 'thursday': [3, "weekday"], 'friday': [4, "weekday"],
