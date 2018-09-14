@@ -1,3 +1,4 @@
+# coding=utf-8
 import re
 
 import models.constant as model_constant
