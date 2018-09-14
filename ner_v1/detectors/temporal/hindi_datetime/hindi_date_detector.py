@@ -119,7 +119,7 @@ def get_hindi_date(text, is_past=False):
 	today = dt.today()
 	today_mmdd = "%d%02d" % (today.month, today.day)
 	today_yymmdd = "%d%02d%02d" % (today.year, today.month, today.day)
-	text = " " + text + " "
+	raw_text = " " + text + " "
 	text = convert_number(text)
 	a1_match = a1.findall(text)
 	if a1_match:
@@ -212,7 +212,7 @@ def get_hindi_date(text, is_past=False):
 	e2_match = e2.findall(text)
 	if e2_match:  # [('pichle', 'month', '2', 'tuesday')]
 		e2_match = e2_match[0]
-		original_text = text.strip()
+		original_text = raw_text.strip()
 		n_weekday = int(e2_match[2])
 		weekday = dates_dict[e2_match[3]][0]
 		ref_date = today + relativedelta(months=datetime_dict[e2_match[0]][1])
