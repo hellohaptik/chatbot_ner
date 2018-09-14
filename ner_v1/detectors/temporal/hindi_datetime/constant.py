@@ -15,18 +15,23 @@ times_dict = {'abhi': 0, 'turant': 0, 'bje': 1, 'bajkr': 1, 'bajkar': 1, 'baje':
               'mins': 2, 'min': 2, 'seconds': 3, 'second': 3, 'sec': 3}
 
 datetime_dict = {"baad": (-1, 1, 0), "is": (1, 0, 0), "isi": (1, 0, 0), "pahle": (-1, -1, 0), "pehle": (-1, -1, 0),
-                 "phle": (-1, -1, 0), "pichle": (1, -1, 0), "hua": (-1, -1, 0),
+                 "phle": (-1, -1, 0), "pichhle": (1, -1, 0), "hua": (-1, -1, 0), "pichhla": (1, -1, 0),
+                 "pichle": (1, -1, 0),  "pichla": (1, -1, 0),
                  "hue": (-1, -1, 0), "agle": (1, 1, 0), "agla": (1, 1, 0), "agli": (1, 1, 0),
                  "ane wala": (1, 1, 0), "aane wala": (1, 1, 0), "aane vala": (1, 1, 0), "ane vala": (1, 1, 0),
+                 "ane vale": (1, 1, 0), "ane wale": (1, 1, 0), "ane vali": (1, 1, 0), "ane wali": (1, 1, 0),
                  "aadhe": (1, 0.5, 1), "aadha": (1, 0.5, 1), "dedh": (1, 1.5, 1), "dhaai": (1, 2.5, 1),
                  "saade": (1, 0.5, 2), 'me': (-1, 1, 0), 'paune': (1, -0.25, 2),
-                 'sawa': (1, 0.25, 2), 'sava': (1, 0.25, 2)}
+                 'sawa': (1, 0.25, 2), 'sava': (1, 0.25, 2), 'pehla': (-1, -1, 0)}
 
 numbers_dict = {'1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], '2': [2, 1], 'do': [2, 1],
-                'doosra': [2, 1], '3': [3, 1], 'teen': [3, 1], 'teesra': [3, 1], '4': [4, 1], 'chaar': [4, 1],
-                'char': [4, 1], 'choutha': [4, 1], '5': [5, 1], 'paanch': [5, 1], 'paanchva': [5, 1], '6': [6, 1],
-                'chhe': [6, 1], 'chhata': [6, 1], '7': [7, 1], 'saat': [7, 1], 'saatva': [7, 1], '8': [8, 1],
-                'aath': [8, 1], 'aathva': [8, 1], '9': [9, 1], 'nau': [9, 1], 'nahla': [9, 1], '10': [10, 1],
+                'doosra': [2, 1], 'doosri': [2, 1], 'doosre': [2, 1], '3': [3, 1], 'teen': [3, 1], 'teesra': [3, 1],
+                'teesre': [3, 1], 'teesri': [3, 1], '4': [4, 1], 'chaar': [4, 1], 'chauthi': [4, 1], 'chautha': [4, 1],
+                'char': [4, 1], 'choutha': [4, 1], '5': [5, 1], 'paanch': [5, 1], 'paanchva': [5, 1],
+                'paanchvi': [5, 1], '6': [6, 1], 'chhatvi': [6, 1], 'chhathva': [6, 1], 'chhathvi': [6, 1],
+                'chhe': [6, 1], 'chhata': [6, 1], '7': [7, 1], 'saat': [7, 1], 'saatva': [7, 1], 'saatvi': [7, 1],
+                '8': [8, 1], 'aathvi': [8, 1], 'aath': [8, 1], 'aathva': [8, 1], '9': [9, 1], 'nau': [9, 1],
+                'naumi': [9, 1], 'nauvi': [9, 1], 'nauva': [9, 1], 'nahla': [9, 1], '10': [10, 1], 'dasvi': [10, 1],
                 'das': [10, 1], 'dasva': [10, 1], '11': [11, 1], 'gyarah': [11, 1], 'gyarva': [11, 1], '12': [12, 1],
                 'barah': [12, 1], 'barvan': [12, 1], '13': [13, 1], 'terah': [13, 1], '14': [14, 1],
                 'chaudah': [14, 1], '15': [15, 1], 'pandrah': [15, 1], '16': [16, 1], 'solah': [16, 1], '17': [17, 1],
