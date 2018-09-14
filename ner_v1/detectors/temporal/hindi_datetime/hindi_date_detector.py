@@ -212,7 +212,7 @@ def get_hindi_date(text, is_past=False):
 	e2_match = e2.findall(text)
 	if e2_match:  # [('pichle', 'month', '2', 'tuesday')]
 		e2_match = e2_match[0]
-		original_text = " ".join(e2_match)
+		original_text = text.strip()
 		n_weekday = int(e2_match[2])
 		weekday = dates_dict[e2_match[3]][0]
 		ref_date = today + relativedelta(months=datetime_dict[e2_match[0]][1])
