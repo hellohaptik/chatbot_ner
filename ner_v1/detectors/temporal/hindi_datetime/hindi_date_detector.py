@@ -123,6 +123,7 @@ def get_hindi_date(text, is_past=False):
 	text = convert_number(text)
 	a1_match = a1.findall(text)
 	if a1_match:
+		original_text = a1_match[0]
 		if not is_past:
 			r_date = today + timedelta(days=dates_dict[a1_match[0]][0])
 		else:
