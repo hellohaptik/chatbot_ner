@@ -155,7 +155,7 @@ class DateAdvancedDetector(object):
             date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
 
         else:
-            parts = re.split(r'\s+(?:\-|to)\s+', self.processed_text.lower())
+            parts = re.split(r'\s+(?:\-|to|se)\s+', self.processed_text.lower())
             if len(parts) > 1:
                 for start_part, end_part in zip(parts[:-1], parts[1:]):
                     start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
@@ -286,9 +286,11 @@ class DateAdvancedDetector(object):
         return_date_flag = False
         if self.bot_message:
             departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
-                                     r'check in date|check-in date|date of check-in|date of departure\.'
+                                     r'check in date|check-in date|date of check-in|' \
+                                     r'date of departure\.|जाना|जाऊँगा|जाने'
             arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
-                                   r'|arrival date|check out date|check-out date|date of check-out|check out'
+                                   r'|arrival date|check out date|check-out date|date of check-out' \
+                                   r'|check out|आगमन|अनेका|अने'
             departure_regexp = re.compile(departure_regex_string)
             arrival_regexp = re.compile(arrival_regex_string)
             if departure_regexp.search(self.bot_message) is not None:
