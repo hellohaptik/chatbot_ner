@@ -1,3 +1,4 @@
+# coding=utf-8
 import copy
 import datetime
 import re
@@ -296,10 +297,14 @@ class DateAdvancedDetector(object):
         if self.bot_message:
             departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
                                      r'check in date|check-in date|date of check-in|' \
-                                     r'date of departure\.|जाना|जाऊँगा|जाने'
+                                     r'date of departure\.|'
+            hinglish_departure = u'जाने'
+            departure_regex_string = departure_regex_string + hinglish_departure
             arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
                                    r'|arrival date|check out date|check-out date|date of check-out' \
-                                   r'|check out|आगमन|अनेका|अने'
+                                   r'|check out|'
+            hinglish_arrival = u'आने'
+            arrival_regex_string = arrival_regex_string + hinglish_arrival
             departure_regexp = re.compile(departure_regex_string)
             arrival_regexp = re.compile(arrival_regex_string)
             if departure_regexp.search(self.bot_message) is not None:
