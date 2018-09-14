@@ -259,13 +259,17 @@ class CityDetector(object):
 
         """
         city_dict_list = []
-        patterns = re.findall(r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)'
+        patterns_1 = re.findall(r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)'
                               r'\s+([A-Za-z]+))\.?\s',
                               self.processed_text.lower())
-
-        for pattern in patterns:
+        patterns_2 = re.findall(r'(.+)\s+(jana|jaana|jau|ghum|ghoom)', self.processed_text.lower())
+        for pattern in patterns_1:
             city_dict_list.extend(
                 self._city_dict_from_text(text=pattern[2], to_property=True)
+            )
+        for pattern in patterns_2:
+            city_dict_list.extend(
+                self._city_dict_from_text(text=pattern[0], to_property=True)
             )
 
         return city_dict_list
