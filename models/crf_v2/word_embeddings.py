@@ -24,7 +24,7 @@ class LoadWordEmbeddings(object):
         Thus function is used to load the word_list and word_vectors from the specified paths.
         Returns:
         vocab (list): word_list present at the specified path.
-        word_vectors (numpy.ndarray): word_vectors present at the specified path.
+        word_vectors (numpy.array): word_vectors present at the specified path.
         """
         file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
         vocab = pickle.load(file_handler)

@@ -214,6 +214,14 @@ def train_crf_model(request):
         request (HttpResponse): HTTP response from url
     Returns:
         HttpResponse : HttpResponse with appropriate status and error message.
+    Post Request Body:
+    key: "external_api_data"
+    value: {
+    "entity_name": "crf_test",
+    "cloud_storage": true,
+    "es_config": true,
+    "cloud_embeddings": true
+    }
     """
     response = {"success": False, "error": "", "result": {}}
     try:

@@ -20,6 +20,8 @@ class CrfTrain(object):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
+            cloud_storage (bool): To indicate if cloud storage settings is required.
+            cloud_embeddings (bool): To indicate if cloud embeddings is active
         """
         self.entity_name = entity_name
         self.model_dir = None
@@ -36,13 +38,12 @@ class CrfTrain(object):
             c1 (int): Coefficient of regularization to control variance and bias.
             c2 (int): Coeffiecnt of regularization to control variance and bias.
             max_iterations (int): Max number of iterations to be carried out.
-            cloud_storage (bool): To indicate if cloud storage settings is required.
         """
         trainer = pycrfsuite.Trainer(verbose=False)
 
         # Submit training data to the trainer
-        for xseq, yseq in zip(x, y):
-            trainer.append(xseq, yseq)
+        for x_seq, y_seq in zip(x, y):
+            trainer.append(x_seq, y_seq)
 
         # Set the parameters of the model
         trainer.set_params({
@@ -91,15 +92,14 @@ class CrfTrain(object):
             max_iterations (int): Max number of iterations to be carried out.
             text_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
-            cloud_storage (bool): To indicate if cloud storage settings is required.
         Returns:
             status (bool): Returns true if the training is successful.
         """
 
-        ner_logger.debug('Preprocessing for Entity: %s started' % self.entity_name)
+        ner_logger.debug('Pre processing for Entity: %s started' % self.entity_name)
         x, y = CrfPreprocessData.get_processed_x_y(text_list=text_list, entity_list=entity_list,
                                                    cloud_embeddings=self.cloud_embeddings)
-        ner_logger.debug('Preprocessing for Entity: %s completed' % self.entity_name)
+        ner_logger.debug('Pre processing for Entity: %s completed' % self.entity_name)
         model_path = self.train_crf_model(x, y, c1, c2, max_iterations)
         return model_path
 
