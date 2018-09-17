@@ -27,10 +27,9 @@ def delete_index(connection, index_name, logger, **kwargs):
         logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
 
 
-def create_index(connection, index_name, doc_type, logger, **kwargs):
+def create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs):
     """
     Creates an Elasticsearch index needed for similarity based searching
-
     Args:
         connection: Elasticsearch client object
         index_name: The name of the index
@@ -48,10 +47,8 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
                               default 'open', valid choices are: 'open', 'closed', 'none', 'all'
             ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
                                 (missing or closed)
-
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
-
     """
     try:
         body = {
@@ -80,18 +77,6 @@ def create_index(connection, index_name, doc_type, logger, **kwargs):
                                                         'wait_for_active_shards'])
         connection.indices.create(index=index_name, body=body, **create_kwargs)
 
-        mapping_body = {
-            doc_type: {
-                'properties': {
-                    'variants': {
-                        'type': 'string',
-                        'analyzer': 'my_analyzer',
-                        'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
-                    }
-                }
-            }
-        }
-
         put_mapping_kwargs = filter_kwargs(kwargs=kwargs, keep_kwargs_keys=['allow_no_indices', 'expand_wildcards',
                                                                             'ignore_unavailable',
                                                                             'master_timeout', 'timeout',
@@ -119,3 +104,106 @@ def exists(connection, index_name):
         boolean, True if index exists , False otherwise
     """
     return connection.indices.exists(index_name)
+
+
+def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
+    """
+    Creates an mapping specific to entity storage in elasticsearch and makes a call to create_index
+    to create the index with the given mapping body
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents that will be indexed
+        logger: logging object to log at debug and exception level
+        **kwargs:
+            master_timeout: Specify timeout for connection to master
+            timeout: Explicit operation timeout
+            update_all_types: Whether to update the mapping for all fields with the same name across all types or not
+            wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
+            doc_type: The name of the document type
+            allow_no_indices: Whether to ignore if a wildcard indices expression resolves into no concrete indices.
+                              (This includes _all string or when no indices have been specified)
+            expand_wildcards: Whether to expand wildcard expression to concrete indices that are open, closed or both.,
+                              default 'open', valid choices are: 'open', 'closed', 'none', 'all'
+            ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
+                                (missing or closed)
+
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
+    """
+    mapping_body = {
+        doc_type: {
+            'properties': {
+                'variants': {
+                    'type': 'text',
+                    'analyzer': 'my_analyzer',
+                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
+                }
+            }
+        }
+    }
+
+    create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+
+
+def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
+    """
+    This method is used to create an index with mapping suited for story training_data
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type:  The type of the documents that will be indexed
+        logger: logging object to log at debug and exception level
+        **kwargs:
+            master_timeout: Specify timeout for connection to master
+            timeout: Explicit operation timeout
+            update_all_types: Whether to update the mapping for all fields with the same name across all types or not
+            wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
+            doc_type: The name of the document type
+            allow_no_indices: Whether to ignore if a wildcard indices expression resolves into no concrete indices.
+                              (This includes _all string or when no indices have been specified)
+            expand_wildcards: Whether to expand wildcard expression to concrete indices that are open, closed or both.,
+                              default 'open', valid choices are: 'open', 'closed', 'none', 'all'
+            ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
+                                (missing or closed)
+
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
+        Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
+    """
+    mapping_body = {
+        doc_type: {
+            'properties': {
+                "entity_data": {
+                    "type": "text"
+                },
+                "sentence": {
+                    "enabled": "false"
+                },
+                "entities": {
+                    "enabled": "false"
+                },
+                "language_script": {
+                    "type": "text"
+                }
+            }
+        }
+    }
+
+    create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+
+
+def create_alias(connection, index_list, alias_name, logger, **kwargs):
+    """
+    This method is used to create alias for list of indices
+    Args:
+        connection:
+        index_list (list): List of indices the alias has to point to
+        alias_name (str): Name of the alias
+        logger: logging object to log at debug and exception level
+
+        **kwargs:
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
+    """
+    logger.debug('Alias creation %s started %s' % alias_name)
+    connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
+    logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
