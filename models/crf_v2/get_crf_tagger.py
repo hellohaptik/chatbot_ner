@@ -27,6 +27,7 @@ class CrfModel(object):
         If no model_path is given data will be loaded from the S3 with the path from redis
         Args:
             model_path (str): Path from where model has to be loaded for the given entity.
+            live_crf_model_path (str): Live path for the Crf Model
         Returns:
             tagger (pycrfsuite.Tagger()): Tagger with the loaded model
         """

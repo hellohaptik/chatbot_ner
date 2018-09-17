@@ -5,7 +5,7 @@ from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from models.crf_v2.word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
 from models.crf_v2.constants import TEXT_LIST, WORD_EMBEDDINGS, WORD_VEC_FEATURE, B_LABEL,\
-    B_TAG, I_LABEL, I_TAG, ENTITY_LIST, POS_TAGS, LABELS, O_LABEL, BOS, EOS
+    B_TAG, I_LABEL, I_TAG, POS_TAGS, LABELS, O_LABEL, BOS, EOS
 
 
 class CrfPreprocessData(object):
@@ -31,7 +31,7 @@ class CrfPreprocessData(object):
             >> ['book', 'a', 'flight', 'from', 'Mumbai', 'to', 'Delhi'],
                 ['O', 'O', 'O', 'O', 'B', 'O', 'B']
         """
-        def IOB_prefixes(entity_value, word_tokenize):
+        def iob_prefixes(entity_value, word_tokenize):
             """
             This entity takes the input as the entity and returns the entity with its respective
             IOB-prefixes
@@ -43,7 +43,7 @@ class CrfPreprocessData(object):
             Example:
                 For city entity
                 entity_value = ['New York']
-                IOB_prefixes(entity_value)
+                iob_prefixes(entity_value)
                 >> 'B_city_New I_city_York'
             """
             iob_entities = ' '.join([B_TAG + token_ if i_ == 0 else I_TAG + token_ for i_, token_
@@ -55,7 +55,7 @@ class CrfPreprocessData(object):
         tokenized_original_text = word_tokenize.tokenize(text)
 
         for entity in entities:
-            text = re.sub(r'\b%s\b' % entity, IOB_prefixes(entity, word_tokenize), text)
+            text = re.sub(r'\b%s\b' % entity, iob_prefixes(entity, word_tokenize), text)
 
         tokenized_text = word_tokenize.tokenize(text)
 
@@ -172,7 +172,7 @@ class CrfPreprocessData(object):
         """
         features = []
         for i, each in enumerate(word_vec):
-            features.append(prefix + 'word_vec' + str(i) + '=' + str(each))
+            features.append(prefix + WORD_VEC_FEATURE + str(i) + '=' + str(each))
         return features
 
     @staticmethod
@@ -296,7 +296,7 @@ class CrfPreprocessData(object):
         return features
 
     @staticmethod
-    def get_processed_x_y(text_list, entity_list, cloud_embeddings=False):
+    def get_processed_x_y(text_list, entity_list=[[]], cloud_embeddings=False):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.

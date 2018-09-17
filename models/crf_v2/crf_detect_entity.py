@@ -2,6 +2,7 @@ from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
 from .get_crf_tagger import CrfModel
 from chatbot_ner.config import MODELS_PATH
+from models.crf_v2.constants import B_LABEL, I_LABEL
 
 
 class CrfDetection(object):
@@ -40,8 +41,8 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfPreprocessData.get_processed_x_y([text], [[]], cloud_embeddings=self.cloud_embeddings)
-        y_prediction = [self.tagger.tag(xseq) for xseq in x][0]
+        x, _ = CrfPreprocessData.get_processed_x_y(text_list=[text], cloud_embeddings=self.cloud_embeddings)
+        y_prediction = [self.tagger.tag(x_seq) for x_seq in x][0]
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
 
@@ -50,10 +51,10 @@ class CrfDetection(object):
         original_text = []
         for i in range(len(y_prediction)):
             temp = []
-            if y_prediction[i] == 'B':
+            if y_prediction[i] == B_LABEL:
                 temp.append(tokenized_text[i])
                 for j in range(i, len(y_prediction)):
-                    if y_prediction[j] == 'I':
+                    if y_prediction[j] == I_LABEL:
                         temp.append(tokenized_text[j])
                 original_text.append(' '.join(temp))
 
