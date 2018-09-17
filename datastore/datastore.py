@@ -488,13 +488,13 @@ class DataStore(object):
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
 
-            elastic_search.populate.update_entity_crf_data(connection=self._client_or_connection,
-                                                           index_name=es_training_index,
-                                                           doc_type=self._connection_settings
-                                                           [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
-                                                           logger=ner_logger,
-                                                           entity_list=entity_list,
-                                                           sentence_list=sentence_list,
-                                                           entity_name=entity_name,
-                                                           language_script=language_script,
-                                                           **kwargs)
+            elastic_search.populate.update_entity_crf_data_populate(connection=self._client_or_connection,
+                                                                    index_name=es_training_index,
+                                                                    doc_type=self._connection_settings
+                                                                    [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                                    logger=ner_logger,
+                                                                    entity_list=entity_list,
+                                                                    sentence_list=sentence_list,
+                                                                    entity_name=entity_name,
+                                                                    language_script=language_script,
+                                                                    **kwargs)
