@@ -2,6 +2,7 @@ from elasticsearch import helpers
 from ner_v1.constant import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
+from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 log_prefix = 'datastore.elastic_search.populate'
 
@@ -187,7 +188,8 @@ def create_dictionary_data_from_file(connection, index_name, doc_type, csv_file_
     if dictionary_value:
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                 dictionary_key=dictionary_key,
-                                dictionary_value=remove_duplicate_data(dictionary_value), logger=logger, **kwargs)
+                                dictionary_value=remove_duplicate_data(dictionary_value), language_script=ENGLISH_LANG,
+                                logger=logger, **kwargs)
     if os.path.exists(csv_file_path) and os.path.splitext(csv_file_path)[1] == '.csv':
         os.path.basename(csv_file_path)
 
@@ -262,8 +264,8 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
-def update_entity_crf_data(connection, index_name, doc_type, entity_list, entity_name, sentence_list, language_script,
-                           logger, **kwargs):
+def update_entity_crf_data_populate(connection, index_name, doc_type, entity_list, entity_name, sentence_list, language_script,
+                                    logger, **kwargs):
     """
     This method is used to populate the elastic search traininf data.
     Args:
