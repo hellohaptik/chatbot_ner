@@ -6,7 +6,8 @@ from models.crf_v2.crf_detect_entity import CrfDetection
 class TextModelDetector(TextDetector):
     """
     This class is inherited from the TextDetector class.
-    This class is primarily used to detect text type entities and additionally return the detection source for the same.
+    This class is primarily used to detect text type entities using the datastore as well as the the CRF
+    model if trained.
     """
     def __init__(self, entity_name, source_language_script, cloud_storage=False, cloud_embeddings=False,
                  live_crf_model_path=None):
@@ -23,7 +24,7 @@ class TextModelDetector(TextDetector):
         Note that datastore stores number of values under a entity_name and each entity_value has its own list of
         variants, whenever a variant is matched successfully, the entity_value whose list the variant belongs to,
         is returned. For more information on how data is stored, see Datastore docs.
-
+        In addition to this method also runs the CRF MODEL if trained and provides the results for the given entity.
         Args:
             text (unicode): string to extract textual entities from
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
@@ -50,9 +51,9 @@ class TextModelDetector(TextDetector):
             text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
 
                 Output:
-                    ([{'datastore_verified': True, 'value': u'Chennai'},
-                      {'datastore_verified': True, 'value': u'New Delhi'},
-                      {'datastore_verified': True, 'value': u'chennai'}]
+                    ([{'datastore_verified': True,'crf_model_verified': True, 'value': u'Chennai'},
+                      {'datastore_verified': True,'crf_model_verified': False, 'value': u'New Delhi'},
+                      {'datastore_verified': False,'crf_model_verified': True, 'value': u'chennai'}]
                     , ['chennai', 'delhi', 'tamilnadu'])
 
             text_detection.tagged_text
@@ -105,6 +106,19 @@ class TextModelDetector(TextDetector):
         return text_entity_verified_values
 
     def combine_results(self, values, original_texts, crf_original_texts):
+        """
+        This method is used to combine the results provided by the datastore search and the
+        crf_model if trained.
+        Args:
+            values (list): List of values detected by datastore
+            original_texts (list): List of original texts present in the texts for which value shave been
+                                   detected
+            crf_original_texts (list): Entities detected by the Crf Model
+        Returns:
+            combined_values (list): List of dicts each dict consisting of the entity value and additionally
+                                    the keys for the datastore and crf model detection
+            combined_original_texts (list): List of original texts detected by the datastore and the crf model.
+        """
         unprocessed_crf_original_texts = []
 
         combined_values = self._add_verification_source(values=values,
