@@ -107,8 +107,6 @@ class CrfTrain(object):
         """
         This method is used to train the crf model by first extracting training data from ES
         for the entity and training the crf model for the same.
-        Args:
-            cloud_storage (bool): To indicate if cloud storage settings is required.
         """
         datastore_object = DataStore()
         ner_logger.debug('Fetch of data from ES for ENTITY: %s started' % self.entity_name)

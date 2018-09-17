@@ -1,9 +1,10 @@
 import numpy as np
 from lib.singleton import Singleton
 import pickle
-from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS
+from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS, REMOTE_EMBEDDINGS_URL
 import requests
 import json
+from models.crf_v2.constants import TEXT_LIST, WORD_EMBEDDINGS_LIST
 
 
 class LoadWordEmbeddings(object):
@@ -34,10 +35,17 @@ class LoadWordEmbeddings(object):
 
     @staticmethod
     def load_word_vectors_remote(text_list):
-        url = 'http://aman.hellohaptik.com:8081/encoders/glove25'
-        json_dict = {'text_list': [text_list]}
-        result = json.loads(requests.get(url=url, json=json_dict, timeout=120).text)
-        word_vectors = result['word_embeddings_list']
+        """
+        This method is used to load word_vectors from a remote location
+        Args:
+            text_list (list): List of tokenized texts
+            text_list = [['my', 'name', 'is', 'chatbot'], ['how', 'are', 'you']]
+        Returns:
+            word_vectors (np.ndarray): Numpy array of vectors for the provided text_list
+        """
+        json_dict = {TEXT_LIST: [text_list]}
+        result = json.loads(requests.get(url=REMOTE_EMBEDDINGS_URL, json=json_dict, timeout=120).text)
+        word_vectors = result[WORD_EMBEDDINGS_LIST]
         if word_vectors:
             word_vectors = np.vstack(word_vectors)
         return word_vectors
