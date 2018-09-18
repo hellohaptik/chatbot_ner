@@ -1,3 +1,5 @@
+import re
+
 dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_day"], 'narson': [3, "ref_day"],
               'parso': [2, "ref_day"], 'narso': [3, "ref_day"],
               'din': [0, "date"], 'dino': [0, "day"], 'month': [0, "months"], 'tarikh': [0, None], 'tareekh': [0, None],
@@ -17,7 +19,8 @@ times_dict = {'abhi': 0, 'turant': 0, 'bje': 1, 'bajkr': 1, 'bajkar': 1, 'baje':
 
 datetime_dict = {"baad": (-1, 1, 0), "is": (1, 0, 0), "isi": (1, 0, 0), "pahle": (-1, -1, 0), "pehle": (-1, -1, 0),
                  "phle": (-1, -1, 0), "pichhle": (1, -1, 0), "hua": (-1, -1, 0), "pichhla": (1, -1, 0),
-                 "pichle": (1, -1, 0),  "pichla": (1, -1, 0),
+                 "pichle": (1, -1, 0),  "pichla": (1, -1, 0), "ane": (1, 1, 0), "aane": (1, 1, 0), "wala": (1, 1, 0),
+                 "vala": (1, 1, 0), "wale": (1, 1, 0), "vale": (1, 1, 0), "wali": (1, 1, 0), "vali": (1, 1, 0),
                  "hue": (-1, -1, 0), "agle": (1, 1, 0), "agla": (1, 1, 0), "agli": (1, 1, 0),
                  "ane wala": (1, 1, 0), "aane wala": (1, 1, 0), "aane vala": (1, 1, 0), "ane vala": (1, 1, 0),
                  "ane vale": (1, 1, 0), "ane wale": (1, 1, 0), "ane vali": (1, 1, 0), "ane wali": (1, 1, 0),
@@ -51,8 +54,54 @@ numbers_dict = {'1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pe
 separators = {'se': 0, 'ke': 0, 'aur': 0, 'evam': 0, 'lekin': 0, 'par': 0, 'magar': 0, 'kintu': 0, 'parantu': 0,
               'ya': 0, 'kyunki': 0, 'isliye': 0}
 
+DAYTIME_MERIDIAN = {
+    'subah': 'am',
+    'raat':'pm',
+    'dopahar':'pm',
+    'din': 'pm',
+    'shaam': 'pm',
+    'sandhya': 'pm'
+}
+
+IGNORE_DIFF_HOUR_LIST = ["bje", "baje", "bajkar", "bajkr", "baj"]
+
 TAG_PREV = 'prev'
 TAG_NEXT = 'next'
 
 HINDI_TAGGED_DATE = 'date'
 HINDI_TAGGED_TIME = 'time'
+
+
+# Time detector Regex
+REF_EXACT_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 1]) + ")"
+REF_DIFF_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 0]) + "|)"
+REF_ADD_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 2]) + "|)"
+
+HOUR_VARIANTS = "(" + "|".join([x for x in times_dict if times_dict[x] == 1]) + ")"
+MINUTE_VARIANTS = "(" + "|".join([x for x in times_dict if times_dict[x] == 2]) + ")"
+
+REGEX_HOUR_TIME_1 = re.compile(REF_ADD_TIME + r"\s*(\d+)\s*" + HOUR_VARIANTS + r"\s+" + REF_DIFF_TIME)
+REGEX_MINUTE_TIME_1 = re.compile(REF_ADD_TIME + r"\s*(\d+)\s*" + MINUTE_VARIANTS + r"\s+" + REF_DIFF_TIME)
+REGEX_HOUR_TIME_2 = re.compile(REF_EXACT_TIME + r"\s*" + HOUR_VARIANTS + r"\s+" + REF_DIFF_TIME)
+MINUTE_TIME_REGEX_2 = re.compile(REF_EXACT_TIME + r"\s*" + MINUTE_VARIANTS + r"\s+" + REF_DIFF_TIME)
+
+
+# Date detector Regex
+DATE_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'ref_day']) + ")"
+DAY_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'date']) + ")"
+TARIKH_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] is None]) + ")"
+MONTHS_TEXT_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'months']) + ")"
+WEEKDAY_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'weekday']) + ")"
+MONTH_REF = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'month']) + ")"
+DATETIME_REF = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 0]) + ")"
+
+REGEX_DATE_REF = re.compile(r'\b' + DATE_REF + r'\b')
+REGEX_MONTH_REF = re.compile(r'(\d+)\s*' + MONTH_REF)
+REGEX_TARIKH_MONTH_REF_1 = re.compile(r'(\d+)\s*' + TARIKH_REF + '\\s*' + DATETIME_REF + r'\s*' + MONTHS_TEXT_REF)
+REGEX_TARIKH_MONTH_REF_2 = re.compile(DATETIME_REF + r'\s*' + MONTHS_TEXT_REF + r'\s*(\d+)\s+' + TARIKH_REF)
+REGEX_TARIKH_MONTH_REF_3 = re.compile(r'(\d+)\s*' + TARIKH_REF)
+REGEX_AFTER_DAYS_REF = re.compile(r'(\d+)\s*' + DAY_REF + r'\s+' + DATETIME_REF)
+REGEX_WEEKDAY_MONTH_REF_1 = re.compile(r'(\d+)\s*' + WEEKDAY_REF + '\\s*' + DATETIME_REF + r'\s+' + MONTHS_TEXT_REF)
+REGEX_WEEKDAY_MONTH_REF_2 = re.compile(DATETIME_REF + r'\s+' + MONTHS_TEXT_REF + r'\s*(\d+)\s*' + WEEKDAY_REF)
+REGEX_WEEKDAY_REF_1 = re.compile(DATETIME_REF + r'\s*' + WEEKDAY_REF)
+REGEX_WEEKDAY_REF_2 = re.compile(WEEKDAY_REF)

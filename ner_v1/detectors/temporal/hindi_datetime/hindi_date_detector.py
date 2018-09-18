@@ -1,246 +1,147 @@
 from dateutil.relativedelta import relativedelta
-import calendar
-import re
-from datetime import datetime as dt, timedelta
-from ner_v1.detectors.constant import TYPE_EXACT
-
-from constant import dates_dict, datetime_dict, numbers_dict
-
-
-def convert_number(item):
-	"""
-
-	Args:
-		item:
-
-	Returns:
-
-	"""
-	common = set(item.split()) & set(numbers_dict.keys())
-	if common:
-		for each in list(common):
-			item = re.sub(each, str(numbers_dict[each][0]), item)
-	return item
+from datetime import datetime, timedelta
+from constant import dates_dict, datetime_dict
+from ner_v1.detectors.temporal.hindi_datetime.constant import REGEX_DATE_REF, REGEX_MONTH_REF, \
+    REGEX_TARIKH_MONTH_REF_1, REGEX_TARIKH_MONTH_REF_2, REGEX_TARIKH_MONTH_REF_3, REGEX_AFTER_DAYS_REF, \
+    REGEX_WEEKDAY_MONTH_REF_1, REGEX_WEEKDAY_MONTH_REF_2, REGEX_WEEKDAY_REF_1, REGEX_WEEKDAY_REF_2
+from ner_v1.detectors.temporal.hindi_datetime.utils import next_weekday, nth_weekday, convert_numeral_to_number
 
 
-def nth_weekday(weekday, n, ref_date):
-	"""
+def get_hindi_date(text, today, is_past=False):
+    """
+    Method to return day, month, year from given hinglish text, Various regular expression has been written to
+    capture dates from text like 'kal', 'parso', 'agle mangalvar', 'aane wale month ki 2 tarikh ko'. Each expression is
+    ran sequentially over text and return required dd, mm, yy format as soon as given expression matches with text.
+    Args:
+        text (str): hinglish text containing dates
+        today (datetime): python datetime object for today's date
+        is_past (bool): Boolean to know if the context of text is in past or in future
+    Returns:
+        dd (int): day
+        mm (int): month
+        yy (int): year
+    """
+    dd = 0
+    mm = 0
+    yy = 0
+    today_mmdd = "%d%02d" % (today.month, today.day)
+    today_yymmdd = "%d%02d%02d" % (today.year, today.month, today.day)
+    text = convert_numeral_to_number(text)
 
-	Args:
-		weekday:
-		n:
-		ref_date:
+    # Regex for date like 'kal', 'parso'
+    date_ref_match = REGEX_DATE_REF.findall(text)
+    if date_ref_match:
+        if not is_past:
+            r_date = today + timedelta(days=dates_dict[date_ref_match[0]][0])
+        else:
+            r_date = today - timedelta(days=dates_dict[date_ref_match[0]][0])
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
 
-	Returns:
+    # Regex for date like '2 july', 'pehli august'
+    date_month_match = REGEX_MONTH_REF.findall(text)
+    if date_month_match:
+        date_month_match = date_month_match[0]
+        dd = int(date_month_match[0])
+        mm = dates_dict[date_month_match[1]][0]
+        mmdd = "%02d%02d" % (mm, dd)
+        if int(today_mmdd) < int(mmdd):
+            yymmdd = str(today.year) + mmdd
+            yy = today.year
+        else:
+            yymmdd = str(today.year + 1) + mmdd
+            yy = today.year + 1
+        if is_past:
+            if int(today_yymmdd) < int(yymmdd):
+                yy -= 1
+        return dd, mm, yy
 
-	"""
-	first_day_of_month = dt(ref_date.year, ref_date.month, 1)
-	first_weekday = first_day_of_month + timedelta(days=((weekday - calendar.monthrange(
-		ref_date.year, ref_date.month)[0]) + 7) % 7)
-	return first_weekday + timedelta(days=(n - 1) * 7)
+    # Regex for date like '2 tarikh is mahine ki'
+    tarikh_month_match = REGEX_TARIKH_MONTH_REF_1.findall(text)
+    if tarikh_month_match:
+        tarikh_month_match = tarikh_month_match[0]
+        dd = int(tarikh_month_match[0])
+        if tarikh_month_match[2] and tarikh_month_match[3]:
+            req_date = today + relativedelta(months=datetime_dict[tarikh_month_match[2]][1])
+            mm = req_date.month
+            yy = req_date.year
+        else:
+            mm = today.month
+            yy = today.year
+        return dd, mm, yy
 
+    # Regex for date like 'agle mahine ki 10 tarikh ko'
+    tarikh_month_match = REGEX_TARIKH_MONTH_REF_2.findall(text)
+    if tarikh_month_match:
+        tarikh_month_match = tarikh_month_match[0]
+        dd = int(tarikh_month_match[2])
+        if tarikh_month_match[0] and tarikh_month_match[1]:
+            req_date = today + relativedelta(months=datetime_dict[tarikh_month_match[0]][1])
+            mm = req_date.month
+            yy = req_date.year
+        else:
+            mm = today.month
+            yy = today.year
+        return dd, mm, yy
 
-def next_weekday(d, weekday, n):
-	"""
+    # Regex for date like '2 tarikh ko'
+    tarikh_month_match = REGEX_TARIKH_MONTH_REF_3.findall(text)
+    if tarikh_month_match:
+        c3_match = tarikh_month_match[0]
+        dd = int(c3_match[0])
+        if today.day < dd:
+            mm = today.month
+            yy = today.year
+        else:
+            req_date = today + relativedelta(months=1)
+            mm = req_date.month
+            yy = req_date.year
+        return dd, mm, yy
 
-	Args:
-		d:
-		weekday:
-		n:
+    # Regex for date like '2 din hua', '2 din baad'
+    after_days_match = REGEX_AFTER_DAYS_REF.findall(text)
+    if after_days_match:
+        after_days_match = after_days_match[0]
+        r_date = today + relativedelta(days=datetime_dict[after_days_match[2]][1])
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
 
-	Returns:
+    # Regex for date like '2 tuesday agle month ki', 'teesra mangalvar aane wale month ka'
+    weekday_month_match = REGEX_WEEKDAY_MONTH_REF_1.findall(text)
+    if weekday_month_match:
+        weekday_month_match = weekday_month_match[0]
+        n_weekday = int(weekday_month_match[0])
+        weekday = dates_dict[weekday_month_match[1]][0]
+        ref_date = today + relativedelta(months=datetime_dict[weekday_month_match[2]][1])
+        r_date = nth_weekday(n_weekday, weekday, ref_date)
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
 
-	"""
-	days_ahead = weekday - d.weekday()
-	if days_ahead < 0:
-		n = n + 1 if n == 0 else n
-	if days_ahead <= 0:  # Target day already happened this week
-		days_ahead += n * 7
-	return d + timedelta(days=days_ahead)
+    # Regex for date like 'agle month ka pehla monday', 'pichle month ki 3 shanivar'
+    weekday_month_match = REGEX_WEEKDAY_MONTH_REF_2.findall(text)
+    if weekday_month_match:
+        weekday_month_match = weekday_month_match[0]
+        n_weekday = int(weekday_month_match[2])
+        weekday = dates_dict[weekday_month_match[3]][0]
+        ref_date = today + relativedelta(months=datetime_dict[weekday_month_match[0]][1])
+        r_date = nth_weekday(weekday, n_weekday, ref_date)
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
 
-
-date_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'ref_day']) + ")"
-day_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'date']) + ")"
-tarikh_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] is None]) + ")"
-months_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'months']) + ")"
-weekday_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'weekday']) + ")"
-month_ref = "(" + "|".join([x for x in dates_dict if dates_dict[x][1] == 'month']) + ")"
-ref_datetime = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 0]) + ")"
-
-a1 = re.compile(r'\b' + date_ref + r'\b')
-b1 = re.compile(r'(\d+)\s*' + month_ref)
-
-c1 = re.compile(r'(\d+)\s*' + tarikh_ref + '\\s*' + ref_datetime + r'\s*' + months_ref)
-c2 = re.compile(ref_datetime + r'\s*' + months_ref + r'\s*(\d+)\s+' + tarikh_ref)
-c3 = re.compile(r'(\d+)\s*' + tarikh_ref)
-
-d1 = re.compile(r'(\d+)\s*' + day_ref + r'\s+' + ref_datetime)
-
-e1 = re.compile(r'(\d+)\s*' + weekday_ref + '\\s*' + ref_datetime + r'\s+' + months_ref)
-e2 = re.compile(ref_datetime + r'\s+' + months_ref + r'\s+[a-z]*\s*(\d+)\s*' + weekday_ref)
-
-f1 = re.compile(ref_datetime + r'\s*' + weekday_ref)
-f2 = re.compile(weekday_ref)
-
-
-def return_parser_type(dd, mm, yy):
-	"""
-
-	Args:
-		dd:
-		mm:
-		yy:
-
-	Returns:
-
-	"""
-	return {
-		'dd': dd,
-		'mm': mm,
-		'yy': yy,
-		'type': TYPE_EXACT
-	}
-
-
-def get_hindi_date(text, is_past=False):
-	"""
-
-	Args:
-		text:
-		is_past:
-
-	Returns:
-
-	"""
-	original_text = None
-	dd = 0
-	mm = 0
-	yy = 0
-	today = dt.today()
-	today_mmdd = "%d%02d" % (today.month, today.day)
-	today_yymmdd = "%d%02d%02d" % (today.year, today.month, today.day)
-	raw_text = " " + text + " "
-	text = convert_number(text)
-	a1_match = a1.findall(text)
-	if a1_match:
-		original_text = a1_match[0]
-		if not is_past:
-			r_date = today + timedelta(days=dates_dict[a1_match[0]][0])
-		else:
-			r_date = today - timedelta(days=dates_dict[a1_match[0]][0])
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-	b1_match = b1.findall(text)
-	if b1_match:
-		b1_match = b1_match[0]
-		original_text = " ".join(b1_match)
-		dd = int(b1_match[0])
-		mm = dates_dict[b1_match[1]][0]
-		mmdd = "%02d%02d" % (mm, dd)
-		if int(today_mmdd) < int(mmdd):
-			yymmdd = str(today.year) + mmdd
-			yy = today.year
-		else:
-			yymmdd = str(today.year + 1) + mmdd
-			yy = today.year + 1
-		if is_past:
-			if int(today_yymmdd) < int(yymmdd):
-				yy -= 1
-		return return_parser_type(dd, mm, yy), original_text
-	c1_match = c1.findall(text)
-	if c1_match:
-		c1_match = c1_match[0]
-		original_text = " ".join(c1_match)
-		dd = int(c1_match[0])
-		if c1_match[2] and c1_match[3]:
-			req_date = today + relativedelta(months=datetime_dict[c1_match[2]][1])
-			mm = req_date.month
-			yy = req_date.year
-		else:
-			mm = today.month
-			yy = today.year
-		return return_parser_type(dd, mm, yy), original_text
-	c2_match = c2.findall(text)
-	if c2_match:
-		c2_match = c2_match[0]
-		original_text = " ".join(c2_match)
-		dd = int(c2_match[2])
-		if c2_match[0] and c2_match[1]:
-			req_date = today + relativedelta(months=datetime_dict[c2_match[0]][1])
-			mm = req_date.month
-			yy = req_date.year
-		else:
-			mm = today.month
-			yy = today.year
-		return return_parser_type(dd, mm, yy), original_text
-	c3_match = c3.findall(text)
-	if c3_match:
-		c3_match = c3_match[0]
-		original_text = " ".join(c3_match)
-		dd = int(c3_match[0])
-		if today.day < dd:
-			mm = today.month
-			yy = today.year
-		else:
-			req_date = today + relativedelta(months=1)
-			mm = req_date.month
-			yy = req_date.year
-		return return_parser_type(dd, mm, yy), original_text
-	d1_match = d1.findall(text)
-	if d1_match:
-		d1_match = d1_match[0]
-		original_text = " ".join(d1_match)
-		r_date = today + relativedelta(days=datetime_dict[d1_match[2]][1])
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-	e1_match = e1.findall(text)
-	if e1_match:  # [('2', 'tuesday', 'pichle', 'month')]
-		e1_match = e1_match[0]
-		original_text = " ".join(e1_match)
-		n_weekday = int(e1_match[0])
-		weekday = dates_dict[e1_match[1]][0]
-		ref_date = today + relativedelta(months=datetime_dict[e1_match[2]][1])
-		r_date = nth_weekday(n_weekday, weekday, ref_date)
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-	e2_match = e2.findall(text)
-	if e2_match:  # [('pichle', 'month', '2', 'tuesday')]
-		e2_match = e2_match[0]
-		original_text = raw_text.strip()
-		n_weekday = int(e2_match[2])
-		weekday = dates_dict[e2_match[3]][0]
-		ref_date = today + relativedelta(months=datetime_dict[e2_match[0]][1])
-		r_date = nth_weekday(weekday, n_weekday, ref_date)
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-
-	f1_match = f1.findall(text)
-	if f1_match:  # [('is', 'tuesday')]
-		f1_match = f1_match[0]
-		original_text = " ".join(f1_match)
-		n = datetime_dict[f1_match[0]][1]
-		weekday = dates_dict[f1_match[1]][0]
-		r_date = next_weekday(d=today, n=n, weekday=weekday)
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-
-	f2_match = f2.findall(text)
-	if f2_match:  # ['monday']
-		original_text = " ".join(f2_match)
-		weekday = dates_dict[f2_match[0]][0]
-		r_date = next_weekday(d=today, n=0, weekday=weekday)
-		dd = r_date.day
-		mm = r_date.month
-		yy = r_date.year
-		return return_parser_type(dd, mm, yy), original_text
-	return return_parser_type(dd, mm, yy), original_text
+    # Regex for date like 'aane wala tuesday', 'is mangalvar'
+    weekday_ref_match = REGEX_WEEKDAY_REF_1.findall(text)
+    if weekday_ref_match:  # [('is', 'tuesday')]
+        weekday_ref_match = weekday_ref_match[0]
+        n = datetime_dict[weekday_ref_match[0]][1]
+        weekday = dates_dict[weekday_ref_match[1]][0]
+        r_date = next_weekday(current_date=today, n=n, weekday=weekday)
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
+    # Regex for date like 'monday', 'somvar'
+    weekday_ref_match = REGEX_WEEKDAY_REF_2.findall(text)
+    if weekday_ref_match:  # ['monday']
+        weekday = dates_dict[weekday_ref_match[0]][0]
+        r_date = next_weekday(current_date=today, n=0, weekday=weekday)
+        dd, mm, yy = r_date.day, r_date.month, r_date.year
+        return dd, mm, yy
+    return dd, mm, yy
