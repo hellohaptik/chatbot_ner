@@ -1,3 +1,4 @@
+import re
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.constant import ENTITY_VALUE_DICT_KEY, DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
 from models.crf_v2.crf_detect_entity import CrfDetection
@@ -133,7 +134,7 @@ class TextModelDetector(TextDetector):
                 if crf_original_texts[i] == original_texts[j]:
                     combined_values[j][CRF_MODEL_VERIFIED] = True
                     match = True
-                elif crf_original_texts[i] in original_texts[j]:
+                elif re.findall(r'\b%s\b' % crf_original_texts[i], original_texts[j]):
                     match = True
             if not match:
                 unprocessed_crf_original_texts.append(crf_original_texts[i])
