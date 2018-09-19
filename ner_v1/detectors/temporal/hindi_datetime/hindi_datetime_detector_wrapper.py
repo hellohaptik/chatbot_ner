@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from ner_v1.detectors.constant import TYPE_EXACT
 from ner_v1.detectors.temporal.hindi_datetime.constant import HINDI_TAGGED_DATE, HINDI_TAGGED_TIME
 from ner_v1.detectors.temporal.hindi_datetime.hindi_date_detector import get_hindi_date
