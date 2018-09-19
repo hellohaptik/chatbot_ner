@@ -1,4 +1,4 @@
-from constant import dates_dict, times_dict, datetime_dict, numbers_dict, \
+from ner_v1.detectors.temporal.hindi_datetime.constant import dates_dict, times_dict, datetime_dict, numbers_dict, \
     TAG_PREV, TAG_NEXT, separators, HINDI_TAGGED_DATE, HINDI_TAGGED_TIME
 
 
