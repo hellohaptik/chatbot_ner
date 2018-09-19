@@ -34,6 +34,7 @@ class HindiDateTimeDetector(object):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.now(tz=self.timezone)
         self.datetime_tagger_object = HindiDateTimeTagger()
+        self.tagged_datetime = self.datetime_tagger_object.get_datetime_tag_text(self.message)
 
     @staticmethod
     def return_ner_format_date(dd, mm, yy):
@@ -101,17 +102,6 @@ class HindiDateTimeDetector(object):
         else:
             return False
 
-    def tag_date_time(self):
-        """
-        Method to return dict containing list of date and time tagged and original text from message
-        Returns:
-            (dict):
-                HINDI_TAGGED_DATE (list): list containing list of tagged text and list of original text for date
-                HINDI_TAGGED_TIME (list): list containing list of tagged text and list of original text for time
-        """
-        response = self.datetime_tagger_object.get_datetime_tag_text(self.message)
-        return response
-
     def detect_date(self):
         """
         Method to detect date, month and year from tagged date text
@@ -122,11 +112,10 @@ class HindiDateTimeDetector(object):
         date_list = []
         original_text_list = []
         try:
-            tagged_datetime_dict = self.tag_date_time()
             is_past_reference = self.is_outbound_message_for_past()
-            if len(tagged_datetime_dict[HINDI_TAGGED_DATE]) > 0:
-                date_text_list = tagged_datetime_dict[HINDI_TAGGED_DATE][0]
-                original_text_date_list = tagged_datetime_dict[HINDI_TAGGED_DATE][1]
+            if len(self.tagged_datetime[HINDI_TAGGED_DATE]) > 0:
+                date_text_list = self.tagged_datetime[HINDI_TAGGED_DATE][0]
+                original_text_date_list = self.tagged_datetime[HINDI_TAGGED_DATE][1]
                 for date_text, original_text in zip(date_text_list, original_text_date_list):
                     dd, mm, yy = get_hindi_date(date_text, self.now_date, is_past=is_past_reference)
                     if dd and mm and yy:
@@ -147,11 +136,9 @@ class HindiDateTimeDetector(object):
         time_list = []
         original_text_list = []
         try:
-            tagged_datetime_dict = self.tag_date_time()
-
-            if len(tagged_datetime_dict[HINDI_TAGGED_TIME]) > 0:
-                time_text_list = tagged_datetime_dict[HINDI_TAGGED_TIME][0]
-                original_text_time_list = tagged_datetime_dict[HINDI_TAGGED_TIME][1]
+            if len(self.tagged_datetime[HINDI_TAGGED_TIME]) > 0:
+                time_text_list = self.tagged_datetime[HINDI_TAGGED_TIME][0]
+                original_text_time_list = self.tagged_datetime[HINDI_TAGGED_TIME][1]
                 for time_text, original_text in zip(time_text_list, original_text_time_list):
                     hh, mm, nn = get_hindi_time(time_text, self.now_date)
                     if hh and mm:
