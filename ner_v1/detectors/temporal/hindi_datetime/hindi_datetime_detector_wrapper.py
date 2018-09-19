@@ -33,8 +33,7 @@ class HindiDateTimeDetector(object):
             self.timezone = pytz.timezone('UTC')
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.now(tz=self.timezone)
-        self.datetime_tagger_object = HindiDateTimeTagger()
-        self.tagged_datetime = self.datetime_tagger_object.get_datetime_tag_text(self.message)
+        self.tagged_datetime = HindiDateTimeTagger().get_datetime_tag_text(self.message)
 
     @staticmethod
     def return_ner_format_date(dd, mm, yy):
@@ -141,7 +140,7 @@ class HindiDateTimeDetector(object):
                 original_text_time_list = self.tagged_datetime[HINDI_TAGGED_TIME][1]
                 for time_text, original_text in zip(time_text_list, original_text_time_list):
                     hh, mm, nn = get_hindi_time(time_text, self.now_date)
-                    if hh and mm:
+                    if hh or mm:
                         time_list.append(self.return_ner_format_time(hh, mm, nn))
                         original_text_list.append(original_text)
         except BaseException as e:
