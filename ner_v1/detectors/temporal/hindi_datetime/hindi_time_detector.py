@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 
-from constant import datetime_dict, DAYTIME_MERIDIAN, IGNORE_DIFF_HOUR_LIST
 from ner_v1.detectors.temporal.hindi_datetime.constant import REGEX_HOUR_TIME_1, REGEX_MINUTE_TIME_1, \
-    REGEX_HOUR_TIME_2, MINUTE_TIME_REGEX_2
+    REGEX_HOUR_TIME_2, MINUTE_TIME_REGEX_2, datetime_dict, DAYTIME_MERIDIAN, IGNORE_DIFF_HOUR_LIST
 from utils import convert_numeral_to_number, get_hour_min_diff
 
 
