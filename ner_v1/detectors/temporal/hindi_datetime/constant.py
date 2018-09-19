@@ -55,9 +55,11 @@ separators = {'se': 0, 'ke': 0, 'aur': 0, 'evam': 0, 'lekin': 0, 'par': 0, 'maga
               'ya': 0, 'kyunki': 0, 'isliye': 0}
 
 DAYTIME_MERIDIAN = {
+    'am': 'am',
+    'pm': 'pm',
     'subah': 'am',
-    'raat':'pm',
-    'dopahar':'pm',
+    'raat': 'pm',
+    'dopahar': 'pm',
     'din': 'pm',
     'shaam': 'pm',
     'sandhya': 'pm'

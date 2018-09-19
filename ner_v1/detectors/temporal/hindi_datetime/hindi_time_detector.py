@@ -66,7 +66,7 @@ def get_hindi_time(text, today):
                 return get_hour_min_diff(today, ref_date)
 
     for each in DAYTIME_MERIDIAN:
-        if each in text:
+        if " " + each + " " in " " + text + " ":
             nn = DAYTIME_MERIDIAN[each]
 
     if type(hh) == float:
