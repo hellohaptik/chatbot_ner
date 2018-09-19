@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timedelta
 
 from constant import numbers_dict
+from ner_v1.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF
 
 
 def convert_numeral_to_number(text):
@@ -73,12 +74,12 @@ def get_hour_min_diff(time1, time2):
         mm (int): minute difference between two times
         nn (str): tell whether time difference is positive or negative
     """
-    nn = '+ve'
+    nn = POSITIVE_TIME_DIFF
     if time2 > time1:
         diff = time2 - time1
     else:
         diff = time1 - time2
-        nn = '-ve'
+        nn = NEGATIVE_TIME_DIFF
     minutes = (diff.seconds / 60) % 60
     hours = diff.seconds / 3600
     return hours, minutes, nn

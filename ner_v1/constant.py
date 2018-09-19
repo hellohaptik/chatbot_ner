@@ -73,3 +73,6 @@ LAST_NAME = 'last_name'
 PARAMETER_FUZZINESS = 'fuzziness'
 PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
 DATASTORE_VERIFIED = 'datastore_verified'
+
+POSITIVE_TIME_DIFF = 'df'
+NEGATIVE_TIME_DIFF = 'ndf'
