@@ -15,7 +15,7 @@ from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                                        TYPE_THIS_DAY, TYPE_PAST,
                                        TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
                                        REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
-from ner_v1.detectors.temporal.hindi_datetime.hindi_date_detector import get_hindi_date
+from ner_v1.detectors.temporal.hindi_datetime.hindi_datetime_detector_wrapper import HindiDateTimeDetector
 
 
 class DateAdvancedDetector(object):
@@ -811,7 +811,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        date_list, original_list = self._get_hindi_datetime(date_list, original_list)
+        date_list, original_list = self._get_hindi_datetime()
         date_list, original_list = self._date_identification_given_day_and_current_month(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_given_day_and_next_month(date_list, original_list)
@@ -847,24 +847,17 @@ class DateDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _get_hindi_datetime(self, date_list=None, original_list=None):
+    def _get_hindi_datetime(self):
         """
-        hindi datetime detector
-        Args:
-            date_list:
-            original_list:
-
+        Hindi date detector
         Returns:
+            date_list (list): list of dict containing date, month, year for each detected date
+            original_list (list): list of original text for each detected date
 
         """
-        if original_list is None:
-            original_list = []
-        if date_list is None:
-            date_list = []
-        date, original_text = get_hindi_date(self.processed_text.lower())
-        if original_text:
-            date_list.append(date)
-            original_list.append(original_text)
+        hindi_datetime_wrapper = HindiDateTimeDetector(message=self.text, timezone=self.timezone,
+                                                       outbound_message=self.bot_message)
+        date_list, original_list = hindi_datetime_wrapper.detect_date()
         return date_list, original_list
 
     def _gregorian_day_month_year_format(self, date_list=None, original_list=None):
