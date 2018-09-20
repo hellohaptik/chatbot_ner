@@ -1,5 +1,5 @@
 from lib.singleton import Singleton
-from chatbot_ner.config import AWS_MODEL_REGION, AWS_MODEL_BUCKET, ner_logger
+from chatbot_ner.config import CRF_MODEL_S3_BUCKET_REGION, CRF_MODEL_S3_BUCKET_NAME, ner_logger
 from lib.aws_utils import read_model_dict_from_s3
 import pycrfsuite
 
@@ -40,15 +40,15 @@ class CrfModel(object):
         ner_logger.debug('Model dir %s path from api' % live_crf_model_path)
         if live_crf_model_path == self.loaded_model_path:
             if not self.entity_model_dict:
-                self.entity_model_dict = read_model_dict_from_s3(bucket_name=AWS_MODEL_BUCKET,
-                                                                 bucket_region=AWS_MODEL_REGION,
+                self.entity_model_dict = read_model_dict_from_s3(bucket_name=CRF_MODEL_S3_BUCKET_NAME,
+                                                                 bucket_region=CRF_MODEL_S3_BUCKET_REGION,
                                                                  model_path_location=live_crf_model_path)
                 ner_logger.debug('New Model dir %s path from api' % live_crf_model_path)
             else:
                 return self.tagger
         else:
-            self.entity_model_dict = read_model_dict_from_s3(bucket_name=AWS_MODEL_BUCKET,
-                                                             bucket_region=AWS_MODEL_REGION,
+            self.entity_model_dict = read_model_dict_from_s3(bucket_name=CRF_MODEL_S3_BUCKET_NAME,
+                                                             bucket_region=CRF_MODEL_S3_BUCKET_REGION,
                                                              model_path_location=live_crf_model_path)
             ner_logger.debug('New Model dir %s path from cache' % live_crf_model_path)
             self.loaded_model_path = live_crf_model_path

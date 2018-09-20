@@ -1,5 +1,5 @@
 import pycrfsuite
-from chatbot_ner.config import ner_logger, AWS_MODEL_BUCKET, AWS_MODEL_REGION, MODELS_PATH
+from chatbot_ner.config import ner_logger, CRF_MODEL_S3_BUCKET_NAME, CRF_MODEL_S3_BUCKET_REGION, MODELS_PATH
 from datastore.datastore import DataStore
 from .constants import SENTENCE_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
@@ -135,8 +135,8 @@ class CrfTrain(object):
             AwsWriteEntityFail if writing to Aws fails
         """
         ner_logger.debug('Model %s saving at AWS started' % self.model_dir)
-        result = write_file_to_s3(bucket_name=AWS_MODEL_BUCKET,
-                                  bucket_region=AWS_MODEL_REGION,
+        result = write_file_to_s3(bucket_name=CRF_MODEL_S3_BUCKET_NAME,
+                                  bucket_region=CRF_MODEL_S3_BUCKET_REGION,
                                   address=self.model_dir,
                                   disk_filepath=self.model_dir)
         if result:

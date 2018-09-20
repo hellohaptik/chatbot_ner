@@ -1,7 +1,7 @@
 import numpy as np
 from lib.singleton import Singleton
 import pickle
-from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS, REMOTE_EMBEDDINGS_URL
+from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS, WORD_EMBEDDING_REMOTE_URL
 import requests
 import json
 from models.crf_v2.constants import TEXT_LIST, WORD_EMBEDDINGS_LIST
@@ -44,7 +44,7 @@ class LoadWordEmbeddings(object):
             word_vectors (np.ndarray): Numpy array of vectors for the provided text_list
         """
         json_dict = {TEXT_LIST: [text_list]}
-        result = json.loads(requests.get(url=REMOTE_EMBEDDINGS_URL, json=json_dict, timeout=120).text)
+        result = json.loads(requests.get(url=WORD_EMBEDDING_REMOTE_URL, json=json_dict, timeout=120).text)
         word_vectors = result[WORD_EMBEDDINGS_LIST]
         if word_vectors:
             word_vectors = np.vstack(word_vectors)
