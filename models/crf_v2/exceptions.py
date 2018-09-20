@@ -1,10 +1,10 @@
-class AwsWriteEntityFail(Exception):
+class AwsCrfModelWriteException(Exception):
     """
-    This exception is raised if training data index is not setup
+    This exception is raised if writing to the Aws model has failed
     """
 
     def __init__(self, message=None):
-        self.value = 'Aws write for has entity has failed'
+        self.value = 'Aws write for the crf model has failed'
         if message:
             self.value = message
 
@@ -12,13 +12,13 @@ class AwsWriteEntityFail(Exception):
         return repr(self.value)
 
 
-class ESTrainingTextListError(Exception):
+class ESCrfTrainingTextListNotFoundException(Exception):
     """
-    This exception is raised if training data index is not setup
+    This exception is raised if text for training Crf Model is not found
     """
 
     def __init__(self, message=None):
-        self.value = 'There is no text present in the elastic search for training the model'
+        self.value = 'There is no text present in the elastic search for training crf the model'
         if message:
             self.value = message
 
@@ -26,9 +26,9 @@ class ESTrainingTextListError(Exception):
         return repr(self.value)
 
 
-class ESTrainingEntityListError(Exception):
+class ESCrfTrainingEntityListNotFoundException(Exception):
     """
-    This exception is raised if training data index is not setup
+    This exception is raised if Entity List for training Crf Model is not found
     """
 
     def __init__(self, message=None):

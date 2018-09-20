@@ -4,8 +4,8 @@ from datastore.datastore import DataStore
 from .constants import SENTENCE_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
 from .crf_preprocess_data import CrfPreprocessData
-from .exceptions import AwsWriteEntityFail, ESTrainingEntityListError, \
-    ESTrainingTextListError
+from .exceptions import AwsCrfModelWriteException, ESCrfTrainingEntityListNotFoundException, \
+    ESCrfTrainingTextListNotFoundException
 from datetime import datetime
 import os
 
@@ -116,9 +116,9 @@ class CrfTrain(object):
         entity_list = result.get(ENTITY_LIST, [])
 
         if not text_list:
-            raise ESTrainingTextListError()
+            raise ESCrfTrainingTextListNotFoundException()
         if not entity_list:
-            raise ESTrainingEntityListError()
+            raise ESCrfTrainingEntityListNotFoundException()
 
         ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
         ner_logger.debug('Length of text_list %s' % str(len(text_list)))
@@ -143,7 +143,7 @@ class CrfTrain(object):
             ner_logger.debug('Model : %s written to s3' % self.model_dir)
         else:
             ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
-            raise AwsWriteEntityFail()
+            raise AwsCrfModelWriteException()
 
     def generate_model_path(self):
         """
