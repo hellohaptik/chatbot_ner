@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 CONFIG_PATH = os.path.join(BASE_DIR, 'config')
 MODEL_CONFIG_PATH = os.path.join(BASE_DIR, 'model_config')
 
-LOG_PATH = BASE_DIR + '/logs/'
+LOG_PATH = os.path.join(BASE_DIR, 'logs')
 # SET UP NER LOGGING
 if not os.path.exists(LOG_PATH):
     os.makedirs(LOG_PATH)
@@ -27,7 +27,7 @@ handler_stdout.setLevel(LOG_LEVEL)
 handler_stdout.setFormatter(formatter)
 
 # SETUP NER LOGGING
-NER_LOG_FILENAME = LOG_PATH + 'ner_log.log'
+NER_LOG_FILENAME = os.path.join(LOG_PATH, 'ner_log.log')
 # Set up a specific logger with our desired output level
 ner_logger = logging.getLogger('NERLogger')
 ner_logger.setLevel(LOG_LEVEL)
@@ -39,7 +39,7 @@ ner_logger.addHandler(handler_stdout)
 
 
 # SETUP NLP LIB LOGGING
-NLP_LIB_LOG_FILENAME = LOG_PATH + 'nlp_log.log'
+NLP_LIB_LOG_FILENAME = os.path.join(LOG_PATH, 'nlp_log.log')
 # Set up a specific logger with our desired output level
 nlp_logger = logging.getLogger('NLPLibLogger')
 nlp_logger.setLevel(LOG_LEVEL)
@@ -57,7 +57,7 @@ else:
                      'datastore(elasticsearch) connection settings are already available in the environment',
                      CONFIG_PATH)
 
-# TODO Consider prefixing everything config with HAPTIK_NER_ because these names are in the environment and so are
+# TODO Consider prefixing everything config with NER_ because these names are in the environment and so are
 # TODO lot of others too which may conflict in name. Example user is already using some another instance of
 # TODO Elasticsearch for other purposes
 ENGINE = os.environ.get('ENGINE')
