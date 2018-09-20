@@ -2,9 +2,9 @@ import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
 from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE)
+                        ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException)
+                         EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 
 
 class DataStore(object):
@@ -335,6 +335,18 @@ class DataStore(object):
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
 
+    def _check_doc_type_for_crf_data_elasticsearch(self):
+        """
+        Checks if doc_type is present in connection settings, if not an exception is raised
+
+        Raises:
+             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
+        """
+        if ELASTICSEARCH_CRF_DATA_DOC_TYPE not in self._connection_settings:
+            raise DataStoreSettingsImproperlyConfiguredException(
+                'Elasticsearch training data needs doc_type. Please configure '
+                'ES_TRAINING_DATA_DOC_TYPE in your environment')
+
     def exists(self):
         """
         Checks if DataStore is already created
@@ -393,3 +405,96 @@ class DataStore(object):
         destination = CHATBOT_NER_DATASTORE.get(self._engine).get('destination_url')
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
+
+    def get_crf_data_for_entity_name(self, entity_name, **kwargs):
+        """
+        This method is used to obtain the sentences and entities from sentences given entity name
+        Args:
+            entity_name (str): Entity name for which training data needs to be obtained
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+        Returns:
+            results_dictionary(dict): Dictionary consisting of the training data for the the given entity.
+
+        Raises:
+             IndexNotFoundException if es_training_index was not found in connection settings
+
+        Example:
+            db = Datastore()
+            db.get_entity_training_data(entity_name, **kwargs):
+            >> {
+        'sentence_list': [
+            'My name is hardik',
+            'This is my friend Ajay'
+                        ],
+        'entity_list': [
+            [
+                'hardik'
+            ],
+            [
+                'Ajay'
+            ]
+                        ]
+            }
+        """
+        ner_logger.debug('Datastore, get_entity_training_data, entity_name %s' % entity_name)
+        if self._client_or_connection is None:
+            self._connect()
+        results_dictionary = {}
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_crf_data_elasticsearch()
+
+            es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
+            if es_training_index is None:
+                raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
+                                             'Please configure the same')
+
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.get_crf_data_for_entity_name(connection=self._client_or_connection,
+                                                                                   index_name=es_training_index,
+                                                                                   doc_type=
+                                                                                   self._connection_settings
+                                                                                   [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                                                   entity_name=entity_name,
+                                                                                   request_timeout=request_timeout,
+                                                                                   **kwargs)
+            ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
+        return results_dictionary
+
+    def update_entity_crf_data(self, entity_name, entity_list, language_script, sentence_list, **kwargs):
+        """
+        This method is used to populate the training data for a given entity
+        Args:
+            entity_name (str): Name of the entity for which the training data has to be populated
+            entity_list (list): List consisting of the entities corresponding to the sentence_list
+            sentence_list (list): List of sentences for training
+            language_script (str): Language code for the language script used.
+            **kwargs:
+                For Elasticsearch:
+                Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
+
+        Raises:
+            IndexNotFoundException if es_training_index was not found in connection settings
+        """
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_crf_data_elasticsearch()
+
+            es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
+            if es_training_index is None:
+                raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
+                                             'Please configure the same')
+
+            elastic_search.populate.update_entity_crf_data_populate(connection=self._client_or_connection,
+                                                                    index_name=es_training_index,
+                                                                    doc_type=self._connection_settings
+                                                                    [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                                    logger=ner_logger,
+                                                                    entity_list=entity_list,
+                                                                    sentence_list=sentence_list,
+                                                                    entity_name=entity_name,
+                                                                    language_script=language_script,
+                                                                    **kwargs)
