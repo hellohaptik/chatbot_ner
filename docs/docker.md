@@ -55,11 +55,14 @@ docker-compose up --build -d
 
 The above will also mount local repo root directory inside the containers /app directory
 Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
-   > **NOTE**: make sure that nothing is running on port 80 on your server or your local environment. If anything is running on port 80 run the following command
+   > **NOTE**: make sure that nothing is running on port 8081 on your server or your local environment.
+     If anything is running on port 8081, you can stop it by running the following command
    >
-   > `sudo lsof -t -i tcp:80 -s tcp:listen | sudo xargs kill`
+   > `sudo lsof -t -i tcp:8081 -s tcp:listen | sudo xargs kill`
 
-   > We have mapped port 80 of the docker container to  port 80 of your machine. Now, on your local machine curl the chatbot api as shown shown below, host can be your local machine or a server IP on which you have been running docker on.
+   > We have mapped port 80 of the docker container to port 8081 of your machine.
+     Now, on your local machine curl the chatbot api as shown shown below,
+     host can be your local machine or a server IP on which you have been running docker on.
 
    > Port mapping can be changed in docker-compose yml 
 
