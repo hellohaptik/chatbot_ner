@@ -1,6 +1,7 @@
 import os
-import nltk
 import time
+
+import nltk
 
 BASE_DIR = os.path.dirname(__file__)
 
@@ -33,6 +34,7 @@ time.sleep(20)
 # POPULATING DATASTORE
 # Comment out entire section if you want to reuse existing data
 from datastore import DataStore
+
 db = DataStore()
 print "Setting up DataStore for Chatbot NER"
 print "Deleting any stale data ..."

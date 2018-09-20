@@ -1,3 +1,5 @@
+import collections
+
 import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
@@ -100,12 +102,24 @@ class DataStore(object):
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
-            elastic_search.create.create_index(connection=self._client_or_connection,
-                                               index_name=self._store_name,
-                                               doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                                               logger=ner_logger,
-                                               ignore=[400, 404],
-                                               **kwargs)
+            elastic_search.create.create_entity_index(connection=self._client_or_connection,
+                                                      index_name=self._store_name,
+                                                      doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                                                      logger=ner_logger,
+                                                      ignore=[400, 404],
+                                                      **kwargs)
+            crf_data_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
+            if crf_data_index is not None:
+                self._check_doc_type_for_crf_data_elasticsearch()
+
+                elastic_search.create.create_crf_index(
+                    connection=self._client_or_connection,
+                    index_name=crf_data_index,
+                    doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                    logger=ner_logger,
+                    ignore=[400, 404],
+                    **kwargs
+                )
 
     def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
@@ -249,6 +263,7 @@ class DataStore(object):
                  u'mumbai': u'mumbai',
                  u'pune': u'pune'}
         """
+        results_dictionary = collections.OrderedDict()
         if self._client_or_connection is None:
             self._connect()
         if self._engine == ELASTICSEARCH:
@@ -323,6 +338,7 @@ class DataStore(object):
                                                                  logger=ner_logger,
                                                                  ignore=[400, 404],
                                                                  **kwargs)
+            # TODO: repopulate code for crf index missing
 
     def _check_doc_type_for_elasticsearch(self):
         """
@@ -381,7 +397,7 @@ class DataStore(object):
             elastic_search.populate.entity_data_update(connection=self._client_or_connection,
                                                        index_name=update_index,
                                                        doc_type=self._connection_settings[
-                                                            ELASTICSEARCH_DOC_TYPE],
+                                                           ELASTICSEARCH_DOC_TYPE],
                                                        logger=ner_logger,
                                                        entity_data=entity_data,
                                                        entity_name=entity_name,
@@ -443,22 +459,19 @@ class DataStore(object):
             self._connect()
         results_dictionary = {}
         if self._engine == ELASTICSEARCH:
-            self._check_doc_type_for_crf_data_elasticsearch()
-
             es_training_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
             if es_training_index is None:
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
-
+            self._check_doc_type_for_crf_data_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.get_crf_data_for_entity_name(connection=self._client_or_connection,
-                                                                                   index_name=es_training_index,
-                                                                                   doc_type=
-                                                                                   self._connection_settings
-                                                                                   [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
-                                                                                   entity_name=entity_name,
-                                                                                   request_timeout=request_timeout,
-                                                                                   **kwargs)
+            results_dictionary = elastic_search.query.get_crf_data_for_entity_name(
+                connection=self._client_or_connection,
+                index_name=es_training_index,
+                doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                entity_name=entity_name,
+                request_timeout=request_timeout,
+                **kwargs)
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
