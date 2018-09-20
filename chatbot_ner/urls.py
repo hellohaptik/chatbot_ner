@@ -34,8 +34,4 @@ urlpatterns = patterns('',
 
     #  Train Crf Model
     url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
-
-    #  Transfer Crf Model
-    url(r'^entities/transfer_crf_model', 'external_api.api.transfer_crf_model'),
-
 )
