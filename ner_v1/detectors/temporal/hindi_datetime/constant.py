@@ -1,21 +1,31 @@
 import re
 
+# Dict to detect date in text, 1 dimension determine the magnitude and second dimension decide its day category
 dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_day"], 'narson': [3, "ref_day"],
-              'parso': [2, "ref_day"], 'narso': [3, "ref_day"],
-              'din': [0, "date"], 'dino': [0, "day"], 'month': [0, "months"], 'tarikh': [0, None], 'tareekh': [0, None],
+              'parso': [2, "ref_day"], 'narso': [3, "ref_day"], 'tareekh': [0, None],
+              'din': [0, "date"], 'dino': [0, "day"], 'month': [0, "months"], 'tarikh': [0, None],
               'mahine': [0, "months"], 'mahina': [0, "months"], 'monday': [0, "weekday"], 'tuesday': [1, "weekday"],
               'wednesday': [2, "weekday"], 'thursday': [3, "weekday"], 'friday': [4, "weekday"],
-              'saturday': [5, "weekday"], 'sunday': [6, "weekday"], 'somvar': [0, "weekday"],
-              'mangalvar': [1, "weekday"], 'budhvar': [2, "weekday"], 'guruvar': [3, "weekday"],
-              'shukravar': [4, "weekday"], 'shanivar': [5, "weekday"], 'ravivar': [6, "weekday"],
+              'saturday': [5, "weekday"], 'sunday': [6, "weekday"], 'somvar': [0, "weekday"], 'somwar': [0, "weekday"],
+              'mangalvar': [1, "weekday"], 'mangalwar': [1, "weekday"], 'budhvar': [2, "weekday"],
+              'budhwar': [2, "weekday"], 'guruvar': [3, "weekday"], 'guruwar': [3, "weekday"],
+              'shukravar': [4, "weekday"], 'shukrawar': [4, "weekday"], 'sukravar': [4, "weekday"],
+              'sukrawar': [4, "weekday"], 'shanivar': [5, "weekday"], 'shaniwar': [5, "weekday"],
+              'sanivar': [5, "weekday"], 'saniwar': [5, "weekday"], 'ravivar': [6, "weekday"],
+              'raviwar': [6, "weekday"],
               'january': [1, "month"], 'february': [2, "month"], 'march': [3, "month"], 'april': [4, "month"],
               'may': [5, "month"], 'june': [6, "month"], 'july': [7, "month"], 'august': [8, "month"],
               'september': [9, "month"], 'october': [10, "month"], 'november': [11, "month"],
               'december': [12, "month"], 'itwar': [6, "weekday"], 'itvar': [6, "weekday"]}
 
+# dict to detect time where keys define tag text and value define category like if its defining hour, minute or second
 times_dict = {'abhi': 0, 'turant': 0, 'bje': 1, 'bajkr': 1, 'bajkar': 1, 'baje': 1, 'baj': 1, 'ghante': 1, 'ghanta': 1,
               'ghanton': 1, 'subah': 0, 'shaam': 0, 'sandhya': 0, 'dopahar': 0, 'raat': 0, 'minutes': 2, 'minute': 2,
               'mins': 2, 'min': 2, 'seconds': 3, 'second': 3, 'sec': 3}
+
+# dict to detect reference both date and time, 1st index corresponds to whether it should be added to forward
+# or backward entity, 2nd index is for magnitude of addition or deletion from entity and 3rd index is to differentiate
+# if given key have exact(dedh, dhaai) or diff(baad, pichhle) or reference (saade, paune) magnitude
 
 datetime_dict = {"baad": (-1, 1, 0), "is": (1, 0, 0), "isi": (1, 0, 0), "pahle": (-1, -1, 0), "pehle": (-1, -1, 0),
                  "phle": (-1, -1, 0), "pichhle": (1, -1, 0), "hua": (-1, -1, 0), "pichhla": (1, -1, 0),
@@ -28,6 +38,8 @@ datetime_dict = {"baad": (-1, 1, 0), "is": (1, 0, 0), "isi": (1, 0, 0), "pahle":
                  "saade": (1, 0.5, 2), 'me': (-1, 1, 0), 'paune': (1, -0.25, 2),
                  'sawa': (1, 0.25, 2), 'sava': (1, 0.25, 2), 'pehla': (-1, -1, 0)}
 
+# dict to contain numbers and hindi numerals, 1st index define magnitude and second define which entity is should be
+# added to (forward or backward)
 numbers_dict = {'1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pehle': [1, 1], 'pehla': [1, 1],
                 '2': [2, 1], 'do': [2, 1],
                 'doosra': [2, 1], 'doosri': [2, 1], 'doosre': [2, 1], '3': [3, 1], 'teen': [3, 1], 'teesra': [3, 1],
@@ -51,9 +63,11 @@ numbers_dict = {'1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pe
                 'atthaish': [28, 1], '29': [29, 1], 'untish': [29, 1], '30': [30, 1], 'teesh': [30, 1],
                 '31': [31, 1], 'ikattish': [31, 1]}
 
+# word to separate two date time
 separators = {'se': 0, 'ke': 0, 'aur': 0, 'evam': 0, 'lekin': 0, 'par': 0, 'magar': 0, 'kintu': 0, 'parantu': 0,
               'ya': 0, 'kyunki': 0, 'isliye': 0}
 
+# dict to find meridian for time detected
 DAYTIME_MERIDIAN = {
     'am': 'am',
     'pm': 'pm',
@@ -65,11 +79,14 @@ DAYTIME_MERIDIAN = {
     'sandhya': 'pm'
 }
 
+# words when diff is ignored
 IGNORE_DIFF_HOUR_LIST = ["bje", "baje", "bajkar", "bajkr", "baj"]
 
+# tag word for word like 'baad', 'pichhle' to decide it should be added (either forward or backward entity)
 TAG_PREV = 'prev'
 TAG_NEXT = 'next'
 
+# dict key for datetime tagger
 HINDI_TAGGED_DATE = 'date'
 HINDI_TAGGED_TIME = 'time'
 
