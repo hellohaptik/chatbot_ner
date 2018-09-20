@@ -23,6 +23,7 @@ services:
       - "DJANGO_SETTINGS_MODULE=chatbot_ner.settings"
       - "DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py"
       - "DJANGO_LOG_LEVEL=debug"
+      - "DJANGO_DEBUG=False"
       - "PORT=8081"
       - "TIMEOUT=600"
       - "ENGINE=elasticsearch"
