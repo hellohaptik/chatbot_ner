@@ -1,5 +1,6 @@
 # Will start the application, mount local directory,
-# Before running PLEASE make logs folder on the local repo manually once and also .env file having ENV keys (if you don't want to use env in compose
+# If you don't want to keep env variables in compose, you can keep an env file that can be copied and source while building the image
+# Variables used in the Django app itself can also be configured at chatbot_ner/config (copy config.example to config and edit it)
 # This will also bring up local Elasticsearch, you could even use your already setup ES
 # I have defined a common network for these 2 services so that containers can communicate with each other
 
@@ -28,7 +29,7 @@ services:
 # ES_HOST is host for ES that comes up with compose
       - "ES_HOST=elasticsearch"
       - "ES_PORT=9200"
-      - "ES_INDEX_NAME=gogo_entity_data"
+      - "ES_INDEX_NAME=entity_data"
       - "ES_DOC_TYPE=data_dictionary"
       - "ES_BULK_MSG_SIZE=1000"
       - "ES_SEARCH_SIZE=10"
@@ -40,12 +41,13 @@ services:
     volumes:
       - ..:/app/
 
-# Map port 80 of host machine to port 80 of container inside which Nginx and chatbot_ner app are running
+# Map port 8081 of host machine to port 80 of container inside which Nginx and chatbot_ner app are running
 # Nginx proxy passes to backend Chatbot_ner app running on 8081
-# This can be run directly by ports "8081:8081"
+# Host 8081 -> Nginx 80 -> uwsgi 8081
+# This can be run directly by ports "8081:8081" if you don't want to use Nginx
 
     ports:
-      - '80:80'
+      - '8081:80'
     networks:
       - chatbot_ner
     depends_on:

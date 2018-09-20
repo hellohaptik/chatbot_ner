@@ -102,5 +102,4 @@ ENV/
 /newrelic.ini
 
 .DS_Store
-# Log path
-logs/
+

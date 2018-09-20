@@ -96,7 +96,7 @@ message = "Reserve me a table today at 6:30pm at Mainland China and on Monday at
 
    ```shell
 URL='localhost'
-PORT=80
+PORT=8081
 curl -i 'http://'$URL':'$PORT'/v1/ner/?entities=\[%22date%22,%22time%22,%22restaurant%22\]&message=Reserve%20me%20a%20table%20today%20at%206:30pm%20at%20Mainland%20China%20and%20on%20Monday%20at%207:00pm%20at%20Barbeque%20Nation'
    ```
 
@@ -185,7 +185,7 @@ Output should be:
    ```
 
 - You can also have a look at our [API call document](/docs/api_call.md) to test and use different NER functionalities.
-- To access GUI, go to http://localhost:80/gui/ or http://host-ip/gui/
+- To access GUI, go to http://localhost:8081/gui/ or http://host-ip/gui/
 
 
 
@@ -199,7 +199,7 @@ If you want to create a custom Docker image execute the following commands after
 $ cd chatbot_ner
 $ cd docker
 $ sudo docker build -t ner_image .
-$ sudo docker run -itd -p 80:80 --name ner ner_image
+$ sudo docker run -itd -p 8081:80 --name ner ner_image
 ```
 
 ## Delete Docker Data
