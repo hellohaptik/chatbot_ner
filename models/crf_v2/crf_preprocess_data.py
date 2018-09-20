@@ -113,8 +113,8 @@ class CrfPreprocessData(object):
 
         for text, entities in zip(text_list, entity_list):
             tokenzied_text, labels = CrfPreprocessData.pre_process_text_(text, entities)
-            processed_list[TEXT_LIST].append(labels)
-            processed_list[LABELS].append(tokenzied_text)
+            processed_list[TEXT_LIST].append(tokenzied_text)
+            processed_list[LABELS].append(labels)
         return processed_list
 
     @staticmethod
@@ -212,7 +212,7 @@ class CrfPreprocessData(object):
 
         if j > 1:
             word1 = doc[TEXT_LIST][i][j - 2]
-            pos_tag = doc[WORD_EMBEDDINGS][i][j - 2]
+            pos_tag = doc[POS_TAGS][i][j - 2]
             features.extend([
                 '-2:word.lower=' + word1.lower(),
                 '-2:word.istitle=%s' % word1.istitle(),
