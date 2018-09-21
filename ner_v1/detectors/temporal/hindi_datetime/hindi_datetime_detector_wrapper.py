@@ -87,19 +87,20 @@ class HindiDateTimeDetector(object):
         Returns:
             (bool): False if there is no previous bot message or reference is for future else True
         """
-        if not self.bot_outbound_message:
-            return False
-
-        english_past_reference = "tha|thi|"
-        hinglish_past_reference = u'थी|था'
-
-        past_reference = english_past_reference + hinglish_past_reference
-        past_reference_regex = re.compile(past_reference)
-
-        if past_reference_regex.match(self.bot_outbound_message):
-            return True
-        else:
-            return False
+        return True
+        # if not self.bot_outbound_message:
+        #     return False
+        #
+        # english_past_reference = "tha|thi|"
+        # hinglish_past_reference = u'थी|था'
+        #
+        # past_reference = english_past_reference + hinglish_past_reference
+        # past_reference_regex = re.compile(past_reference)
+        #
+        # if past_reference_regex.match(self.bot_outbound_message):
+        #     return True
+        # else:
+        #     return False
 
     def detect_date(self):
         """
