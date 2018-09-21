@@ -82,7 +82,7 @@ class CrfTrain(object):
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
             return local_path
 
-    def train_model(self, text_list, entity_list, c1=0, c2=0, max_iterations=1000):
+    def train_model(self, sentence_list, entity_list, c1=0, c2=0, max_iterations=1000):
         """
         This model is used to train the crf model. It performs the pre processing steps
         and trains the models
@@ -90,14 +90,14 @@ class CrfTrain(object):
             c1 (int): Coefficient of regularization to control variance and bias.
             c2 (int): Coefficient of regularization to control variance and bias.
             max_iterations (int): Max number of iterations to be carried out.
-            text_list (list): List of sentences on which the NER task has to be carried out.
+            sentence_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
         Returns:
             status (bool): Returns true if the training is successful.
         """
 
         ner_logger.debug('Pre processing for Entity: %s started' % self.entity_name)
-        x, y = CrfPreprocessData.preprocess_crf_text_entity_list(text_list=text_list, entity_list=entity_list,
+        x, y = CrfPreprocessData.preprocess_crf_text_entity_list(sentence_list=sentence_list, entity_list=entity_list,
                                                                  read_embeddings_from_remote_url=
                                                                  self.read_embeddings_from_remote_url)
         ner_logger.debug('Pre processing for Entity: %s completed' % self.entity_name)
@@ -113,18 +113,18 @@ class CrfTrain(object):
         ner_logger.debug('Fetch of data from ES for ENTITY: %s started' % self.entity_name)
         result = datastore_object.get_crf_data_for_entity_name(entity_name=self.entity_name)
 
-        text_list = result.get(SENTENCE_LIST, [])
+        sentence_list = result.get(SENTENCE_LIST, [])
         entity_list = result.get(ENTITY_LIST, [])
 
-        if not text_list:
+        if not sentence_list:
             raise ESCrfTrainingTextListNotFoundException()
         if not entity_list:
             raise ESCrfTrainingEntityListNotFoundException()
 
         ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
-        ner_logger.debug('Length of text_list %s' % str(len(text_list)))
+        ner_logger.debug('Length of text_list %s' % str(len(sentence_list)))
 
-        model_path = self.train_model(entity_list=entity_list, text_list=text_list)
+        model_path = self.train_model(entity_list=entity_list, sentence_list=sentence_list)
         return model_path
 
     def write_crf_model_to_s3(self):

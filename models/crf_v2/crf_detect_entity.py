@@ -43,7 +43,7 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfPreprocessData.preprocess_crf_text_entity_list(text_list=[text],
+        x, _ = CrfPreprocessData.preprocess_crf_text_entity_list(sentence_list=[text],
                                                                  read_embeddings_from_remote_url=self.read_embeddings_from_remote_url)
         y_prediction = [self.tagger.tag(x_seq) for x_seq in x][0]
 

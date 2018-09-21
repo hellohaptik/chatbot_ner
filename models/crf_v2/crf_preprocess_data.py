@@ -4,7 +4,7 @@ import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
-from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS, CRF_WORD_VEC_FEATURE, CRF_B_LABEL,\
+from models.crf_v2.constants import SENTENCE_LIST, CRF_WORD_EMBEDDINGS, CRF_WORD_VEC_FEATURE, CRF_B_LABEL,\
     CRF_B_TAG, CRF_I_LABEL, CRF_I_TAG, CRF_POS_TAGS, CRF_LABELS, CRF_O_LABEL, CRF_BOS, CRF_EOS
 
 
@@ -87,11 +87,11 @@ class CrfPreprocessData(object):
         return word_embeddings
 
     @staticmethod
-    def pre_process_text(text_list, entity_list):
+    def pre_process_text(sentence_list, entity_list):
         """
         This method is used to call pre_process_text for every text_list and entity_list
         Args:
-            text_list (list): List of text on which NER has to be performed
+            sentence_list (list): List of text on which NER has to be performed
             entity_list (list): List of entities present in text_list for every text occurrence.
         Returns:
             processed_list (dict): Dict consisting of the keys text_list and labels
@@ -110,12 +110,12 @@ class CrfPreprocessData(object):
                          ['Book', 'a', 'flight', 'to', 'Pune']]}
         """
 
-        processed_list = {TEXT_LIST: [],
+        processed_list = {SENTENCE_LIST: [],
                           CRF_LABELS: []}
 
-        for text, entities in zip(text_list, entity_list):
+        for text, entities in zip(sentence_list, entity_list):
             tokenzied_text, labels = CrfPreprocessData.get_text_entity_list(text, entities)
-            processed_list[TEXT_LIST].append(tokenzied_text)
+            processed_list[SENTENCE_LIST].append(tokenzied_text)
             processed_list[CRF_LABELS].append(labels)
         return processed_list
 
@@ -151,7 +151,7 @@ class CrfPreprocessData(object):
         """
         docs[CRF_POS_TAGS] = []
         pos_tagger = POS()
-        for text in docs[TEXT_LIST]:
+        for text in docs[SENTENCE_LIST]:
             docs[CRF_POS_TAGS].append([tag[1] for tag in pos_tagger.tagger.tag(text)])
 
         return docs
@@ -194,7 +194,7 @@ class CrfPreprocessData(object):
             features (list): List of CRF trainable features.
         """
 
-        word = doc[TEXT_LIST][i][j]
+        word = doc[SENTENCE_LIST][i][j]
         pos_tag = doc[CRF_POS_TAGS][i][j]
         # Common features for all words
         features = [
@@ -213,7 +213,7 @@ class CrfPreprocessData(object):
         # at the beginning of a document
 
         if j > 1:
-            word1 = doc[TEXT_LIST][i][j - 2]
+            word1 = doc[SENTENCE_LIST][i][j - 2]
             pos_tag = doc[CRF_POS_TAGS][i][j - 2]
             features.extend([
                 '-2:word.lower=' + word1.lower(),
@@ -229,7 +229,7 @@ class CrfPreprocessData(object):
             features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('-2', word_embedding))
 
         if j > 0:
-            word1 = doc[TEXT_LIST][i][j - 1]
+            word1 = doc[SENTENCE_LIST][i][j - 1]
             pos_tag = doc[CRF_POS_TAGS][i][j - 1]
             features.extend([
                 '-1:word.lower=' + word1.lower(),
@@ -247,8 +247,8 @@ class CrfPreprocessData(object):
 
         # Features for words that are not
         # at the end of a document
-        if j < len(doc[TEXT_LIST][i]) - 2:
-            word1 = doc[TEXT_LIST][i][j + 2]
+        if j < len(doc[SENTENCE_LIST][i]) - 2:
+            word1 = doc[SENTENCE_LIST][i][j + 2]
             pos_tag = doc[CRF_POS_TAGS][i][j + 2]
             features.extend([
                 '+2:word.lower=' + word1.lower(),
@@ -260,8 +260,8 @@ class CrfPreprocessData(object):
             word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j + 2]
             features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('+2', word_embedding))
 
-        if j < len(doc[TEXT_LIST][i]) - 1:
-            word1 = doc[TEXT_LIST][i][j + 1]
+        if j < len(doc[SENTENCE_LIST][i]) - 1:
+            word1 = doc[SENTENCE_LIST][i][j + 1]
             pos_tag = doc[CRF_POS_TAGS][i][j + 1]
             features.extend([
                 '+1:word.lower=' + word1.lower(),
@@ -293,17 +293,17 @@ class CrfPreprocessData(object):
             (list): List consisting of the features used to train the CRF model.
         """
         features = []
-        for i in range(len(doc[TEXT_LIST])):
-            features.append([CrfPreprocessData.get_crf_feature_from_word_vector(doc, i, j) for j in range(len(doc[TEXT_LIST][i]))])
+        for i in range(len(doc[SENTENCE_LIST])):
+            features.append([CrfPreprocessData.get_crf_feature_from_word_vector(doc, i, j) for j in range(len(doc[SENTENCE_LIST][i]))])
         return features
 
     @staticmethod
-    def preprocess_crf_text_entity_list(text_list, entity_list=[[]], read_embeddings_from_remote_url=False):
+    def preprocess_crf_text_entity_list(sentence_list, entity_list=[[]], read_embeddings_from_remote_url=False):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.
         Args:
-            text_list (list): List of sentences on which the NER task has to be carried out.
+            sentence_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
             read_embeddings_from_remote_url (bool): To indicate if cloud embeddings is active
         Returns:
@@ -311,7 +311,7 @@ class CrfPreprocessData(object):
             labels (list): Labels corresponding in IOB format.
         """
         ner_logger.debug('pre_process_text Started')
-        processed_text = CrfPreprocessData.pre_process_text(text_list, entity_list)
+        processed_text = CrfPreprocessData.pre_process_text(sentence_list, entity_list)
         ner_logger.debug('pre_process_text Completed')
 
         ner_logger.debug('pos_tag Started')
@@ -331,7 +331,7 @@ class CrfPreprocessData(object):
         processed_text_pos_tag['word_embeddings'] = [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
                                                                                        vocab=vocab,
                                                      word_vectors=word_vectors)
-                                                     for each in processed_text_pos_tag[TEXT_LIST]]
+                                                     for each in processed_text_pos_tag[SENTENCE_LIST]]
         ner_logger.debug('Loading Word Embeddings Completed')
 
         ner_logger.debug('CrfPreprocessData.extract_features Started')
@@ -361,10 +361,10 @@ class CrfPreprocessData(object):
               }
         """
         words_list = []
-        for text in text_dict[TEXT_LIST]:
+        for text in text_dict[SENTENCE_LIST]:
             for token in text:
                 words_list.append(token)
 
-        word_vectors = LoadWordEmbeddings.load_word_vectors_remote(text_list=words_list)
+        word_vectors = LoadWordEmbeddings.load_word_vectors_remote(sentence_list=words_list)
 
         return words_list, word_vectors

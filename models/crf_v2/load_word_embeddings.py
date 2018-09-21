@@ -40,18 +40,18 @@ class LoadWordEmbeddings(object):
         return vocab, word_vectors
 
     @staticmethod
-    def load_word_vectors_remote(text_list):
+    def load_word_vectors_remote(sentence_list):
         """
         This method is used to load word_vectors from a remote location
         Args:
-            text_list (list): List of tokenized texts
+            sentence_list (list): List of tokenized texts
             text_list = [['my', 'name', 'is', 'chatbot'], ['how', 'are', 'you']]
         Returns:
             word_vectors (np.ndarray): Numpy array of vectors for the provided text_list
         """
         word_vectors = np.array([])
         try:
-            json_dict = {TEXT_LIST: [text_list]}
+            json_dict = {TEXT_LIST: [sentence_list]}
             result = json.loads(requests.get(url=WORD_EMBEDDING_REMOTE_URL, json=json_dict, timeout=120).text)
             word_vectors = result[CRF_WORD_EMBEDDINGS_LIST]
             if word_vectors:
