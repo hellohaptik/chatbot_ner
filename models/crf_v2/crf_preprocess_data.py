@@ -13,7 +13,7 @@ class CrfPreprocessData(object):
     This class is used to pre_process_data for the Crf model.
     """
     @staticmethod
-    def pre_process_text_(text, entities):
+    def get_text_entity_list(text, entities):
         """
         This function takes input as the text and entities present in the text and processes
         them to generate processed tokens along with their respective IOB labels.
@@ -27,7 +27,7 @@ class CrfPreprocessData(object):
         Example:
             text_list ='book a flight from Mumbai to Delhi'
             entity_list = ['Mumbai', 'Delhi']
-            pre_process_text_(text, entity_list)
+            get_text_entity_list(text, entity_list)
             >> ['book', 'a', 'flight', 'from', 'Mumbai', 'to', 'Delhi'],
                 ['O', 'O', 'O', 'O', 'B', 'O', 'B']
         """
@@ -112,13 +112,13 @@ class CrfPreprocessData(object):
                           CRF_LABELS: []}
 
         for text, entities in zip(text_list, entity_list):
-            tokenzied_text, labels = CrfPreprocessData.pre_process_text_(text, entities)
+            tokenzied_text, labels = CrfPreprocessData.get_text_entity_list(text, entities)
             processed_list[TEXT_LIST].append(tokenzied_text)
             processed_list[CRF_LABELS].append(labels)
         return processed_list
 
     @staticmethod
-    def pos_tag(docs):
+    def get_pos_tagged_dict(docs):
         """
         This method is used to apply pos_tags to every token
         Args:
@@ -155,7 +155,7 @@ class CrfPreprocessData(object):
         return docs
 
     @staticmethod
-    def convert_wordvec_features(prefix, word_vec):
+    def convert_word_vector_to_crf_features(prefix, word_vec):
         """
         This method is used to unroll the word_vectors
         Args:
@@ -176,7 +176,7 @@ class CrfPreprocessData(object):
         return features
 
     @staticmethod
-    def word_to_features(doc, i, j):
+    def get_crf_feature_from_word_vector(doc, i, j):
         """
         This class is used to convert the doc to CRF trainable features.
         Args:
@@ -205,7 +205,7 @@ class CrfPreprocessData(object):
         ]
 
         word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j]
-        features.extend(CrfPreprocessData.convert_wordvec_features('', word_embedding))
+        features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('', word_embedding))
 
         # Features for words that are not
         # at the beginning of a document
@@ -224,7 +224,7 @@ class CrfPreprocessData(object):
             ])
 
             word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j - 2]
-            features.extend(CrfPreprocessData.convert_wordvec_features('-2', word_embedding))
+            features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('-2', word_embedding))
 
         if j > 0:
             word1 = doc[TEXT_LIST][i][j - 1]
@@ -238,7 +238,7 @@ class CrfPreprocessData(object):
 
             ])
             word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j - 1]
-            features.extend(CrfPreprocessData.convert_wordvec_features('-1', word_embedding))
+            features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('-1', word_embedding))
         else:
             # Indicate that it is the 'beginning of a document'
             features.append(CRF_BOS)
@@ -256,7 +256,7 @@ class CrfPreprocessData(object):
                 '+2:pos_tag=' + pos_tag,
             ])
             word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j + 2]
-            features.extend(CrfPreprocessData.convert_wordvec_features('+2', word_embedding))
+            features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('+2', word_embedding))
 
         if j < len(doc[TEXT_LIST][i]) - 1:
             word1 = doc[TEXT_LIST][i][j + 1]
@@ -269,7 +269,7 @@ class CrfPreprocessData(object):
                 '+1:pos_tag=' + pos_tag,
             ])
             word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j + 1]
-            features.extend(CrfPreprocessData.convert_wordvec_features('+1', word_embedding))
+            features.extend(CrfPreprocessData.convert_word_vector_to_crf_features('+1', word_embedding))
         else:
             # Indicate that it is the 'end of a document'
             features.append(CRF_EOS)
@@ -277,7 +277,7 @@ class CrfPreprocessData(object):
         return features
 
     @staticmethod
-    def extract_features(doc):
+    def extract_crf_features(doc):
         """
         This method is used to extract features from the doc and it accomplishes this by calling the
         word_to_feature method.
@@ -292,11 +292,11 @@ class CrfPreprocessData(object):
         """
         features = []
         for i in range(len(doc[TEXT_LIST])):
-            features.append([CrfPreprocessData.word_to_features(doc, i, j) for j in range(len(doc[TEXT_LIST][i]))])
+            features.append([CrfPreprocessData.get_crf_feature_from_word_vector(doc, i, j) for j in range(len(doc[TEXT_LIST][i]))])
         return features
 
     @staticmethod
-    def get_processed_x_y(text_list, entity_list=[[]], cloud_embeddings=False):
+    def preprocess_crf_text_entity_list(text_list, entity_list=[[]], cloud_embeddings=False):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.
@@ -313,12 +313,12 @@ class CrfPreprocessData(object):
         ner_logger.debug('pre_process_text Completed')
 
         ner_logger.debug('pos_tag Started')
-        processed_text_pos_tag = CrfPreprocessData.pos_tag(processed_text)
+        processed_text_pos_tag = CrfPreprocessData.get_pos_tagged_dict(processed_text)
         ner_logger.debug('pos_tag Completed')
 
         ner_logger.debug('LoadWordEmbeddings Started')
         if cloud_embeddings:
-            vocab, word_vectors = CrfPreprocessData.remote_word_embeddings(processed_text_pos_tag)
+            vocab, word_vectors = CrfPreprocessData.get_word_vectors_from_remote(processed_text_pos_tag)
         else:
             word_embeddings = LoadWordEmbeddings()
             vocab = word_embeddings.vocab
@@ -333,7 +333,7 @@ class CrfPreprocessData(object):
         ner_logger.debug('Loading Word Embeddings Completed')
 
         ner_logger.debug('CrfPreprocessData.extract_features Started')
-        features = CrfPreprocessData.extract_features(processed_text_pos_tag)
+        features = CrfPreprocessData.extract_crf_features(processed_text_pos_tag)
         ner_logger.debug('CrfPreprocessData.extract_features Completed')
 
         ner_logger.debug('CrfPreprocessData.get_labels Started')
@@ -342,7 +342,7 @@ class CrfPreprocessData(object):
         return features, labels
 
     @staticmethod
-    def remote_word_embeddings(text_dict):
+    def get_word_vectors_from_remote(text_dict):
         """
         This method is used to obtain remotely setup word embeddings
         Args:

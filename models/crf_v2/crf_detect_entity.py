@@ -43,7 +43,7 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfPreprocessData.get_processed_x_y(text_list=[text], cloud_embeddings=self.cloud_embeddings)
+        x, _ = CrfPreprocessData.preprocess_crf_text_entity_list(text_list=[text], cloud_embeddings=self.cloud_embeddings)
         y_prediction = [self.tagger.tag(x_seq) for x_seq in x][0]
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
