@@ -5,6 +5,7 @@ from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS, W
 import requests
 import json
 from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS_LIST
+from chatbot_ner.config import ner_logger
 
 
 class LoadWordEmbeddings(object):
@@ -27,10 +28,15 @@ class LoadWordEmbeddings(object):
         vocab (list): word_list present at the specified path.
         word_vectors (numpy.array): word_vectors present at the specified path.
         """
-        file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
-        vocab = pickle.load(file_handler)
-        file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
-        word_vectors = np.array(pickle.load(file_handler))
+        vocab = []
+        word_vectors = np.array([])
+        try:
+            file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
+            vocab = pickle.load(file_handler)
+            file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
+            word_vectors = np.array(pickle.load(file_handler))
+        except Exception as e:
+            ner_logger.debug('Error in loading local word vectors %s' % e)
         return vocab, word_vectors
 
     @staticmethod
@@ -43,9 +49,13 @@ class LoadWordEmbeddings(object):
         Returns:
             word_vectors (np.ndarray): Numpy array of vectors for the provided text_list
         """
-        json_dict = {TEXT_LIST: [text_list]}
-        result = json.loads(requests.get(url=WORD_EMBEDDING_REMOTE_URL, json=json_dict, timeout=120).text)
-        word_vectors = result[CRF_WORD_EMBEDDINGS_LIST]
-        if word_vectors:
-            word_vectors = np.vstack(word_vectors)
+        word_vectors = np.array([])
+        try:
+            json_dict = {TEXT_LIST: [text_list]}
+            result = json.loads(requests.get(url=WORD_EMBEDDING_REMOTE_URL, json=json_dict, timeout=120).text)
+            word_vectors = result[CRF_WORD_EMBEDDINGS_LIST]
+            if word_vectors:
+                word_vectors = np.vstack(word_vectors)
+        except Exception as e:
+            ner_logger.debug('Error in loading remote models %s' % e)
         return word_vectors
