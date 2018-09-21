@@ -6,6 +6,19 @@ from constant import numbers_dict
 from ner_v1.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF
 
 
+def separate_digit_text(text):
+    """
+    Separate digit and text with space
+    Args:
+        text (str): text
+    Returns:
+        clean_text (str): cleaned text with separated digits and chars
+    """
+    regex_patter = re.compile(r'([\d]+)([a-zA-Z]+)')
+    clean_text = regex_patter.sub(r'\1 \2', text)
+    return clean_text
+
+
 def convert_numeral_to_number(text):
     """
     Method to convert numeral present in text to numeric digites
@@ -20,6 +33,7 @@ def convert_numeral_to_number(text):
         >> '3 tarikh ko'
 
     """
+    text = separate_digit_text(text)
     common = set(text.split()) & set(numbers_dict.keys())
     if common:
         for each in list(common):
