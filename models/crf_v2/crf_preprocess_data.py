@@ -4,8 +4,8 @@ import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from models.crf_v2.word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
-from models.crf_v2.constants import TEXT_LIST, WORD_EMBEDDINGS, WORD_VEC_FEATURE, B_LABEL,\
-    B_TAG, I_LABEL, I_TAG, POS_TAGS, LABELS, O_LABEL, BOS, EOS
+from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS, CRF_WORD_VEC_FEATURE, CRF_B_LABEL,\
+    CRF_B_TAG, CRF_I_LABEL, CRF_I_TAG, CRF_POS_TAGS, CRF_LABELS, CRF_O_LABEL, CRF_BOS, CRF_EOS
 
 
 class CrfPreprocessData(object):
@@ -46,8 +46,8 @@ class CrfPreprocessData(object):
                 iob_prefixes(entity_value)
                 >> 'B_city_New I_city_York'
             """
-            iob_entities = ' '.join([B_TAG + token_ if i_ == 0 else I_TAG + token_ for i_, token_
-                                    in enumerate(word_tokenize.tokenize(entity_value))])
+            iob_entities = ' '.join([CRF_B_TAG + token_ if i_ == 0 else CRF_I_TAG + token_ for i_, token_
+                                     in enumerate(word_tokenize.tokenize(entity_value))])
             return iob_entities
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
@@ -59,9 +59,9 @@ class CrfPreprocessData(object):
 
         tokenized_text = word_tokenize.tokenize(text)
 
-        labels = [B_LABEL if B_TAG in tokenized_text[i]
-                  else I_LABEL if I_TAG in tokenized_text[i]
-                  else O_LABEL for i in range(len(tokenized_original_text))]
+        labels = [CRF_B_LABEL if CRF_B_TAG in tokenized_text[i]
+                  else CRF_I_LABEL if CRF_I_TAG in tokenized_text[i]
+                  else CRF_O_LABEL for i in range(len(tokenized_original_text))]
 
         return tokenized_original_text, labels
 
@@ -109,12 +109,12 @@ class CrfPreprocessData(object):
         """
 
         processed_list = {TEXT_LIST: [],
-                          LABELS: []}
+                          CRF_LABELS: []}
 
         for text, entities in zip(text_list, entity_list):
             tokenzied_text, labels = CrfPreprocessData.pre_process_text_(text, entities)
             processed_list[TEXT_LIST].append(tokenzied_text)
-            processed_list[LABELS].append(labels)
+            processed_list[CRF_LABELS].append(labels)
         return processed_list
 
     @staticmethod
@@ -147,10 +147,10 @@ class CrfPreprocessData(object):
 
                 }
         """
-        docs[POS_TAGS] = []
+        docs[CRF_POS_TAGS] = []
         pos_tagger = POS()
         for text in docs[TEXT_LIST]:
-            docs[POS_TAGS].append([tag[1] for tag in pos_tagger.tagger.tag(text)])
+            docs[CRF_POS_TAGS].append([tag[1] for tag in pos_tagger.tagger.tag(text)])
 
         return docs
 
@@ -172,7 +172,7 @@ class CrfPreprocessData(object):
         """
         features = []
         for i, each in enumerate(word_vec):
-            features.append(prefix + WORD_VEC_FEATURE + str(i) + '=' + str(each))
+            features.append(prefix + CRF_WORD_VEC_FEATURE + str(i) + '=' + str(each))
         return features
 
     @staticmethod
@@ -193,7 +193,7 @@ class CrfPreprocessData(object):
         """
 
         word = doc[TEXT_LIST][i][j]
-        pos_tag = doc[POS_TAGS][i][j]
+        pos_tag = doc[CRF_POS_TAGS][i][j]
         # Common features for all words
         features = [
             'bias',
@@ -204,7 +204,7 @@ class CrfPreprocessData(object):
             'pos_tag=' + pos_tag
         ]
 
-        word_embedding = doc[WORD_EMBEDDINGS][i][j]
+        word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j]
         features.extend(CrfPreprocessData.convert_wordvec_features('', word_embedding))
 
         # Features for words that are not
@@ -212,7 +212,7 @@ class CrfPreprocessData(object):
 
         if j > 1:
             word1 = doc[TEXT_LIST][i][j - 2]
-            pos_tag = doc[POS_TAGS][i][j - 2]
+            pos_tag = doc[CRF_POS_TAGS][i][j - 2]
             features.extend([
                 '-2:word.lower=' + word1.lower(),
                 '-2:word.istitle=%s' % word1.istitle(),
@@ -223,12 +223,12 @@ class CrfPreprocessData(object):
 
             ])
 
-            word_embedding = doc[WORD_EMBEDDINGS][i][j - 2]
+            word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j - 2]
             features.extend(CrfPreprocessData.convert_wordvec_features('-2', word_embedding))
 
         if j > 0:
             word1 = doc[TEXT_LIST][i][j - 1]
-            pos_tag = doc[POS_TAGS][i][j - 1]
+            pos_tag = doc[CRF_POS_TAGS][i][j - 1]
             features.extend([
                 '-1:word.lower=' + word1.lower(),
                 '-1:word.istitle=%s' % word1.istitle(),
@@ -237,17 +237,17 @@ class CrfPreprocessData(object):
                 '-1:pos_tag=' + pos_tag,
 
             ])
-            word_embedding = doc[WORD_EMBEDDINGS][i][j - 1]
+            word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j - 1]
             features.extend(CrfPreprocessData.convert_wordvec_features('-1', word_embedding))
         else:
             # Indicate that it is the 'beginning of a document'
-            features.append(BOS)
+            features.append(CRF_BOS)
 
         # Features for words that are not
         # at the end of a document
         if j < len(doc[TEXT_LIST][i]) - 2:
             word1 = doc[TEXT_LIST][i][j + 2]
-            pos_tag = doc[POS_TAGS][i][j + 2]
+            pos_tag = doc[CRF_POS_TAGS][i][j + 2]
             features.extend([
                 '+2:word.lower=' + word1.lower(),
                 '+2:word.istitle=%s' % word1.istitle(),
@@ -255,12 +255,12 @@ class CrfPreprocessData(object):
                 '+2:word.isdigit=%s' % word1.isdigit(),
                 '+2:pos_tag=' + pos_tag,
             ])
-            word_embedding = doc[WORD_EMBEDDINGS][i][j + 2]
+            word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j + 2]
             features.extend(CrfPreprocessData.convert_wordvec_features('+2', word_embedding))
 
         if j < len(doc[TEXT_LIST][i]) - 1:
             word1 = doc[TEXT_LIST][i][j + 1]
-            pos_tag = doc[POS_TAGS][i][j + 1]
+            pos_tag = doc[CRF_POS_TAGS][i][j + 1]
             features.extend([
                 '+1:word.lower=' + word1.lower(),
                 '+1:word.istitle=%s' % word1.istitle(),
@@ -268,11 +268,11 @@ class CrfPreprocessData(object):
                 '+1:word.isdigit=%s' % word1.isdigit(),
                 '+1:pos_tag=' + pos_tag,
             ])
-            word_embedding = doc[WORD_EMBEDDINGS][i][j + 1]
+            word_embedding = doc[CRF_WORD_EMBEDDINGS][i][j + 1]
             features.extend(CrfPreprocessData.convert_wordvec_features('+1', word_embedding))
         else:
             # Indicate that it is the 'end of a document'
-            features.append(EOS)
+            features.append(CRF_EOS)
 
         return features
 

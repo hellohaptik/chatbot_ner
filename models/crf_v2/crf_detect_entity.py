@@ -2,7 +2,7 @@ from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
 from .get_crf_tagger import CrfModel
 from chatbot_ner.config import MODELS_PATH
-from models.crf_v2.constants import B_LABEL, I_LABEL
+from models.crf_v2.constants import CRF_B_LABEL, CRF_I_LABEL
 
 
 class CrfDetection(object):
@@ -53,10 +53,10 @@ class CrfDetection(object):
         original_text = []
         for i in range(len(y_prediction)):
             temp = []
-            if y_prediction[i] == B_LABEL:
+            if y_prediction[i] == CRF_B_LABEL:
                 temp.append(tokenized_text[i])
                 for j in range(i, len(y_prediction)):
-                    if y_prediction[j] == I_LABEL:
+                    if y_prediction[j] == CRF_I_LABEL:
                         temp.append(tokenized_text[j])
                 original_text.append(' '.join(temp))
 
