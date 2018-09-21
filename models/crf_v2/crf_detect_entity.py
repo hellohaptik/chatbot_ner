@@ -15,6 +15,8 @@ class CrfDetection(object):
         Args:
             entity_name (str): Name of the entity for which the entity has to be detected
             cloud_storage (bool): To indicate if cloud storage settings is required.
+            live_crf_model_path (str): Path for the model to be loaded.
+            cloud_embeddings (bool): To indicate if local embeddings have to be used or remote embeddings
         """
         self.entity_name = entity_name
         self.cloud_storage = cloud_storage
