@@ -4,6 +4,7 @@ import pytz
 
 from ner_v1.detectors.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
 from ner_v1.detectors.base_detector import BaseDetector
+from ner_v1.detectors.temporal.hindi_datetime.hindi_datetime_detector_wrapper import HindiDateTimeDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
 
@@ -115,6 +116,7 @@ class TimeDetector(BaseDetector):
         """
         time_list = []
         original_list = []
+        time_list, original_list = self._detect_hindi_time()
         time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
@@ -228,6 +230,19 @@ class TimeDetector(BaseDetector):
         for detected_text in original_time_strings:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
+
+    def _detect_hindi_time(self):
+        """
+        Hindi time detector
+        Returns:
+            time_list (list): list of dict containing hour, minutes, time type for each detected time
+            original_list (list): list of original text for each detected time
+
+        """
+        hindi_datetime_wrapper = HindiDateTimeDetector(message=self.text, timezone=self.timezone,
+                                                       outbound_message=self.bot_message)
+        time_list, original_list = hindi_datetime_wrapper.detect_time()
+        return time_list, original_list
 
     def _detect_range_12_hour_format(self, time_list=None, original_list=None):
         """

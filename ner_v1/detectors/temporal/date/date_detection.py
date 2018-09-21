@@ -1,3 +1,4 @@
+# coding=utf-8
 import copy
 import datetime
 import re
@@ -14,6 +15,7 @@ from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                                        TYPE_THIS_DAY, TYPE_PAST,
                                        TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
                                        REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
+from ner_v1.detectors.temporal.hindi_datetime.hindi_datetime_detector_wrapper import HindiDateTimeDetector
 
 
 class DateAdvancedDetector(object):
@@ -155,7 +157,7 @@ class DateAdvancedDetector(object):
             date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
 
         else:
-            parts = re.split(r'\s+(?:\-|to)\s+', self.processed_text.lower())
+            parts = re.split(r'\s+(?:\-|to|se)\s+', self.processed_text.lower())
             if len(parts) > 1:
                 for start_part, end_part in zip(parts[:-1], parts[1:]):
                     start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
@@ -254,13 +256,22 @@ class DateAdvancedDetector(object):
         """
 
         date_dict_list = []
-        regex_pattern = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
-                                   r'arriving|arrive|return|returning at)\s+(.+))\.?\s?')
-        patterns = regex_pattern.findall(self.processed_text.lower())
-        for pattern in patterns:
-            date_dict_list.extend(
-                self._date_dict_from_text(text=pattern[2], to_property=True)
-            )
+        regex_pattern_1 = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
+                                     r'arriving|arrive|return|returning at)\s+(.+))\.?\s?')
+        regex_pattern_2 = re.compile(r'(.+)\s+(ko|k|)\s*(aana|ana|aunga|aaun)')
+        patterns_1 = regex_pattern_1.findall(self.processed_text.lower())
+        patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
+        if patterns_1:
+            for pattern in patterns_1:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[2], to_property=True)
+                )
+        elif patterns_2:
+            for pattern in patterns_2:
+                date_dict_list.extend(
+                    self._date_dict_from_text(text=pattern[0], to_property=True)
+                )
+
         return date_dict_list
 
     def _detect_any_date(self):
@@ -286,9 +297,15 @@ class DateAdvancedDetector(object):
         return_date_flag = False
         if self.bot_message:
             departure_regex_string = r'traveling on|going on|starting on|departure date|date of travel|' + \
-                                     r'check in date|check-in date|date of check-in|date of departure\.'
+                                     r'check in date|check-in date|date of check-in|' \
+                                     r'date of departure\.|'
+            hinglish_departure = u'जाने|जाऊँगा|जाना'
+            departure_regex_string = departure_regex_string + hinglish_departure
             arrival_regex_string = r'traveling back|coming back|returning back|returning on|return date' + \
-                                   r'|arrival date|check out date|check-out date|date of check-out|check out'
+                                   r'|arrival date|check out date|check-out date|date of check-out' \
+                                   r'|check out|'
+            hinglish_arrival = u'आने|आगमन|अनेका|रिटर्न'
+            arrival_regex_string = arrival_regex_string + hinglish_arrival
             departure_regexp = re.compile(departure_regex_string)
             arrival_regexp = re.compile(arrival_regex_string)
             if departure_regexp.search(self.bot_message) is not None:
@@ -729,6 +746,7 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
+        date_list, original_list = self._get_hindi_datetime()
         date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
@@ -829,8 +847,22 @@ class DateDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
+    def _get_hindi_datetime(self):
+        """
+        Hindi date detector
+        Returns:
+            date_list (list): list of dict containing date, month, year for each detected date
+            original_list (list): list of original text for each detected date
+
+        """
+        hindi_datetime_wrapper = HindiDateTimeDetector(message=self.text, timezone=self.timezone,
+                                                       outbound_message=self.bot_message)
+        date_list, original_list = hindi_datetime_wrapper.detect_date()
+        return date_list, original_list
+
     def _gregorian_day_month_year_format(self, date_list=None, original_list=None):
         """
+        Detects date in the following format
         Detects date in the following format
 
         format: <day><separator><month><separator><year>
