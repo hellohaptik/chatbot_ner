@@ -862,7 +862,8 @@ class DateDetector(object):
 
         """
         hindi_datetime_wrapper = HindiDateTimeDetector(message=self.text, timezone=self.timezone,
-                                                       outbound_message=self.bot_message)
+                                                       outbound_message=self.bot_message,
+                                                       is_past_reference=self.date_past_reference)
         date_list, original_list = hindi_datetime_wrapper.detect_date()
         return date_list, original_list
 

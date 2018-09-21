@@ -16,13 +16,14 @@ class HindiDateTimeDetector(object):
     """
     A wrapper class to detect hindi datetime from hinglish text
     """
-    def __init__(self, message, timezone='UTC', outbound_message=None):
+    def __init__(self, message, timezone='UTC', outbound_message=None, is_past_reference=None):
         """
         Initialise parameters
         Args:
             message (str): message
             timezone (str): timezone
             outbound_message (str): previous bot message
+            is_past_reference (bool): True if past is referenced for date
         """
         self.message = message
         self.bot_outbound_message = outbound_message
@@ -34,6 +35,9 @@ class HindiDateTimeDetector(object):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.now(tz=self.timezone)
         self.tagged_datetime = HindiDateTimeTagger().get_datetime_tag_text(self.message)
+        self.is_past_reference = is_past_reference
+        if self.is_past_reference is None:
+            self.is_past_reference = self.is_outbound_message_for_past()
 
     @staticmethod
     def return_ner_format_date(dd, mm, yy):
@@ -87,20 +91,19 @@ class HindiDateTimeDetector(object):
         Returns:
             (bool): False if there is no previous bot message or reference is for future else True
         """
-        return True
-        # if not self.bot_outbound_message:
-        #     return False
-        #
-        # english_past_reference = "tha|thi|"
-        # hinglish_past_reference = u'थी|था'
-        #
-        # past_reference = english_past_reference + hinglish_past_reference
-        # past_reference_regex = re.compile(past_reference)
-        #
-        # if past_reference_regex.match(self.bot_outbound_message):
-        #     return True
-        # else:
-        #     return False
+        if not self.bot_outbound_message:
+            return False
+
+        english_past_reference = "tha|thi|"
+        hinglish_past_reference = u'थी|था'
+
+        past_reference = english_past_reference + hinglish_past_reference
+        past_reference_regex = re.compile(past_reference)
+
+        if past_reference_regex.match(self.bot_outbound_message):
+            return True
+        else:
+            return False
 
     def detect_date(self):
         """
@@ -112,12 +115,11 @@ class HindiDateTimeDetector(object):
         date_list = []
         original_text_list = []
         try:
-            is_past_reference = self.is_outbound_message_for_past()
             if len(self.tagged_datetime[HINDI_TAGGED_DATE]) > 0:
                 date_text_list = self.tagged_datetime[HINDI_TAGGED_DATE][0]
                 original_text_date_list = self.tagged_datetime[HINDI_TAGGED_DATE][1]
                 for date_text, original_text in zip(date_text_list, original_text_date_list):
-                    dd, mm, yy = get_hindi_date(date_text, self.now_date, is_past=is_past_reference)
+                    dd, mm, yy = get_hindi_date(date_text, self.now_date, is_past=self.is_past_reference)
                     if dd and mm and yy:
                         date_list.append(self.return_ner_format_date(dd, mm, yy))
                         original_text_list.append(original_text)
