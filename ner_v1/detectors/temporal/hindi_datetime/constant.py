@@ -16,7 +16,12 @@ dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_d
               'january': [1, "month"], 'february': [2, "month"], 'march': [3, "month"], 'april': [4, "month"],
               'may': [5, "month"], 'june': [6, "month"], 'july': [7, "month"], 'august': [8, "month"],
               'september': [9, "month"], 'october': [10, "month"], 'november': [11, "month"],
-              'december': [12, "month"], 'itwar': [6, "weekday"], 'itvar': [6, "weekday"]}
+              'december': [12, "month"], 'itwar': [6, "weekday"], 'itvar': [6, "weekday"],
+              'jan': [1, "month"], 'feb': [2, "month"], 'mar': [3, "month"], 'apr': [4, "month"],
+              'jun': [6, "month"], 'jul': [7, "month"], 'aug': [8, "month"],
+              'sep': [9, "month"], 'sept': [9, "month"], 'oct': [10, "month"], 'nov': [11, "month"],
+              'dec': [12, "month"],
+              }
 
 # dict to detect time where keys define tag text and value define category like if its defining hour, minute or second
 times_dict = {'abhi': 0, 'turant': 0, 'bje': 1, 'bajkr': 1, 'bajkar': 1, 'baje': 1, 'baj': 1, 'ghante': 1, 'ghanta': 1,

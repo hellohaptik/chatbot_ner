@@ -125,6 +125,23 @@ class HindiDateTimeTagger(object):
                 self.ref_prev.append(word)
                 self.last_active_entity = 2
 
+        elif len(word) > 2 and (word[:2] in numbers_dict or word[:1] in numbers_dict):
+            if word[:2] in numbers_dict:
+                if numbers_dict[word[:2]][1] == 1:
+                    self.ref_next.append(word)
+                    self.last_active_entity = 1
+                else:
+                    self.ref_prev.append(word)
+                    self.last_active_entity = 2
+
+            elif word[:1] in numbers_dict:
+                if numbers_dict[word[:1]][1] == 1:
+                    self.ref_next.append(word)
+                    self.last_active_entity = 1
+                else:
+                    self.ref_prev.append(word)
+                    self.last_active_entity = 2
+
     @staticmethod
     def _last_index_in_list(word_list, word):
         """
@@ -219,6 +236,19 @@ class HindiDateTimeTagger(object):
                 self.original_text_ref_next.append(word)
             else:
                 self.original_text_ref_prev.append(word)
+
+        elif len(word) > 2 and (word[:2] in numbers_dict or word[:1] in numbers_dict):
+            if word[:2] in numbers_dict:
+                if numbers_dict[word[:2]][1] == 1:
+                    self.original_text_ref_next.append(word)
+                else:
+                    self.original_text_ref_prev.append(word)
+
+            elif word[:1] in numbers_dict:
+                if numbers_dict[word[:1]][1] == 1:
+                    self.original_text_ref_next.append(word)
+                else:
+                    self.original_text_ref_prev.append(word)
 
         else:
             if is_date:
