@@ -240,7 +240,7 @@ def train_crf_model(request):
         else:
             sentence_list = external_api_data.get(SENTENCE_LIST)
             entity_list = external_api_data.get(ENTITY_LIST)
-            model_path = crf_model.train_model(sentence_list=sentence_list, entity_list=entity_list)
+            model_path = crf_model.train_crf_model_from_list(sentence_list=sentence_list, entity_list=entity_list)
 
         response['result'] = {LIVE_CRF_MODEL_PATH: model_path}
         response['success'] = True

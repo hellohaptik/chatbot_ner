@@ -82,7 +82,7 @@ class CrfTrain(object):
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
             return local_path
 
-    def train_model(self, sentence_list, entity_list, c1=0, c2=0, max_iterations=1000):
+    def train_crf_model_from_list(self, sentence_list, entity_list, c1=0, c2=0, max_iterations=1000):
         """
         This model is used to train the crf model. It performs the pre processing steps
         and trains the models
@@ -124,7 +124,7 @@ class CrfTrain(object):
         ner_logger.debug('Fetch of data from ES for ENTITY: %s completed' % self.entity_name)
         ner_logger.debug('Length of text_list %s' % str(len(sentence_list)))
 
-        model_path = self.train_model(entity_list=entity_list, sentence_list=sentence_list)
+        model_path = self.train_crf_model_from_list(entity_list=entity_list, sentence_list=sentence_list)
         return model_path
 
     def write_crf_model_to_s3(self):
