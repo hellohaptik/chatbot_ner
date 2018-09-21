@@ -27,7 +27,7 @@ def delete_index(connection, index_name, logger, **kwargs):
         logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
 
 
-def create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs):
+def _create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs):
     """
     Creates an Elasticsearch index needed for similarity based searching
     Args:
@@ -35,6 +35,7 @@ def create_index(connection, index_name, doc_type, logger, mapping_body, **kwarg
         index_name: The name of the index
         doc_type:  The type of the documents that will be indexed
         logger: logging object to log at debug and exception level
+        mapping_body: dict, mappings to put on the index
         kwargs:
             master_timeout: Specify timeout for connection to master
             timeout: Explicit operation timeout
@@ -143,7 +144,7 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
         }
     }
 
-    create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+    _create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
 
 
 def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
@@ -189,7 +190,7 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
         }
     }
 
-    create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
+    _create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs)
 
 
 def create_alias(connection, index_list, alias_name, logger, **kwargs):

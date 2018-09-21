@@ -244,7 +244,7 @@ def _parse_es_search_results(results):
         u'_type': u'data_dictionary',
         u'highlight': {u'variants': [u'<em>goa</em>']}},
         {u'_id': u'AVrW02W99WNuMIY9vmcf',
-        u'_index': u'gogo_entity_data',
+        u'_index': u'entity_data',
         u'_score': 11.210829,
         u'_source': {u'dict_type': u'variants',
         u'entity_data': u'city',
