@@ -5,9 +5,14 @@ from chatbot_ner.config import ner_logger
 
 def read_model_dict_from_s3(bucket_name, bucket_region, model_path_location=None):
     """
-    bucket_name (str): name of the bucket to upload file to
-    model_path_location (str): full path including filename on disk of the file to download
-    bucket_region (str, Optional): region of the s3 bucket, defaults to None
+    This method is used to read the model from S3 bucket and region specified.
+    Args:
+        bucket_name (str): name of the bucket to upload file to
+        model_path_location (str): full path including filename on disk of the file to download
+        bucket_region (str, Optional): region of the s3 bucket, defaults to None
+
+    Returns:
+        model_dict: Model from aws s3
     """
     model_dict = None
     try:
