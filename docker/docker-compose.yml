@@ -1,0 +1,67 @@
+# Will start the application, mount local directory,
+# If you don't want to keep env variables in compose, you can keep an env file that can be copied and source while building the image
+# Variables used in the Django app itself can also be configured at chatbot_ner/config (copy config.example to config and edit it)
+# This will also bring up local Elasticsearch, you could even use your already setup ES
+# I have defined a common network for these 2 services so that containers can communicate with each other
+
+# TODO move Nginx also into docker-compose
+#
+version: '3.1'
+
+services:
+  chatbot-ner:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+# Vars being used are defined in config.example and used in settings.py
+# ENV vars defined in Dockerfile can be overwritten here before docker-compose up
+      - "NAME=chatbot_ner"
+      - "DJANGODIR=/app"
+      - "NUM_WORKERS=1"
+      - "MAX_REQUESTS=1000"
+      - "DJANGO_SETTINGS_MODULE=chatbot_ner.settings"
+      - "DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py"
+      - "DJANGO_LOG_LEVEL=debug"
+      - "DJANGO_DEBUG=False"
+      - "PORT=8081"
+      - "TIMEOUT=600"
+      - "ENGINE=elasticsearch"
+# ES_HOST is host for ES that comes up with compose
+      - "ES_HOST=elasticsearch"
+      - "ES_PORT=9200"
+      - "ES_INDEX_NAME=entity_data"
+      - "ES_DOC_TYPE=data_dictionary"
+      - "ES_BULK_MSG_SIZE=1000"
+      - "ES_SEARCH_SIZE=10"
+      - "CITY_MODEL_TYPE=crf"
+      - "CITY_MODEL_PATH="
+      - "GOOGLE_TRANSLATE_API_KEY="
+
+    restart: always
+    volumes:
+      - ..:/app/
+
+# Map port 8081 of host machine to port 80 of container inside which Nginx and chatbot_ner app are running
+# Nginx proxy passes to backend Chatbot_ner app running on 8081
+# Host 8081 -> Nginx 80 -> uwsgi 8081
+# This can be run directly by ports "8081:8081" if you don't want to use Nginx
+
+    ports:
+      - '8081:80'
+    networks:
+      - chatbot_ner
+    depends_on:
+      - elasticsearch
+
+  # using Docker Registry Elasticsearch image assuming default datastore engine is Elasticsearch
+  elasticsearch:
+    image: "elasticsearch:5.6-alpine"
+    environment:
+      - "ES_JAVA_OPTS=-Xmx512m -Xms512m"
+    networks:
+     - chatbot_ner
+
+networks:
+  chatbot_ner:
+    driver: bridge
