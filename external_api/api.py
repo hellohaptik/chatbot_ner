@@ -10,7 +10,8 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, LIVE_CRF_MODEL_PATH
+    EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, \
+    LIVE_CRF_MODEL_PATH, TEXT_LIST
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -237,7 +238,7 @@ def train_crf_model(request):
         if es_config:
             model_path = crf_model.train_model_from_es_data()
         else:
-            text_list = external_api_data.get(SENTENCE_LIST)
+            text_list = external_api_data.get(TEXT_LIST)
             entity_list = external_api_data.get(ENTITY_LIST)
             model_path = crf_model.train_model(text_list=text_list, entity_list=entity_list)
 
