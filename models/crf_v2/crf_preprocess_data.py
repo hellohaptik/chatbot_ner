@@ -2,7 +2,7 @@ import numpy as np
 from lib.nlp.pos import POS
 import re
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
-from models.crf_v2.word_embeddings import LoadWordEmbeddings
+from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
 from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS, CRF_WORD_VEC_FEATURE, CRF_B_LABEL,\
     CRF_B_TAG, CRF_I_LABEL, CRF_I_TAG, CRF_POS_TAGS, CRF_LABELS, CRF_O_LABEL, CRF_BOS, CRF_EOS
