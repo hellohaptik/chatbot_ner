@@ -746,6 +746,7 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
+        date_list, original_list = self._get_hindi_datetime()
         date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
@@ -811,7 +812,6 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        date_list, original_list = self._get_hindi_datetime()
         date_list, original_list = self._date_identification_given_day_and_current_month(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_given_day_and_next_month(date_list, original_list)
@@ -862,6 +862,7 @@ class DateDetector(object):
 
     def _gregorian_day_month_year_format(self, date_list=None, original_list=None):
         """
+        Detects date in the following format
         Detects date in the following format
 
         format: <day><separator><month><separator><year>
