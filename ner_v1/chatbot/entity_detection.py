@@ -799,7 +799,8 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
                                  bot_message=bot_message)
 
 
-def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC'):
+def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC',
+             date_past_reference=False):
     """Use DateDetector to detect date
 
     Args:
@@ -813,7 +814,8 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-
+        timezone (str): Time zone for the date detection
+        date_past_reference (bool): This is a flag which indicates if past references have to be taken in consideration
 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
@@ -851,7 +853,8 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     """
     if timezone is None:
         timezone = 'UTC'
-    date_detection = DateAdvancedDetector(entity_name=entity_name, timezone=timezone)
+    date_detection = DateAdvancedDetector(entity_name=entity_name,
+                                          timezone=timezone, date_past_reference=date_past_reference)
     date_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         entity_dict_list = date_detection.detect_entity(text=structured_value)

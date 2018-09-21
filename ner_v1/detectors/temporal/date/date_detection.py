@@ -38,7 +38,7 @@ class DateAdvancedDetector(object):
         bot_message: str, set as the outgoing bot text/message
     """
 
-    def __init__(self, entity_name='date', timezone='UTC'):
+    def __init__(self, entity_name='date', timezone='UTC', date_past_reference=False):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
@@ -47,6 +47,8 @@ class DateAdvancedDetector(object):
                                detect_entity()
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
+            date_past_reference (bool): This is a flag which indicates if past references have to be taken in
+                                        consideration
         """
         self.text = ''
         self.tagged_text = ''
@@ -55,7 +57,9 @@ class DateAdvancedDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=entity_name, timezone=timezone)
+        self.date_past_reference = date_past_reference
+        self.date_detector_object = DateDetector(entity_name=entity_name, timezone=timezone,
+                                                 date_past_reference=date_past_reference)
         self.bot_message = None
 
     def detect_entity(self, text, run_model=False):
@@ -638,7 +642,7 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC'):
+    def __init__(self, entity_name, timezone='UTC', date_past_reference=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -646,7 +650,8 @@ class DateDetector(object):
                         detect_entity()
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
-
+            date_past_reference (bool): This is a flag which indicates if past references have to be taken in
+                                        consideration
         """
         self.text = ''
         self.tagged_text = ''
@@ -657,6 +662,7 @@ class DateDetector(object):
         self.day_dictionary = {}
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
+        self.date_past_reference = date_past_reference
         try:
             self.timezone = pytz.timezone(timezone)
         except Exception as e:
