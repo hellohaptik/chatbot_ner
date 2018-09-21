@@ -14,8 +14,8 @@ def separate_digit_text(text):
     Returns:
         clean_text (str): cleaned text with separated digits and chars
     """
-    regex_patter = re.compile(r'([\d]+)([a-zA-Z]+)')
-    clean_text = regex_patter.sub(r'\1 \2', text)
+    regex_patter = re.compile(r'([\d]+)(nd|st|th|rd)')
+    clean_text = regex_patter.sub(r'\1', text)
     return clean_text
 
 
