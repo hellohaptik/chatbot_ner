@@ -70,10 +70,10 @@ class CrfTrain(object):
         ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
         if self.cloud_storage:
-            self.model_dir = self.generate_model_path()
+            self.model_dir = self.generate_crf_model_path()
             trainer.train(self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
-            self.write_model_to_s3()
+            self.write_crf_model_to_s3()
             return self.model_dir
         else:
             local_path = MODELS_PATH + self.entity_name
@@ -126,7 +126,7 @@ class CrfTrain(object):
         model_path = self.train_model(entity_list=entity_list, text_list=text_list)
         return model_path
 
-    def write_model_to_s3(self):
+    def write_crf_model_to_s3(self):
         """
         This method is used to write data to S3 and
         Returns:
@@ -145,7 +145,7 @@ class CrfTrain(object):
             ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
             raise AwsCrfModelWriteException()
 
-    def generate_model_path(self):
+    def generate_crf_model_path(self):
         """
         This method is used to generate the directory to store the entity along with the timestamp
         Returns:
