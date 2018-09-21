@@ -47,6 +47,8 @@ class DateAdvancedDetector(object):
                                detect_entity()
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
+            date_past_reference (bool): This is a flag which indicates if past references have to be taken in
+                                        consideration
         """
         self.text = ''
         self.tagged_text = ''
@@ -648,7 +650,8 @@ class DateDetector(object):
                         detect_entity()
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
-
+            date_past_reference (bool): This is a flag which indicates if past references have to be taken in
+                                        consideration
         """
         self.text = ''
         self.tagged_text = ''

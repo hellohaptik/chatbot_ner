@@ -814,7 +814,8 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-
+        timezone (str): Time zone for the date detection
+        date_past_reference (bool): This is a flag which indicates if past references have to be taken in consideration
 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
