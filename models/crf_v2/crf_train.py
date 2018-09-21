@@ -140,11 +140,12 @@ class CrfTrain(object):
                                   bucket_region=CRF_MODEL_S3_BUCKET_REGION,
                                   address=self.model_dir,
                                   disk_filepath=self.model_dir)
-        if result:
-            ner_logger.debug('Model : %s written to s3' % self.model_dir)
-        else:
-            ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
-            raise AwsCrfModelWriteException()
+        ner_logger.debug('TRAINING result >> %s' % result)
+#        if result:
+#            ner_logger.debug('Model : %s written to s3' % self.model_dir)
+#        else:
+#            ner_logger.debug('Failure in saving Model to s3 %s' % self.model_dir)
+#            raise AwsCrfModelWriteException()
 
     def generate_crf_model_path(self):
         """
