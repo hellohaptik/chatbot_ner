@@ -1,7 +1,7 @@
 import numpy as np
 from lib.singleton import Singleton
 import pickle
-from chatbot_ner.config import EMBEDDINGS_PATH_VOCAB, EMBEDDINGS_PATH_VECTORS, WORD_EMBEDDING_REMOTE_URL
+from chatbot_ner.config import CRF_EMBEDDINGS_PATH_VOCAB, CRF_EMBEDDINGS_PATH_VECTORS, WORD_EMBEDDING_REMOTE_URL
 import requests
 import json
 from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS_LIST
@@ -31,9 +31,9 @@ class LoadWordEmbeddings(object):
         vocab = []
         word_vectors = np.array([])
         try:
-            file_handler = open(EMBEDDINGS_PATH_VOCAB, 'rb')
+            file_handler = open(CRF_EMBEDDINGS_PATH_VOCAB, 'rb')
             vocab = pickle.load(file_handler)
-            file_handler = open(EMBEDDINGS_PATH_VECTORS, 'rb')
+            file_handler = open(CRF_EMBEDDINGS_PATH_VECTORS, 'rb')
             word_vectors = np.array(pickle.load(file_handler))
         except Exception as e:
             ner_logger.debug('Error in loading local word vectors %s' % e)

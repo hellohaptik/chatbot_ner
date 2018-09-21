@@ -1,7 +1,7 @@
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
 from .get_crf_tagger import CrfModel
-from chatbot_ner.config import MODELS_PATH
+from chatbot_ner.config import CRF_MODELS_PATH
 from models.crf_v2.constants import CRF_B_LABEL, CRF_I_LABEL
 
 
@@ -28,7 +28,7 @@ class CrfDetection(object):
         if self.read_model_from_s3:
             self.tagger = crf_model.load_model(live_crf_model_path=live_crf_model_path)
         else:
-            self.tagger = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
+            self.tagger = crf_model.load_model(model_path=CRF_MODELS_PATH + self.entity_name)
 
     def detect_entity(self, text):
         """

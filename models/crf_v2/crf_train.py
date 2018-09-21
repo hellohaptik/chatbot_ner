@@ -1,5 +1,5 @@
 import pycrfsuite
-from chatbot_ner.config import ner_logger, CRF_MODEL_S3_BUCKET_NAME, CRF_MODEL_S3_BUCKET_REGION, MODELS_PATH
+from chatbot_ner.config import ner_logger, CRF_MODEL_S3_BUCKET_NAME, CRF_MODEL_S3_BUCKET_REGION, CRF_MODELS_PATH
 from datastore.datastore import DataStore
 from .constants import SENTENCE_LIST, ENTITY_LIST
 from lib.aws_utils import write_file_to_s3
@@ -65,7 +65,7 @@ class CrfTrain(object):
         # the model will be saved to the file when training is finished
         ner_logger.debug('Training for entity %s started' % self.entity_name)
 
-        trainer.train(MODELS_PATH + self.entity_name + '/' + self.entity_name)
+        trainer.train(CRF_MODELS_PATH + self.entity_name + '/' + self.entity_name)
         ner_logger.debug('Training for entity %s completed' % self.entity_name)
         ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
@@ -76,7 +76,7 @@ class CrfTrain(object):
             self.write_crf_model_to_s3()
             return self.model_dir
         else:
-            local_path = MODELS_PATH + self.entity_name
+            local_path = CRF_MODELS_PATH + self.entity_name
             trainer.train(local_path)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
@@ -152,14 +152,14 @@ class CrfTrain(object):
         Returns:
             output_directory (str): The path where the model needs to be stored.
         """
-        file_path = MODELS_PATH + self.entity_name
-        entity_path = MODELS_PATH + self.entity_name + '/' + self.entity_name
+        file_path = CRF_MODELS_PATH + self.entity_name
+        entity_path = CRF_MODELS_PATH + self.entity_name + '/' + self.entity_name
         entity_directory = os.path.dirname(entity_path)
         file_directory = os.path.dirname(entity_path)
         if not os.path.exists(entity_directory):
             os.makedirs(file_directory)
             ner_logger.debug('creating new directory %s' % file_path)
 
-        output_directory_prefix = MODELS_PATH + self.entity_name + '/'
+        output_directory_prefix = CRF_MODELS_PATH + self.entity_name + '/'
         output_directory_postfix = datetime.now().strftime("%d%m%Y-%H%M%S")
         return output_directory_prefix + self.entity_name + output_directory_postfix

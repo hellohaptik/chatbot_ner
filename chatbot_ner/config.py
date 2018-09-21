@@ -73,9 +73,9 @@ ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
 ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
 
 # Crf Model Specific (Mandatory to use CRF Model)
-MODELS_PATH = os.environ.get('MODELS_PATH')
-EMBEDDINGS_PATH_VOCAB = os.environ.get('EMBEDDINGS_PATH_VOCAB')
-EMBEDDINGS_PATH_VECTORS = os.environ.get('EMBEDDINGS_PATH_VECTORS')
+CRF_MODELS_PATH = os.environ.get('MODELS_PATH')
+CRF_EMBEDDINGS_PATH_VOCAB = os.environ.get('EMBEDDINGS_PATH_VOCAB')
+CRF_EMBEDDINGS_PATH_VECTORS = os.environ.get('EMBEDDINGS_PATH_VECTORS')
 
 try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
