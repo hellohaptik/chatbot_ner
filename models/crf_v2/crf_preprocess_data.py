@@ -31,31 +31,13 @@ class CrfPreprocessData(object):
             >> ['book', 'a', 'flight', 'from', 'Mumbai', 'to', 'Delhi'],
                 ['O', 'O', 'O', 'O', 'B', 'O', 'B']
         """
-        def iob_prefixes(entity_value, word_tokenize):
-            """
-            This entity takes the input as the entity and returns the entity with its respective
-            IOB-prefixes
-            Args:
-                entity_value (str): Entity for which IOB prefixing is required.
-                word_tokenize (Tokenizer): Tokenizer for separatun g
-            Returns:
-                iob_entities (str): IOB prefixed entity_values
-            Example:
-                For city entity
-                entity_value = ['New York']
-                iob_prefixes(entity_value)
-                >> 'B_city_New I_city_York'
-            """
-            iob_entities = ' '.join([CRF_B_TAG + token_ if i_ == 0 else CRF_I_TAG + token_ for i_, token_
-                                     in enumerate(word_tokenize.tokenize(entity_value))])
-            return iob_entities
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)
         entities.sort(key=lambda s: len(word_tokenize.tokenize(s)), reverse=True)
         tokenized_original_text = word_tokenize.tokenize(text)
 
         for entity in entities:
-            text = re.sub(r'\b%s\b' % entity, iob_prefixes(entity, word_tokenize), text)
+            text = re.sub(r'\b%s\b' % entity, CrfPreprocessData.iob_prefixes(entity, word_tokenize), text)
 
         tokenized_text = word_tokenize.tokenize(text)
 
@@ -64,6 +46,26 @@ class CrfPreprocessData(object):
                   else CRF_O_LABEL for i in range(len(tokenized_original_text))]
 
         return tokenized_original_text, labels
+
+    @staticmethod
+    def iob_prefixes(entity_value, word_tokenize):
+        """
+        This entity takes the input as the entity and returns the entity with its respective
+        IOB-prefixes
+        Args:
+            entity_value (str): Entity for which IOB prefixing is required.
+            word_tokenize (Tokenizer): Tokenizer for separatun g
+        Returns:
+            iob_entities (str): IOB prefixed entity_values
+        Example:
+            For city entity
+            entity_value = ['New York']
+            iob_prefixes(entity_value)
+            >> 'B_city_New I_city_York'
+        """
+        iob_entities = ' '.join([CRF_B_TAG + token_ if i_ == 0 else CRF_I_TAG + token_ for i_, token_
+                                 in enumerate(word_tokenize.tokenize(entity_value))])
+        return iob_entities
 
     @staticmethod
     def word_embeddings(processed_pos_tag_data, vocab, word_vectors):
