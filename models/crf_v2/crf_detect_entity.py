@@ -9,18 +9,18 @@ class CrfDetection(object):
     """
     This method is used to detect a text entity using the Crf model.
     """
-    def __init__(self, entity_name, read_model_from_s3=False, cloud_embeddings=False, live_crf_model_path=''):
+    def __init__(self, entity_name, read_model_from_s3=False, read_embeddings_from_remote_url=False, live_crf_model_path=''):
         """
         This method is used to detect text entities using the Crf model
         Args:
             entity_name (str): Name of the entity for which the entity has to be detected
             read_model_from_s3 (bool): To indicate if cloud storage settings is required.
             live_crf_model_path (str): Path for the model to be loaded.
-            cloud_embeddings (bool): To indicate if local embeddings have to be used or remote embeddings
+            read_embeddings_from_remote_url (bool): To indicate if local embeddings have to be used or remote embeddings
         """
         self.entity_name = entity_name
         self.read_model_from_s3 = read_model_from_s3
-        self.cloud_embeddings = cloud_embeddings
+        self.read_embeddings_from_remote_url = read_embeddings_from_remote_url
         self.live_crf_model_path = live_crf_model_path
 
         crf_model = CrfModel(entity_name=self.entity_name)
@@ -43,7 +43,8 @@ class CrfDetection(object):
             get_predictions(text)
             >> ['brown rice', 'apples']
         """
-        x, _ = CrfPreprocessData.preprocess_crf_text_entity_list(text_list=[text], cloud_embeddings=self.cloud_embeddings)
+        x, _ = CrfPreprocessData.preprocess_crf_text_entity_list(text_list=[text],
+                                                                 read_embeddings_from_remote_url=self.read_embeddings_from_remote_url)
         y_prediction = [self.tagger.tag(x_seq) for x_seq in x][0]
 
         word_tokenize = Tokenizer(tokenizer_selected=NLTK_TOKENIZER)

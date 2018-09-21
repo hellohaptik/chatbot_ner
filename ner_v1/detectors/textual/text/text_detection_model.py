@@ -10,11 +10,11 @@ class TextModelDetector(TextDetector):
     This class is primarily used to detect text type entities using the datastore as well as the the CRF
     model if trained.
     """
-    def __init__(self, entity_name, source_language_script, read_model_from_s3=False, cloud_embeddings=False,
+    def __init__(self, entity_name, source_language_script, read_model_from_s3=False, read_embeddings_from_remote_url=False,
                  live_crf_model_path=None):
         super(TextModelDetector, self).__init__(entity_name=entity_name, source_language_script=source_language_script)
         self.read_model_from_s3 = read_model_from_s3
-        self.cloud_embeddings = cloud_embeddings
+        self.read_embeddings_from_remote_url = read_embeddings_from_remote_url
         self.live_crf_model_path = live_crf_model_path
 
     def detect_entity(self, text, **kwargs):
@@ -68,7 +68,7 @@ class TextModelDetector(TextDetector):
         crf_original_texts = []
         if self.live_crf_model_path:
             crf_model = CrfDetection(entity_name=self.entity_name, read_model_from_s3=self.read_model_from_s3,
-                                     cloud_embeddings=self.cloud_embeddings,
+                                     read_embeddings_from_remote_url=self.read_embeddings_from_remote_url,
                                      live_crf_model_path=self.live_crf_model_path)
 
             crf_original_texts = crf_model.detect_entity(text=text)

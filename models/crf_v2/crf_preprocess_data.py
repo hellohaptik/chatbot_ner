@@ -298,14 +298,14 @@ class CrfPreprocessData(object):
         return features
 
     @staticmethod
-    def preprocess_crf_text_entity_list(text_list, entity_list=[[]], cloud_embeddings=False):
+    def preprocess_crf_text_entity_list(text_list, entity_list=[[]], read_embeddings_from_remote_url=False):
         """
         This method is used to convert the text_list and entity_list to the corresponding
         training features and labels.
         Args:
             text_list (list): List of sentences on which the NER task has to be carried out.
             entity_list (list): List of entities present in each sentence of the text_list.
-            cloud_embeddings (bool): To indicate if cloud embeddings is active
+            read_embeddings_from_remote_url (bool): To indicate if cloud embeddings is active
         Returns:
             features (list): List of features required for training the CRF Model
             labels (list): Labels corresponding in IOB format.
@@ -319,7 +319,7 @@ class CrfPreprocessData(object):
         ner_logger.debug('pos_tag Completed')
 
         ner_logger.debug('LoadWordEmbeddings Started')
-        if cloud_embeddings:
+        if read_embeddings_from_remote_url:
             vocab, word_vectors = CrfPreprocessData.get_word_vectors_from_remote(processed_text_pos_tag)
         else:
             word_embeddings = LoadWordEmbeddings()

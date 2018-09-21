@@ -10,7 +10,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, CLOUD_EMBEDDINGS, LIVE_CRF_MODEL_PATH
+    EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, LIVE_CRF_MODEL_PATH
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -220,7 +220,7 @@ def train_crf_model(request):
     "entity_name": "crf_test",
     "read_model_from_s3": true,
     "es_config": true,
-    "cloud_embeddings": true
+    "read_embeddings_from_remote_url": true
     }
     """
     response = {"success": False, "error": "", "result": {}}
@@ -229,10 +229,10 @@ def train_crf_model(request):
         entity_name = external_api_data.get(ENTITY_NAME)
         read_model_from_s3 = external_api_data.get(READ_MODEL_FROM_S3)
         es_config = external_api_data.get(ES_CONFIG)
-        cloud_embeddings = external_api_data.get(CLOUD_EMBEDDINGS)
+        read_embeddings_from_remote_url = external_api_data.get(READ_EMBEDDINGS_FROM_REMOTE_URL)
         crf_model = CrfTrain(entity_name=entity_name,
                              read_model_from_s3=read_model_from_s3,
-                             cloud_embeddings=cloud_embeddings)
+                             read_embeddings_from_remote_url=read_embeddings_from_remote_url)
 
         if es_config:
             model_path = crf_model.train_model_from_es_data()
