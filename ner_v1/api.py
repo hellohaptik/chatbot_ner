@@ -12,7 +12,8 @@ from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
-    PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3, PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL, PARAMETER_LIVE_CRF_MODEL_PATH
+    PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3, PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL, \
+    PARAMETER_LIVE_CRF_MODEL_PATH, PARAMETER_DATE_PAST_REFERENCE
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
@@ -43,7 +44,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL:
                            request.GET.get('read_embeddings_from_remote_url', 'False'),
                        PARAMETER_READ_MODEL_FROM_S3: request.GET.get('read_model_from_s3', 'False'),
-                       PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path')
+                       PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
+                       PARAMETER_DATE_PAST_REFERENCE: request.GET.get('date_past_reference', 'False')
                        }
 
     return parameters_dict
@@ -378,11 +380,13 @@ def date(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        date_past_reference = json.loads(parameters_dict[PARAMETER_DATE_PAST_REFERENCE])
         entity_output = get_date(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
                                  parameters_dict[PARAMETER_BOT_MESSAGE],
-                                 parameters_dict[PARAMETER_TIMEZONE])
+                                 parameters_dict[PARAMETER_TIMEZONE],
+                                 date_past_reference=date_past_reference)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for date: %s ' % e)
