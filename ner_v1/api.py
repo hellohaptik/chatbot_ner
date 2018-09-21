@@ -12,7 +12,7 @@ from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
-    PARAMETER_MAX_DIGITS, PARAMETER_CLOUD_STORAGE, PARAMETER_CLOUD_EMBEDDINGS, PARAMETER_LIVE_CRF_MODEL_PATH
+    PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3, PARAMETER_CLOUD_EMBEDDINGS, PARAMETER_LIVE_CRF_MODEL_PATH
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 from ner_v1.language_utilities.constant import ENGLISH_LANG
 
@@ -41,7 +41,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        PARAMETER_CLOUD_EMBEDDINGS: request.GET.get('cloud_embeddings', 'False'),
-                       PARAMETER_CLOUD_STORAGE: request.GET.get('cloud_storage', 'False'),
+                       PARAMETER_READ_MODEL_FROM_S3: request.GET.get('read_model_from_s3', 'False'),
                        PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path')
                        }
 
@@ -60,11 +60,11 @@ def text(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         fuzziness = parameters_dict[PARAMETER_FUZZINESS]
         min_token_len_fuzziness = parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS]
-        cloud_storage = json.loads(parameters_dict[PARAMETER_CLOUD_STORAGE].lower())
+        read_model_from_s3 = json.loads(parameters_dict[PARAMETER_READ_MODEL_FROM_S3].lower())
         cloud_embeddings = json.loads(parameters_dict[PARAMETER_CLOUD_EMBEDDINGS].lower())
         text_model_detector = TextModelDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                                 source_language_script=parameters_dict[PARAMETER_LANGUAGE_SCRIPT],
-                                                cloud_storage=cloud_storage,
+                                                read_model_from_s3=read_model_from_s3,
                                                 cloud_embeddings=cloud_embeddings,
                                                 live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH]
                                                 )

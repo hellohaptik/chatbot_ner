@@ -77,6 +77,6 @@ CRF_MODEL_VERIFIED = 'crf_model_verified'
 
 #  **********************constants used for text detection************************************
 
-PARAMETER_CLOUD_STORAGE = 'cloud_storage'
+PARAMETER_READ_MODEL_FROM_S3 = 'read_model_from_s3'
 PARAMETER_CLOUD_EMBEDDINGS = 'cloud_embeddings'
 PARAMETER_LIVE_CRF_MODEL_PATH = 'live_crf_model_path'

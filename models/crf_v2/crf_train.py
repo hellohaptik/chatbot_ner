@@ -16,16 +16,16 @@ class CrfTrain(object):
     Named Entity Recognition (NER).
 
     """
-    def __init__(self, entity_name, cloud_storage=False, cloud_embeddings=False):
+    def __init__(self, entity_name, read_model_from_s3=False, cloud_embeddings=False):
         """
         Args:
             entity_name (str): The destination path for saving the trained model.
-            cloud_storage (bool): To indicate if cloud storage settings is required.
+            read_model_from_s3 (bool): To indicate if cloud storage settings is required.
             cloud_embeddings (bool): To indicate if cloud embeddings is active
         """
         self.entity_name = entity_name
         self.model_dir = None
-        self.cloud_storage = cloud_storage
+        self.read_model_from_s3 = read_model_from_s3
         self.cloud_embeddings = cloud_embeddings
 
     def train_crf_model(self, x, y, c1, c2, max_iterations):
@@ -69,7 +69,7 @@ class CrfTrain(object):
         ner_logger.debug('Training for entity %s completed' % self.entity_name)
         ner_logger.debug('Model locally saved at %s' % self.entity_name)
 
-        if self.cloud_storage:
+        if self.read_model_from_s3:
             self.model_dir = self.generate_crf_model_path()
             trainer.train(self.model_dir)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)

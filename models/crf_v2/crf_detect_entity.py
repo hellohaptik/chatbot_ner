@@ -9,23 +9,23 @@ class CrfDetection(object):
     """
     This method is used to detect a text entity using the Crf model.
     """
-    def __init__(self, entity_name, cloud_storage=False, cloud_embeddings=False, live_crf_model_path=''):
+    def __init__(self, entity_name, read_model_from_s3=False, cloud_embeddings=False, live_crf_model_path=''):
         """
         This method is used to detect text entities using the Crf model
         Args:
             entity_name (str): Name of the entity for which the entity has to be detected
-            cloud_storage (bool): To indicate if cloud storage settings is required.
+            read_model_from_s3 (bool): To indicate if cloud storage settings is required.
             live_crf_model_path (str): Path for the model to be loaded.
             cloud_embeddings (bool): To indicate if local embeddings have to be used or remote embeddings
         """
         self.entity_name = entity_name
-        self.cloud_storage = cloud_storage
+        self.read_model_from_s3 = read_model_from_s3
         self.cloud_embeddings = cloud_embeddings
         self.live_crf_model_path = live_crf_model_path
 
         crf_model = CrfModel(entity_name=self.entity_name)
 
-        if self.cloud_storage:
+        if self.read_model_from_s3:
             self.tagger = crf_model.load_model(live_crf_model_path=live_crf_model_path)
         else:
             self.tagger = crf_model.load_model(model_path=MODELS_PATH + self.entity_name)
