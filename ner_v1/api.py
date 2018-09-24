@@ -380,7 +380,9 @@ def date(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        date_past_reference = json.loads(parameters_dict[PARAMETER_DATE_PAST_REFERENCE])
+
+        date_past_reference = parameters_dict.get(PARAMETER_DATE_PAST_REFERENCE, "false")
+        date_past_reference = date_past_reference == 'true' or date_past_reference == 'True'
         entity_output = get_date(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
