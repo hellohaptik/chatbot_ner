@@ -3,7 +3,7 @@ import re
 # Dict to detect date in text, 1 dimension determine the magnitude and second dimension decide its day category
 dates_dict = {'aaj': [0, "ref_day"], 'kal': [1, "ref_day"], 'parson': [2, "ref_day"], 'narson': [3, "ref_day"],
               'parso': [2, "ref_day"], 'narso': [3, "ref_day"], 'tareekh': [0, None],
-              'din': [0, "date"], 'dino': [0, "day"], 'month': [0, "months"], 'tarikh': [0, None],
+              'din': [0, "date"], 'dino': [0, "date"], 'month': [0, "months"], 'tarikh': [0, None],
               'mahine': [0, "months"], 'mahina': [0, "months"], 'monday': [0, "weekday"], 'tuesday': [1, "weekday"],
               'wednesday': [2, "weekday"], 'thursday': [3, "weekday"], 'friday': [4, "weekday"],
               'saturday': [5, "weekday"], 'sunday': [6, "weekday"], 'somvar': [0, "weekday"], 'somwar': [0, "weekday"],

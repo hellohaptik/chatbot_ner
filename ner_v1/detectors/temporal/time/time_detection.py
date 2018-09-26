@@ -116,7 +116,6 @@ class TimeDetector(BaseDetector):
         """
         time_list = []
         original_list = []
-        time_list, original_list = self._detect_hindi_time()
         time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
@@ -167,9 +166,12 @@ class TimeDetector(BaseDetector):
             self._update_processed_text(original_list)
             time_list, original_list = self._get_default_time_range(time_list, original_list)
             self._update_processed_text(original_list)
+            time_list, original_list = self._detect_hindi_time(time_list, original_list)
+            self._update_processed_text(original_list)
         if not self.range_enabled and time_list:
             time_list, original_list = self._remove_time_range_entities(time_list=time_list,
                                                                         original_list=original_list)
+
         return time_list, original_list
 
     def detect_entity(self, text, **kwargs):
@@ -231,17 +233,22 @@ class TimeDetector(BaseDetector):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _detect_hindi_time(self):
+    def _detect_hindi_time(self, time_list, original_list):
         """
         Hindi time detector
-        Returns:
+        Args:
             time_list (list): list of dict containing hour, minutes, time type for each detected time
             original_list (list): list of original text for each detected time
-
+        Returns:
+            time_list (list): updated list of dict containing hour, minutes, time type for each detected time
+            original_list (list): updated list of original text for each detected time
         """
         hindi_datetime_wrapper = HindiDateTimeDetector(message=self.text, timezone=self.timezone,
                                                        outbound_message=self.bot_message)
-        time_list, original_list = hindi_datetime_wrapper.detect_time()
+        _time_list, _original_list = hindi_datetime_wrapper.detect_time()
+        if _time_list:
+            time_list = _time_list
+            original_list = _original_list
         return time_list, original_list
 
     def _detect_range_12_hour_format(self, time_list=None, original_list=None):
