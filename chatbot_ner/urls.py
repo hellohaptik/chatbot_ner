@@ -28,4 +28,10 @@ urlpatterns = patterns('',
     # Transfer Dictioanry
     url(r'^entities/transfer_entities', 'external_api.api.transfer_entities'),
 
+    # Training Data Read Write
+    url(r'^entities/get_crf_training_data', 'external_api.api.get_crf_training_data'),
+    url(r'^entities/update_crf_training_data', 'external_api.api.update_crf_training_data'),
+
+    #  Train Crf Model
+    url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
 )

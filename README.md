@@ -1,7 +1,7 @@
 # Named Entity Recognition for chatbots
-Haptik is India’s first Conversational Commerce platform that is powered by both AI and real humans and we aim to redefine the way people get their everyday jobs done using chat as the underlying interface. 
+Haptik is one of the world's largest conversational AI companies redefining the way chatbots work. 
 
-To build conversational platforms like Haptik, one of the module that plays crucial role is [Named Entity Recognition](https://en.wikipedia.org/wiki/Named-entity_recognition) (NER). In this repository, we have open-sourced NER which uses heuristic approach along with several NLP techniques to extract necessary entities from chat interfaces.
+To build a good chatbot, one of the modules that play a crucial role is [Named Entity Recognition](https://en.wikipedia.org/wiki/Named-entity_recognition) (NER). In this repository, we have open-sourced our NER which uses heuristic approach along with several NLP techniques to extract necessary entities from chat interfaces.
 
 To know more about our NER repository please go through the following documentations:
 
@@ -12,8 +12,3 @@ To know more about our NER repository please go through the following documentat
 3. [Approach used](docs/approach.md): *Document on the architecture along with different detection logics (entity types) and built-in entities*
 
 4. [API calls](docs/api_call.md): *A brief document on the api calls for different detection logics along with its necessary output*
-
-5. [Install it using Docker image:](docs/docker.md) *Trouble in installing the Chatbot NER? install it using our Docker image* 
-
-   ​
-

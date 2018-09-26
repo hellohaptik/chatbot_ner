@@ -3,7 +3,7 @@ import re
 import collections
 from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
-
+from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 log_prefix = 'datastore.elastic_search.query'
 
 
@@ -244,7 +244,7 @@ def _parse_es_search_results(results):
         u'_type': u'data_dictionary',
         u'highlight': {u'variants': [u'<em>goa</em>']}},
         {u'_id': u'AVrW02W99WNuMIY9vmcf',
-        u'_index': u'gogo_entity_data',
+        u'_index': u'entity_data',
         u'_score': 11.210829,
         u'_source': {u'dict_type': u'variants',
         u'entity_data': u'city',
@@ -290,3 +290,61 @@ def _parse_es_search_results(results):
                 variants_to_values[variant] = value
 
     return variants_to_values
+
+
+def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    Get all sentence_list and entity_list for a entity stored in the index
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name: name of the entity to perform a 'term' query on
+        kwargs:
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+    Returns:
+        dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
+        sentence_list and entity_list of the key
+
+    Examples:
+        training_data_query(connection, index_name, doc_type, entity_name, **kwargs)
+        >>{
+        'sentence_list': [
+            'My name is hardik',
+            'This is my friend Ajay'
+                        ],
+        'entity_list': [
+            [
+                'hardik'
+            ],
+            [
+                'Ajay'
+            ]
+                        ]
+            }
+
+    """
+    results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
+    data = {
+        'query': {
+            'term': {
+                'entity_data': {
+                    'value': entity_name
+                }
+            }
+        }
+    }
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                  scroll='1m')
+    search_results = _run_es_search(connection, **kwargs)
+
+    # Parse hits
+    results = search_results['hits']['hits']
+
+    for result in results:
+        results_dictionary[SENTENCE_LIST].append(result['_source']['sentence'])
+        results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
+
+    return results_dictionary
