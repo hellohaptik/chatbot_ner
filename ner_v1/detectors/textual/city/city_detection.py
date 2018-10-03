@@ -1,8 +1,8 @@
 import re
 
-import models.constant as model_constant
+import models.crf.constant as model_constant
 import ner_v1.detectors.constant as detector_constant
-from models.models import Models
+from models.crf.models import Models
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
