@@ -39,13 +39,14 @@ datetime_dict = {"baad": (-1, 1, 0), "is": (1, 0, 0), "isi": (1, 0, 0), "pahle":
                  "hue": (-1, -1, 0), "agle": (1, 1, 0), "agla": (1, 1, 0), "agli": (1, 1, 0),
                  "ane wala": (1, 1, 0), "aane wala": (1, 1, 0), "aane vala": (1, 1, 0), "ane vala": (1, 1, 0),
                  "ane vale": (1, 1, 0), "ane wale": (1, 1, 0), "ane vali": (1, 1, 0), "ane wali": (1, 1, 0),
-                 "aadhe": (1, 0.5, 1), "aadha": (1, 0.5, 1), "dedh": (1, 1.5, 1), "dhaai": (1, 2.5, 1),
-                 "saade": (1, 0.5, 2), 'me': (-1, 1, 0), 'paune': (1, -0.25, 2),
-                 'sawa': (1, 0.25, 2), 'sava': (1, 0.25, 2), 'pehla': (-1, -1, 0)}
+                 'me': (-1, 1, 0), 'pehla': (-1, -1, 0),
+                 'saade': (1, 0.5, 1), 'paune': (1, -0.25, 1), 'sawa': (1, 0.25, 1), 'sava': (1, 0.25, 1)}
 
 # dict to contain numbers and hindi numerals, 1st index define magnitude and second define which entity is should be
 # added to (forward or backward)
-numbers_dict = {'1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pehle': [1, 1], 'pehla': [1, 1],
+numbers_dict = {'aadhe': [0.5, 1], 'aadha': [0.5, 1], 'adhe': [0.5, 1], 'adha': [0.5, 1], 'dedh': [1.5, 1],
+                'dhaai': [2.5, 1],
+                '1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pehla': [1, 1],
                 '2': [2, 1], 'do': [2, 1],
                 'doosra': [2, 1], 'doosri': [2, 1], 'doosre': [2, 1], '3': [3, 1], 'teen': [3, 1], 'teesra': [3, 1],
                 'teesre': [3, 1], 'teesri': [3, 1], '4': [4, 1], 'chaar': [4, 1], 'chauthi': [4, 1], 'chautha': [4, 1],
@@ -97,17 +98,14 @@ HINDI_TAGGED_TIME = 'time'
 
 
 # Time detector Regex
-REF_EXACT_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 1]) + ")"
 REF_DIFF_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 0]) + "|)"
 REF_ADD_TIME = "(" + "|".join([x for x in datetime_dict if datetime_dict[x][2] == 2]) + "|)"
 
 HOUR_VARIANTS = "(" + "|".join([x for x in times_dict if times_dict[x] == 1]) + ")"
 MINUTE_VARIANTS = "(" + "|".join([x for x in times_dict if times_dict[x] == 2]) + ")"
 
-REGEX_HOUR_TIME_1 = re.compile(REF_ADD_TIME + r"\s*(\d+)\s*" + HOUR_VARIANTS + r"\s+" + REF_DIFF_TIME)
-REGEX_MINUTE_TIME_1 = re.compile(REF_ADD_TIME + r"\s*(\d+)\s*" + MINUTE_VARIANTS + r"\s+" + REF_DIFF_TIME)
-REGEX_HOUR_TIME_2 = re.compile(REF_EXACT_TIME + r"\s*" + HOUR_VARIANTS + r"\s+" + REF_DIFF_TIME)
-MINUTE_TIME_REGEX_2 = re.compile(REF_EXACT_TIME + r"\s*" + MINUTE_VARIANTS + r"\s+" + REF_DIFF_TIME)
+REGEX_HOUR_TIME = re.compile(REF_ADD_TIME + r"\s*([\d.]+)\s*" + HOUR_VARIANTS + r"\s+" + REF_DIFF_TIME)
+REGEX_MINUTE_TIME = re.compile(REF_ADD_TIME + r"\s*([\d.]+)\s*" + MINUTE_VARIANTS + r"\s+" + REF_DIFF_TIME)
 
 
 # Date detector Regex
