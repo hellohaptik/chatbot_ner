@@ -8,7 +8,7 @@ from ner_v1.detectors.pattern.email.email_detection import EmailDetector
 from ner_v1.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v1.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v1.detectors.pattern.regex.regex_detection import RegexDetector
-from ner_v1.detectors.temporal.date.en.en_date_detection import DateAdvancedDetector
+from ner_v1.detectors.temporal.date.en.date_detection import DateAdvancedDetector
 from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
