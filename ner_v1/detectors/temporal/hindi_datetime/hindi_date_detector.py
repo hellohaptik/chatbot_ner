@@ -102,7 +102,8 @@ def get_hindi_date(text, today, is_past=False):
     after_days_match = REGEX_AFTER_DAYS_REF.findall(text)
     if after_days_match:
         after_days_match = after_days_match[0]
-        r_date = today + relativedelta(days=numbers_dict[after_days_match[0]][0])
+        diff_day = numbers_dict[after_days_match[0]][0]
+        r_date = today + relativedelta(days=datetime_dict[after_days_match[2]][1] * diff_day)
         dd, mm, yy = r_date.day, r_date.month, r_date.year
         return dd, mm, yy
 
