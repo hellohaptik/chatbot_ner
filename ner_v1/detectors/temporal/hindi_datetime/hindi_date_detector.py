@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
-from constant import dates_dict, datetime_dict
+from constant import dates_dict, datetime_dict, numbers_dict
 from ner_v1.detectors.temporal.hindi_datetime.constant import REGEX_DATE_REF, REGEX_MONTH_REF, \
     REGEX_TARIKH_MONTH_REF_1, REGEX_TARIKH_MONTH_REF_2, REGEX_TARIKH_MONTH_REF_3, REGEX_AFTER_DAYS_REF, \
     REGEX_WEEKDAY_MONTH_REF_1, REGEX_WEEKDAY_MONTH_REF_2, REGEX_WEEKDAY_REF_1, REGEX_WEEKDAY_REF_2
@@ -102,7 +102,7 @@ def get_hindi_date(text, today, is_past=False):
     after_days_match = REGEX_AFTER_DAYS_REF.findall(text)
     if after_days_match:
         after_days_match = after_days_match[0]
-        r_date = today + relativedelta(days=datetime_dict[after_days_match[2]][1])
+        r_date = today + relativedelta(days=numbers_dict[after_days_match[0]][0])
         dd, mm, yy = r_date.day, r_date.month, r_date.year
         return dd, mm, yy
 
