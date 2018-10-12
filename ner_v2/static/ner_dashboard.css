@@ -1,0 +1,45 @@
+.top-header{
+	text-align: center;
+	background: #4db9e6;
+    font-family: 'latobold';
+    font-size: 44px;
+    color: white;
+    padding: 10px;
+}
+
+.inputlabel{
+	//margin-right: 50px;
+	display: inline-block;
+	height: 34px;
+	padding-top: 8px;
+}
+
+.dropdown{
+	padding-left: 0px !important;
+}
+.tab-pane{
+	padding-top: 30px;
+	padding-left: 30px;
+}
+
+.input-group, #entitynamefield{
+	padding-top: 10px;
+}
+
+#entitynamefield{
+	padding-top: 10px;
+}
+
+#entitysubmitbtn{
+	margin-top: 10px;
+}
+
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.string { color: green; }
+.number { color: darkorange; }
+.boolean { color: blue; }
+.null { color: magenta; }
+.key { color: red; }
+
+
+

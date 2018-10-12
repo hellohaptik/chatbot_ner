@@ -12,6 +12,7 @@ weighted-levenshtein==0.1
 regex==2018.7.11
 ipython
 word2number==1.1
+python-dateutil==2.7.3
 python-crfsuite==0.9.6
 boto==2.49.0
 boto3==1.8.4
