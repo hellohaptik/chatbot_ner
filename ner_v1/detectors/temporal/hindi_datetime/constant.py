@@ -48,10 +48,11 @@ numbers_dict = {'aadhe': [0.5, 1], 'aadha': [0.5, 1], 'adhe': [0.5, 1], 'adha': 
                 'dhaai': [2.5, 1],
                 '1': [1, 1], 'ek': [1, 1], 'pahla': [1, 1], 'pahli': [1, 1], 'pehla': [1, 1],
                 '2': [2, 1], 'do': [2, 1],
-                'doosra': [2, 1], 'doosri': [2, 1], 'doosre': [2, 1], '3': [3, 1], 'teen': [3, 1], 'teesra': [3, 1],
+                'doosra': [2, 1], 'doosri': [2, 1], 'doosre': [2, 1], '3': [3, 1], 'teen': [3, 1], 'tin': [3, 1],
+                'teesra': [3, 1],
                 'teesre': [3, 1], 'teesri': [3, 1], '4': [4, 1], 'chaar': [4, 1], 'chauthi': [4, 1], 'chautha': [4, 1],
                 'char': [4, 1], 'choutha': [4, 1], 'chauthe': [4, 1], '5': [5, 1], 'paanch': [5, 1],
-                'paanchva': [5, 1], 'paanchve': [5, 1],
+                'paanchva': [5, 1], 'paanchve': [5, 1], 'panch': [5, 1],
                 'paanchvi': [5, 1], '6': [6, 1], 'chhatvi': [6, 1], 'chhathva': [6, 1], 'chhathvi': [6, 1],
                 'chhatve': [6, 1], 'chhe': [6, 1], 'chhata': [6, 1], '7': [7, 1], 'saat': [7, 1],
                 'saatva': [7, 1], 'saatvi': [7, 1], 'saatve': [7, 1],
@@ -62,12 +63,15 @@ numbers_dict = {'aadhe': [0.5, 1], 'aadha': [0.5, 1], 'adhe': [0.5, 1], 'adha': 
                 'das': [10, 1], 'dasva': [10, 1], '11': [11, 1], 'gyarah': [11, 1], 'gyarva': [11, 1], '12': [12, 1],
                 'barah': [12, 1], 'barvan': [12, 1], '13': [13, 1], 'terah': [13, 1], '14': [14, 1],
                 'chaudah': [14, 1], '15': [15, 1], 'pandrah': [15, 1], '16': [16, 1], 'solah': [16, 1], '17': [17, 1],
-                'satrah': [17, 1], '18': [18, 1], 'atharah': [18, 1], '19': [19, 1], 'unnish': [19, 1], '20': [20, 1],
-                'bees': [20, 1], '21': [21, 1], 'ikkish': [21, 1], '22': [22, 1], 'baaish': [22, 1], '23': [23, 1],
-                'teish': [23, 1], '24': [24, 1], 'chaubish': [24, 1], '25': [25, 1], 'pachhish': [25, 1],
+                'satrah': [17, 1], '18': [18, 1], 'atharah': [18, 1], '19': [19, 1], 'unnis': [19, 1], '20': [20, 1],
+                'bees': [20, 1], '21': [21, 1], 'ikkish': [21, 1], 'ikkis': [21, 1], '22': [22, 1], 'baaish': [22, 1],
+                'baais': [22, 1],
+                '23': [23, 1], 'teish': [23, 1], 'teis': [23, 1], '24': [24, 1], 'chaubish': [24, 1],
+                'chaubis': [24, 1], '25': [25, 1], 'pachhish': [25, 1], 'pacchis': [25, 1],
                 '26': [26, 1], 'chhabish': [26, 1], '27': [27, 1], 'sattaish': [27, 1], '28': [28, 1],
                 'atthaish': [28, 1], '29': [29, 1], 'untish': [29, 1], '30': [30, 1], 'teesh': [30, 1],
-                '31': [31, 1], 'ikattish': [31, 1]}
+                '31': [31, 1], 'ikattish': [31, 1], 'chhabis': [26, 1], 'sattais': [27, 1],
+                'atthais': [28, 1], 'untis': [29, 1], 'tees': [30, 1], 'ikattis': [31, 1]}
 
 # word to separate two date time
 separators = {'se': 0, 'ke': 0, 'aur': 0, 'evam': 0, 'lekin': 0, 'par': 0, 'magar': 0, 'kintu': 0, 'parantu': 0,
