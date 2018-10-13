@@ -300,7 +300,7 @@ class CityDetector(object):
             hinglish_departure = u'कहां से'
             departure_regexp = re.compile(
                 r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from|' + hinglish_departure)
-            hinglish_arrival = u'कहां जाना'
+            hinglish_arrival = u'कहां जाना|ख़तम'
             arrival_regexp = re.compile(
                 r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to|' + hinglish_arrival)
             if departure_regexp.search(self.bot_message) is not None:
