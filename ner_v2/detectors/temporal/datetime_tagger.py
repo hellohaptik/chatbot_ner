@@ -1,5 +1,5 @@
 from ner_v2.detectors.temporal.constant import TAG_PREV, TAG_NEXT, DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE, \
-    NUMERALS_CONSTANT_FILE, TIME_CONSTANT_FILE, TAGGED_DATE, TAGGED_TIME
+    NUMERALS_CONSTANT_FILE, TIME_CONSTANT_FILE, TAGGED_DATE, TAGGED_TIME, ORIGINAL_DATE_TEXT, ORIGINAL_TIME_TEXT
 from ner_v2.detectors.temporal.utils import get_tuple_list
 
 
@@ -309,4 +309,5 @@ class HindiDateTimeTagger(object):
         self.original_text_date = self.preprocess_original_text(self.date, self.original_text_date)
         self.original_text_time = self.preprocess_original_text(self.time, self.original_text_time)
 
-        return {TAGGED_DATE: [self.date, self.original_text_date], TAGGED_TIME: [self.time, self.original_text_time]}
+        return {TAGGED_DATE: self.date, ORIGINAL_DATE_TEXT: self.original_text_date,
+                TAGGED_TIME: self.time, ORIGINAL_TIME_TEXT: self.original_text_time}

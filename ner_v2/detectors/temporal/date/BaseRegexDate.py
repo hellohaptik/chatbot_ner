@@ -359,7 +359,7 @@ class BaseRegexDate(object):
             dd, mm, yy = req_date.day, req_date.month, req_date.year
         return self._return_date_ner_format(dd, mm, yy)
 
-    def _detect_date(self, text):
+    def _detect_date_from_standard_regex(self, text):
         """
         Method which will detect date from given text by running the parser in order defined in
         self.detector_preferences
