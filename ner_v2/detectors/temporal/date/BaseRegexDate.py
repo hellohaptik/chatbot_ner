@@ -83,20 +83,20 @@ class BaseRegexDate(object):
         self.datetime_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
         self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
-        relative_date_choices = "(" + " | ".join([x for x in self.date_constant_dict if
-                                                  self.date_constant_dict[x][1] == RELATIVE_DATE]) + ")"
-        date_literal_choices = "(" + " | ".join([x for x in self.date_constant_dict if
-                                                 self.date_constant_dict[x][1] == DATE_LITERAL_TYPE]) + ")"
-        month_ref_date_choices = "(" + " | ".join([x for x in self.date_constant_dict
-                                                   if self.date_constant_dict[x][1] == MONTH_DATE_REF_TYPE]) + ")"
-        month_literal_choices = "(" + " | ".join([x for x in self.date_constant_dict
-                                                  if self.date_constant_dict[x][1] == MONTH_LITERAL_TYPE]) + ")"
-        weekday_choices = "(" + " | ".join([x for x in self.date_constant_dict
-                                            if self.date_constant_dict[x][1] == WEEKDAY_TYPE]) + ")"
-        month_choices = "(" + " | ".join([x for x in self.date_constant_dict
-                                          if self.date_constant_dict[x][1] == MONTH_TYPE]) + ")"
-        datetime_diff_choices = "(" + " | ".join([x for x in self.datetime_constant_dict if
-                                                  self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + ")"
+        relative_date_choices = "(" + "|".join([x for x in self.date_constant_dict if
+                                                self.date_constant_dict[x][1] == RELATIVE_DATE]) + ")"
+        date_literal_choices = "(" + "|".join([x for x in self.date_constant_dict if
+                                               self.date_constant_dict[x][1] == DATE_LITERAL_TYPE]) + ")"
+        month_ref_date_choices = "(" + "|".join([x for x in self.date_constant_dict
+                                                 if self.date_constant_dict[x][1] == MONTH_DATE_REF_TYPE]) + ")"
+        month_literal_choices = "(" + "|".join([x for x in self.date_constant_dict
+                                                if self.date_constant_dict[x][1] == MONTH_LITERAL_TYPE]) + ")"
+        weekday_choices = "(" + "|".join([x for x in self.date_constant_dict
+                                          if self.date_constant_dict[x][1] == WEEKDAY_TYPE]) + ")"
+        month_choices = "(" + "|".join([x for x in self.date_constant_dict
+                                        if self.date_constant_dict[x][1] == MONTH_TYPE]) + ")"
+        datetime_diff_choices = "(" + "|".join([x for x in self.datetime_constant_dict if
+                                                self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + ")"
 
         # Date detector Regex
         self.regex_relative_date = re.compile((r'(\b' + relative_date_choices + r'\b)'))
@@ -112,8 +112,8 @@ class BaseRegexDate(object):
         self.regex_weekday_month_1 = re.compile(r'((\d+)\s*' + weekday_choices + '\\s*' +
                                                 datetime_diff_choices + r'\s+' + month_literal_choices + r')')
         self.regex_weekday_month_2 = re.compile(r'(' + datetime_diff_choices + r'\s+' + month_literal_choices +
-                                                r'\s*[a-z]*\s*(\d+)\s*' + weekday_choices + r')')
-        self.regex_weekday_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + weekday_choices + r')')
+                                                r'\s*[a-z]*\s*(\d+)\s+' + weekday_choices + r')')
+        self.regex_weekday_diff = re.compile(r'(' + datetime_diff_choices + r'\s+' + weekday_choices + r')')
         self.regex_weekday = re.compile(r'(' + weekday_choices + r')')
 
     def _detect_relative_date(self, date_list=None, original_list=None):
