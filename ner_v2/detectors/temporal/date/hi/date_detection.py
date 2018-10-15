@@ -1,8 +1,10 @@
 from chatbot_ner.config import ner_logger
+from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.temporal.date.BaseRegexDate import BaseRegexDate
 import datetime
 import pytz
-from chatbot_ner.config import BASE_DIR
+
+from ner_v2.language_utilities.constant import HINDI_LANG
 
 
 class DateDetector(BaseRegexDate):
@@ -23,10 +25,10 @@ class DateDetector(BaseRegexDate):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
-        data_directory_path = BASE_DIR.rstrip('/') + '/' + 'ner_v2/detectors/temporal/date/hi/data/'
+        data_directory_path = BASE_DATE_DETECTOR_PATH.strip('/') + '/' + HINDI_LANG + '/' + LANGUAGE_DATA_DIRECTORY
         super(DateDetector, self).__init__(data_directory_path=data_directory_path)
 
-    def _detect_date(self, text):
+    def detect_date(self, text):
         """
         Detects exact date for complete date information - day, month, year are available in text
         and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also

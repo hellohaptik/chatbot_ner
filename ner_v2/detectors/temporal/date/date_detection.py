@@ -1,5 +1,7 @@
 import copy
 import datetime
+import importlib
+import os
 import re
 
 import pytz
@@ -10,6 +12,7 @@ from chatbot_ner.config import ner_logger
 from models.models import Models
 from ner_v2.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v2.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
+from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATE_DETECTION_FILE
 
 from ner_v2.language_utilities.constant import ENGLISH_LANG
 
@@ -606,6 +609,7 @@ class DateDetector(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.source_language = source_language
+        self.language_date_detector = self._get_language_detector()
 
     def detect_entity(self, text):
         """
@@ -635,7 +639,8 @@ class DateDetector(object):
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        self.date, self.original_date_text = self._detect_date()
+        if not self.language_date_detector:
+            self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text)
         return self.date, self.original_date_text
 
     def set_bot_message(self, bot_message):
@@ -681,3 +686,12 @@ class DateDetector(object):
             'yy': datetime_object.year,
             'type': date_type,
         }
+
+    def _get_language_detector(self):
+        try:
+            date_detector_module = importlib.import_module(
+                'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.source_language))
+            return date_detector_module.DateDetector(self.entity_name)
+        except ImportError as e:
+            ner_logger.exception("No date detector exists for %s language" % self.source_language)
+            return None

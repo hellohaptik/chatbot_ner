@@ -101,7 +101,7 @@ class DateDetector(object):
         self.day_dictionary = DAY_DICT
         self.bot_message = None
 
-    def _detect_date(self, text):
+    def detect_date(self, text):
         """
         Detects exact date for complete date information - day, month, year are available in text
         and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
