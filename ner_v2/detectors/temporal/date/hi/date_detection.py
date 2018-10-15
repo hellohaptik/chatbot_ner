@@ -25,7 +25,7 @@ class DateDetector(BaseRegexDate):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
-        data_directory_path = BASE_DATE_DETECTOR_PATH.strip('/') + '/' + HINDI_LANG + '/' + LANGUAGE_DATA_DIRECTORY
+        data_directory_path = BASE_DATE_DETECTOR_PATH.rstrip('/') + '/' + HINDI_LANG + '/' + LANGUAGE_DATA_DIRECTORY
         super(DateDetector, self).__init__(data_directory_path=data_directory_path)
 
     def detect_date(self, text):
