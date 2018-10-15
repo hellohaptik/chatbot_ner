@@ -97,7 +97,7 @@ def get_hour_min_diff(time1, time2):
     return hours, minutes, nn
 
 
-def get_tuple_list(csv_file):
+def get_tuple_dict(csv_file):
     data_df = pd.read_csv(csv_file)
     data_df = data_df.set_index(CONSTANT_FILE_KEY)
     records = data_df.to_records()
@@ -105,5 +105,5 @@ def get_tuple_list(csv_file):
     for record in records:
         key = record[0]
         key = " | ".join([x.strip() for x in key.split("|")])
-        tuple_records[key] = (record[1], record[2])
+        tuple_records[key] = tuple(list(record[1:]))
     return tuple_records

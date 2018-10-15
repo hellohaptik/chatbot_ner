@@ -33,7 +33,7 @@ class BaseRegexDate(object):
             self.timezone = pytz.timezone('UTC')
             ner_logger.debug('Default timezone passed as "UTC"')
 
-        self.now_date = datetime.now(tz=self.timezone)
+        self.now_date = datetime.datetime.now(tz=self.timezone)
         self.is_past_referenced = is_past_referenced
 
         # dict to store words for date, numerals and words which comes in reference to some date
