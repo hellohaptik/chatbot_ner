@@ -1,10 +1,8 @@
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import TAGGED_DATE, ORIGINAL_DATE_TEXT
 from ner_v2.detectors.temporal.date.BaseRegexDate import BaseRegexDate
 import datetime
 import pytz
 from chatbot_ner.config import BASE_DIR
-from ner_v2.detectors.temporal.datetime_tagger import HindiDateTimeTagger
 
 
 class DateDetector(BaseRegexDate):
@@ -26,8 +24,6 @@ class DateDetector(BaseRegexDate):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         data_directory_path = BASE_DIR.rstrip('/') + '/' + 'ner_v2/detector/temporal/date/hi/data/'
-
-        self.date_tagger = HindiDateTimeTagger(data_directory_path)
         super(DateDetector, self).__init__(data_directory_path=data_directory_path)
 
     def detect_entity(self, text):
@@ -73,16 +69,8 @@ class DateDetector(BaseRegexDate):
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
         """
-        date_list = []
-        original_list = []
-        date_tagged_dict = self.date_tagger.get_datetime_tagged(self.processed_text)
-        if not date_tagged_dict.get(TAGGED_DATE):
-            return date_list, original_list
 
-        tagged_text_list = date_tagged_dict.get(TAGGED_DATE)
-        original_text_list = date_tagged_dict.get(ORIGINAL_DATE_TEXT)
-
-        date_list, original_list = self.get_exact_date(tagged_text_list, original_text_list)
+        date_list, original_list = self._detect_date_from_standard_regex(self.text, self.tag)
         validated_date_list, validated_original_list = [], []
 
         # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
@@ -95,29 +83,3 @@ class DateDetector(BaseRegexDate):
                 pass
 
         return validated_date_list, validated_original_list
-
-    def get_exact_date(self, tagged_text_list, original_text_list):
-        """
-        Detects exact date if complete date information - day, month, year are available in text.
-        Also detects "today", "tomorrow", "yesterday", "day after tomorrow", "day before yesterday",
-        "day in next week" and their variants/ synonyms and returns their dates as these can have exactly one date
-        they refer to. Type of dates returned by this method include TYPE_NORMAL, TYPE_TODAY, TYPE_TOMORROW,
-        TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_YESTERDAY, TYPE_NEXT_DAY
-
-        Args:
-            tagged_text_list: Optional, list to store dictionaries of detected date entities
-            original_text_list: Optional, list to store corresponding substrings of given text which were detected as
-                            date entities
-
-        Returns:
-            A tuple of two lists with first list containing the detected date entities and second list containing their
-            corresponding substrings in the given text.
-
-        """
-        date_list, original_list = [], []
-        for tagged_text, original_text in zip(tagged_text_list, original_text_list):
-            detect_date = self._detect_date_from_standard_regex(tagged_text)
-            if detect_date:
-                date_list.append(detect_date)
-                original_list.append(original_text)
-        return date_list, original_list

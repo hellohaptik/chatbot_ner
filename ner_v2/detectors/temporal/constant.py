@@ -17,13 +17,3 @@ ADD_DIFF_DATETIME_TYPE = 'add_diff_datetime'
 
 POSITIVE_TIME_DIFF = 'df'
 NEGATIVE_TIME_DIFF = 'ndf'
-
-
-TAG_PREV = 'prev'
-TAG_NEXT = 'next'
-
-TAGGED_DATE = 'tagged_date_text'
-TAGGED_TIME = 'tagged_time_text'
-
-ORIGINAL_DATE_TEXT = 'original_date_text'
-ORIGINAL_TIME_TEXT = 'original_time_text'
