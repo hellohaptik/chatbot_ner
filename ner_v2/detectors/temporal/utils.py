@@ -105,5 +105,5 @@ def get_tuple_dict(csv_file):
     for record in records:
         key = record[0]
         key = " | ".join([x.strip() for x in key.split("|")])
-        tuple_records[key] = tuple(list(record[1:]))
+        tuple_records[key] = tuple(list(record)[1:])
     return tuple_records
