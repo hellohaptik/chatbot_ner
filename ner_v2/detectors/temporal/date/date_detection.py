@@ -639,7 +639,7 @@ class DateDetector(object):
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        if not self.language_date_detector:
+        if self.language_date_detector:
             self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text)
         return self.date, self.original_date_text
 
