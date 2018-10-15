@@ -8,7 +8,7 @@ import re
 import datetime
 from dateutil.relativedelta import relativedelta
 
-from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple_list
+from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple_dict
 
 
 class BaseRegexDate(object):
@@ -79,9 +79,9 @@ class BaseRegexDate(object):
         Returns:
             None
         """
-        self.date_constant_dict = get_tuple_list(data_directory_path.rstrip('/') + '/' + DATE_CONSTANT_FILE)
-        self.datetime_constant_dict = get_tuple_list(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
-        self.numerals_constant_dict = get_tuple_list(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
+        self.date_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATE_CONSTANT_FILE)
+        self.datetime_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
+        self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
         relative_date_choices = "(" + " | ".join([x for x in self.date_constant_dict if
                                                   self.date_constant_dict[x][1] == RELATIVE_DATE]) + ")"
