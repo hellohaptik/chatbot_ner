@@ -98,6 +98,14 @@ def get_hour_min_diff(time1, time2):
 
 
 def get_tuple_dict(csv_file):
+    """
+    Method to convert language constant csv into tuple dict
+    Args:
+        csv_file (str): csv file path
+
+    Returns:
+        (dict): dict containing key as csv index key and all other rows values as tuple
+    """
     data_df = pd.read_csv(csv_file)
     data_df = data_df.set_index(CONSTANT_FILE_KEY)
     records = data_df.to_records()
