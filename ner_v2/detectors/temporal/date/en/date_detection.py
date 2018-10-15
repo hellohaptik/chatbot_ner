@@ -101,38 +101,7 @@ class DateDetector(object):
         self.day_dictionary = DAY_DICT
         self.bot_message = None
 
-    def detect_entity(self, text):
-        """
-        Detects all date strings in text and returns two lists of detected date entities and their corresponding
-        original substrings in text respectively.
-
-        Args:
-            text: string to extract date entities from
-
-        Returns:
-            Tuple containing two lists, first containing dictionaries, containing
-            date values as 'dd', 'mm', 'type', 'yy' for each detected date, and second list containing corresponding
-            substrings in given for entity detection
-
-            Examples:
-                date_detector = DateDetector("date")
-                date_detector.detect_entity('Remind me everyday')
-
-                date_detector.tagged_text
-
-
-        Additionally this function assigns these lists to self.date and self.original_date_text attributes
-        respectively.
-
-        """
-
-        self.text = ' ' + text.lower() + ' '
-        self.processed_text = self.text
-        self.tagged_text = self.text
-        self.date, self.original_date_text = self._detect_date()
-        return self.date, self.original_date_text
-
-    def _detect_date(self):
+    def _detect_date(self, text):
         """
         Detects exact date for complete date information - day, month, year are available in text
         and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
@@ -144,6 +113,10 @@ class DateDetector(object):
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
         """
+        self.text = ' ' + text.lower() + ' '
+        self.processed_text = self.text
+        self.tagged_text = self.text
+
         date_list = []
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
