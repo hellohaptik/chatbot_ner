@@ -151,7 +151,7 @@ class PhoneDetector(BaseDetector):
 
                 (['+919222222222', '919999999999'])
         """
-        return re.findall(r'\s((?:(?:\+|0{0,2})91(?:\s*[\-]\s*)?|[0]?)?[789]\d{9})\b', text)
+        return re.findall(r'\s((?:(?:\+|0{0,2})91(?:\s*[\-]\s*)?|[0]?)?[6789]\d{9})\b', text)
 
     def _update_processed_text(self, original_phone_strings):
         """
