@@ -9,7 +9,7 @@ from ner_v2.detectors.pattern.phone_number.phone_detection import PhoneDetector
 from ner_v2.detectors.pattern.pnr.pnr_detection import PNRDetector
 from ner_v2.detectors.pattern.regex.regex_detection import RegexDetector
 from ner_v2.detectors.temporal.date.en.date_detection import DateAdvancedDetector
-from ner_v2.detectors.temporal.time.time_detection import TimeDetector
+from ner_v2.detectors.temporal.time.en.time_detection import TimeDetector
 from ner_v2.detectors.textual.city.city_detection import CityDetector
 from ner_v2.detectors.textual.name.name_detection import NameDetector
 from ner_v2.detectors.textual.text.text_detection import TextDetector

@@ -1,7 +1,6 @@
 import copy
 import datetime
 import importlib
-import os
 import re
 
 import pytz
@@ -12,7 +11,6 @@ from chatbot_ner.config import ner_logger
 from models.models import Models
 from ner_v2.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v2.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
-from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATE_DETECTION_FILE
 
 from ner_v2.language_utilities.constant import ENGLISH_LANG
 
@@ -688,10 +686,16 @@ class DateDetector(object):
         }
 
     def _get_language_detector(self):
+        """
+        Get language detector class for source language
+        Returns:
+
+        """
         try:
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.source_language))
             return date_detector_module.DateDetector(self.entity_name)
         except ImportError as e:
-            ner_logger.exception("No date detector exists for %s language" % self.source_language)
+            ner_logger.exception("No date detector exists for %s language, Error - %s" %
+                                 (self.source_language, str(e)))
             return None

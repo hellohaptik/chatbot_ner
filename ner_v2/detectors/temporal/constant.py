@@ -14,6 +14,10 @@ MONTH_LITERAL_TYPE = 'month_literal'
 WEEKDAY_TYPE = 'weekday'
 MONTH_TYPE = 'month'
 ADD_DIFF_DATETIME_TYPE = 'add_diff_datetime'
+REF_DATETIME_TYPE = 'ref_datetime'
+
+HOUR_TIME_TYPE = 'hour'
+MINUTE_TIME_TYPE = 'minute'
 
 POSITIVE_TIME_DIFF = 'df'
 NEGATIVE_TIME_DIFF = 'ndf'
