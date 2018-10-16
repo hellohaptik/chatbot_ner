@@ -68,6 +68,9 @@ We have used seven types of labels to tag our data for ENTITY='city':
 
 """
 
+CITY_MODEL_OBJECT = None  # store city model object
+DATE_MODEL_OBJECT = None  # store date model object
+
 
 class PredictCRF(object):
     def __init__(self):
