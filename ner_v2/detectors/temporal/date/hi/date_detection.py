@@ -25,9 +25,9 @@ class DateDetector(BaseRegexDate):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
-        current_working_dir = os.getcwd().split('/')[-1].strip('/')
-        data_directory_path = (BASE_DATE_DETECTOR_PATH.rstrip('/') + '/' + current_working_dir + '/'
-                               + LANGUAGE_DATA_DIRECTORY)
+        data_directory_path = os.path.join(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
+                                           LANGUAGE_DATA_DIRECTORY)
+
         super(DateDetector, self).__init__(data_directory_path=data_directory_path)
 
     def detect_date(self, text):
