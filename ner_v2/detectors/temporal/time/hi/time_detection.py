@@ -1,19 +1,18 @@
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
 import datetime
 import pytz
 import os
 
+from ner_v2.detectors.temporal.time.standard_time_regex import BaseRegexTime
 
-class DateDetector(BaseRegexDate):
+
+class TimeDetector(BaseRegexTime):
     def __init__(self, entity_name, timezone='UTC'):
 
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.date = []
-        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         try:
@@ -26,11 +25,11 @@ class DateDetector(BaseRegexDate):
         self.bot_message = None
 
         current_working_dir = os.getcwd().split('/')[-1].strip('/')
-        data_directory_path = (BASE_DATE_DETECTOR_PATH.rstrip('/') + '/' + current_working_dir + '/'
-                               + LANGUAGE_DATA_DIRECTORY)
-        super(DateDetector, self).__init__(data_directory_path=data_directory_path)
+        data_directory_path = (BASE_DATE_DETECTOR_PATH.rstrip('/') + '/' + current_working_dir + '/' +
+                               LANGUAGE_DATA_DIRECTORY)
+        super(TimeDetector, self).__init__(data_directory_path=data_directory_path)
 
-    def detect_date(self, text):
+    def detect_time(self, text):
         """
         Detects exact date for complete date information - day, month, year are available in text
         and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
@@ -47,16 +46,6 @@ class DateDetector(BaseRegexDate):
         self.processed_text = self.text
         self.tagged_text = self.text
 
-        date_list, original_list = self._detect_date_from_standard_regex()
-        validated_date_list, validated_original_list = [], []
+        time_list, original_text_list = self._detect_time_from_standard_regex()
 
-        # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
-        for date, original_text in zip(date_list, original_list):
-            try:
-                datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
-                validated_date_list.append(date)
-                validated_original_list.append(original_text)
-            except ValueError:
-                pass
-
-        return validated_date_list, validated_original_list
+        return time_list, original_text_list

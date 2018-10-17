@@ -5,7 +5,7 @@ baje|bajkr|bajkar|bje|baj,hour,NA
 ghanta|ghante|ghanton,hour,NA
 minutes|mins|minute|min,minute,NA
 second|sec,second,NA
-subah|subeh,day_time_reference,am
-dopahar|dopehar|dupahar,day_time_reference,pm
-shaam|sandhya,day_time_reference,pm
-raat,day_time_reference,pm
+subah|subeh,daytime_meridian,am
+dopahar|dopehar|dupahar,daytime_meridian,pm
+shaam|sandhya|sham|saam,daytime_meridian,pm
+raat,daytime_meridian,pm

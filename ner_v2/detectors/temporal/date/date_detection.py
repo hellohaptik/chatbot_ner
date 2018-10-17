@@ -607,7 +607,7 @@ class DateDetector(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.source_language = source_language
-        self.language_date_detector = self._get_language_detector()
+        self.language_date_detector = self._get_date_language_detector()
 
     def detect_entity(self, text):
         """
@@ -685,7 +685,7 @@ class DateDetector(object):
             'type': date_type,
         }
 
-    def _get_language_detector(self):
+    def _get_date_language_detector(self):
         """
         Get language detector class for source language
         Returns:

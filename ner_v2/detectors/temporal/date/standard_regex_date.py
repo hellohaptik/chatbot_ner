@@ -122,7 +122,8 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -151,7 +152,8 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -192,7 +194,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -227,7 +231,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -261,7 +267,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -293,7 +301,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -318,7 +328,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -344,7 +356,8 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -372,7 +385,8 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -401,7 +415,8 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -429,7 +444,9 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -464,7 +481,7 @@ class BaseRegexDate(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _detect_date_from_standard_regex(self, text, tag):
+    def _detect_date_from_standard_regex(self):
         """
         Method which will detect date from given text by running the parser in order defined in
         self.detector_preferences
@@ -473,12 +490,10 @@ class BaseRegexDate(object):
             tag (str): tag by which entity in text will be replaced
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         date_list, original_list = None, None
-        self.text = text
-        self.processed_text = self.text
-        self.tag = tag
         for detector in self.detector_preferences:
             date_list, original_list = detector(date_list, original_list)
             self._update_processed_text(original_list)

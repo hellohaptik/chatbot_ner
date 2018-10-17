@@ -1,7 +1,7 @@
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.constant import TYPE_EXACT
+from ner_v2.detectors.constant import TYPE_EXACT, TWELVE_HOUR
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE
+    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
 import pytz
 import re
 import datetime
@@ -39,9 +39,8 @@ class BaseRegexTime(object):
         self.datetime_constant_dict = {}
         self.numerals_constant_dict = {}
 
-        # define dynamic created standard regex from language data files
-        self.regex_hour = None
-        self.regex_minute = None
+        # define dynamic created standard regex for time from language data files
+        self.regex_time = None
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
@@ -63,87 +62,89 @@ class BaseRegexTime(object):
         self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
         datetime_diff_choices = "(" + "|".join([x for x in self.datetime_constant_dict
-                                        if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + "|)"
+                                                if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + "|)"
         datetime_add_ref_choices = "(" + "|".join([x for x in self.datetime_constant_dict
-                                       if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
+                                                   if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
 
         hour_variants = "(" + "|".join([x for x in self.time_constant_dict if
                                         self.time_constant_dict[x][1] == HOUR_TIME_TYPE]) + ")"
         minute_variants = "(" + "|".join([x for x in self.time_constant_dict if
                                           self.time_constant_dict[x][1] == MINUTE_TIME_TYPE]) + ")"
+        daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if
+                                           self.time_constant_dict[x][1] == DAYTIME_MERIDIAN]) + ")"
 
-        self.regex_hour = re.compile(r'(' + datetime_add_ref_choices + r"\s*([\d.]+)\s*" + hour_variants + r"\s+" +
-                                     datetime_diff_choices + r')')
-        self.regex_minute = re.compile(r'(' + datetime_add_ref_choices + r"\s*([\d+.])\s*" + minute_variants + r"\s+" +
-                                       datetime_diff_choices + r')')
+        self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
+                                     r'\s*([\d.]+)\s*' + hour_variants + r'\s*([\d]*)\s*' + minute_variants + r'\s+'
+                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')')
 
     def _detect_hour_minute(self, time_list, original_list):
         """
-
+        Parser to detect time for following text:
+            i) 2 baje
+            ii) 2 ghante baad
+            iii) 2 bajkar 30 minute
+            iv) dhaai baje
+            v) shaam me 5 baje
+            vi) subah me paune 9 baje
+            v) 30 minute baad
+            vi) 5 baje shaam me
         Returns:
+            time_list (list): list of dict containing hour, minute, time type from detected text
+            original_list (list): list of original text corresponding to values detected
 
         """
         time_list = time_list or []
         original_list = original_list or []
 
-        regex_hour_match = self.regex_hour.findall(self.processed_text)
+        regex_hour_match = self.regex_time.findall(self.processed_text)
         for time_match in regex_hour_match:
-        if regex_hour_match:
-            print regex_hour_match
-            regex_hour_match = regex_hour_match[0]
-            hh = float(regex_hour_match[1])
-            if regex_hour_match[0]:
-                val_add = self.datetime_constant_dict[regex_hour_match[0]][1]
-                print val_add
-                hh = hh + val_add
-            if regex_hour_match[3] and regex_hour_match[2] not in IGNORE_DIFF_HOUR_LIST:
-                ref_date = self.now_date + datetime_dict[regex_hour_match[3]][1] * timedelta(hours=hh)
-                return get_hour_min_diff(today, ref_date)
+            hh = 0
+            mm = 0
+            nn = None
+            original = time_match[0]
+            val = float(time_match[3])
 
-        # regex to match text like '30 minutes', '12 minute pehle'
-        regex_minute_match = REGEX_MINUTE_TIME_1.findall(text)
-        if regex_minute_match:
-            regex_minute_match = regex_minute_match[0]
-            mm = float(regex_minute_match[1])
-            if regex_minute_match[3]:
-                ref_date = self.now_date + self,datetime_constant_dict[regex_minute_match[3]][1] * \
-                           timedelta(hours=hh, minutes=mm)
-                return get_hour_min_diff(today, ref_date)
+            if time_match[1]:
+                val_add = self.datetime_constant_dict[time_match[2]][1]
+                val = val + val_add
 
-        print hh, mm
-        for each in DAYTIME_MERIDIAN:
-            if each in text:
-                nn = DAYTIME_MERIDIAN[each]
+            if time_match[4]:
+                hh = val
+            else:
+                mm = val
 
-        if type(hh) == float:
-            mm = int((hh - int(hh)) * 60)
-            hh = int(hh)
-    def _detect_weekday(self,date_list, original_list):
-        """
-        Parser to detect date containing referenced weekday without referencing any particular day like
-        'mangalvar'(hindi), 'ravivar'(hindi)
-        Args:
+            if time_match[5]:
+                mm = float(time_match[5])
 
-        Returns:
-            (dict): containing detected day, month, year if detected else empty dict
-        """
-        date_list = date_list or []
-        original_list = original_list or []
+            if time_match[7]:
+                ref_date = self.now_date + self.datetime_constant_dict[time_match[7]][1] * \
+                           datetime.timedelta(hours=hh, minutes=mm)
+                hh = ref_date.hour
+                mm = ref_date.minute
+                nn = ref_date.strftime("%P")
 
-        weekday_ref_match = self.regex_weekday.findall(self.processed_text)
-        for date_match in weekday_ref_match:
-            original = date_match[0]
-            weekday = self.date_constant_dict[date_match[1]][0]
-            req_date = next_weekday(current_date=self.now_date, n=0, weekday=weekday)
-            date = {
-                'dd': req_date.day,
-                'mm': req_date.month,
-                'yy': req_date.year,
-                'type': TYPE_EXACT
+            if int(hh) != hh:
+                mm = int((hh - int(hh)) * 60)
+                hh = int(hh)
+
+            if hh > 12:
+                nn = TWELVE_HOUR
+
+            if not nn:
+                for key, values in self.time_constant_dict.items():
+                    if values[1] == DAYTIME_MERIDIAN and key in original:
+                        nn = values[1]
+
+            time = {
+                'hh': int(hh),
+                'mm': int(mm),
+                'nn': nn
             }
-            date_list.append(date)
+
+            time_list.append(time)
             original_list.append(original)
-        return date_list, original_list
+
+        return time_list, original_list
 
     def _update_processed_text(self, original_date_list):
         """
@@ -160,7 +161,7 @@ class BaseRegexTime(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _detect_time_from_standard_regex(self, text, tag):
+    def _detect_time_from_standard_regex(self):
         """
         Method which will detect date from given text by running the parser in order defined in
         self.detector_preferences
@@ -172,9 +173,6 @@ class BaseRegexTime(object):
             (dict): containing detected day, month, year if detected else empty dict
         """
         time_list, original_list = None, None
-        self.text = text
-        self.processed_text = self.text
-        self.tag = tag
         for detector in self.detector_preferences:
             time_list, original_list = detector(time_list, original_list)
             self._update_processed_text(original_list)
