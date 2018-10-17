@@ -1,5 +1,5 @@
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATA_DIRECTORY
+from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
 import datetime
 import pytz
