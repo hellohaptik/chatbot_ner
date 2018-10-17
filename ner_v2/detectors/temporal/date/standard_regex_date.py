@@ -486,8 +486,6 @@ class BaseRegexDate(object):
         Method which will detect date from given text by running the parser in order defined in
         self.detector_preferences
         Args:
-            text (str): text from which date has to be detected
-            tag (str): tag by which entity in text will be replaced
 
         Returns:
             date_list (list): list of dict containing day, month, year from detected text

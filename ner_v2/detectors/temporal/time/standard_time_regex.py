@@ -1,12 +1,13 @@
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.constant import TYPE_EXACT, TWELVE_HOUR
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
+    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, POSITIVE_TIME_DIFF, \
+    NEGATIVE_TIME_DIFF
 import pytz
 import re
 import datetime
 
-from ner_v2.detectors.temporal.utils import get_tuple_dict
+from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
 
 class BaseRegexTime(object):
@@ -119,9 +120,8 @@ class BaseRegexTime(object):
             if time_match[7]:
                 ref_date = self.now_date + self.datetime_constant_dict[time_match[7]][1] * \
                            datetime.timedelta(hours=hh, minutes=mm)
-                hh = ref_date.hour
-                mm = ref_date.minute
-                nn = ref_date.strftime("%P")
+
+                hh, mm, nn = get_hour_min_diff(self.now_date, ref_date)
 
             if int(hh) != hh:
                 mm = int((hh - int(hh)) * 60)
@@ -146,31 +146,30 @@ class BaseRegexTime(object):
 
         return time_list, original_list
 
-    def _update_processed_text(self, original_date_list):
+    def _update_processed_text(self, original_time_list):
         """
-        Replaces detected date with tag generated from entity_name used to initialize the object with
+        Replaces detected time with tag generated from entity_name used to initialize the object with
 
-        A final string with all dates replaced will be stored in object's tagged_text attribute
-        A string with all dates removed will be stored in object's processed_text attribute
+        A final string with all time replaced will be stored in object's tagged_text attribute
+        A string with all time removed will be stored in object's processed_text attribute
 
         Args:
-            original_date_list (list): list of substrings of original text to be replaced with tag
+            original_time_list (list): list of substrings of original text to be replaced with tag
                                        created from entity_name
         """
-        for detected_text in original_date_list:
+        for detected_text in original_time_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
     def _detect_time_from_standard_regex(self):
         """
-        Method which will detect date from given text by running the parser in order defined in
+        Method which will detect time from given text by running the parser in order defined in
         self.detector_preferences
         Args:
-            text (str): text from which date has to be detected
-            tag (str): tag by which entity in text will be replaced
 
         Returns:
-            (dict): containing detected day, month, year if detected else empty dict
+            time_list (list): list of dict containing hour, minute, time type from detected text
+            original_list (list): list of original text corresponding to values detected
         """
         time_list, original_list = None, None
         for detector in self.detector_preferences:
