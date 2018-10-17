@@ -179,9 +179,9 @@ class BaseRegexDate(object):
                 if int(today_yymmdd) < int(yymmdd):
                     yy -= 1
             date = {
-                'dd': dd,
-                'mm': mm,
-                'yy': yy,
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
                 'type': TYPE_EXACT
             }
             date_list.append(date)
@@ -216,9 +216,9 @@ class BaseRegexDate(object):
                 yy = self.now_date.year
 
             date = {
-                'dd': dd,
-                'mm': mm,
-                'yy': yy,
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
                 'type': TYPE_EXACT
             }
             date_list.append(date)
@@ -252,9 +252,9 @@ class BaseRegexDate(object):
                 yy = self.now_date.year
 
             date = {
-                'dd': dd,
-                'mm': mm,
-                'yy': yy,
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
                 'type': TYPE_EXACT
             }
             date_list.append(date)
@@ -286,9 +286,9 @@ class BaseRegexDate(object):
                 mm = req_date.month
                 yy = req_date.year
             date = {
-                'dd': dd,
-                'mm': mm,
-                'yy': yy,
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
                 'type': TYPE_EXACT
             }
             date_list.append(date)
