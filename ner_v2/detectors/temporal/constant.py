@@ -24,5 +24,6 @@ POSITIVE_TIME_DIFF = 'df'
 NEGATIVE_TIME_DIFF = 'ndf'
 
 BASE_DATE_DETECTOR_PATH = BASE_DIR.rstrip('/') + '/ner_v2/detectors/temporal/date/'
-LANGUAGE_DATE_DETECTION_FILE = 'date_detection.py'
+BASE_TIME_DETECTOR_PATH = BASE_DIR.rstrip('/') + '/ner_v2/detectors/temporal/time/'
+
 LANGUAGE_DATA_DIRECTORY = 'data'

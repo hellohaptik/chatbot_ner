@@ -1,5 +1,5 @@
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import BASE_DATE_DETECTOR_PATH, LANGUAGE_DATA_DIRECTORY
+from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY, BASE_TIME_DETECTOR_PATH
 import datetime
 import pytz
 import os
@@ -25,7 +25,7 @@ class TimeDetector(BaseRegexTime):
         self.bot_message = None
 
         current_working_dir = os.getcwd().split('/')[-1].strip('/')
-        data_directory_path = (BASE_DATE_DETECTOR_PATH.rstrip('/') + '/' + current_working_dir + '/' +
+        data_directory_path = (BASE_TIME_DETECTOR_PATH.rstrip('/') + '/' + current_working_dir + '/' +
                                LANGUAGE_DATA_DIRECTORY)
         super(TimeDetector, self).__init__(data_directory_path=data_directory_path)
 
