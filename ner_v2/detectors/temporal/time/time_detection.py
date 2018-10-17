@@ -57,8 +57,8 @@ class TimeDetector(object):
         self.bot_message = None
         self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
-        self.language_time_detector = self._get_time_language_detector()
         self.source_language = source_language
+        self.language_time_detector = self._get_time_language_detector()
 
     def detect_entity(self, text):
         """
@@ -86,9 +86,9 @@ class TimeDetector(object):
 
         """
         try:
-            date_detector_module = importlib.import_module(
+            time_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.source_language))
-            return date_detector_module.TimeDetector(self.entity_name)
+            return time_detector_module.TimeDetector(self.entity_name)
         except ImportError as e:
             ner_logger.exception("No time detector exists for %s language, Error - %s" %
                                  (self.source_language, str(e)))
