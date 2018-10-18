@@ -133,7 +133,7 @@ class BaseRegexTime(object):
             if not nn:
                 for key, values in self.time_constant_dict.items():
                     if values[0] == DAYTIME_MERIDIAN and key in original:
-                        nn = values[0]
+                        nn = values[1]
 
             time = {
                 'hh': int(hh),
