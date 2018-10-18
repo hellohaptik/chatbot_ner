@@ -1,8 +1,7 @@
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.constant import TYPE_EXACT, TWELVE_HOUR
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, POSITIVE_TIME_DIFF, \
-    NEGATIVE_TIME_DIFF
+    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
 import pytz
 import re
 import datetime
@@ -102,7 +101,7 @@ class BaseRegexTime(object):
             hh = 0
             mm = 0
             nn = None
-            original = time_match[0]
+            original = time_match[0].strip()
             val = float(time_match[3])
 
             if time_match[2]:
