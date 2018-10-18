@@ -3,8 +3,6 @@ from language_utilities.constant import ENGLISH_LANG
 from constants.ner_constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                                     FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                                     DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-from language_utilities.utils import translate_text
-from language_utilities.constant import TRANSLATED_TEXT
 
 
 class BaseDetector(object):
@@ -14,9 +12,7 @@ class BaseDetector(object):
     detectors using translation
     
     Attributes:
-        _source_language_script (str): ISO 639 language code of language of orignal query
-        _target_language_script (str): ISO-639 language code in which detector would process the query
-        _translation_enabled (bool): Decides to either enable or disable translation API
+       language (str): ISO 639 language code of language of orignal query
     """
     __metaclass__ = abc.ABCMeta
 

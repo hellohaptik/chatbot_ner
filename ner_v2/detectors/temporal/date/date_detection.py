@@ -585,7 +585,7 @@ class DateDetector(BaseDetector):
     def supported_languages(self):
         pass
 
-    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, timezone='UTC'):
+    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -610,9 +610,9 @@ class DateDetector(BaseDetector):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
-        self.language = source_language_script
+        self.language = language
         self.language_date_detector = self._get_date_language_detector()
-        super(DateDetector, self).__init__(source_language_script=source_language_script)
+        super(DateDetector, self).__init__(language=language)
 
     def detect_entity(self, text, **kwargs):
         """

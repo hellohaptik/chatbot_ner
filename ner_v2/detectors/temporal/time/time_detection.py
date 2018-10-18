@@ -33,7 +33,8 @@ class TimeDetector(BaseDetector):
     def supported_languages(self):
         pass
 
-    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False, source_language_script=ENGLISH_LANG):
+    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
+                 language=ENGLISH_LANG):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:
@@ -43,7 +44,7 @@ class TimeDetector(BaseDetector):
                             default is UTC
             range_enabled (bool): whether time range needs to be detected
             form_check (bool): Optional, boolean set to False, used when passed text is a form type message
-            source_language_script (str): ISO 639 code for language of entities to be detected by the instance of this
+            language (str): ISO 639 code for language of entities to be detected by the instance of this
                                           class
         """
         # assigning values to superclass attributes
@@ -61,7 +62,7 @@ class TimeDetector(BaseDetector):
         self.bot_message = None
         self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
-        self.language = source_language_script
+        self.language = language
         super(TimeDetector, self).__init__(self.language)
         self.language_time_detector = self._get_time_language_detector()
 
