@@ -105,7 +105,7 @@ class BaseRegexTime(object):
             original = time_match[0]
             val = float(time_match[3])
 
-            if time_match[1]:
+            if time_match[2]:
                 val_add = self.datetime_constant_dict[time_match[2]][1]
                 val = val + val_add
 
