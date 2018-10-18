@@ -68,11 +68,11 @@ class BaseRegexTime(object):
                                                    if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
 
         hour_variants = "(" + "|".join([x for x in self.time_constant_dict if
-                                        self.time_constant_dict[x][0] == HOUR_TIME_TYPE]) + ")"
+                                        self.time_constant_dict[x][0] == HOUR_TIME_TYPE]) + "|)"
         minute_variants = "(" + "|".join([x for x in self.time_constant_dict if
-                                          self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + ")"
+                                          self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + "|)"
         daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if
-                                           self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + ")"
+                                           self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + "|)"
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*([\d.]+)\s*' + hour_variants + r'\s*([\d]*)\s*' + minute_variants + r'\s+'
