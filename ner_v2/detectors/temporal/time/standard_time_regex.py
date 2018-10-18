@@ -72,10 +72,26 @@ class BaseRegexTime(object):
                                           self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + "|)"
         daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if
                                            self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + "|)"
+        numeral_variants = "|".join([x for x in self.numerals_constant_dict])
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
-                                     r'\s*([\d.]+)\s*' + hour_variants + r'\s*([\d]*)\s*' + minute_variants + r'\s+'
+                                     r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
+                                     numeral_variants + r')\s*' + minute_variants + r'\s+'
                                      + datetime_diff_choices + r'\s*' + daytime_meridian + r')')
+
+    def _get_float_from_numeral(self, numeral):
+        """
+        Convert string to float for given numeral text
+        Args:
+            numeral (str): numeral text
+
+        Returns:
+            (float): return float corresponding to given numeral
+        """
+        if numeral.replace('.', '').isdigit():
+            return float(numeral)
+        else:
+            return float(self.numerals_constant_dict[numeral][0])
 
     def _detect_hour_minute(self, time_list, original_list):
         """
@@ -102,7 +118,7 @@ class BaseRegexTime(object):
             mm = 0
             nn = None
             original = time_match[0].strip()
-            val = float(time_match[3])
+            val = self._get_float_from_numeral(time_match[3])
 
             if time_match[2]:
                 val_add = self.datetime_constant_dict[time_match[2]][1]
@@ -114,7 +130,7 @@ class BaseRegexTime(object):
                 mm = val
 
             if time_match[5]:
-                mm = float(time_match[5])
+                mm = self._get_float_from_numeral(time_match[5])
 
             if time_match[7]:
                 ref_date = self.now_date + int(self.datetime_constant_dict[time_match[7]][1]) * \

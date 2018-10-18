@@ -106,7 +106,7 @@ def get_tuple_dict(csv_file):
     Returns:
         (dict): dict containing key as csv index key and all other rows values as tuple
     """
-    data_df = pd.read_csv(csv_file)
+    data_df = pd.read_csv(csv_file, encoding='utf-8')
     data_df = data_df.set_index(CONSTANT_FILE_KEY)
     records = data_df.to_records()
     tuple_records = {}

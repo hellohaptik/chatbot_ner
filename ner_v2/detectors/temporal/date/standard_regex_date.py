@@ -97,24 +97,53 @@ class BaseRegexDate(object):
                                         if self.date_constant_dict[x][1] == MONTH_TYPE]) + ")"
         datetime_diff_choices = "(" + "|".join([x for x in self.datetime_constant_dict if
                                                 self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + ")"
+        numeral_variants = "|".join([x for x in self.numerals_constant_dict])
 
         # Date detector Regex
         self.regex_relative_date = re.compile((r'(\b' + relative_date_choices + r'\b)'))
+
         self.regex_day_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + date_literal_choices + r')')
-        self.regex_date_month = re.compile(r'((\d+)\s*' + month_choices + r')')
-        self.regex_date_ref_month_1 = re.compile(r'((\d+)\s*' + month_ref_date_choices + '\\s*' +
-                                                 datetime_diff_choices + r'\s*' + month_literal_choices + r')')
-        self.regex_date_ref_month_2 = re.compile(r'(' + datetime_diff_choices + r'\s*' + month_literal_choices +
-                                                 r'\s*[a-z]*\s*(\d+)\s+' + month_ref_date_choices + r')')
-        self.regex_date_ref_month_3 = re.compile(r'((\d+)\s*' + month_ref_date_choices + r')')
-        self.regex_after_days_ref = re.compile(r'((\d+)\s*' + date_literal_choices + r'\s+' +
+
+        self.regex_date_month = re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_choices + r')')
+
+        self.regex_date_ref_month_1 = \
+            re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + '\\s*' +
+                       datetime_diff_choices + r'\s*' + month_literal_choices + r')')
+
+        self.regex_date_ref_month_2 = \
+            re.compile(r'(' + datetime_diff_choices + r'\s*' + month_literal_choices + r'\s*[a-z]*\s*(\d+|' +
+                       numeral_variants + r')\s+' + month_ref_date_choices + r')')
+
+        self.regex_date_ref_month_3 = \
+            re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + r')')
+
+        self.regex_after_days_ref = re.compile(r'((\d+|' + numeral_variants + r')\s*' + date_literal_choices + r'\s+' +
                                                datetime_diff_choices + r')')
-        self.regex_weekday_month_1 = re.compile(r'((\d+)\s*' + weekday_choices + '\\s*' +
+
+        self.regex_weekday_month_1 = re.compile(r'((\d+|' + numeral_variants + ')\s*' + weekday_choices + '\\s*' +
                                                 datetime_diff_choices + r'\s+' + month_literal_choices + r')')
+
         self.regex_weekday_month_2 = re.compile(r'(' + datetime_diff_choices + r'\s+' + month_literal_choices +
-                                                r'\s*[a-z]*\s*(\d+)\s+' + weekday_choices + r')')
+                                                r'\s*[a-z]*\s*(\d+|' + numeral_variants + ')\s+' +
+                                                weekday_choices + r')')
+
         self.regex_weekday_diff = re.compile(r'(' + datetime_diff_choices + r'\s+' + weekday_choices + r')')
+
         self.regex_weekday = re.compile(r'(' + weekday_choices + r')')
+
+    def _get_int_from_numeral(self, numeral):
+        """
+        Convert string to float for given numeral text
+        Args:
+            numeral (str): numeral text
+
+        Returns:
+            (int): return float corresponding to given numeral
+        """
+        if numeral.replace('.', '').isdigit():
+            return int(numeral)
+        else:
+            return int(self.numerals_constant_dict[numeral][0])
 
     def _detect_relative_date(self, date_list=None, original_list=None):
         """
@@ -161,7 +190,7 @@ class BaseRegexDate(object):
         date_month_match = self.regex_date_month.findall(self.processed_text)
         for date_match in date_month_match:
             original = date_match[0]
-            dd = int(date_match[1])
+            dd = self._get_int_from_numeral(date_match[1])
             mm = self.date_constant_dict[date_match[2]][0]
 
             today_mmdd = "%d%02d" % (self.now_date.month, self.now_date.day)
@@ -205,7 +234,7 @@ class BaseRegexDate(object):
 
         for date_match in date_ref_month_match:
             original = date_match[0]
-            dd = int(date_match[1])
+            dd = self._get_int_from_numeral(date_match[1])
             if date_match[3] and date_match[4]:
                 req_date = self.now_date + \
                            relativedelta(months=self.datetime_constant_dict[date_match[3]][1])
@@ -241,7 +270,7 @@ class BaseRegexDate(object):
         date_ref_month_match = self.regex_date_ref_month_2.findall(self.processed_text)
         for date_match in date_ref_month_match:
             original = date_match[0]
-            dd = int(date_match[3])
+            dd = self._get_int_from_numeral(date_match[3])
             if date_match[1] and date_match[2]:
                 req_date = self.now_date + \
                            relativedelta(months=self.datetime_constant_dict[date_match[1]][1])
@@ -277,7 +306,7 @@ class BaseRegexDate(object):
         date_ref_month_match = self.regex_date_ref_month_3.findall(self.processed_text)
         for date_match in date_ref_month_match:
             original = date_match[0]
-            dd = int(date_match[1])
+            dd = self._get_int_from_numeral(date_match[1])
             if self.now_date.day < dd:
                 mm = self.now_date.month
                 yy = self.now_date.year
@@ -338,7 +367,7 @@ class BaseRegexDate(object):
         after_days_match = self.regex_after_days_ref.findall(self.processed_text)
         for date_match in after_days_match:
             original = date_match[0]
-            day_diff = int(date_match[1])
+            day_diff = self._get_int_from_numeral(date_match[1])
             req_date = self.now_date + relativedelta(days=day_diff * self.datetime_constant_dict[date_match[3]][1])
             date = {
                 'dd': req_date.day,
@@ -365,7 +394,7 @@ class BaseRegexDate(object):
         weekday_month_match = self.regex_weekday_month_1.findall(self.processed_text)
         for date_match in weekday_month_match:
             original = date_match[0]
-            n_weekday = int(date_match[1])
+            n_weekday = self._get_int_from_numeral(date_match[1])
             weekday = self.date_constant_dict[date_match[2]][0]
             ref_date = self.now_date + relativedelta(months=self.datetime_constant_dict[date_match[3]][1])
             req_date = nth_weekday(n_weekday, weekday, ref_date)
@@ -394,7 +423,7 @@ class BaseRegexDate(object):
         weekday_month_match = self.regex_weekday_month_2.findall(self.processed_text)
         for date_match in weekday_month_match:
             original = date_match[0]
-            n_weekday = int(date_match[3])
+            n_weekday = self._get_int_from_numeral(date_match[3])
             weekday = self.date_constant_dict[date_match[4]][0]
             ref_date = self.now_date + relativedelta(months=self.datetime_constant_dict[date_match[1]][1])
             req_date = nth_weekday(weekday, n_weekday, ref_date)
