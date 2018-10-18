@@ -118,7 +118,7 @@ class BaseRegexTime(object):
                 mm = float(time_match[5])
 
             if time_match[7]:
-                ref_date = self.now_date + self.datetime_constant_dict[time_match[7]][1] * \
+                ref_date = self.now_date + int(self.datetime_constant_dict[time_match[7]][1]) * \
                            datetime.timedelta(hours=hh, minutes=mm)
 
                 hh, mm, nn = get_hour_min_diff(self.now_date, ref_date)
