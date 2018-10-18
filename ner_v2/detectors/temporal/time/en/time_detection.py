@@ -3,11 +3,10 @@ import re
 import pytz
 
 from constants.detection_constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
-from ner_v1.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
 
 
-class TimeDetector(BaseDetector):
+class TimeDetector(object):
     """Detects time in various formats from given text and tags them.
 
     Detects all time entities in given text and replaces them by entity_name.
@@ -63,7 +62,7 @@ class TimeDetector(BaseDetector):
     """
 
     def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
-                 source_language_script=ENGLISH_LANG,
+                 language=ENGLISH_LANG,
                  translation_enabled=False):
         """Initializes a TimeDetector object with given entity_name and timezone
 
@@ -74,15 +73,13 @@ class TimeDetector(BaseDetector):
                             default is UTC
             range_enabled (bool): whether time range needs to be detected
             form_check (bool): Optional, boolean set to False, used when passed text is a form type message
-            source_language_script (str): ISO 639 code for language of entities to be detected by the instance of this
+            language (str): ISO 639 code for language of entities to be detected by the instance of this
                                           class
             translation_enabled (bool): True if messages needs to be translated in case detector does not support a
                                         particular language, else False
 
         """
         # assigning values to superclass attributes
-        self._supported_languages = [ENGLISH_LANG]
-        super(TimeDetector, self).__init__(source_language_script, translation_enabled)
         self.entity_name = entity_name
         self.text = ''
         self.departure_flag = False
@@ -97,80 +94,7 @@ class TimeDetector(BaseDetector):
         self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
 
-    @property
-    def supported_languages(self):
-        return self._supported_languages
-
-    def _detect_time(self):
-        """
-        Detects all time strings in text and returns list of detected time entities and their corresponding original
-        substrings in text
-
-        Returns:
-            Tuple containing two lists, first containing dictionaries, each containing
-            containing hour, minutes and meridiem/notation - either 'am', 'pm', 'hrs', 'df' ('df' denotes relative
-            difference to current time) for each detected time, and second list containing corresponding original
-            substrings in text
-
-        """
-        time_list = []
-        original_list = []
-        time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_start_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_start_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_end_range_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_end_range_12_hour_format_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_12_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_12_hour_without_min(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_with_difference(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_with_difference_later(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_with_every_x_hour(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_with_once_in_x_day(time_list, original_list)
-        self._update_processed_text(original_list)
-        if self.form_check:
-            time_list, original_list = self._detect_24_hour_format(time_list, original_list)
-            self._update_processed_text(original_list)
-        time_list, original_list = self._detect_restricted_24_hour_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_12_hour_word_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_12_hour_word_format2(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_24_hour_without_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_without_format(time_list, original_list)
-        self._update_processed_text(original_list)
-        time_list, original_list = self._detect_time_without_format_preceeding(time_list, original_list)
-        self._update_processed_text(original_list)
-        if not time_list:
-            time_list, original_list = self._get_morning_time_range(time_list, original_list)
-            self._update_processed_text(original_list)
-            time_list, original_list = self._get_afternoon_time_range(time_list, original_list)
-            self._update_processed_text(original_list)
-            time_list, original_list = self._get_evening_time_range(time_list, original_list)
-            self._update_processed_text(original_list)
-            time_list, original_list = self._get_night_time_range(time_list, original_list)
-            self._update_processed_text(original_list)
-            time_list, original_list = self._get_default_time_range(time_list, original_list)
-            self._update_processed_text(original_list)
-        if not self.range_enabled and time_list:
-            time_list, original_list = self._remove_time_range_entities(time_list=time_list,
-                                                                        original_list=original_list)
-        return time_list, original_list
-
-    def detect_entity(self, text, **kwargs):
+    def detect_time(self, text, **kwargs):
         """
         Detects all time strings in text and returns two lists of detected time entities and their corresponding
         original substrings in text respectively.

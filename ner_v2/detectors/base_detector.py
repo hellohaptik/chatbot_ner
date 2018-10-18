@@ -20,17 +20,13 @@ class BaseDetector(object):
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, language=ENGLISH_LANG):
         """
         Initialize basedetector
         Args:
-             source_language_script (str): ISO 639 language code of language of original query
-             translation_enabled (bool): Decides to either enable or disable translation API
+             language (str): ISO 639 language code of language of original query
         """
-        self._source_language_script = source_language_script
-        self._target_language_script = ENGLISH_LANG
-        self._translation_enabled = translation_enabled
-        self._set_language_processing_script()
+        self.language = language
 
     @abc.abstractproperty
     def supported_languages(self):
@@ -53,19 +49,6 @@ class BaseDetector(object):
             to derive the detected value respectively
         """
         return [], []
-
-    def _set_language_processing_script(self):
-        """
-        This method is used to decide the language in which detector should run it's logic based on
-        supported language and query language for which subclass is initialized
-        """
-        if self._source_language_script in self.supported_languages:
-            self._target_language_script = self._source_language_script
-        elif ENGLISH_LANG in self.supported_languages and self._translation_enabled:
-            self._target_language_script = ENGLISH_LANG
-        else:
-            raise NotImplementedError('Please enable translation or extend language support'
-                                      'for %s' % self._source_language_script)
 
     def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
         """
@@ -127,15 +110,6 @@ class BaseDetector(object):
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
                     
         """
-        if self._source_language_script != self._target_language_script and self._translation_enabled:
-            if structured_value:
-                translation_output = translate_text(structured_value, self._source_language_script,
-                                                    self._target_language_script)
-                structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
-            elif message:
-                translation_output = translate_text(message, self._source_language_script,
-                                                    self._target_language_script)
-                message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
         entity_list, original_text_list = self.detect_entity(text=text)
@@ -154,7 +128,7 @@ class BaseDetector(object):
             return None
 
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
-                                            detection_method=method, detection_language=self._target_language_script)
+                                            detection_method=method, detection_language=self.language)
 
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,

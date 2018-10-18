@@ -9,12 +9,12 @@ from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_
     get_number, get_passenger_count, get_shopping_size, get_time, get_time_with_range, get_date, get_budget, \
     get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
-from ner_v1.constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
+from constants.ner_constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE, PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \
     PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3, PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL, PARAMETER_LIVE_CRF_MODEL_PATH
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
-from ner_v1.language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG
 
 
 def get_parameters_dictionary(request):

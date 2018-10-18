@@ -2,7 +2,7 @@ import re
 
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import *
-from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
+from constants.ner_constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 

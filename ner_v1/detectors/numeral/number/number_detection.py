@@ -3,9 +3,9 @@ import re
 from word2number import w2n
 
 from lib.nlp.const import nltk_tokenizer
-from ner_v1.constant import NUMERIC_VARIANTS, DIGIT_UNITS
+from constants.ner_constant import NUMERIC_VARIANTS, DIGIT_UNITS
 from ner_v1.detectors.base_detector import BaseDetector
-from ner_v1.language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG
 
 
 class NumberDetector(BaseDetector):
