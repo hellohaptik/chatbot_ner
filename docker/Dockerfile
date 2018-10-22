@@ -21,53 +21,53 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 # install ES
 
-RUN addgroup -S elasticsearch && adduser -S -G elasticsearch elasticsearch
+# grab gosu for easy step-down from root
 
-# grab su-exec for easy step-down from root
-# and bash for "bin/elasticsearch" among others
-RUN apk add --no-cache 'su-exec>=0.2' bash
-
-# https://artifacts.elastic.co/GPG-KEY-elasticsearch
-ENV GPG_KEY 46095ACC8548582C1A2699A9D27D666CD88E42B4
-
-WORKDIR /usr/share/elasticsearch
-ENV PATH /usr/share/elasticsearch/bin:$PATH
-
-ENV ELASTICSEARCH_VERSION 5.6.12
-ENV ELASTICSEARCH_TARBALL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.12.tar.gz" \
-	ELASTICSEARCH_TARBALL_ASC="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.6.12.tar.gz.asc" \
-	ELASTICSEARCH_TARBALL_SHA1="bc57fb5f089d7859ad2db5b10dc7561c711fd419"
+ENV GOSU_VERSION 1.10
+RUN set -x \
+	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
+	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
+	&& export GNUPGHOME="$(mktemp -d)" \
+	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+	&& rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	&& chmod +x /usr/local/bin/gosu \
+	&& gosu nobody true
 
 RUN set -ex; \
+# https://artifacts.elastic.co/GPG-KEY-elasticsearch
+	key='46095ACC8548582C1A2699A9D27D666CD88E42B4'; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+	gpg --export "$key" > /etc/apt/trusted.gpg.d/elastic.gpg; \
+	rm -rf "$GNUPGHOME"; \
+	apt-key list
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-repositories.html
+# https://www.elastic.co/guide/en/elasticsearch/reference/5.0/deb.html
+RUN set -x \
+	&& apt-get update && apt-get install -y --no-install-recommends apt-transport-https && rm -rf /var/lib/apt/lists/* \
+	&& echo 'deb https://artifacts.elastic.co/packages/5.x/apt stable main' > /etc/apt/sources.list.d/elasticsearch.list
+
+ENV ELASTICSEARCH_VERSION 5.6.12
+ENV ELASTICSEARCH_DEB_VERSION 5.6.12
+
+RUN set -x \
 	\
-	apk add --no-cache --virtual .fetch-deps \
-		ca-certificates \
-		gnupg \
-		openssl \
-		tar \
-	; \
+# don't allow the package to install its sysctl file (causes the install to fail)
+# Failed to write '262144' to '/proc/sys/vm/max_map_count': Read-only file system
+	&& dpkg-divert --rename /usr/lib/sysctl.d/elasticsearch.conf \
 	\
-	wget -O elasticsearch.tar.gz "$ELASTICSEARCH_TARBALL"; \
-	\
-	if [ "$ELASTICSEARCH_TARBALL_SHA1" ]; then \
-		echo "$ELASTICSEARCH_TARBALL_SHA1 *elasticsearch.tar.gz" | sha1sum -c -; \
-	fi; \
-	\
-	if [ "$ELASTICSEARCH_TARBALL_ASC" ]; then \
-		wget -O elasticsearch.tar.gz.asc "$ELASTICSEARCH_TARBALL_ASC"; \
-		export GNUPGHOME="$(mktemp -d)"; \
-		gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$GPG_KEY"; \
-		gpg --batch --verify elasticsearch.tar.gz.asc elasticsearch.tar.gz; \
-		rm -rf "$GNUPGHOME" elasticsearch.tar.gz.asc; \
-	fi; \
-	\
-	tar -xf elasticsearch.tar.gz --strip-components=1; \
-	rm elasticsearch.tar.gz; \
-	\
-	apk del .fetch-deps; \
-	\
-	mkdir -p ./plugins; \
-	for path in \
+	&& apt-get update \
+	&& apt-get install -y --no-install-recommends "elasticsearch=$ELASTICSEARCH_DEB_VERSION" \
+	&& rm -rf /var/lib/apt/lists/*
+
+ENV PATH /usr/share/elasticsearch/bin:$PATH
+
+WORKDIR /usr/share/elasticsearch
+
+RUN set -ex \
+	&& for path in \
 		./data \
 		./logs \
 		./config \
@@ -75,25 +75,16 @@ RUN set -ex; \
 	; do \
 		mkdir -p "$path"; \
 		chown -R elasticsearch:elasticsearch "$path"; \
-	done; \
-	\
-# we shouldn't need much RAM to test --version (default is 2gb, which gets Jenkins in trouble sometimes)
-	export ES_JAVA_OPTS='-Xms32m -Xmx32m'; \
-	if [ "${ELASTICSEARCH_VERSION%%.*}" -gt 1 ]; then \
-		elasticsearch --version; \
-	else \
-# elasticsearch 1.x doesn't support --version
-# but in 5.x, "-v" is verbose (and "-V" is --version)
-		elasticsearch -v; \
-	fi
+	done
 
 #COPY config ./config
 
-VOLUME /usr/share/elasticsearch/data
+#VOLUME /usr/share/elasticsearch/data
 
 #COPY docker-entrypoint.sh /
 
 EXPOSE 9200 9300
+#ENTRYPOINT ["/docker-entrypoint.sh"]
 
 
 #---- / SM image ---
