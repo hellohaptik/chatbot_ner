@@ -3,6 +3,7 @@
 FROM python:2.7.15
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
+RUN apt-get install -y software-properties-common
 
 #--- SM image -----
 
@@ -11,7 +12,7 @@ RUN \
   echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
   add-apt-repository -y ppa:webupd8team/java && \
   apt-get update && \
-  apt-get install -y oracle-java8-installer && \
+  apt-get install -y --allow-unauthenticated oracle-java8-installer && \
   rm -rf /var/lib/apt/lists/* && \
   rm -rf /var/cache/oracle-jdk8-installer
 
@@ -23,8 +24,8 @@ ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 WORKDIR /app
 
 
-COPY docker/install.sh initial_setup.py /app/
-COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY install.sh initial_setup.py /app/
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \
