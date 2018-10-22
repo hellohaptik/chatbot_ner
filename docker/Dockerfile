@@ -4,6 +4,22 @@ FROM python:2.7.15
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
 
+#--- SM image -----
+
+# Java installation for elasticsearch
+RUN \
+  echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
+  add-apt-repository -y ppa:webupd8team/java && \
+  apt-get update && \
+  apt-get install -y oracle-java8-installer && \
+  rm -rf /var/lib/apt/lists/* && \
+  rm -rf /var/cache/oracle-jdk8-installer
+
+# Define commonly used JAVA_HOME variable
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
+
+#---- / SM image ---
+
 WORKDIR /app
 
 
@@ -30,6 +46,30 @@ ENV DJANGO_SETTINGS_MODULE=chatbot_ner.settings
 ENV PORT=8081
 ENV TIMEOUT=600
 ENV DEBIAN_FRONTEND=noninteractive
+
+#--- SM image --
+
+# Setting env variables
+# ENV vars defined in Dockerfile can be overwritten here before docker-compose up
+ENV NUM_WORKERS=1
+ENV MAX_REQUESTS=1000
+ENV DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py
+ENV DJANGO_LOG_LEVEL=debug
+ENV DJANGO_DEBUG=False
+ENV ENGINE=elasticsearch
+
+# ES_HOST is host for ES that comes up with compose
+ENV ES_HOST=localhost
+ENV ES_PORT=9200
+ENV ES_INDEX_NAME=entity_data
+ENV ES_DOC_TYPE=data_dictionary
+ENV ES_BULK_MSG_SIZE=1000
+ENV ES_SEARCH_SIZE=10
+ENV CITY_MODEL_TYPE=crf
+ENV CITY_MODEL_PATH=
+ENV GOOGLE_TRANSLATE_API_KEY=
+
+# --- / SM image --
 
 
 #ENV DATE_MODEL_TYPE=crf
