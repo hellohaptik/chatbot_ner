@@ -1,5 +1,5 @@
 from chatbot_ner.config import ner_logger
-from constants.detection_constant import TWELVE_HOUR
+from constants.detection_constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
     TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
 import pytz
@@ -93,6 +93,61 @@ class BaseRegexTime(object):
         else:
             return float(self.numerals_constant_dict[numeral][0])
 
+    def _get_meridiem(self, hours, mins, original_text):
+        """
+        Returns the meridiem(am/pm) for which the given hours:mins time is in within 12 hour span from the current
+        timestamp.
+        If hours value is greater than 12, 'hrs' is returned instead
+
+        For example,
+            If it is 12:30 PM at the moment of invoking this method, 1:45 would be assigned 'PM'
+            as 12:30 PM <= 1:45 PM < 12:30 AM and 12:10 would be assigned 'AM' as 12:30 PM <= 12:10 AM < 12:30 AM
+
+        Args:
+            hours (int): hours in integer
+            mins (int): mins in integer
+            original_text (str): original substring having hour and minute
+
+        Returns
+            meridiem type (str): returns the meridiem type whether its am and pm
+        """
+        current_datetime = datetime.datetime.now(pytz.timezone(self.timezone))
+        current_hour = current_datetime.hour
+        current_min = current_datetime.minute
+        if hours == 0 or hours >= TWELVE_HOUR:
+            return 'hrs'
+
+        for key, values in self.time_constant_dict.items():
+            if values[0] == DAYTIME_MERIDIAN and key in original_text:
+                return values[1]
+
+        if not self.is_past_referenced:
+            if current_hour > TWELVE_HOUR:
+                current_hour -= 12
+                if current_hour < hours:
+                    return PM_MERIDIEM
+                elif current_hour == hours and current_min < mins:
+                    return PM_MERIDIEM
+            else:
+                if current_hour > hours:
+                    return PM_MERIDIEM
+                elif current_hour == hours and current_min < mins:
+                    return PM_MERIDIEM
+            return AM_MERIDIEM
+        else:
+            if current_hour > TWELVE_HOUR:
+                current_hour -= 12
+                if current_hour < hours:
+                    return AM_MERIDIEM
+                elif current_hour == hours and current_min < mins:
+                    return AM_MERIDIEM
+            else:
+                if current_hour > hours:
+                    return AM_MERIDIEM
+                elif current_hour == hours and current_min < mins:
+                    return AM_MERIDIEM
+            return PM_MERIDIEM
+
     def _detect_hour_minute(self, time_list, original_list):
         """
         Parser to detect time for following text:
@@ -142,13 +197,8 @@ class BaseRegexTime(object):
                 mm = int((hh - int(hh)) * 60)
                 hh = int(hh)
 
-            if hh > 12:
-                nn = TWELVE_HOUR
-
             if not nn:
-                for key, values in self.time_constant_dict.items():
-                    if values[0] == DAYTIME_MERIDIAN and key in original:
-                        nn = values[1]
+                nn = self._get_meridiem(hh, mm, original)
 
             time = {
                 'hh': int(hh),
