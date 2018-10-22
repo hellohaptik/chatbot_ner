@@ -512,8 +512,7 @@ class BaseRegexDate(object):
 
     def _detect_date_from_standard_regex(self):
         """
-        Method which will detect date from given text by running the parser in order defined in
-        self.detector_preferences
+        Method to detect date running parser in order defined in self.detector_preferences
         Args:
 
         Returns:

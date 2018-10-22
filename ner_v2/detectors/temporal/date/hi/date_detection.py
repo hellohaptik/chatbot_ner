@@ -33,10 +33,7 @@ class DateDetector(BaseRegexDate):
     def detect_date(self, text):
         """
         Detects exact date for complete date information - day, month, year are available in text
-        and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
-        detects "today", "tomorrow", "yesterday", "everyday", "day after tomorrow", "day before yesterday",
-        "only weekdays", "only weekends", "day in next week", "day A to day B", "month A to month B" ranges
-        and their variants/synonyms
+        and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults.
 
         Returns:
             A tuple of two lists with first list containing the detected date entities and second list containing their

@@ -30,14 +30,10 @@ class TimeDetector(BaseRegexTime):
 
     def detect_time(self, text):
         """
-        Detects exact date for complete date information - day, month, year are available in text
-        and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
-        detects "today", "tomorrow", "yesterday", "everyday", "day after tomorrow", "day before yesterday",
-        "only weekdays", "only weekends", "day in next week", "day A to day B", "month A to month B" ranges
-        and their variants/synonyms
+        Detects exact time for complete time information - hour, minute, time_type available in text
 
         Returns:
-            A tuple of two lists with first list containing the detected date entities and second list containing their
+            A tuple of two lists with first list containing the detected time entities and second list containing their
             corresponding substrings in the given text.
         """
 
