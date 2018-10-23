@@ -5,10 +5,10 @@ import re
 
 import pytz
 
-import models.constant as model_constant
+import models.crf.constant as model_constant
 import ner_v1.detectors.constant as detector_constant
 from chatbot_ner.config import ner_logger
-from models.models import Models
+from models.crf.models import Models
 from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                                        TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
@@ -149,8 +149,20 @@ class DateAdvancedDetector(object):
             Whereas for end range the key "end_range" will be set to True.
         """
         date_dict_list = []
-        regex_pattern = re.compile('\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
-                                   '(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])'
+                                   r'\s?'
+                                   r'(?:nd|st|rd|th)?'
+                                   r'\s?'
+                                   r'(?:to|\-|till)'
+                                   r'\s?'
+                                   r'([12][0-9]|3[01]|0?[1-9])'
+                                   r'\s?'
+                                   r'(?:nd|st|rd|th)?'
+                                   r'[\ \,]'
+                                   r'\s?'
+                                   r'(?:of)?'
+                                   r'\s?'
+                                   r'([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         if patterns:
             for pattern in patterns:
@@ -898,7 +910,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s?[/\-\.]\s?(0?[1-9]|1[0-2])\s?[/\-\.]'
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])\s?[/\-\.]'
                                    r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -948,7 +960,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|1[0-2])\s?[/\-\.]\s?(0?[1-9]|[12][0-9]|3[01])\s?[/\-\.]'
+        regex_pattern = re.compile(r'\b((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]'
                                    r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -999,7 +1011,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?'
-                                   r'(0?[1-9]|1[0-2])\s?[/\-\.]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)')
+                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1048,7 +1060,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
                                    r'((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1102,7 +1114,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?'
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,]\s?'
                                    r'([A-Za-z]+)[\s\,]\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1154,7 +1166,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?'
-                                   r'[\/\ \,\-]\s?(0?[1-9]|[12][0-9]|3[01]))(\s|$)')
+                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1205,7 +1217,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})[\ \,]\s?(0?[1-9]|[12][0-9]|3[01])\s?'
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?'
                                    r'(?:nd|st|rd|th)?[\ \,]([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1256,7 +1268,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,]\s?(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?'
+        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
                                    r'[\ \,]\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1307,7 +1319,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,]\s?(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?)\b')
+        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1364,7 +1376,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1788,7 +1800,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s*(?:nd|st|rd|th))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1842,7 +1854,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s*(?:nd|st|rd|th)?\s*(?:of)?'
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th)?\s*(?:of)?'
                                    r'\s*(?:this|dis)\s*(?:curr?ent)?\s*(month|mnth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1892,7 +1904,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s*(?:nd|st|rd|th)?\s*(?:of)?'
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th)?\s*(?:of)?'
                                    r'\s*(?:next|nxt|comm?ing?|foll?owing?|)\s*(mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -2146,8 +2158,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
-                                   r'(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
