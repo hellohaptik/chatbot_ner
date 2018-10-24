@@ -1,0 +1,11 @@
+key,time_type,meridian
+હમણાં|હમણા|હાલ|hamda|hal|haal|abhi,relative_time,NA
+તરત|turant|tarat,relative_time,NA
+વાગે|વાગ્યા|વાગીને|vage|vagya|vagine,hour,NA
+કલાક|કલ્લાક|kalak|kallak|ghanta|ghante|ghanton,hour,NA
+મિનિટ|મિનિટે|minutes|mins|minute|min,minute,NA
+સેકન્ડ|સેકન્ડમાં|second|sec,second,NA
+સવાર |સવારે |પરોઢે|સવારમાં|સવારમા|સવારના|savare|parodhe|savar|savarma|subah|subeh,daytime_meridian,am
+બપોર|બપ્પોર|બપોરે|બપોરના|bapor|bapore|bappor|bappore|baporma|dopahar|dopehar|dupahar,daytime_meridian,pm
+સાંજે|સાંજ|saanjh|sanj|sanjhe|saanjhe|sanjna|saanjhna|sandhyakale|sandhyakade|shaam|sandhya|sham|saam,daytime_meridian,pm
+રાતે|રાત્રે|રાતનાં|રાતના|raate|ratre|rate|ratna|raat,daytime_meridian,pm
