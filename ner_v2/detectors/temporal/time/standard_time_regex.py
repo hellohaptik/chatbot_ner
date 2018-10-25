@@ -4,13 +4,14 @@ from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_
     TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
 import pytz
 import re
+import abc
 import datetime
 
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
 
 class BaseRegexTime(object):
-    def __init__(self, data_directory_path, timezone='UTC', is_past_referenced=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', is_past_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -21,17 +22,19 @@ class BaseRegexTime(object):
                                           'parso' to know if the reference is past or future.
         """
         self.text = ''
+        self.tagged_text = ''
         self.processed_text = ''
-        self.tag = ''
-
+        self.entity_name = entity_name
+        self.tag = '__' + entity_name + '__'
         try:
             self.timezone = pytz.timezone(timezone)
         except Exception as e:
             ner_logger.debug('Timezone error: %s ' % e)
             self.timezone = pytz.timezone('UTC')
             ner_logger.debug('Default timezone passed as "UTC"')
-
         self.now_date = datetime.datetime.now(tz=self.timezone)
+        self.bot_message = None
+
         self.is_past_referenced = is_past_referenced
 
         # dict to store words for time, numerals and words which comes in reference to some date
@@ -48,6 +51,10 @@ class BaseRegexTime(object):
         # Variable to define default order in which these regex will work
         self.detector_preferences = [self._detect_hour_minute
                                      ]
+
+    @abc.abstractmethod
+    def detect_time(self, text):
+        return [], []
 
     def init_regex_and_parser(self, data_directory_path):
         """

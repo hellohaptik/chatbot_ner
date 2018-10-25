@@ -5,6 +5,7 @@ from ner_v2.detectors.temporal.constant import DATE_CONSTANT_FILE, DATETIME_CONS
     MONTH_TYPE, ADD_DIFF_DATETIME_TYPE, MONTH_DATE_REF_TYPE, NUMERALS_CONSTANT_FILE
 import pytz
 import re
+import abc
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -12,7 +13,7 @@ from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple
 
 
 class BaseRegexDate(object):
-    def __init__(self, data_directory_path, timezone='UTC', is_past_referenced=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', is_past_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -23,9 +24,12 @@ class BaseRegexDate(object):
                                           'parso' to know if the reference is past or future.
         """
         self.text = ''
+        self.tagged_text = ''
         self.processed_text = ''
-        self.tag = ''
-
+        self.date = []
+        self.original_date_text = []
+        self.entity_name = entity_name
+        self.tag = '__' + entity_name + '__'
         try:
             self.timezone = pytz.timezone(timezone)
         except Exception as e:
@@ -34,6 +38,8 @@ class BaseRegexDate(object):
             ner_logger.debug('Default timezone passed as "UTC"')
 
         self.now_date = datetime.datetime.now(tz=self.timezone)
+        self.bot_message = None
+
         self.is_past_referenced = is_past_referenced
 
         # dict to store words for date, numerals and words which comes in reference to some date
@@ -70,6 +76,10 @@ class BaseRegexDate(object):
                                      self._detect_weekday_diff,
                                      self._detect_weekday
                                      ]
+
+    @abc.abstractmethod
+    def detect_date(self, text):
+        return [], []
 
     def init_regex_and_parser(self, data_directory_path):
         """
@@ -516,12 +526,24 @@ class BaseRegexDate(object):
         Args:
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
+            validated_date_list (list): list of dict containing day, month, year from detected text
+            validated_original_list (list): list of original text corresponding to values detected
         """
         date_list, original_list = None, None
         for detector in self.detector_preferences:
             date_list, original_list = detector(date_list, original_list)
             self._update_processed_text(original_list)
 
-        return date_list, original_list
+        validated_date_list, validated_original_list = [], []
+
+        # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
+        for date, original_text in zip(date_list, original_list):
+            try:
+                datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
+                validated_date_list.append(date)
+                validated_original_list.append(original_text)
+            except ValueError:
+                pass
+
+        return validated_date_list, validated_original_list
+
