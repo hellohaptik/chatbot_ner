@@ -6,12 +6,12 @@ import re
 import pytz
 
 import models.constant as model_constant
-import constants.detection_constant as detector_constant
+import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.base_detector import BaseDetector
 from models.models import Models
-from constants.ner_constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
-from constants.detection_constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
+from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
 
 from language_utilities.constant import ENGLISH_LANG
 

@@ -1,5 +1,5 @@
-from constants.ner_constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
-                                    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
+from constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
+                      FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
 from ner_v1.detectors.numeral.number.passenger_detection import PassengerDetector

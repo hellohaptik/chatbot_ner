@@ -1,9 +1,9 @@
 import re
 
 import models.constant as model_constant
-import constants.detection_constant as detector_constant
+import ner_v1.constant as detector_constant
 from models.models import Models
-from constants.ner_constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 

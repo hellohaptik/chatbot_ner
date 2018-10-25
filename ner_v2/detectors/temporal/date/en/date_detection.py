@@ -5,12 +5,12 @@ import re
 import pytz
 
 from chatbot_ner.config import ner_logger
-from constants.detection_constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
-                                          TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE,
-                                          TYPE_NEXT_DAY, TYPE_THIS_DAY,
-                                          TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS,
-                                          REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT,
-                                          TYPE_N_DAYS_AFTER)
+from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
+                             TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE,
+                             TYPE_NEXT_DAY, TYPE_THIS_DAY,
+                             TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS,
+                             REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT,
+                             TYPE_N_DAYS_AFTER)
 
 
 class DateDetector(object):

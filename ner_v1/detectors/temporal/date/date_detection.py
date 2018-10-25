@@ -5,15 +5,15 @@ import re
 import pytz
 
 import models.constant as model_constant
-import constants.detection_constant as detector_constant
+import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
 from models.models import Models
-from constants.ner_constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
-from constants.detection_constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
-                                          TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
-                                          TYPE_THIS_DAY, TYPE_PAST,
-                                          TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
-                                          REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
+from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_v1.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
+                             TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
+                             TYPE_THIS_DAY, TYPE_PAST,
+                             TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
+                             REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
 
 
 class DateAdvancedDetector(object):

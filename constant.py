@@ -50,33 +50,3 @@ PARAMETER_LANGUAGE_SCRIPT = 'language_script'  # ISO 639 code for language. For 
 PARAMETER_SOURCE_LANGUAGE = 'source_language'  # ISO 639 code vocabulary.  For eg, 'hi' for 'Namaste', 'en' for 'Hello'
 # ********************** constant used to define dict type in data dictionary *********************
 DICTIONARY_DATA_VARIANTS = 'variants'
-
-# **********************constants used for number detection************************************
-
-DIGIT_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-NUMERIC_VARIANTS = DIGIT_UNITS + [
-    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-    "sixteen", "seventeen", "eighteen", "nineteen", "and",
-    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
-    "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
-]
-PARAMETER_MIN_DIGITS = 'min_number_digits'
-PARAMETER_MAX_DIGITS = 'max_number_digits'
-
-#  **********************constants used for name detection************************************
-
-FIRST_NAME = 'first_name'
-MIDDLE_NAME = 'middle_name'
-LAST_NAME = 'last_name'
-
-
-PARAMETER_FUZZINESS = 'fuzziness'
-PARAMETER_MIN_TOKEN_LEN_FUZZINESS = 'min_token_len_fuzziness'
-DATASTORE_VERIFIED = 'datastore_verified'
-CRF_MODEL_VERIFIED = 'crf_model_verified'
-
-#  **********************constants used for text detection************************************
-
-PARAMETER_READ_MODEL_FROM_S3 = 'read_model_from_s3'
-PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL = 'read_embeddings_from_remote_url'
-PARAMETER_LIVE_CRF_MODEL_PATH = 'live_crf_model_path'

@@ -1,6 +1,7 @@
 import re
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from constants.ner_constant import ENTITY_VALUE_DICT_KEY, DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
+from constant import ENTITY_VALUE_DICT_KEY
+from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
 from models.crf_v2.crf_detect_entity import CrfDetection
 
 

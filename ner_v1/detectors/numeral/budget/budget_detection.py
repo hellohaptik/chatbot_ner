@@ -1,6 +1,6 @@
 import re
 
-from constants.detection_constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT
+from ner_v1.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT
 from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.base_detector import BaseDetector

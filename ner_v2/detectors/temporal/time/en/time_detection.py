@@ -2,7 +2,7 @@ from datetime import datetime
 import re
 import pytz
 
-from constants.detection_constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
+from ner_v2.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
 from language_utilities.constant import ENGLISH_LANG
 
 

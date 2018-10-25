@@ -1,8 +1,8 @@
 import abc
 from language_utilities.constant import ENGLISH_LANG
-from constants.ner_constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
-                                    FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
-                                    DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+from constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
+                      FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
+                      DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 
 
 class BaseDetector(object):

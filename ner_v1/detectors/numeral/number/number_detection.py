@@ -3,7 +3,7 @@ import re
 from word2number import w2n
 
 from lib.nlp.const import nltk_tokenizer
-from constants.ner_constant import NUMERIC_VARIANTS, DIGIT_UNITS
+from ner_v1.constant import DIGIT_UNITS, NUMERIC_VARIANTS
 from ner_v1.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
 
