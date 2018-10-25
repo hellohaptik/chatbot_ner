@@ -3,6 +3,8 @@ from language_utilities.constant import ENGLISH_LANG
 from constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                       FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                       DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+from language_utilities.utils import translate_text
+from language_utilities.constant import TRANSLATED_TEXT
 
 
 class BaseDetector(object):
@@ -10,24 +12,30 @@ class BaseDetector(object):
     This class is the base class from which will be inherited by individual detectors. It primarily contains the
     priority flow of structured value, message and fallback value and is also use to extend language support for
     detectors using translation
-    
+
     Attributes:
-       language (str): ISO 639 language code of language of orignal query
+        _language (str): ISO 639 language code of language of orignal query
+        _processing_language (str): ISO-639 language code in which detector would process the query
+        _translation_enabled (bool): Decides to either enable or disable translation API
     """
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, language=ENGLISH_LANG):
+    def __init__(self, language=ENGLISH_LANG, translation_enabled=False):
         """
         Initialize basedetector
         Args:
              language (str): ISO 639 language code of language of original query
+             translation_enabled (bool): Decides to either enable or disable translation API
         """
-        self.language = language
+        self._language = language
+        self._processing_language = ENGLISH_LANG
+        self._translation_enabled = translation_enabled
+        self._set_language_processing_script()
 
     @abc.abstractproperty
     def supported_languages(self):
         """
-        This method returns the list of languages supported by entity detectors        
+        This method returns the list of languages supported by entity detectors
         Return:
              list: List of ISO 639 codes of languages supported by subclass/detector
         """
@@ -40,11 +48,24 @@ class BaseDetector(object):
         Args:
             text: text snippet from which entities needs to be detected
             **kwargs: values specific to different detectors such as 'last bot message', custom configs, etc.
-        Return: 
+        Return:
             tuple: Two lists of same length containing detected values and original substring from text which is used
             to derive the detected value respectively
         """
         return [], []
+
+    def _set_language_processing_script(self):
+        """
+        This method is used to decide the language in which detector should run it's logic based on
+        supported language and query language for which subclass is initialized
+        """
+        if self._language in self.supported_languages:
+            self._processing_language = self._language
+        elif ENGLISH_LANG in self.supported_languages and self._translation_enabled:
+            self._processing_language = ENGLISH_LANG
+        else:
+            raise NotImplementedError('Please enable translation or extend language support'
+                                      'for %s' % self._language)
 
     def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
         """
@@ -74,13 +95,13 @@ class BaseDetector(object):
                 output = detect(message=message, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
                     {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
                     'entity_value': {'value': u"Domino's Pizza"}}]
 
             2) Consider an example of movie name detection from a structured value
-            
+
                 message = 'i wanted to watch movie'
                 entity_name = 'movie'
                 structured_value = 'inferno'
@@ -89,7 +110,7 @@ class BaseDetector(object):
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
                     {'value': u'Inferno'}}]
 
@@ -102,10 +123,19 @@ class BaseDetector(object):
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
-                    
+
         """
+        if self._language != self._processing_language and self._translation_enabled:
+            if structured_value:
+                translation_output = translate_text(structured_value, self._language,
+                                                    self._processing_language)
+                structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
+            elif message:
+                translation_output = translate_text(message, self._language,
+                                                    self._processing_language)
+                message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
         entity_list, original_text_list = self.detect_entity(text=text)
@@ -114,7 +144,7 @@ class BaseDetector(object):
             if entity_list:
                 value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list
             else:
-                value, method, original_text = [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED,\
+                value, method, original_text = [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED, \
                                                [structured_value]
         elif entity_list:
             value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
@@ -124,7 +154,7 @@ class BaseDetector(object):
             return None
 
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
-                                            detection_method=method, detection_language=self.language)
+                                            detection_method=method, detection_language=self._processing_language)
 
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,

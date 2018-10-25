@@ -1,7 +1,6 @@
 import importlib
 import os
 
-from chatbot_ner.config import ner_logger
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
 
@@ -37,8 +36,13 @@ class TimeDetector(BaseDetector):
         Returns:
             (list): supported languages
         """
+        supported_languages = []
         cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
-        return [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        cwd_dirs = [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        for _dir in cwd_dirs:
+            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
+                supported_languages.append(_dir)
+        return supported_languages
 
     def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
                  language=ENGLISH_LANG):
@@ -55,7 +59,7 @@ class TimeDetector(BaseDetector):
                                           class
         """
         # assigning values to superclass attributes
-
+        super(TimeDetector, self).__init__(language=language)
         self.entity_name = entity_name
         self.text = ''
         self.departure_flag = False
@@ -70,8 +74,10 @@ class TimeDetector(BaseDetector):
         self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
         self.language = language
-        super(TimeDetector, self).__init__(self.language)
-        self.language_time_detector = self._get_time_language_detector()
+        time_detector_module = importlib.import_module(
+            'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
+
+        self.language_time_detector = time_detector_module.TimeDetector(self.entity_name)
 
     def detect_entity(self, text, **kwargs):
         """
@@ -91,18 +97,3 @@ class TimeDetector(BaseDetector):
         if self.language_time_detector:
             self.time, self.original_time_text = self.language_time_detector.detect_time(self.processed_text)
         return self.time, self.original_time_text
-
-    def _get_time_language_detector(self):
-        """
-        Get language detector class for source language
-        Returns:
-
-        """
-        try:
-            time_detector_module = importlib.import_module(
-                'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
-            return time_detector_module.TimeDetector(self.entity_name)
-        except ImportError as e:
-            ner_logger.exception("No time detector exists for %s language, Error - %s" %
-                                 (self.language, str(e)))
-            return None

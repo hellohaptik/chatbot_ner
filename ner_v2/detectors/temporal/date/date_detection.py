@@ -14,6 +14,7 @@ from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
 
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.temporal.constant import LANGUAGE_DATE_DETECTION_FILE
 
 
 class DateAdvancedDetector(object):
@@ -586,8 +587,13 @@ class DateDetector(BaseDetector):
         Returns:
             (list): supported languages
         """
+        supported_languages = []
         cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
-        return [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        cwd_dirs = [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        for _dir in cwd_dirs:
+            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
+                supported_languages.append(_dir)
+        return supported_languages
 
     def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
@@ -599,6 +605,7 @@ class DateDetector(BaseDetector):
                                       default is UTC
 
         """
+        super(DateDetector, self).__init__(language=language)
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
@@ -615,8 +622,9 @@ class DateDetector(BaseDetector):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.language = language
-        self.language_date_detector = self._get_date_language_detector()
-        super(DateDetector, self).__init__(language=language)
+        date_detector_module = importlib.import_module(
+            'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
+        self.language_date_detector = date_detector_module.DateDetector(self.entity_name)
 
     def detect_entity(self, text, **kwargs):
         """
@@ -693,18 +701,3 @@ class DateDetector(BaseDetector):
             'yy': datetime_object.year,
             'type': date_type,
         }
-
-    def _get_date_language_detector(self):
-        """
-        Get language detector class for source language
-        Returns:
-
-        """
-        try:
-            date_detector_module = importlib.import_module(
-                'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
-            return date_detector_module.DateDetector(self.entity_name)
-        except ImportError as e:
-            ner_logger.exception("No date detector exists for %s language, Error - %s" %
-                                 (self.language, str(e)))
-            return None
