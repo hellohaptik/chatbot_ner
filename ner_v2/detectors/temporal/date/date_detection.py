@@ -546,19 +546,15 @@ class DateAdvancedDetector(object):
                 date_value = output[model_constant.MODEL_DATE_VALUE]
                 detection_method = FROM_MODEL_NOT_VERIFIED
 
-            date_dict_list.append(
-                {
-                    detector_constant.DATE_VALUE: date_value,
-                    detector_constant.ORIGINAL_DATE_TEXT: output[model_constant.MODEL_DATE_VALUE],
-                    detector_constant.DATE_FROM_PROPERTY: output[model_constant.MODEL_DATE_FROM],
-                    detector_constant.DATE_TO_PROPERTY: output[model_constant.MODEL_DATE_TO],
-                    detector_constant.DATE_START_RANGE_PROPERTY: output[model_constant.MODEL_START_DATE_RANGE],
-                    detector_constant.DATE_END_RANGE_PROPERTY: output[model_constant.MODEL_END_DATE_RANGE],
-                    detector_constant.DATE_NORMAL_PROPERTY: output[model_constant.MODEL_DATE_NORMAL],
-                    detector_constant.DATE_DETECTION_METHOD: detection_method
-                }
-
-            )
+            data_dict = self._to_output_dict(date_dict=date_value,
+                                             original_text=output[model_constant.MODEL_DATE_VALUE],
+                                             from_property=output[model_constant.MODEL_DATE_FROM],
+                                             to_property=output[model_constant.MODEL_DATE_TO],
+                                             start_range_property=output[model_constant.MODEL_START_DATE_RANGE],
+                                             end_range_property=output[model_constant.MODEL_END_DATE_RANGE],
+                                             normal_property=output[model_constant.MODEL_DATE_NORMAL],
+                                             detection_method=detection_method)
+            date_dict_list.append(data_dict)
         return date_dict_list
 
 
