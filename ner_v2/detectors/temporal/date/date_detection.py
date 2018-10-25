@@ -137,6 +137,8 @@ class DateAdvancedDetector(object):
         It  splits the text into two parts on '-' or 'to'
         and detects the start range in the first (left) part and detects end range in the second (right) part
 
+        Notes:- This feature is currently supported for english language script only.
+
         Returns:
             The list of dictionary containing the dictionary for date which is detected as start_range and date
             that got detected as end_range. For start range the key "start_range" will be set to True.
