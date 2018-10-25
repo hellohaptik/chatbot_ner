@@ -2,7 +2,7 @@ import copy
 import datetime
 import importlib
 import re
-
+import os
 import pytz
 
 import models.crf.constant as model_constant
@@ -581,7 +581,13 @@ class DateDetector(BaseDetector):
     """
 
     def supported_languages(self):
-        pass
+        """
+        Return list of supported languages
+        Returns:
+            (list): supported languages
+        """
+        cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
+        return [x for x in os.listdir('.') if os.path.isdir(cwd)]
 
     def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object

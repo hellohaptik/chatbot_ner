@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.base_detector import BaseDetector
@@ -31,7 +32,13 @@ class TimeDetector(BaseDetector):
     """
 
     def supported_languages(self):
-        pass
+        """
+        Return list of supported languages
+        Returns:
+            (list): supported languages
+        """
+        cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
+        return [x for x in os.listdir('.') if os.path.isdir(cwd)]
 
     def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
                  language=ENGLISH_LANG):
