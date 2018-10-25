@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
+from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
-from models.constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE, CITY_MODEL_OBJECT, DATE_MODEL_OBJECT
-from models.constant import INBOUND, OUTBOUND
-from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
-from models.crf.output_generation.city import generate_city_output
-from models.crf.output_generation.date import generate_date_output
+from .constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
+from .constant import INBOUND, OUTBOUND
+from .output_generation.city import generate_city_output
+from .output_generation.date import generate_date_output
 
 try:
     import CRFPP
+
     MODEL_RUN = True
 except ImportError:
     CRFPP = False
@@ -66,6 +67,9 @@ We have used seven types of labels to tag our data for ENTITY='city':
     use this class to run CRF. You will get a json list of all tagged data.
 
 """
+
+CITY_MODEL_OBJECT = None  # store city model object
+DATE_MODEL_OBJECT = None  # store date model object
 
 
 class PredictCRF(object):
