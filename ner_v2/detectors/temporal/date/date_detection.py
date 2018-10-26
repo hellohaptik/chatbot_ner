@@ -17,7 +17,7 @@ from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATE_DETECTION_FILE
 
 
-class DateAdvancedDetector(object):
+class DateAdvancedDetector(BaseDetector):
     """
     DateAdvancedDetector detects dates from the text. It detects date with the properties like "from", "to",
     "start_range", "end_range"and "normal". These dates are returned in a dictionary form that contains relevant text,
@@ -36,17 +36,32 @@ class DateAdvancedDetector(object):
         date_detector_object: DateDetector object used to detect dates in the given text
         bot_message: str, set as the outgoing bot text/message
     """
+    def supported_languages(self):
+        """
+        Return list of supported languages
+        Returns:
+            (list): supported languages
+        """
+        supported_languages = []
+        cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
+        cwd_dirs = [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        for _dir in cwd_dirs:
+            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
+                supported_languages.append(_dir)
+        return supported_languages
 
-    def __init__(self, entity_name='date', timezone='UTC'):
+    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC'):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
         Args:
             entity_name (str): A string by which the detected date entity substrings would be replaced with on calling
                                detect_entity()
+
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
         """
+        super(DateAdvancedDetector, self).__init__(language=language)
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
@@ -54,7 +69,7 @@ class DateAdvancedDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=entity_name, timezone=timezone)
+        self.date_detector_object = DateDetector(entity_name=entity_name, language=language, timezone=timezone)
         self.bot_message = None
 
     def detect_entity(self, text, run_model=False):
@@ -559,7 +574,7 @@ class DateAdvancedDetector(object):
         return date_dict_list
 
 
-class DateDetector(BaseDetector):
+class DateDetector(object):
     """
     Detects date in various formats from given text and tags them.
 
@@ -570,7 +585,7 @@ class DateDetector(BaseDetector):
     Attributes:
         text: string to extract entities from
         entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
-        tagged_text: string with date entities replaced with tag defined by entity name
+        tagged_text: string with date entities replaced with tag defichaloned by entity name
         processed_text: string with detected date entities removed
         date: list of date entities detected
         original_date_text: list to store substrings of the text detected as date entities
@@ -580,20 +595,6 @@ class DateDetector(BaseDetector):
         bot_message: str, set as the outgoing bot text/message
         language: source language of text
     """
-
-    def supported_languages(self):
-        """
-        Return list of supported languages
-        Returns:
-            (list): supported languages
-        """
-        supported_languages = []
-        cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
-        cwd_dirs = [x for x in os.listdir('.') if os.path.isdir(cwd)]
-        for _dir in cwd_dirs:
-            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
-                supported_languages.append(_dir)
-        return supported_languages
 
     def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC'):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
@@ -605,7 +606,6 @@ class DateDetector(BaseDetector):
                                       default is UTC
 
         """
-        super(DateDetector, self).__init__(language=language)
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
