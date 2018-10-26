@@ -69,19 +69,19 @@ In order to add any new language you have to follow below steps:
    Below is the folder structure of same after adding all the files for new language `xy`.
 
    ```python
-   --ner_v2
-     |___detector
-         |___temporal
-             |___date
-                 |___xy    # <- New language Added 
-                 |	  |___data
-                 |   |   |___date_constant.csv
-                 |   |   |___datetime_diff_constant.csv
-                 |   |   |___numbers_constant.csv
-                 |   |
-                 |	  |___date_detection.py
-                 |
-                 |__date_detection.py 
+   |__ner_v2
+         |___detector
+             |___temporal
+                 |___date
+                     |___xy    # <- New language Added 
+                     |	  |___data
+                     |   |   |___date_constant.csv
+                     |   |   |___datetime_diff_constant.csv
+                     |   |   |___numbers_constant.csv
+                     |   |
+                     |	  |___date_detection.py
+                     |
+                     |__date_detection.py 
    ```
 
 
@@ -141,9 +141,12 @@ Below is the brief about how to create three data files `date_constant.csv`, `da
    Here, 1st column contains the word which can in reference for date time, 2nd column define the positioning of this word in entity whether it comes in start or in end. For example, in sentence *2 din baad* ,  "baad" came after "2 din"(date entity), hence its present_in_start will be false.  3rd column define the magnitude it is adding to referenced date or time, (1 if its adding positively, -1 if adding negatively). 4th column define the datetime type. Below are their detailed description.
 
    1. ***add_diff_datetime***:  Words which are referencing to datetime difference from current time like word baad in 2  दिन *बाद*  referring to a day, which comes 2 day later from current date.
+
    2. **ref_datetime**: Words which referenced to create difference in time reference next to it. Example- सावा 4 , here whole sentence is referring to time 4:15.
 
-For reference see `datetime constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/data/datetime_diff_constant.csv
+      
+
+      For reference see `datetime_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/data/datetime_diff_constant.csv
 
 
 

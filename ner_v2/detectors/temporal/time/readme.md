@@ -70,19 +70,19 @@ In order to add any new language you have to follow below steps:
    Below is the folder structure of same after adding all the files for new language `xy`.
 
    ```python
-   --ner_v2
-     |___detector
-         |___temporal
-             |___time
-                 |___xy    # <- New language Added 
-                 |	  |___data
-                 |   |   |___time_constant.csv
-                 |   |   |___datetime_diff_constant.csv
-                 |   |   |___numbers_constant.csv
-                 |   |
-                 |	  |___time_detection.py
-                 |
-                 |__time_detection.py 
+   |__ner_v2
+         |___detector
+             |___temporal
+                 |___time
+                     |___xy    # <- New language Added 
+                     |	  |___data
+                     |   |   |___time_constant.csv
+                     |   |   |___datetime_diff_constant.csv
+                     |   |   |___numbers_constant.csv
+                     |   |
+                     |	  |___time_detection.py
+                     |
+                     |__time_detection.py 
    ```
 
 
@@ -150,7 +150,7 @@ Below is the brief about how to create three data files `time_constant.csv`, `da
    1. ***add_diff_datetime***:  Words which are referencing to datetime difference from current time like word baad in 2  दिन *बाद*  referring to a day, which comes 2 day later from current date.
    2. **ref_datetime**: Words which referenced to create difference in time reference next to it. Example- सावा 4 , here whole sentence is referring to time 4:15.
 
-For reference see `datetime constant_csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/time/datetime_diff_constant.csv
+   For reference see `datetime_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/time/datetime_diff_constant.csv
 
 
 
