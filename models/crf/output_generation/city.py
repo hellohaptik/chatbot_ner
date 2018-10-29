@@ -1,4 +1,4 @@
-import models.constant as model_constant
+import models.crf.constant as model_constant
 
 
 def generate_city_output(crf_data):

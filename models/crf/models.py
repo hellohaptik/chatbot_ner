@@ -1,12 +1,13 @@
 from chatbot_ner.config import CITY_MODEL_TYPE, DATE_MODEL_TYPE
 from .constant import CRF_MODEL_TYPE, CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
-from .crf.test import PredictCRF
+from .test import PredictCRF
 
 
 class Models(object):
     """""
     This class will decide which model to choose based on its model_type
     """""
+
     def __init__(self):
         """
         Initalises the object
