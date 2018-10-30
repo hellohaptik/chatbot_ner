@@ -50,7 +50,7 @@ RUN set -x \
 
 ENV ELASTICSEARCH_VERSION 5.6.12
 ENV ELASTICSEARCH_DEB_VERSION 5.6.12
-ENV ES_JAVA_OPTS="-Djna.tmpdir=/var/lib/elasticsearch/tmp"
+ENV ES_JAVA_OPTS="-Djava.io.tmpdir=/var/lib/elasticsearch/tmp"
 
 RUN set -x \
 	\
@@ -133,7 +133,6 @@ ENV GOOGLE_TRANSLATE_API_KEY=
 
 #ENV DATE_MODEL_TYPE=crf
 #ENV DATE_MODEL_PATH=/root/models/models_live/date/crf/model.crf
-RUN chmod 777 -R /tmp && chmod o+t -R /tmp
 
 EXPOSE 8080
 
