@@ -9,7 +9,7 @@ from ner_v1.chatbot.entity_detection import get_location, get_phone_number, get_
     get_number, get_passenger_count, get_shopping_size, get_time, get_time_with_range, get_date, get_budget, \
     get_person_name, get_regex
 from ner_v1.chatbot.tag_message import run_ner
-from constant import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
+from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, \
     PARAMETER_SOURCE_LANGUAGE
 from ner_v1.constant import PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS, \

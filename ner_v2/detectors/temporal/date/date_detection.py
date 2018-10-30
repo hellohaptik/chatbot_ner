@@ -10,7 +10,7 @@ import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.base_detector import BaseDetector
 from models.crf.models import Models
-from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
 
 from language_utilities.constant import ENGLISH_LANG
@@ -36,7 +36,8 @@ class DateAdvancedDetector(BaseDetector):
         date_detector_object: DateDetector object used to detect dates in the given text
         bot_message: str, set as the outgoing bot text/message
     """
-    def supported_languages(self):
+    @staticmethod
+    def get_supported_languages():
         """
         Return list of supported languages
         Returns:
@@ -61,6 +62,7 @@ class DateAdvancedDetector(BaseDetector):
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
         """
+        self._supported_languages = self.get_supported_languages()
         super(DateAdvancedDetector, self).__init__(language=language)
         self.text = ''
         self.tagged_text = ''
@@ -71,6 +73,10 @@ class DateAdvancedDetector(BaseDetector):
         self.tag = '__' + entity_name + '__'
         self.date_detector_object = DateDetector(entity_name=entity_name, language=language, timezone=timezone)
         self.bot_message = None
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def detect_entity(self, text, run_model=False):
         """

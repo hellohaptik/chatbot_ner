@@ -1,5 +1,5 @@
 from elasticsearch import helpers
-from constant import DICTIONARY_DATA_VARIANTS
+from ner_constants import DICTIONARY_DATA_VARIANTS
 from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
 from ..utils import *
 from language_utilities.constant import ENGLISH_LANG

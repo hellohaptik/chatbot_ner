@@ -30,7 +30,8 @@ class TimeDetector(BaseDetector):
 
     """
 
-    def supported_languages(self):
+    @staticmethod
+    def get_supported_languages():
         """
         Return list of supported languages
         Returns:
@@ -59,6 +60,7 @@ class TimeDetector(BaseDetector):
                                           class
         """
         # assigning values to superclass attributes
+        self._supported_languages = self.get_supported_languages()
         super(TimeDetector, self).__init__(language=language)
         self.entity_name = entity_name
         self.text = ''
@@ -78,6 +80,10 @@ class TimeDetector(BaseDetector):
             'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
 
         self.language_time_detector = time_detector_module.TimeDetector(self.entity_name)
+
+    @property
+    def supported_languages(self):
+        return self._supported_languages
 
     def detect_entity(self, text, **kwargs):
         """

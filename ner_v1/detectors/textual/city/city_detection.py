@@ -3,7 +3,7 @@ import re
 import models.crf.constant as model_constant
 import ner_v1.constant as detector_constant
 from models.crf.models import Models
-from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 

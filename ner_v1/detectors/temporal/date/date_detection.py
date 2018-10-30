@@ -8,7 +8,7 @@ import models.crf.constant as model_constant
 import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
 from models.crf.models import Models
-from constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                              TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
                              TYPE_THIS_DAY, TYPE_PAST,
