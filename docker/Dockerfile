@@ -133,6 +133,7 @@ ENV GOOGLE_TRANSLATE_API_KEY=
 
 #ENV DATE_MODEL_TYPE=crf
 #ENV DATE_MODEL_PATH=/root/models/models_live/date/crf/model.crf
+RUN chmod 777 -R /tmp && chmod o+t -R /tmp
 
 EXPOSE 8080
 
