@@ -476,7 +476,7 @@ class BaseRegexDate(object):
             original_list.append(original)
         return date_list, original_list
 
-    def _detect_weekday(self,date_list, original_list):
+    def _detect_weekday(self, date_list, original_list):
         """
         Parser to detect date containing referenced weekday without referencing any particular day like
         'mangalvar'(hindi), 'ravivar'(hindi)
