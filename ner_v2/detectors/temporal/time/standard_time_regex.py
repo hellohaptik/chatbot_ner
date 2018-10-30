@@ -116,7 +116,7 @@ class BaseRegexTime(object):
             original_text (str): original substring having hour and minute
 
         Returns
-            meridiem type (str): returns the meridiem type whether its am and pm
+            meridian type (str): returns the meridiem type whether its am and pm
         """
         current_hour = self.now_date.hour
         current_min = self.now_date.minute
