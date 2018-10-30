@@ -7,10 +7,11 @@ export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
 # Initial setup.py - Datastore lines need to be commented for using previously create data
 
-python /app/initial_setup.py
+# python /app/initial_setup.py
 
 # Using supervisor as we want to use Nginx and Uwsgi both, Settings specified in supervisord.conf, any update to that will need build
 
+nohup sh initial_setup_es.sh &
 /usr/bin/supervisord
 
 

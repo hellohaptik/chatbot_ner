@@ -83,7 +83,7 @@ def text(request):
                                                    fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                                    bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
+    except Exception as e:
         ner_logger.exception('Exception for text_synonym: %s ' % e)
         return HttpResponse(status=500)
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
