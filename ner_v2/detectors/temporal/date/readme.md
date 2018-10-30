@@ -11,14 +11,43 @@ This is the V2 version of date detector module that will detect date in multiple
 
 ### Usage
 
-```python
->> from ner_v2.detector.temporal.date.date_detection import DateDetector
->> detector = DateDetector(entity_name='date', language='hi')  # here language will be ISO 639-1 code
->> detector.detect_entity(text= 'agla mangalvar')
->> {'entity_value': [{'dd':12 ,'mm': 10, 'yy': 2018}], 'original_text':['agla mangalvar']}
-```
+- **Python Shell**
 
+  ```python
+  >> from ner_v2.detector.temporal.date.date_detection import DateDetector
+  >> detector = DateDetector(entity_name='date', language='hi')  # here language will be ISO 639-1 code
+  >> detector.detect_entity(text= 'agla mangalvar')
+  >> {'entity_value': [{'dd':12 ,'mm': 10, 'yy': 2018}], 'original_text':['agla mangalvar']}
+  ```
 
+- **Curl Command**
+
+  ```bash
+  message = "agle month ki 2 tarikh ka subah ka alarm lagao"
+  entity_name = 'date'
+  structured_value = None
+  fallback_value = None
+  bot_message = None
+  timezone='UTC'
+  source_language='hi'
+  language_script='en'
+  
+  $ URL='localhost'
+  $ PORT=8081
+  
+  $ curl -i 'http://'$URL':'$PORT'/v2/date/?message=agle%20month%20ki%2%20tarikh%20ka%20alarm%20lagao&entity_name=date&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_language=hi&language_script=en'
+  
+  # Curl output
+  $ { "data": [{ "detection": "message", "original_text": "agle month ki 2 tarikh",
+          	   "entity_value": { "end_range": false, "from": false, "normal": true,
+            						 "value": { "mm": 11, "yy": 2018, "dd": 2, "type":
+            						            "date"},
+            						 "to": false, "start_range": false}
+            	}]
+    }
+  ```
+
+  
 
 ### Steps to add new language for date detection
 
@@ -146,7 +175,4 @@ Below is the brief about how to create three data files `date_constant.csv`, `da
 
       
 
-      For reference see `datetime_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/data/datetime_diff_constant.csv
-
-
-
+      For reference see `datetime_diff_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/data/datetime_diff_constant.csv

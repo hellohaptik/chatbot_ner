@@ -97,3 +97,13 @@ class TimeDetector(BaseDetector):
         if self.language_time_detector:
             self.time, self.original_time_text = self.language_time_detector.detect_time(self.processed_text)
         return self.time, self.original_time_text
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message (str): previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
+

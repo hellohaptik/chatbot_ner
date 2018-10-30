@@ -11,12 +11,38 @@ This is the V2 version of time detector module that will detect time in multiple
 
 ### Usage
 
-```python
->> from ner_v2.detector.temporal.time.time_detection import TimeDetector
->> detector = TimeDetector(entity_name='time', language='hi')  # here language will be ISO 639-1 code
->> detector.detect_entity(text= 'shaam ko sava 4 baje')
->> {'entity_value': [{'hh':12 ,'mm': 10, 'nn': 'pm'}], 'original_text':['shaam ko sava 4 baje']}
-```
+- **Python Shell**
+
+  ```python
+  >> from ner_v2.detector.temporal.time.time_detection import TimeDetector
+  >> detector = TimeDetector(entity_name='time', language='hi')  # here language will be ISO 639-1 code
+  >> detector.detect_entity(text= 'shaam ko sava 4 baje')
+  >> {'entity_value': [{'hh':12 ,'mm': 10, 'nn': 'pm'}], 'original_text':['shaam ko sava 4 baje']}
+  ```
+
+- **Curl Command**
+
+  ```bash
+  message = "shaam to sava 4 baje"
+  entity_name = 'time'
+  structured_value = None
+  fallback_value = None
+  bot_message = None
+  timezone = 'UTC'  
+  source_language = 'hi'
+  language_script = 'en'
+  
+  $ URL='localhost'
+  $ PORT=8081
+  
+  $ curl -i 'http://'$URL':'$PORT'/v2/time/?message=shaam%20ko%20sava%204%20baje&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_langauge=hi&language_script=en'
+  
+  # Curl output
+  $ {
+    "data": [{"detection": "message", "original_text": "shaam ko sava 4 baje", 						"entity_value": {"mm": 15, "hh": 4, "nn": "pm" }
+             }]
+    }
+  ```
 
 
 
@@ -150,7 +176,4 @@ Below is the brief about how to create three data files `time_constant.csv`, `da
    1. ***add_diff_datetime***:  Words which are referencing to datetime difference from current time like word baad in 2  दिन *बाद*  referring to a day, which comes 2 day later from current date.
    2. **ref_datetime**: Words which referenced to create difference in time reference next to it. Example- सावा 4 , here whole sentence is referring to time 4:15.
 
-   For reference see `datetime_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/time/datetime_diff_constant.csv
-
-
-
+   For reference see `datetime_diff_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/time/datetime_diff_constant.csv
