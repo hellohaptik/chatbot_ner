@@ -44,10 +44,10 @@ class DateAdvancedDetector(BaseDetector):
             (list): supported languages
         """
         supported_languages = []
-        cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
-        cwd_dirs = [x for x in cwd if os.path.isdir(x)]
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        cwd_dirs = [x for x in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, x))]
         for _dir in cwd_dirs:
-            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
+            if os.path.exists(os.path.join(cwd, _dir, LANGUAGE_DATE_DETECTION_FILE)):
                 supported_languages.append(_dir)
         return supported_languages
 
