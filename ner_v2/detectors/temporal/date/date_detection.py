@@ -127,7 +127,7 @@ class DateAdvancedDetector(BaseDetector):
             date_data = self._date_model_detection()
         if not run_model or not date_data:
             date_data = self._detect_date()
-        return date_data
+        return self.unzip_convert_date_dictionaries(date_data)
 
     def _detect_date(self):
         """
@@ -435,12 +435,10 @@ class DateAdvancedDetector(BaseDetector):
         date_list, original_list = self.date_detector_object.detect_entity(text)
         return date_list, original_list
 
-    @staticmethod
-    def unzip_convert_date_dictionaries(entity_dict_list):
+    def unzip_convert_date_dictionaries(self, entity_dict_list):
         """
         Separate out date dictionaries into list of dictionaries of date values, corresponding list of substrings in
-        the original text for each date dictionary and corresponding list of detection method for each date dictionary
-
+        the original text for each date dictionary
         Args:
             entity_dict_list (list of dict): list containing dictionaries containing detected date values and metadata
 
@@ -448,10 +446,8 @@ class DateAdvancedDetector(BaseDetector):
             Returns the tuple containing three lists of equal length
              list containing dictionaries of date values,
              list containing original text for each detected date value
-             list containing detection method for each detected date value
-
         """
-        entity_list, original_list, detection_list = [], [], []
+        entity_list, original_list = [], []
         for entity_dict in entity_dict_list:
             entity_list.append(
                 {
@@ -466,8 +462,7 @@ class DateAdvancedDetector(BaseDetector):
                 }
             )
             original_list.append(entity_dict[detector_constant.ORIGINAL_DATE_TEXT])
-            detection_list.append(entity_dict[detector_constant.DATE_DETECTION_METHOD])
-        return entity_list, original_list, detection_list
+        return entity_list, original_list
 
     @staticmethod
     def _to_output_dict(date_dict, original_text, from_property, to_property, start_range_property,
