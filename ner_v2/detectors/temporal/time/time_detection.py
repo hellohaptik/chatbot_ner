@@ -3,6 +3,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.temporal.constant import LANGUAGE_TIME_DETECTION_FILE
 
 
 class TimeDetector(BaseDetector):
@@ -39,9 +40,9 @@ class TimeDetector(BaseDetector):
         """
         supported_languages = []
         cwd = os.listdir((os.path.dirname(os.path.abspath(__file__))))
-        cwd_dirs = [x for x in os.listdir('.') if os.path.isdir(cwd)]
+        cwd_dirs = [x for x in cwd if os.path.isdir(x)]
         for _dir in cwd_dirs:
-            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_DATE_DETECTION_FILE)):
+            if os.path.exists(os.path.join(_dir.rstrip(os.sep), LANGUAGE_TIME_DETECTION_FILE)):
                 supported_languages.append(_dir)
         return supported_languages
 
