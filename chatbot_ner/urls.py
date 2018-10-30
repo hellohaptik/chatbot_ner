@@ -34,4 +34,7 @@ urlpatterns = patterns('',
 
     #  Train Crf Model
     url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
+
+    # Status check
+    url(r'^ping/$', 'ner_v1.api.ping'),
 )

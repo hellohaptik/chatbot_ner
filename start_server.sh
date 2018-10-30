@@ -8,7 +8,7 @@ GROUP=`id -gn`                                                  # the group to r
 NUM_WORKERS=4                                                   # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=chatbot_ner.settings                     # which settings file should Django use
 DJANGO_WSGI_MODULE=chatbot_ner.wsgi                             # WSGI module name
-PORT=8081
+PORT=8080
 TIMEOUT=600
 
 

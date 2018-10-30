@@ -483,3 +483,10 @@ def parse_fuzziness_parameter(fuzziness):
     except ValueError as e:
         fuzziness = 1
     return fuzziness
+
+
+def ping(request):
+    """
+    Status check API
+    """
+    return HttpResponse(status=200)
