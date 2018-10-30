@@ -23,7 +23,7 @@ This is the V2 version of time detector module that will detect time in multiple
 - **Curl Command**
 
   ```bash
-  message = "shaam to sava 4 baje"
+  message = "shaam sava 4 baje"
   entity_name = 'time'
   structured_value = None
   fallback_value = None
@@ -35,13 +35,23 @@ This is the V2 version of time detector module that will detect time in multiple
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/time/?message=shaam%20ko%20sava%204%20baje&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_langauge=hi&language_script=en'
+  $ curl -i 'http://'$URL':'$PORT'/v2/time?message=shaam%20sava%204%20baje&entity_name=date&structured_value=&fallback_value=&bot_message=&source_language=hi&language_script=hi'
   
   # Curl output
   $ {
-    "data": [{"detection": "message", "original_text": "shaam ko sava 4 baje", 						"entity_value": {"mm": 15, "hh": 4, "nn": "pm" }
-             }]
-    }
+      "data": [
+          {
+              "detection": "message",
+              "original_text": "shaam sava 4 baje",
+              "entity_value": {
+                  "mm": 15,
+                  "hh": 4,
+                  "nn": "pm"
+              },
+              "language": "hi"
+          }
+      ]
+  }
   ```
 
 

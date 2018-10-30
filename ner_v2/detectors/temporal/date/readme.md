@@ -23,7 +23,7 @@ This is the V2 version of date detector module that will detect date in multiple
 - **Curl Command**
 
   ```bash
-  message = "agle month ki 2 tarikh ka subah ka alarm lagao"
+  message = "agle mahine ka doosra somvar"
   entity_name = 'date'
   structured_value = None
   fallback_value = None
@@ -35,16 +35,31 @@ This is the V2 version of date detector module that will detect date in multiple
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/date/?message=agle%20month%20ki%2%20tarikh%20ka%20alarm%20lagao&entity_name=date&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_language=hi&language_script=en'
+  $ curl -i 'http://'$URL':'$PORT'/v2/date?message=agle%20mahine%20ka%20doosra%20somvar&entity_name=date&structured_value=&fallback_value=&bot_message=&source_language=hi&language_script=hi'
   
   # Curl output
-  $ { "data": [{ "detection": "message", "original_text": "agle month ki 2 tarikh",
-          	   "entity_value": { "end_range": false, "from": false, "normal": true,
-            						 "value": { "mm": 11, "yy": 2018, "dd": 2, "type":
-            						            "date"},
-            						 "to": false, "start_range": false}
-            	}]
-    }
+  $ {
+      "data": [
+          {
+              "detection": "message",
+              "original_text": "agle mahine ka doosra somvar",
+              "entity_value": {
+                  "end_range": false,
+                  "from": false,
+                  "normal": true,
+                  "value": {
+                      "mm": 11,
+                      "yy": 2018,
+                      "dd": 12,
+                      "type": "date"
+                  },
+                  "to": false,
+                  "start_range": false
+              },
+              "language": "hi"
+          }
+      ]
+  }
   ```
 
   
