@@ -73,13 +73,13 @@ class BaseRegexTime(object):
         datetime_add_ref_choices = "(" + "|".join([x for x in self.datetime_constant_dict
                                                    if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
 
-        hour_variants = "(" + "|".join([x for x in self.time_constant_dict if
+        hour_variants = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
                                         self.time_constant_dict[x][0] == HOUR_TIME_TYPE]) + "|)"
-        minute_variants = "(" + "|".join([x for x in self.time_constant_dict if
+        minute_variants = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
                                           self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + "|)"
-        daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if
+        daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
                                            self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + "|)"
-        numeral_variants = "|".join([x for x in self.numerals_constant_dict])
+        numeral_variants = "|".join([x for x in self.numerals_constant_dict if x.strip() != ""])
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
