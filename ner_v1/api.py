@@ -2,6 +2,7 @@ import ast
 import json
 
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from chatbot_ner.config import ner_logger
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
@@ -27,25 +28,45 @@ def get_parameters_dictionary(request):
            parameters_dict (json)
                 parameter dictionary
     """
-    parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
-                       PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
-                       PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
-                       PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
-                       PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
-                       PARAMETER_TIMEZONE: request.GET.get('timezone'),
-                       PARAMETER_REGEX: request.GET.get('regex'),
-                       PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
-                       PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
-                       PARAMETER_FUZZINESS: request.GET.get('fuzziness'),
-                       PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness'),
-                       PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
-                       PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
-                       PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL:
-                           request.GET.get('read_embeddings_from_remote_url', 'False'),
-                       PARAMETER_READ_MODEL_FROM_S3: request.GET.get('read_model_from_s3', 'False'),
-                       PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path')
-                       }
-
+    if request.method == 'GET':
+        parameters_dict = {PARAMETER_MESSAGE: request.GET.get('message'),
+                           PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
+                           PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
+                           PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
+                           PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
+                           PARAMETER_TIMEZONE: request.GET.get('timezone'),
+                           PARAMETER_REGEX: request.GET.get('regex'),
+                           PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
+                           PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
+                           PARAMETER_FUZZINESS: request.GET.get('fuzziness'),
+                           PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness'),
+                           PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
+                           PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
+                           PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL:
+                               request.GET.get('read_embeddings_from_remote_url', 'False'),
+                           PARAMETER_READ_MODEL_FROM_S3: request.GET.get('read_model_from_s3', 'False'),
+                           PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path')
+                           }
+    else:
+        json_obj = json.loads(request.body.decode(encoding='UTF-8'))
+        parameters_dict = {PARAMETER_MESSAGE: json_obj.get('message'),
+                           PARAMETER_ENTITY_NAME: json_obj.get('entity_name'),
+                           PARAMETER_STRUCTURED_VALUE: json_obj.get('structured_value'),
+                           PARAMETER_FALLBACK_VALUE: json_obj.get('fallback_value'),
+                           PARAMETER_BOT_MESSAGE: json_obj.get('bot_message'),
+                           PARAMETER_TIMEZONE: json_obj.get('timezone'),
+                           PARAMETER_REGEX: json_obj.get('regex'),
+                           PARAMETER_LANGUAGE_SCRIPT: json_obj.get('language_script', ENGLISH_LANG),
+                           PARAMETER_SOURCE_LANGUAGE: json_obj.get('source_language', ENGLISH_LANG),
+                           PARAMETER_FUZZINESS: json_obj.get('fuzziness'),
+                           PARAMETER_MIN_TOKEN_LEN_FUZZINESS: json_obj.get('min_token_len_fuzziness'),
+                           PARAMETER_MIN_DIGITS: json_obj.get('min_number_digits'),
+                           PARAMETER_MAX_DIGITS: json_obj.get('max_number_digits'),
+                           PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL:
+                               json_obj.get('read_embeddings_from_remote_url', 'False'),
+                           PARAMETER_READ_MODEL_FROM_S3: json_obj.get('read_model_from_s3', 'False'),
+                           PARAMETER_LIVE_CRF_MODEL_PATH: json_obj.get('live_crf_model_path')
+                           }
     return parameters_dict
 
 
@@ -490,3 +511,36 @@ def ping(request):
     Status check API
     """
     return HttpResponse(status=200)
+
+
+@csrf_exempt
+def sagemaker_entity_invocations(request):
+    """
+    sagemaker invocations
+    """
+    if not request.META.get('CONTENT_TYPE') or 'application/json' not in request.META.get('CONTENT_TYPE') \
+            or request.method != 'POST':
+        response = {'message': 'This predictor only supports POST request with JSON data'}
+        return HttpResponse(content=json.dumps(response), content_type="application/json", status=415)
+    json_obj = json.loads(request.body.decode(encoding='UTF-8'))
+    entity_type = json_obj.get('entity_type')
+    entity_view = ENTITY_TYPE_VIEW_MAPPING.get(entity_type)
+    if not entity_view:
+        response = {'message': 'entity_type present in request data is not supported'}
+        return HttpResponse(content=json.dumps(response), content_type="application/json", status=400)
+    return entity_view(request)
+
+
+ENTITY_TYPE_VIEW_MAPPING = {
+    'text': text,
+    'phone_number': phone_number,
+    'regex': regex,
+    'email': email,
+    'city': city,
+    'pnr': pnr,
+    'number': number,
+    'time': time,
+    'time_with_range': time_with_range,
+    'date': date,
+    'budget': budget
+}
