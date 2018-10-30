@@ -50,6 +50,7 @@ RUN set -x \
 
 ENV ELASTICSEARCH_VERSION 5.6.12
 ENV ELASTICSEARCH_DEB_VERSION 5.6.12
+ENV ES_JAVA_OPTS="-Djna.tmpdir=/var/lib/elasticsearch/tmp"
 
 RUN set -x \
 	\
