@@ -37,4 +37,5 @@ urlpatterns = patterns('',
 
     # Status check
     url(r'^ping/$', 'ner_v1.api.ping'),
+    url(r'^ping$', 'ner_v1.api.ping'),
 )
