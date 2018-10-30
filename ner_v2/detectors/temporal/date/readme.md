@@ -89,6 +89,7 @@ In order to add any new language you have to follow below steps:
                                               LANGUAGE_DATA_DIRECTORY)
            super(DateDetector, self).__init__(entity_name=entity_name, timezone=timezone,
                                               data_directory_path=data_directory_path)
+           self.custom_detectors = []
    
        def detect_date(self, text):
            """
@@ -104,8 +105,14 @@ In order to add any new language you have to follow below steps:
            self.processed_text = self.text
            self.tagged_text = self.text
    
-           return self._detect_date_from_standard_regex()
+           date_list, original_list  = self._detect_date_from_standard_regex()
    
+           # run custom date detectors
+           for detector in self.custom_detectors:
+               date_list, original_list = detector(date_list, original_list)
+               self._update_processed_text(original_list)
+   
+           return date_list, original_list
    ```
 
     
@@ -191,3 +198,47 @@ Below is the brief about how to create three data files `date_constant.csv`, `da
       
 
       For reference see `datetime_diff_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/data/datetime_diff_constant.csv
+
+
+
+#### GuideLines to add new Regex pattern for date apart from standared Regex:
+
+Create a method inside language date detection class accepting params `date_list` and `original_list` and return the their updated list. Defined method will have custom regex patterns and parser within same method. Also you need to add the method to `custom_ detector` class property . For reference check the below method `def custom_christmas_date_detector` defined here to detect date for patterns like 'christmas', 'x-mas'
+
+```python
+
+class DateDetector(BaseRegexDate):
+    def __init__(self, entity_name, timezone='UTC'):
+        ##
+        self.custom_detectors = [self.custom_chritmast_date_detector]
+
+    def custom_chritmast_date_detector(self, date_list=None, original_list=None):
+        """
+        Method to detect chritmast
+        Args:
+
+        Returns:
+            date_list (list): list of dict containing day, month, year from detected text
+            original_list (list): list of original text corresponding to values detected
+
+        """
+        date_list = date_list or []
+        original_list = original_list or []
+
+        chritmas_regex = re.compile(r'((chritmas|xmas|x-mas|chistmas))')
+        day_match = chritmas_regex.findall(self.processed_text)
+        for match in day_match:
+            original = match[0]
+            date = {
+                'dd': 25,
+                'mm': 12,
+                'yy': self.now_date.year,
+                'type': TYPE_EXACT
+            }
+            date_list.append(date)
+            original_list.append(original)
+        return date_list, original_list
+
+    def detect_date(self, text):
+ 		###
+```

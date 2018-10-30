@@ -11,6 +11,7 @@ class TimeDetector(BaseRegexTime):
 
         super(TimeDetector, self).__init__(entity_name=entity_name, timezone=timezone,
                                            data_directory_path=data_directory_path)
+        self.custom_detectors = []
 
     def detect_time(self, text):
         """
@@ -25,6 +26,11 @@ class TimeDetector(BaseRegexTime):
         self.processed_text = self.text
         self.tagged_text = self.text
 
-        time_list, original_text_list = self._detect_time_from_standard_regex()
+        time_list, original_list = self._detect_time_from_standard_regex()
 
-        return time_list, original_text_list
+        # run custom date detectors
+        for detector in self.custom_detectors:
+            time_list, original_list = detector(time_list, original_list)
+            self._update_processed_text(original_list)
+
+        return time_list, original_list

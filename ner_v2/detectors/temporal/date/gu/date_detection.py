@@ -10,6 +10,7 @@ class DateDetector(BaseRegexDate):
                                            LANGUAGE_DATA_DIRECTORY)
         super(DateDetector, self).__init__(entity_name=entity_name, timezone=timezone,
                                            data_directory_path=data_directory_path)
+        self.custom_detectors = []
 
     def detect_date(self, text):
         """
@@ -25,4 +26,11 @@ class DateDetector(BaseRegexDate):
         self.processed_text = self.text
         self.tagged_text = self.text
 
-        return self._detect_date_from_standard_regex()
+        date_list, original_list = self._detect_date_from_standard_regex()
+
+        # run custom date detectors
+        for detector in self.custom_detectors:
+            date_list, original_list = detector(date_list, original_list)
+            self._update_processed_text(original_list)
+
+        return date_list, original_list

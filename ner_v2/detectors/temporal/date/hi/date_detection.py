@@ -1,5 +1,6 @@
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
+from ner_v2.constant import TYPE_EXACT
 import os
 import re
 
@@ -34,7 +35,8 @@ class DateDetector(BaseRegexDate):
             date = {
                 'dd': 25,
                 'mm': 12,
-                'yy': self.now_date.year
+                'yy': self.now_date.year,
+                'type': TYPE_EXACT
             }
             date_list.append(date)
             original_list.append(original)
