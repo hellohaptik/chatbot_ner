@@ -118,9 +118,8 @@ class BaseRegexTime(object):
         Returns
             meridiem type (str): returns the meridiem type whether its am and pm
         """
-        current_datetime = datetime.datetime.now(pytz.timezone(self.timezone))
-        current_hour = current_datetime.hour
-        current_min = current_datetime.minute
+        current_hour = self.now_date.hour
+        current_min = self.now_date.minute
         if hours == 0 or hours >= TWELVE_HOUR:
             return 'hrs'
 
