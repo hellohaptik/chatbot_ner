@@ -138,4 +138,5 @@ EXPOSE 8080
 ADD . /app
 
 # entrypoint/cmd script
-CMD /app/docker/cmd.sh
+# CMD /app/docker/cmd.sh
+ENTRYPOINT ["/app/docker/cmd.sh"]
