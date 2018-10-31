@@ -510,6 +510,7 @@ def ping(request):
     """
     Status check API
     """
+    ner_logger.debug('Sagemaker ping')
     return HttpResponse(status=200)
 
 
