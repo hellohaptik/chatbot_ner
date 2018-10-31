@@ -3,13 +3,13 @@
 FROM python:2.7.15
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
-RUN apt-get install -y software-properties-common
+RUN apt-get install -y software-properties-common vim
 
 
 # Java installation for elasticsearch
 RUN \
   echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | debconf-set-selections && \
-  add-apt-repository -y ppa:webupd8team/java && \
+  add-apt-repository "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main" && \
   apt-get update && \
   apt-get install -y --allow-unauthenticated oracle-java8-installer && \
   rm -rf /var/lib/apt/lists/* && \
