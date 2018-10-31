@@ -38,6 +38,7 @@ urlpatterns = patterns('',
     # Status check
     url(r'^ping/$', 'ner_v1.api.ping'),
     url(r'^ping$', 'ner_v1.api.ping'),
+    url(r'^$', 'ner_v1.api.ping'),
 
     # Sagemaker
     url(r'^invocations/$', 'ner_v1.api.sagemaker_entity_invocations'),
