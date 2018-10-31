@@ -522,9 +522,13 @@ def sagemaker_entity_invocations(request):
     ner_logger.debug('Sagemaker entity invocation: ' + request.body)
     if not request.META.get('CONTENT_TYPE') or 'application/json' not in request.META.get('CONTENT_TYPE') \
             or request.method != 'POST':
-        response = {'message': 'This predictor only supports POST request with JSON data'}
+        response = {'message': 'NER only supports POST request with JSON data'}
         return HttpResponse(content=json.dumps(response), content_type="application/json", status=415)
-    json_obj = json.loads(request.body.decode(encoding='UTF-8'))
+    try:
+        json_obj = json.loads(request.body.decode(encoding='UTF-8'))
+    except ValueError:
+        response = {'message': 'NER only supports POST request with JSON data'}
+        return HttpResponse(content=json.dumps(response), content_type="application/json", status=415)
     entity_type = json_obj.get('entity_type')
     entity_view = ENTITY_TYPE_VIEW_MAPPING.get(entity_type)
     if not entity_view:
