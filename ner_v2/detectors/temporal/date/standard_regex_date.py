@@ -110,36 +110,39 @@ class BaseRegexDate(object):
         numeral_variants = "|".join([x for x in self.numerals_constant_dict if x.strip() != ""])
 
         # Date detector Regex
-        self.regex_relative_date = re.compile((r'(\b' + relative_date_choices + r'\b)'))
+        self.regex_relative_date = re.compile((r'(\b' + relative_date_choices + r'\b)'), re.IGNORECASE)
 
-        self.regex_day_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + date_literal_choices + r')')
+        self.regex_day_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + date_literal_choices + r')',
+                                         re.IGNORECASE)
 
-        self.regex_date_month = re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_choices + r')')
+        self.regex_date_month = re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_choices + r')', re.IGNORECASE)
 
         self.regex_date_ref_month_1 = \
             re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + '\\s*' +
-                       datetime_diff_choices + r'\s*' + month_literal_choices + r')')
+                       datetime_diff_choices + r'\s*' + month_literal_choices + r')', re.IGNORECASE)
 
         self.regex_date_ref_month_2 = \
             re.compile(r'(' + datetime_diff_choices + r'\s*' + month_literal_choices + r'\s*[a-z]*\s*(\d+|' +
-                       numeral_variants + r')\s+' + month_ref_date_choices + r')')
+                       numeral_variants + r')\s+' + month_ref_date_choices + r')', re.IGNORECASE)
 
         self.regex_date_ref_month_3 = \
-            re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + r')')
+            re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + r')', re.IGNORECASE)
 
         self.regex_after_days_ref = re.compile(r'((\d+|' + numeral_variants + r')\s*' + date_literal_choices + r'\s+' +
-                                               datetime_diff_choices + r')')
+                                               datetime_diff_choices + r')', re.IGNORECASE)
 
         self.regex_weekday_month_1 = re.compile(r'((\d+|' + numeral_variants + ')\s*' + weekday_choices + '\\s*' +
-                                                datetime_diff_choices + r'\s+' + month_literal_choices + r')')
+                                                datetime_diff_choices + r'\s+' + month_literal_choices + r')',
+                                                re.IGNORECASE)
 
         self.regex_weekday_month_2 = re.compile(r'(' + datetime_diff_choices + r'\s+' + month_literal_choices +
                                                 r'\s*[a-z]*\s*(\d+|' + numeral_variants + ')\s+' +
-                                                weekday_choices + r')')
+                                                weekday_choices + r')', re.IGNORECASE)
 
-        self.regex_weekday_diff = re.compile(r'(' + datetime_diff_choices + r'\s+' + weekday_choices + r')')
+        self.regex_weekday_diff = re.compile(r'(' + datetime_diff_choices + r'\s+' + weekday_choices + r')',
+                                             re.IGNORECASE)
 
-        self.regex_weekday = re.compile(r'(' + weekday_choices + r')')
+        self.regex_weekday = re.compile(r'(' + weekday_choices + r')', re.IGNORECASE)
 
     def _get_int_from_numeral(self, numeral):
         """

@@ -84,7 +84,7 @@ class BaseRegexTime(object):
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
                                      numeral_variants + r')\s*' + minute_variants + r'\s+'
-                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')')
+                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')', re.IGNORECASE)
 
     def _get_float_from_numeral(self, numeral):
         """
