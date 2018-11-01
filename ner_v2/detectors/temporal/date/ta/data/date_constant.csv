@@ -1,4 +1,4 @@
-Key,key,date_type
+key,numeric_representation,date_type
 இன்று|Inru,0,relative_date
 நாளை|Nalai,1,relative_date
 நாள் கழித்து|Nal kalittu,2,relative_date

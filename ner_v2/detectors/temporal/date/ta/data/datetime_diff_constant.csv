@@ -1,4 +1,4 @@
-Key,present_in_start,adding_magnitude,datetime_type
+key,present_in_start,adding_magnitude,datetime_type
 குச்சிகளை|Pinnar,0,1,add_diff_datetime
 இதே|Ite,1,0,add_diff_datetime
 முன்|Mun,0,-1,add_diff_datetime
