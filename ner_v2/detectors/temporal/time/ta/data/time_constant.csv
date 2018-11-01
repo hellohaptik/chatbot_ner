@@ -1,0 +1,11 @@
+key,time_type,meridian
+ஆயினும்|Ayinum,relative_time,NA
+உடனே|Utane,relative_time,NA
+சனிக்கிழமை|அழைக்கிறார்|மூலம்|Canikkilamai|Mulam|Alaikkirat,hour,NA
+மணி|மணிநேரம்|Havar|Maṇi|Manineram,hour,NA
+நிமிடங்கள்|Nimitankal,minutes,NA
+இரண்டாவது|Irantavatu,second,NA
+காலையில்|Kalaiyil,daytime_meridian,am
+மதியம்|Matiyam,daytime_meridian,pm
+மலை|Malai,daytime_meridian,pm
+இரவு|Iravu,daytime_meridian,pm
