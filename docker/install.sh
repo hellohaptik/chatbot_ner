@@ -22,3 +22,7 @@ python setup.py install
 # rm -rf /etc/nginx/sites-enabled/default
 # ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 # sed -i 's/www-data/root/g' /etc/nginx/nginx.conf
+
+cd /app
+wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh
+chmod +x wait-for-it.sh

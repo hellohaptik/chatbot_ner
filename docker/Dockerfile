@@ -2,7 +2,7 @@
 
 FROM python:2.7.15
 
-RUN apt-get update && apt-get install -y wget build-essential curl supervisor vim openjdk-8-jdk-headless
+RUN apt-get update && apt-get install -y wget build-essential curl supervisor vim openjdk-8-jdk-headless sudo
 
 
 # install ES
