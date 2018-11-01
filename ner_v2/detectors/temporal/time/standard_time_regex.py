@@ -73,18 +73,18 @@ class BaseRegexTime(object):
         datetime_add_ref_choices = "(" + "|".join([x for x in self.datetime_constant_dict
                                                    if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
 
-        hour_variants = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
+        hour_variants = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
                                         self.time_constant_dict[x][0] == HOUR_TIME_TYPE]) + "|)"
-        minute_variants = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
+        minute_variants = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
                                           self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + "|)"
-        daytime_meridian = "(" + "|".join([x for x in self.time_constant_dict if x.strip() != "" and
+        daytime_meridian = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
                                            self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + "|)"
-        numeral_variants = "|".join([x for x in self.numerals_constant_dict if x.strip() != ""])
+        numeral_variants = "|".join([x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
                                      numeral_variants + r')\s*' + minute_variants + r'\s+'
-                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')', re.IGNORECASE)
+                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')')
 
     def _get_float_from_numeral(self, numeral):
         """
