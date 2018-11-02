@@ -209,7 +209,7 @@ Create a method inside language date detection class accepting params `date_list
 ```python
 
 class DateDetector(BaseRegexDate):
-    def __init__(self, entity_name, timezone='UTC'):
+    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
         ##
         self.custom_detectors = [self.custom_chritmast_date_detector]
 
