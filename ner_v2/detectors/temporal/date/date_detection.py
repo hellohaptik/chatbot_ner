@@ -167,8 +167,20 @@ class DateAdvancedDetector(BaseDetector):
             Whereas for end range the key "end_range" will be set to True.
         """
         date_dict_list = []
-        regex_pattern = re.compile('\b((0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
-                                   '(0?[1-9]|[12][0-9]|3[01])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])'
+                                   r'\s?'
+                                   r'(?:nd|st|rd|th)?'
+                                   r'\s?'
+                                   r'(?:to|\-|till)'
+                                   r'\s?'
+                                   r'([12][0-9]|3[01]|0?[1-9])'
+                                   r'\s?'
+                                   r'(?:nd|st|rd|th)?'
+                                   r'[\ \,]'
+                                   r'\s?'
+                                   r'(?:of)?'
+                                   r'\s?'
+                                   r'([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         if patterns:
             for pattern in patterns:
