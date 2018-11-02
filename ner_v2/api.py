@@ -1,6 +1,8 @@
 from chatbot_ner.config import ner_logger
-from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, PARAMETER_FALLBACK_VALUE, \
-    PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE
+from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
+    PARAMETER_FALLBACK_VALUE, \
+    PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
+    PARAMETER_PAST_DATE_REFERENCED
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -28,6 +30,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
                        PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
                        PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
+                       PARAMETER_PAST_DATE_REFERENCED: request.GET.get('date_past_reference', 'False')
                        }
 
     return parameters_dict
@@ -77,9 +80,12 @@ def date(request):
         parameters_dict = get_parameters_dictionary(request)
         timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        date_past_reference = parameters_dict.get(PARAMETER_PAST_DATE_REFERENCED, "false")
+        past_date_referenced = date_past_reference == 'true' or date_past_reference == 'True'
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
-                                              timezone=timezone)
+                                              timezone=timezone,
+                                              past_date_referenced=past_date_referenced)
 
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 

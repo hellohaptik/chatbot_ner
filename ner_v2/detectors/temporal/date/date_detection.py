@@ -52,7 +52,7 @@ class DateAdvancedDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC'):
+    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
@@ -62,6 +62,7 @@ class DateAdvancedDetector(BaseDetector):
 
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
+            past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
         """
         self._supported_languages = self.get_supported_languages()
         super(DateAdvancedDetector, self).__init__(language=language)
@@ -72,7 +73,8 @@ class DateAdvancedDetector(BaseDetector):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=entity_name, language=language, timezone=timezone)
+        self.date_detector_object = DateDetector(entity_name=entity_name, language=language, timezone=timezone,
+                                                 past_date_referenced=past_date_referenced)
         self.bot_message = None
 
     @property
@@ -624,7 +626,7 @@ class DateDetector(object):
         language: source language of text
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC'):
+    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -632,7 +634,7 @@ class DateDetector(object):
                         detect_entity()
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
-
+            past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
         """
         self.text = ''
         self.tagged_text = ''
@@ -652,7 +654,8 @@ class DateDetector(object):
         self.language = language
         date_detector_module = importlib.import_module(
             'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
-        self.language_date_detector = date_detector_module.DateDetector(self.entity_name)
+        self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
+                                                                        past_date_referenced=past_date_referenced)
 
     def detect_entity(self, text, **kwargs):
         """
