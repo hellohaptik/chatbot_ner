@@ -871,7 +871,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday)\b')
+        regex_pattern = re.compile(r'\b((yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
