@@ -318,9 +318,14 @@ class BaseRegexDate(object):
         for date_match in date_ref_month_match:
             original = date_match[0]
             dd = self._get_int_from_numeral(date_match[1])
-            if self.now_date.day < dd:
+            if (self.now_date.day > dd and self.is_past_referenced) or \
+                    (self.now_date.day < dd and not self.is_past_referenced):
                 mm = self.now_date.month
                 yy = self.now_date.year
+            elif self.now_date.day < dd and self.is_past_referenced:
+                req_date = self.now_date - relativedelta(months=1)
+                mm = req_date.month
+                yy = req_date.year
             else:
                 req_date = self.now_date + relativedelta(months=1)
                 mm = req_date.month
