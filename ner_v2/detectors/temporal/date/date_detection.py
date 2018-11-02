@@ -183,7 +183,7 @@ class DateAdvancedDetector(BaseDetector):
                                    r'\s?'
                                    r'(?:of)?'
                                    r'\s?'
-                                   r'([A-Za-z]+))\b')
+                                   r'([A-Za-z]+))\b', flags=re.UNICODE)
         patterns = regex_pattern.findall(self.processed_text.lower())
         if patterns:
             for pattern in patterns:
@@ -270,7 +270,7 @@ class DateAdvancedDetector(BaseDetector):
         """
         date_dict_list = []
         regex_pattern = re.compile(r'\b((onward date\:|onward date -|departure date|leaving on|starting from|'
-                                   r'departing on|departing|going on|for|departs on)\s+(.+))\b')
+                                   r'departing on|departing|going on|for|departs on)\s+(.+))\b', flags=re.UNICODE)
         patterns = regex_pattern.findall(self.processed_text.lower())
 
         for pattern in patterns:
@@ -294,8 +294,8 @@ class DateAdvancedDetector(BaseDetector):
 
         date_dict_list = []
         regex_pattern_1 = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
-                                     r'arriving|arrive|return|returning at)\s+(.+))\.?\s?')
-        regex_pattern_2 = re.compile(r'(.+)\s+(ko|k|)\s*(aana|ana|aunga|aaun)')
+                                     r'arriving|arrive|return|returning at)\s+(.+))\.?\s?', flags=re.UNICODE)
+        regex_pattern_2 = re.compile(r'(.+)\s+(ko|k|)\s*(aana|ana|aunga|aaun)', flags=re.UNICODE)
         patterns_1 = regex_pattern_1.findall(self.processed_text.lower())
         patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
         if patterns_1:
@@ -342,14 +342,14 @@ class DateAdvancedDetector(BaseDetector):
                                    r'|check out|'
             hinglish_arrival = u'आने|आगमन|अनेका|रिटर्न'
             arrival_regex_string = arrival_regex_string + hinglish_arrival
-            departure_regexp = re.compile(departure_regex_string)
-            arrival_regexp = re.compile(arrival_regex_string)
+            departure_regexp = re.compile(departure_regex_string, flags=re.UNICODE)
+            arrival_regexp = re.compile(arrival_regex_string, flags=re.UNICODE)
             if departure_regexp.search(self.bot_message) is not None:
                 departure_date_flag = True
             elif arrival_regexp.search(self.bot_message) is not None:
                 return_date_flag = True
 
-        patterns = re.compile(r'\s((.+))\.?\b').findall(self.processed_text.lower())
+        patterns = re.compile(r'\s((.+))\.?\b', flags=re.UNICODE).findall(self.processed_text.lower())
 
         for pattern in patterns:
             pattern = list(pattern)
