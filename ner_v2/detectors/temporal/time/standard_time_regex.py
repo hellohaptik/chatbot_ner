@@ -1,3 +1,4 @@
+# coding=utf-8
 from chatbot_ner.config import ner_logger
 from ner_v2.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \

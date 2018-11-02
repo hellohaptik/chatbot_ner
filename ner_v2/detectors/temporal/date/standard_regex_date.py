@@ -1,3 +1,4 @@
+# coding=utf-8
 from chatbot_ner.config import ner_logger
 from ner_v2.constant import TYPE_EXACT
 from ner_v2.detectors.temporal.constant import DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE, \
