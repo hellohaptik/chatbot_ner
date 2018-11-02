@@ -11,9 +11,9 @@ export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 
 # Using supervisor as we want to use Nginx and Uwsgi both, Settings specified in supervisord.conf, any update to that will need build
 
-sudo -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch -d -p /tmp/elasticsearch-pid
+sudo ES_JAVA_OPTS=$ES_JAVA_OPTS -u elasticsearch /usr/share/elasticsearch/bin/elasticsearch -d -p /usr/share/elasticsearch/logs/elasticsearch-pid
 sh initial_setup_es.sh
-kill -SIGTERM $(cat /tmp/elasticsearch-pid)
+kill -SIGTERM $(cat /usr/share/elasticsearch/logs/elasticsearch-pid)
 /usr/bin/supervisord
 
 
