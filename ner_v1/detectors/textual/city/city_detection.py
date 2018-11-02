@@ -1,3 +1,4 @@
+# coding=utf-8
 import re
 
 import models.crf.constant as model_constant
