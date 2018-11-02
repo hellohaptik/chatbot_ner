@@ -114,7 +114,8 @@ class BaseRegexDate(object):
 
         self.regex_day_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + date_literal_choices + r')')
 
-        self.regex_date_month = re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_choices + r')')
+        self.regex_date_month = re.compile(r'((\d+|' + numeral_variants + r')\s*(st|nd|th|rd|)\s*' +
+                                           month_choices + r')')
 
         self.regex_date_ref_month_1 = \
             re.compile(r'((\d+|' + numeral_variants + r')\s*' + month_ref_date_choices + '\\s*' +
@@ -201,7 +202,7 @@ class BaseRegexDate(object):
         for date_match in date_month_match:
             original = date_match[0]
             dd = self._get_int_from_numeral(date_match[1])
-            mm = self.date_constant_dict[date_match[2]][0]
+            mm = self.date_constant_dict[date_match[3]][0]
 
             today_mmdd = "%d%02d" % (self.now_date.month, self.now_date.day)
             today_yymmdd = "%d%02d%02d" % (self.now_date.year, self.now_date.month, self.now_date.day)
