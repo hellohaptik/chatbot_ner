@@ -83,12 +83,13 @@ In order to add any new language you have to follow below steps:
    
    
    class DateDetector(BaseRegexDate):
-       def __init__(self, entity_name, timezone='UTC'):
+       def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
    
            data_directory_path = os.path.join(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
                                               LANGUAGE_DATA_DIRECTORY)
            super(DateDetector, self).__init__(entity_name=entity_name, timezone=timezone,
-                                              data_directory_path=data_directory_path)
+                                              data_directory_path=data_directory_path,
+                                              is_past_referenced=past_date_referenced)
            self.custom_detectors = []
    
        def detect_date(self, text):
