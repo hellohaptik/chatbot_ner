@@ -349,7 +349,7 @@ class DateAdvancedDetector(BaseDetector):
             elif arrival_regexp.search(self.bot_message) is not None:
                 return_date_flag = True
 
-        patterns = re.compile(r'\s((.+))\.?\b', flags=re.UNICODE).findall(self.processed_text.lower())
+        patterns = re.compile(r'\s((.+))\.?', flags=re.UNICODE).findall(self.processed_text.lower())
 
         for pattern in patterns:
             pattern = list(pattern)
