@@ -1,9 +1,9 @@
 key,present_in_start,adding_magnitude,datetime_type
 नंतर|Nantar,0,1,add_diff_datetime
 हे|He,1,0,add_diff_datetime
-पूर्वी|अगोदर|Purvi|Porvi|Agodar,0,-1,add_diff_datetime
-अंतिम|Antim,1,-1,add_diff_datetime
-पुढील|पुढे|Pudhil|Pudhe,1,1,add_diff_datetime
+पूर्वी|अगोदर|गेल्या|Gelya|Purvi|Porvi|Agodar,0,-1,add_diff_datetime
+अंतिम|शेवट|शेवटी|Antim|shevat|shewat|shevati|shewati,1,-1,add_diff_datetime
+पुढील|पुढे|पुढच्या|पुढचा|Pudcha|Pudhil|Pudhe|Pudhchya,1,1,add_diff_datetime
 मी|Mi|me,0,1,add_diff_datetime
 सवा|sawa|sava,1,0.25,ref_datetime
 पौने|paune,1,-0.25,ref_datetime
