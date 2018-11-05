@@ -111,7 +111,7 @@ class BaseRegexDate(object):
         numeral_variants = "|".join([x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
 
         # Date detector Regex
-        self.regex_relative_date = re.compile((r'(\b' + relative_date_choices + r'\b)'), flags=re.UNICODE)
+        self.regex_relative_date = re.compile((r'(' + relative_date_choices + r')'), flags=re.UNICODE)
 
         self.regex_day_diff = re.compile(r'(' + datetime_diff_choices + r'\s*' + date_literal_choices + r')',
                                          flags=re.UNICODE)

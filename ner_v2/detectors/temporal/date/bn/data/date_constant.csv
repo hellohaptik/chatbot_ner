@@ -1,15 +1,15 @@
 key,numeric_representation,date_type
-আজ|today,0,relative_date
+আজ|today|Ajge,0,relative_date
 আগামীকাল|Agamikal ,1,relative_date
 পরশু|Parasu|Porasu,2,relative_date
 2 দিন পর|2 din pore,3,relative_date
 তারিখ|Tarikh,NA,month_date_ref
-দিন|Dina,NA,date_literal
+দিন|Dina|din,NA,date_literal
 মাস|মাসে|Maas|maser|mas,NA,month_literal
 সোমবার|Sombar,0,weekday
 মঙ্গলবার|Mongolbar,1,weekday
 বুধবার|Budhbar,2,weekday
-বৃহস্পতিবার|Brihashpatibar,3,weekday
+বৃহস্পতিবার|Brihashpatibar|brihaspatibar,3,weekday
 শুক্রবার|Shukrobar,4,weekday
 শনিবার|Shonibar,5,weekday
 রবিবার|Rabibar|Robibar,6,weekday
