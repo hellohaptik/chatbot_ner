@@ -1,11 +1,11 @@
 key,key,date_type
 आज|Aaj,0,relative_date
-उद्या|Udya,1,relative_date
-परवा|Parava,2,relative_date
+उद्या|काल|कल|Udya|udhya|kaal,1,relative_date
+परवा|पर्वा|Parava|parva,2,relative_date
 तिसऱ्या देवीशि|Tisrya Div shi,3,relative_date
-तारिक|Tarik|Taarik,NA,month_date_ref
+तारिक|तार्कीला|Tarik|Taarik|tarkila,NA,month_date_ref
 दिवस|दिवसं|Divas|divsan ,NA,date_literal
-महिना|महीने|महिन्याचा|months|month|mahina|mahine|mahinyacha|mahinyachi,NA,month_literal
+महिना|महीने|महिन्याचा|months|month|mahina|mahine|mahinyacha|mahinyachi|mahinyacha,NA,month_literal
 सोमवार|monday|somvar|somwar,0,weekday
 मंगळवार|मंगळवारी|Mangalvari|tuesday|mangalvar|mangalwar,1,weekday
 बुधवार|बुधवारी|wednesday|budhvar|budhwar|budhvari|budhwari,2,weekday
