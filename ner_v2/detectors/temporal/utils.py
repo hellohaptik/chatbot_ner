@@ -112,7 +112,7 @@ def get_tuple_dict(csv_file):
     tuple_records = {}
     for record in records:
         keys = record[0]
-        keys = [x.strip() for x in keys.split("|")]
+        keys = [x.strip().lower() for x in keys.split("|")]
         for key in keys:
             tuple_records[key] = tuple(list(record)[1:])
     return tuple_records
