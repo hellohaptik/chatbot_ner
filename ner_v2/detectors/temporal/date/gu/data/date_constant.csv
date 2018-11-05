@@ -2,7 +2,7 @@ key,numeric_representation,date_type
 આજે|આજ|aaj|aje|aaje,0,relative_date
 કાલ|કાલે|kal|kale|kaal|kaale,1,relative_date
 પરમદિવસ|પરમદિવસે|paramdivse|paramdivas,2,relative_date
-તારીખ|તારીખે|tareekh|tarikh|tarikhe|tarikhey,NA,month_date_ref
+તારીખ|તારીખે|તારિખ|tareekh|tarikh|tarikhe|tarikhey|taarikh,NA,month_date_ref
 દિવસ|દિવસે|din|dino|divas|divase|divasey,NA,date_literal
 મહિનો|મહિના|મહિને|months|month|mahina|mahine|mahino|mahina,NA,month_literal
 સોમવાર|સોમવારે|monday|somvar|somwar|somvare|somware,0,weekday
@@ -18,7 +18,7 @@ key,numeric_representation,date_type
 એપ્રિલ|april|apr,4,month
 મે|may,5,month
 જૂન|જૂને|june|jun,6,month
-જુલાઈ|july|jul,7,month
+જુલાઈ|જુલાઇ|july|jul,7,month
 ઓગસ્ટ|ઑગષ્ટ|august|aug,8,month
 સપ્ટેમ્બર|september|sept|sep,9,month
 ઓક્ટોબર|october|oct,10,month
