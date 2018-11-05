@@ -3,7 +3,7 @@ key,time_type,meridian
 તરત|turant|tarat,relative_time,NA
 વાગે|વાગ્યા|વાગીને|vage|vaage|vagya|vagine|vaagine,hour,NA
 કલાક|કલ્લાક|kalak|kallak|ghanta|ghante|ghanton,hour,NA
-મિનિટ|મિનિટે|minutes|mins|minute|min,minute,NA
+મિનિટ|મિનિટે|મિનટ|minutes|mins|minute|min,minute,NA
 સેકન્ડ|સેકન્ડમાં|second|sec,second,NA
 સવાર |સવારે |પરોઢે|સવારમાં|સવારમા|સવારના|savare|parodhe|savar|savarma|subah|subeh|sawar,daytime_meridian,am
 બપોર|બપ્પોર|બપોરે|બપોરના|bapor|bapore|bappor|bappore|baporma|dopahar|dopehar|dupahar,daytime_meridian,pm
