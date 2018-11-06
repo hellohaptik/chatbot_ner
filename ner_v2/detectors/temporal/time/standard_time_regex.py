@@ -59,7 +59,8 @@ class BaseRegexTime(object):
 
     @staticmethod
     def _sort_choices_on_word_counts(choices_list):
-        return choices_list.sort(key=lambda s: len(s.split()), reverse=True)
+        choices_list.sort(key=lambda s: len(s.split()), reverse=True)
+        return choices_list
 
     def init_regex_and_parser(self, data_directory_path):
         """
