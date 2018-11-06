@@ -75,37 +75,32 @@ class BaseRegexTime(object):
         self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
         # datetime_add_diff OR choices for regex
-        datetime_diff_choices = self._sort_choices_on_word_counts(
-            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE])
-        datetime_diff_choices = "(" + "|".join(datetime_diff_choices) + "|)"
+        datetime_diff_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x for x in self.datetime_constant_dict
+             if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE])) + "|)"
 
         # datetime_ref OR choices in regex
-        datetime_add_ref_choices = self._sort_choices_on_word_counts(
-            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE])
-        datetime_add_ref_choices = "(" + "|".join(datetime_add_ref_choices) + "|)"
+        datetime_add_ref_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE])) + "|)"
 
         # hour OR choices for regex
-        hour_variants = self._sort_choices_on_word_counts(
+        hour_variants = "(" + "|".join(self._sort_choices_on_word_counts(
             [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == HOUR_TIME_TYPE])
-        hour_variants = "(" + "|".join(hour_variants) + "|)"
+             self.time_constant_dict[x][0] == HOUR_TIME_TYPE])) + "|)"
 
         # minute OR choices for regex
-        minute_variants = self._sort_choices_on_word_counts(
+        minute_variants = "(" + "|".join(self._sort_choices_on_word_counts(
             [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == MINUTE_TIME_TYPE])
-        minute_variants = "(" + "|".join(minute_variants) + "|)"
+             self.time_constant_dict[x][0] == MINUTE_TIME_TYPE])) + "|)"
 
         # meridian OR choices for regex
-        daytime_meridian = self._sort_choices_on_word_counts(
+        daytime_meridian = "(" + "|".join(self._sort_choices_on_word_counts(
             [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == DAYTIME_MERIDIAN])
-        daytime_meridian = "(" + "|".join(daytime_meridian) + "|)"
+             self.time_constant_dict[x][0] == DAYTIME_MERIDIAN])) + "|)"
 
         # numeral OR choices for regex
-        numeral_variants = self._sort_choices_on_word_counts(
-            [x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
-        numeral_variants = "|".join(numeral_variants)
+        numeral_variants = "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.numerals_constant_dict if x.strip() != ""]))
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
@@ -231,7 +226,8 @@ class BaseRegexTime(object):
 
             if not nn:
                 nn = self._get_meridiem(hh, mm, original)
-
+            if hh == 0 and mm > 0 and nn == 'hrs':
+                break
             time = {
                 'hh': int(hh),
                 'mm': int(mm),

@@ -82,6 +82,11 @@ class BaseRegexDate(object):
     def detect_date(self, text):
         return [], []
 
+    @staticmethod
+    def _sort_choices_on_word_counts(choices_list):
+        choices_list.sort(key=lambda s: len(s.split()), reverse=True)
+        return choices_list
+
     def init_regex_and_parser(self, data_directory_path):
         """
         Initialise standard regex from data file
@@ -94,21 +99,36 @@ class BaseRegexDate(object):
         self.datetime_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
         self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
-        relative_date_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                                self.date_constant_dict[x][1] == RELATIVE_DATE]) + ")"
-        date_literal_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                               self.date_constant_dict[x][1] == DATE_LITERAL_TYPE]) + ")"
-        month_ref_date_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                                 self.date_constant_dict[x][1] == MONTH_DATE_REF_TYPE]) + ")"
-        month_literal_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                                self.date_constant_dict[x][1] == MONTH_LITERAL_TYPE]) + ")"
-        weekday_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                          self.date_constant_dict[x][1] == WEEKDAY_TYPE]) + ")"
-        month_choices = "(" + "|".join([x.lower() for x in self.date_constant_dict if x.strip() != "" and
-                                        self.date_constant_dict[x][1] == MONTH_TYPE]) + ")"
-        datetime_diff_choices = "(" + "|".join([x.lower() for x in self.datetime_constant_dict if x.strip() != "" and
-                                                self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + ")"
-        numeral_variants = "|".join([x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
+        relative_date_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == RELATIVE_DATE])) + ")"
+
+        date_literal_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == DATE_LITERAL_TYPE])) + ")"
+
+        month_ref_date_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == MONTH_DATE_REF_TYPE])) + ")"
+
+        month_literal_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == MONTH_LITERAL_TYPE])) + ")"
+
+        weekday_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == WEEKDAY_TYPE])) + ")"
+
+        month_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.date_constant_dict if x.strip() != "" and
+             self.date_constant_dict[x][1] == MONTH_TYPE])) + ")"
+
+        datetime_diff_choices = "(" + "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.datetime_constant_dict if x.strip() != "" and
+             self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE])) + ")"
+
+        numeral_variants = "|".join(self._sort_choices_on_word_counts(
+            [x.lower() for x in self.numerals_constant_dict if x.strip() != ""]))
 
         # Date detector Regex
         self.regex_relative_date = re.compile((r'(' + relative_date_choices + r')'), flags=re.UNICODE)
