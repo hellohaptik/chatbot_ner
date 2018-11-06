@@ -2,8 +2,7 @@
 from chatbot_ner.config import ner_logger
 from ner_v2.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM
 from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, NEGATIVE_TIME_DIFF, \
-    POSITIVE_TIME_DIFF
+    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN
 import pytz
 import re
 import abc
@@ -58,6 +57,10 @@ class BaseRegexTime(object):
     def detect_time(self, text):
         return [], []
 
+    @staticmethod
+    def _sort_choices_on_word_counts(choices_list):
+        return choices_list.sort(key=lambda s: len(s.split()), reverse=True)
+
     def init_regex_and_parser(self, data_directory_path):
         """
         Initialise standard regex from data file
@@ -70,18 +73,38 @@ class BaseRegexTime(object):
         self.datetime_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
         self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
 
-        datetime_diff_choices = "(" + "|".join([x for x in self.datetime_constant_dict
-                                                if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]) + "|)"
-        datetime_add_ref_choices = "(" + "|".join([x for x in self.datetime_constant_dict
-                                                   if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]) + "|)"
+        # datetime_add_diff OR choices for regex
+        datetime_diff_choices = self._sort_choices_on_word_counts(
+            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE])
+        datetime_diff_choices = "(" + "|".join(datetime_diff_choices) + "|)"
 
-        hour_variants = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
-                                        self.time_constant_dict[x][0] == HOUR_TIME_TYPE]) + "|)"
-        minute_variants = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
-                                          self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]) + "|)"
-        daytime_meridian = "(" + "|".join([x.lower() for x in self.time_constant_dict if x.strip() != "" and
-                                           self.time_constant_dict[x][0] == DAYTIME_MERIDIAN]) + "|)"
-        numeral_variants = "|".join([x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
+        # datetime_ref OR choices in regex
+        datetime_add_ref_choices = self._sort_choices_on_word_counts(
+            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE])
+        datetime_add_ref_choices = "(" + "|".join(datetime_add_ref_choices) + "|)"
+
+        # hour OR choices for regex
+        hour_variants = self._sort_choices_on_word_counts(
+            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
+             self.time_constant_dict[x][0] == HOUR_TIME_TYPE])
+        hour_variants = "(" + "|".join(hour_variants) + "|)"
+
+        # minute OR choices for regex
+        minute_variants = self._sort_choices_on_word_counts(
+            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
+             self.time_constant_dict[x][0] == MINUTE_TIME_TYPE])
+        minute_variants = "(" + "|".join(minute_variants) + "|)"
+
+        # meridian OR choices for regex
+        daytime_meridian = self._sort_choices_on_word_counts(
+            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
+             self.time_constant_dict[x][0] == DAYTIME_MERIDIAN])
+        daytime_meridian = "(" + "|".join(daytime_meridian) + "|)"
+
+        # numeral OR choices for regex
+        numeral_variants = self._sort_choices_on_word_counts(
+            [x.lower() for x in self.numerals_constant_dict if x.strip() != ""])
+        numeral_variants = "|".join(numeral_variants)
 
         self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
