@@ -226,7 +226,7 @@ Following are the list of entities which we have provided for detection purpose:
 | train_pnr        | pnr                | PNR identification for trains            |
 | flight_pnr       | pnr                | PNR identification for flights           |
 | number_of_people | number             | Detection of number of people from text  |
-| number_of_units  | number             | Detection of numberof units              |
+| number_of_units  | number             | Detection of number of units              |
 | budget           | budget             | Detection of budget                      |
 | shopping_size    | size               | Detects size which are used for shopping. |
 | phone_number     | phone_number       | Phone number detection                   |
