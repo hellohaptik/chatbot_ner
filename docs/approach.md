@@ -13,7 +13,7 @@ NER is a subtask of information extraction that seeks to locate and classify nam
 For example,
 
 ```json
-"Remind me to call Mainland China day afer tommorrow at 6:00pm"
+"Remind me to call Mainland China day after tommorrow at 6:00pm"
 ```
 
 In this example:
