@@ -102,7 +102,7 @@ class BaseRegexTime(object):
         numeral_variants = "|".join(self._sort_choices_on_word_counts(
             [x.lower() for x in self.numerals_constant_dict if x.strip() != ""]))
 
-        self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*\s*' + datetime_add_ref_choices +
+        self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*' + datetime_add_ref_choices +
                                      r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
                                      numeral_variants + r')\s*' + minute_variants + r'\s+'
                                      + datetime_diff_choices + r'\s*' + daytime_meridian + r')', flags=re.UNICODE)
