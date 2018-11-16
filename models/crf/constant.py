@@ -44,6 +44,3 @@ MODEL_DATE_NORMAL = 'normal'  # Dictionary key of model output that stores wheth
 # Tags for inbound and outbound message in crf
 INBOUND = 'i'
 OUTBOUND = 'o'
-
-CITY_MODEL_OBJECT = None  # store city model object
-DATE_MODEL_OBJECT = None  # store date model object
