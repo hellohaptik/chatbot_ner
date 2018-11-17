@@ -311,7 +311,7 @@ class CityDetector(object):
             elif arrival_regexp.search(self.bot_message) is not None:
                 arrival_city_flag = True
 
-        patterns = re.findall(r'\s((.+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(r'\s((.+))\.?', self.processed_text.lower())
 
         for pattern in patterns:
             pattern = list(pattern)
