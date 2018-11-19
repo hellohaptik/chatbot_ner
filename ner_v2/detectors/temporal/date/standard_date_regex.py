@@ -80,6 +80,10 @@ class BaseRegexDate(object):
                                      ]
 
     def detect_date(self, text):
+        self.text = text
+        self.processed_text = text
+        self.tagged_text = text
+
         date_list, original_list = None, None
         for detector in self.detector_preferences:
             date_list, original_list = detector(date_list, original_list)
