@@ -149,7 +149,8 @@ class BaseDetector(object):
         elif entity_list:
             value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
         elif fallback_value:
-            value, method, original_text = [fallback_value], FROM_FALLBACK_VALUE, [fallback_value]
+            entity_list, original_text_list = self.detect_entity(text=fallback_value)
+            value, method, original_text = entity_list, FROM_FALLBACK_VALUE, original_text_list
         else:
             return None
 
