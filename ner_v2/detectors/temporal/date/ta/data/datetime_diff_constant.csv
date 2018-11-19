@@ -1,0 +1,10 @@
+key,present_in_start,adding_magnitude,datetime_type
+குச்சிகளை|பிறகு|Pinnar|piraku,0,1,add_diff_datetime
+இதே|இந்த|Ite|Inta,1,0,add_diff_datetime
+முன்|Mun,0,-1,add_diff_datetime
+கடைசி|முந்தைய|கடந்த|Kaṭaici|Muntaiya|Kaṭanta,1,-1,add_diff_datetime
+அடுத்தது|அடுத்த|Aṭuttatu|Aṭutta|Atutta,1,1,add_diff_datetime
+என்னை|Ennai,0,1,add_diff_datetime
+கலந்து|Kalantu,1,0.25,ref_datetime
+மூன்று நான்காவது|Munru nankavatu,1,-0.25,ref_datetime
+அரை|Arai,1,0.5,ref_datetime

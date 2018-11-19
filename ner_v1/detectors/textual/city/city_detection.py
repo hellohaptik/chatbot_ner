@@ -1,9 +1,10 @@
+# coding=utf-8
 import re
 
 import models.crf.constant as model_constant
-import ner_v1.detectors.constant as detector_constant
+import ner_v1.constant as detector_constant
 from models.crf.models import Models
-from ner_v1.constant import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
@@ -24,13 +25,14 @@ class CityDetector(object):
         tag: entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, language):
         """
         Initializes a CityDetector object with given entity_name
 
         Args:
             entity_name: A string by which the detected substrings that correspond to text entities would be replaced
                          with on calling detect_entity()
+            language: language code of text
         """
 
         self.entity_name = entity_name
@@ -39,7 +41,7 @@ class CityDetector(object):
         self.tagged_text = ''
         self.processed_text = ''
         self.city = []
-        self.text_detection_object = TextDetector(entity_name=entity_name)
+        self.text_detection_object = TextDetector(entity_name=entity_name, source_language_script=language)
         self.tag = '__' + self.entity_name + '__'
 
     def detect_entity(self, text, run_model=False):
@@ -142,7 +144,7 @@ class CityDetector(object):
             Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
-        patterns = re.findall(r'\s(([A-Za-z]+)\s+(\-|to|2|and)\s+([A-Za-z\s]+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(r'\s(([A-Za-z]+)\s+(\-|to|2|se|से|and)\s+([A-Za-z\s]+))\.?\b', self.processed_text.lower())
         for pattern in patterns:
             city_dict_list.extend(
                 self._city_dict_from_text(text=pattern[1], from_property=True)
@@ -171,7 +173,7 @@ class CityDetector(object):
         """
         city_dict_list = []
         patterns = re.findall(r'\s((?:from|frm|departing|depart|leaving|leave)\s+([A-Za-z]+)'
-                              r'\s+(?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)\s+([A-Za-z]+))\.?\b',
+                              r'\s+(?:and|to|se|से|2|for|fr|arriving|arrive|reaching|reach|rch)\s+([A-Za-z]+))\.?\b',
                               self.processed_text.lower())
 
         for pattern in patterns:
@@ -258,13 +260,17 @@ class CityDetector(object):
 
         """
         city_dict_list = []
-        patterns = re.findall(r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)'
-                              r'\s+([A-Za-z]+))\.?\s',
-                              self.processed_text.lower())
-
-        for pattern in patterns:
+        patterns_1 = re.findall(r'\s((to|2|for|fr|arriving|arrive|reaching|reach|rch|destination city\:|arrival city\:)'
+                                r'\s+([A-Za-z]+))\.?\s',
+                                self.processed_text.lower())
+        patterns_2 = re.findall(r'(.+)\s+(jana|jaana|jau|ghum|ghoom|जाना|जाऊं|जाऊँ|घूम)', self.processed_text.lower())
+        for pattern in patterns_1:
             city_dict_list.extend(
                 self._city_dict_from_text(text=pattern[2], to_property=True)
+            )
+        for pattern in patterns_2:
+            city_dict_list.extend(
+                self._city_dict_from_text(text=pattern[0], to_property=True)
             )
 
         return city_dict_list
@@ -292,16 +298,20 @@ class CityDetector(object):
         departure_city_flag = False
         arrival_city_flag = False
         if self.bot_message:
+            hinglish_departure = u'कहां से'
             departure_regexp = re.compile(
-                r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from')
+                r'departure city|origin city|origin|traveling from|leaving from|flying from|travelling from|' +
+                hinglish_departure)
+            hinglish_arrival = u'कहां जाना|\u0916\u093c\u0924\u092e|\u0959\u0924\u092e'  # unicode for ख़तम
             arrival_regexp = re.compile(
-                r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to')
+                r'traveling to|travelling to|arrival city|arrival|destination city|destination|leaving to|flying to|'
+                + hinglish_arrival)
             if departure_regexp.search(self.bot_message) is not None:
                 departure_city_flag = True
             elif arrival_regexp.search(self.bot_message) is not None:
                 arrival_city_flag = True
 
-        patterns = re.findall(r'\s((.+))\.?\b', self.processed_text.lower())
+        patterns = re.findall(r'\s((.+))\.?', self.processed_text.lower())
 
         for pattern in patterns:
             pattern = list(pattern)

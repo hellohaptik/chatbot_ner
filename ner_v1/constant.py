@@ -1,55 +1,94 @@
+# DATE IDENTIFICATION constant
 
-# ************************ constant used for detection_method ************************
+ENTITY_MONTH = 'month_list'
+ENTITY_DAY = 'day_list'
 
-# when entity is detected from message
-FROM_MESSAGE = 'message'
-# entity is detected from structured_value and verified with detection logic
-FROM_STRUCTURE_VALUE_VERIFIED = 'structure_value_verified'
-# entity is detected from structured_value and not verified with detection logic
-FROM_STRUCTURE_VALUE_NOT_VERIFIED = 'structure_value_not_verified'
-# entity is detected from fallback_value
-FROM_FALLBACK_VALUE = 'fallback_value'
-# entity is detected from a message, through model and verified from the dictionary
-FROM_MODEL_VERIFIED = 'model_verified'
-# entity is detected from a message, through model and but not verified from the dictionary
-FROM_MODEL_NOT_VERIFIED = 'model_not_verified'
+TYPE_EXACT = 'date'
+TYPE_EVERYDAY = 'everyday'
+TYPE_PAST = 'past'  # for dates in the past
+TYPE_TODAY = 'today'
+TYPE_TOMORROW = 'tomorrow'
+TYPE_YESTERDAY = 'yesterday'
+TYPE_DAY_AFTER = 'day_after'
+TYPE_DAY_BEFORE = 'day_before'
+TYPE_N_DAYS_AFTER = 'after_n_days'
+TYPE_NEXT_DAY = 'day_in_next_week'
+TYPE_THIS_DAY = 'day_within_one_week'
 
-# ************************ constant used as key of output dictionary in entity detection ************************
-# Consider this example for below reference 'I want to order from mcd'
-# entity_value is a key that will store value of entity which is detected. For example Mc Donalds
-ENTITY_VALUE = 'entity_value'
-# detection is a key that will store how the entity is detected i.e. from chat, structured_value, fallback, etc
-DETECTION_METHOD = 'detection'
-# original_text is a key that will store actual value that was detected. For example, mcd
-ORIGINAL_TEXT = 'original_text'
-DETECTION_LANGUAGE = 'language'
 
-ENTITY_VALUE_DICT_KEY = 'value'
+# ORIGINAL constants
+# TYPE_NEXT_DAY = 'next_day'
+# TYPE_CURRENT_DAY = 'current_day'
 
-# ************************ constants tell us what to do with structured_value ************************
-# This will execute entity detection on the structured_value.
-STRUCTURED = 0
-# This will consider structured_value as an entity value without executing entity detection logic.
-UNCHANGED = 1
-# This will execute entity detection on structured_value, if it returns None then we consider structure_value as it is.
-IF_POSSIBLE = 2
-# verifies with dictionary if match then it will return the value else it will take the same value
+TYPE_POSSIBLE_DAY = 'possible_day'
 
-# ************************ constants used as a key of request  ************************
-PARAMETER_MESSAGE = 'message'
-PARAMETER_ENTITY_NAME = 'entity_name'
-PARAMETER_STRUCTURED_VALUE = 'structured_value'
-PARAMETER_STRUCTURED_VALUE_VERIFICATION = 'structured_value_verification'
-PARAMETER_FALLBACK_VALUE = 'fallback_value'
-PARAMETER_BOT_MESSAGE = 'bot_message'
-PARAMETER_TIMEZONE = 'timezone'
-PARAMETER_REGEX = 'regex'
+# BUDGET IDENTIFICATION
 
-# Language parameters of the query.
-PARAMETER_LANGUAGE_SCRIPT = 'language_script'  # ISO 639 code for language. For eg, 'en' for 'Namaste', 'Hello'
-PARAMETER_SOURCE_LANGUAGE = 'source_language'  # ISO 639 code vocabulary.  For eg, 'hi' for 'Namaste', 'en' for 'Hello'
-# ********************** constant used to define dict type in data dictionary *********************
-DICTIONARY_DATA_VARIANTS = 'variants'
+BUDGET_TYPE_NORMAL = 'normal_budget'
+BUDGET_TYPE_TEXT = 'text_budget'
+
+# CAROUSEL DETECTION
+API_NAME = 'api_name'
+
+# TIME DETECTION
+AM_MERIDIEM = 'am'
+PM_MERIDIEM = 'pm'
+TWELVE_HOUR = 12
+EVERY_TIME_TYPE = 'ev'
+
+# WEEK DETECTION
+WEEKDAYS = 'weekdays'
+REPEAT_WEEKDAYS = 'repeat_weekdays'
+WEEKENDS = 'weekends'
+REPEAT_WEEKENDS = 'repeat_weekends'
+TYPE_REPEAT_DAY = 'repeat_day'
+
+
+MONTH_DICT = {
+    u'1': [u'jan', u'january'],
+    u'10': [u'october', u'oct'],
+    u'11': [u'november', u'nov'],
+    u'12': [u'december', u'dec'],
+    u'2': [u'february', u'feb'],
+    u'3': [u'mar', u'march'],
+    u'4': [u'apr', u'april'],
+    u'5': [u'may'],
+    u'6': [u'jun', u'june'],
+    u'7': [u'july', u'jul'],
+    u'8': [u'august', u'aug'],
+    u'9': [u'september', u'sept', u'sep']
+}
+
+DAY_DICT = {
+    u'1': [u'sun', u'sunday'],
+    u'2': [u'mon', u'monday'],
+    u'3': [u'tuesday', u'tue'],
+    u'4': [u'wednesday', u'wed'],
+    u'5': [u'thu', u'thursday', u'thurs', u'thur'],
+    u'6': [u'fri', u'friday'],
+    u'7': [u'saturday', u'sat']
+}
+
+# CONSTANTS USED FOR CITY DETECTION
+CITY_FROM_PROPERTY = 'from'
+CITY_TO_PROPERTY = 'to'
+CITY_VIA_PROPERTY = 'via'
+CITY_NORMAL_PROPERTY = 'normal'
+CITY_VALUE = 'value'
+ORIGINAL_CITY_TEXT = 'text'
+CITY_DETECTION_METHOD = 'detection_method'
+
+# CONSTANTS USED FOR DATE DETECTION
+DATE_FROM_PROPERTY = 'from'
+DATE_TO_PROPERTY = 'to'
+DATE_START_RANGE_PROPERTY = 'start_range'
+DATE_END_RANGE_PROPERTY = 'end_range'
+DATE_NORMAL_PROPERTY = 'normal'
+DATE_TYPE_PROPERTY = 'type'
+DATE_VALUE = 'value'
+ORIGINAL_DATE_TEXT = 'text'
+DATE_DETECTION_METHOD = 'detection_method'
+
 
 # **********************constants used for number detection************************************
 

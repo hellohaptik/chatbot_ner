@@ -4,6 +4,8 @@ import collections
 from lib.nlp.const import TOKENIZER
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
+from language_utilities.constant import ENGLISH_LANG
+
 log_prefix = 'datastore.elastic_search.query'
 
 
@@ -178,12 +180,11 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
     }
     must_terms.append(term_dict_entity_name)
 
+    # search on language_script, add english as default search
     if language_script is not None:
         term_dict_language = {
-            'term': {
-                'language_script': {
-                    'value': language_script
-                }
+            'terms': {
+                'language_script': [language_script, ENGLISH_LANG]
             }
         }
         must_terms.append(term_dict_language)

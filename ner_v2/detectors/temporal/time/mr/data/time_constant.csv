@@ -1,0 +1,11 @@
+key,time_type,meridian
+आता|Ata|aata,relative_time,NA
+लगेच|Lagech,relative_time,NA
+वाजले|वाजता|वाजुन|Vajle|Vajta|Vazta|Vazle|Vajun|Vazun,hour,NA
+तास|तासा|तासात|Tas|Taasaa|Tasa|Tasaa|Taasan|Taasat,hour,NA
+मिनिट|मिनिटे|Minute|Minte,minute,NA
+सेकंड|seconds|sec|second,second,NA
+सकाळ|सकाळी|Sakal|Sakali,daytime_meridian,am
+दुपार|दुपारी|Dupar|Dupari,daytime_meridian,pm
+संध्याकाळी|संध्याकाळ|Sandhyakali|Sandhyakal,daytime_meridian,pm
+रात्री|रात्र|Ratri|Ratra,daytime_meridian,pm

@@ -22,19 +22,12 @@ TYPE_THIS_DAY = 'day_within_one_week'
 
 TYPE_POSSIBLE_DAY = 'possible_day'
 
-# BUDGET IDENTIFICATION
-
-BUDGET_TYPE_NORMAL = 'normal_budget'
-BUDGET_TYPE_TEXT = 'text_budget'
-
-# CAROUSEL DETECTION
-API_NAME = 'api_name'
-
 # TIME DETECTION
 AM_MERIDIEM = 'am'
 PM_MERIDIEM = 'pm'
 TWELVE_HOUR = 12
 EVERY_TIME_TYPE = 'ev'
+
 
 # WEEK DETECTION
 WEEKDAYS = 'weekdays'
@@ -69,14 +62,6 @@ DAY_DICT = {
     u'7': [u'saturday', u'sat']
 }
 
-# CONSTANTS USED FOR CITY DETECTION
-CITY_FROM_PROPERTY = 'from'
-CITY_TO_PROPERTY = 'to'
-CITY_VIA_PROPERTY = 'via'
-CITY_NORMAL_PROPERTY = 'normal'
-CITY_VALUE = 'value'
-ORIGINAL_CITY_TEXT = 'text'
-CITY_DETECTION_METHOD = 'detection_method'
 
 # CONSTANTS USED FOR DATE DETECTION
 DATE_FROM_PROPERTY = 'from'

@@ -4,7 +4,7 @@ from six import iteritems
 
 from lib.nlp.const import TOKENIZER
 from lib.nlp.regexreplace import RegexReplace
-from ner_v1.constant import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 
 
 def combine_output_of_detection_logic_and_tag(entity_data, text):
