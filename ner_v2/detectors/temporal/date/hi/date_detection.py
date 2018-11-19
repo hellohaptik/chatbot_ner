@@ -1,5 +1,5 @@
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
+from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
 from ner_v2.constant import TYPE_EXACT
 import os
 import re
@@ -14,9 +14,9 @@ class DateDetector(BaseRegexDate):
                                            data_directory_path=data_directory_path,
                                            is_past_referenced=past_date_referenced)
 
-        self.custom_detectors = [self.custom_chritmast_date_detector]
+        self.custom_detectors = [self.custom_christmas_date_detector]
 
-    def custom_chritmast_date_detector(self, date_list=None, original_list=None):
+    def custom_christmas_date_detector(self, date_list=None, original_list=None):
         """
         Method to detect chritmast
         Args:
@@ -29,7 +29,7 @@ class DateDetector(BaseRegexDate):
         date_list = date_list or []
         original_list = original_list or []
 
-        chritmas_regex = re.compile(r'((chritmas|xmas|x-mas|chistmas))')
+        chritmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
         day_match = chritmas_regex.findall(self.processed_text)
         for match in day_match:
             original = match[0]
@@ -57,7 +57,7 @@ class DateDetector(BaseRegexDate):
         self.processed_text = self.text
         self.tagged_text = self.text
 
-        date_list, original_list  = self._detect_date_from_standard_regex()
+        date_list, original_list = self._detect_date_from_standard_regex()
 
         # run custom date detectors
         for detector in self.custom_detectors:
