@@ -2,7 +2,7 @@ import re
 
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.base_detector import BaseDetector
-from ner_v1.language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG
 
 
 class ShoppingSizeDetector(BaseDetector):

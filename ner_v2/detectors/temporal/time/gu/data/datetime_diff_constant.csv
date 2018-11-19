@@ -1,0 +1,10 @@
+key,present_in_start,adding_magnitude,datetime_type
+પછી|pachhi|pachi|ma,FALSE,1,add_diff_datetime
+હમણાં|હમણા|હાલ|આ|aa|hamda,TRUE,0,add_diff_datetime
+પેહલા|pahle|pehle|pahla|pehla|pela|pehlla,FALSE,-1,add_diff_datetime
+ગયા।પાછલા|pachhla|gaya|pachadna|pachhla,TRUE,-1,add_diff_datetime
+આગલા|આવતા|agla|avta,TRUE,1,add_diff_datetime
+માં|મા,FALSE,1,add_diff_datetime
+સવા|sawa|sava,TRUE,0.25,ref_datetime
+પોણા|pona|pono,TRUE,-0.25,ref_datetime
+સાડા|સાદા|સાડી|saade|sade|sada|sadi,TRUE,0.5,ref_datetime

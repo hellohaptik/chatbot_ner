@@ -1,0 +1,11 @@
+key,time_type,meridian
+এখন|Ekon,relative_time,NA
+অবিলম্বে|Abilambe,relative_time,NA
+সময়|টায়|টা|Samay|ta|Somay,hour,NA
+ঘন্টা|ঘন্টা এবং|Ghonta|Ghonta ebam,hour,NA
+মিনিট|Minite|minute,minute,NA
+দ্বিতীয়|Dbitiy,second,NA
+সকাল|Shokol|Sokole,daytime_meridian,am
+বিকেল|Dupur,daytime_meridian,pm
+সন্ধ্যা|Sandhe|Shandya,daytime_meridian,pm
+রাত|Raat,daytime_meridian,pm

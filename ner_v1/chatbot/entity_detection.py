@@ -1,5 +1,5 @@
-from ner_v1.constant import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
-                             FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
+from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
+                           FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
 from ner_v1.detectors.numeral.number.number_detection import NumberDetector
 from ner_v1.detectors.numeral.number.passenger_detection import PassengerDetector
@@ -314,7 +314,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
                                   bot_message=bot_message)
 
 
-def get_city(message, entity_name, structured_value, fallback_value, bot_message):
+def get_city(message, entity_name, structured_value, fallback_value, bot_message, language):
     """Use CityDetector to detect cities
 
     Args:
@@ -328,6 +328,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        language (str): language of text
 
 
     Returns:
@@ -396,7 +397,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
     """
-    city_detection = CityDetector(entity_name=entity_name)
+    city_detection = CityDetector(entity_name=entity_name, language=language)
     city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
         entity_dict_list = city_detection.detect_entity(text=structured_value)

@@ -21,6 +21,10 @@ urlpatterns = patterns('',
     url(r'^v1/person_name/$', 'ner_v1.api.person_name'),
     url(r'^v1/regex/$', 'ner_v1.api.regex'),
 
+    # V2 detectors
+    url(r'^v2/date/$', 'ner_v2.api.date'),
+    url(r'^v2/time/$', 'ner_v2.api.time'),
+
     # Dictionary Read Write
     url(r'^entities/get_entity_word_variants', 'external_api.api.get_entity_word_variants'),
     url(r'^entities/update_dictionary', 'external_api.api.update_dictionary'),

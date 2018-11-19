@@ -1,6 +1,6 @@
 # coding=utf-8
-from ner_v1.language_utilities.constant import ENGLISH_LANG
-from ner_v1.language_utilities.constant import TRANSLATED_TEXT
+from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import TRANSLATED_TEXT
 from chatbot_ner.config import ner_logger, GOOGLE_TRANSLATE_API_KEY
 import urllib
 import requests

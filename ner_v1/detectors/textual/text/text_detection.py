@@ -8,7 +8,7 @@ from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 # from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.base_detector import BaseDetector
-from ner_v1.language_utilities.constant import ENGLISH_LANG, HINDI_LANG
+from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
 
 class TextDetector(BaseDetector):

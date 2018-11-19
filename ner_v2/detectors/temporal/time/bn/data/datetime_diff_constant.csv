@@ -1,0 +1,9 @@
+key,present_in_start,adding_magnitude,datetime_type
+পরবর্তীতে|পর|Parabartite|পরে|Pore,0,1,add_diff_datetime
+হয়|এই|Hoy|Ei,1,0,add_diff_datetime
+গত|আগে|আগের|Gat|Gata|age|agera,1,-1,add_diff_datetime
+পরবর্তী|আগামী|Parabartī|agami|Parabati,1,1,add_diff_datetime
+আমাকে|Amake,0,1,add_diff_datetime
+1 এবং চতুর্থাংশ|1 ebam cathurthansa,1,0.25,ref_datetime
+3 চতুর্থ|3 Caturtha|সাড়ে|Sare,1,-0.25,ref_datetime
+এক এবং অর্ধেক|Eka ebam ardhek,1,0.5,ref_datetime

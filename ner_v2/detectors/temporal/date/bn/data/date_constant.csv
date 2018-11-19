@@ -1,0 +1,27 @@
+key,numeric_representation,date_type
+আজ|today|Ajge,0,relative_date
+আগামীকাল|Agamikal ,1,relative_date
+পরশু|Parasu|Porasu,2,relative_date
+2 দিন পর|2 din pore,3,relative_date
+তারিখ|Tarikh,NA,month_date_ref
+দিন|Dina|din,NA,date_literal
+মাস|মাসে|Maas|maser|mas,NA,month_literal
+সোমবার|Sombar,0,weekday
+মঙ্গলবার|Mongolbar,1,weekday
+বুধবার|Budhbar,2,weekday
+বৃহস্পতিবার|Brihashpatibar|brihaspatibar,3,weekday
+শুক্রবার|Shukrobar,4,weekday
+শনিবার|Shonibar,5,weekday
+রবিবার|Rabibar|Robibar,6,weekday
+Januyari|জানুয়ারী,1,month
+Phebruyari|ফেব্রুয়ারি,2,month
+March|মার্চ,3,month
+Epril|এপ্রিল,4,month
+Me|মে,5,month
+Jun|জুন,6,month
+Juloi|জুলাই,7,month
+Agast|অগাস্ট,8,month
+Septembar|সেপ্টেম্বর,9,month
+Aktobar|অক্টোবর,10,month
+Nabhembar|নভেম্বর,11,month
+Disembar|ডিসেম্বর,12,month
