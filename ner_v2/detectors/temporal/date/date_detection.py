@@ -9,12 +9,14 @@ import pytz
 import models.crf.constant as model_constant
 import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
+from language_utilities.utils import translate_text
 from ner_v2.detectors.base_detector import BaseDetector
 from models.crf.models import Models
-from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED, \
+    FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE
 from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
 
-from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATE_DETECTION_FILE
 
 
@@ -602,6 +604,96 @@ class DateAdvancedDetector(BaseDetector):
                                              detection_method=detection_method)
             date_dict_list.append(data_dict)
         return date_dict_list
+
+    def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
+        """
+        Use detector to detect entities from text. It also translates query to language compatible to detector
+
+        Args:
+            message (str): natural text on which detection logic is to be run. Note if structured value is
+                                    detection is run on structured value instead of message
+            structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                    detection is run on structured value instead of message
+                                    (For example, UI elements like form, payload, etc)
+            fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                              or message then we return a fallback_value as an output.
+            bot_message (str): previous message from a bot/agent.
+
+        Returns:
+            dict or None: dictionary containing entity_value, original_text and detection;
+                          entity_value is in itself a dict with its keys varying from entity to entity
+
+        Example:
+            1) Consider an example of restaurant detection from a message
+
+                message = 'i want to order chinese from  mainland china and pizza from domminos'
+                structured_value = None
+                fallback_value = None
+                bot_message = None
+                output = detect(message=message, structured_value=structured_value,
+                                  fallback_value=fallback_value, bot_message=bot_message)
+                print output
+
+                    >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
+                    {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}}]
+
+            2) Consider an example of movie name detection from a structured value
+
+                message = 'i wanted to watch movie'
+                entity_name = 'movie'
+                structured_value = 'inferno'
+                fallback_value = None
+                bot_message = None
+                output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
+                                  fallback_value=fallback_value, bot_message=bot_message)
+                print output
+
+                    >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
+                    {'value': u'Inferno'}}]
+
+            3) Consider an example of movie name detection from  a message
+                message = 'i wanted to watch inferno'
+                entity_name = 'movie'
+                structured_value = 'delhi'
+                fallback_value = None
+                bot_message = None
+                output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
+                                  fallback_value=fallback_value, bot_message=bot_message)
+                print output
+
+                    >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
+
+        """
+        if self._language != self._processing_language and self._translation_enabled:
+            if structured_value:
+                translation_output = translate_text(structured_value, self._language,
+                                                    self._processing_language)
+                structured_value = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
+            elif message:
+                translation_output = translate_text(message, self._language,
+                                                    self._processing_language)
+                message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
+
+        text = structured_value if structured_value else message
+        entity_list, original_text_list = self.detect_entity(text=text)
+
+        if structured_value:
+            if entity_list:
+                value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list
+            else:
+                value, method, original_text = [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED, \
+                                               [structured_value]
+        elif entity_list:
+            value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
+        elif fallback_value:
+            entity_list, original_text_list = self.detect_entity(text=fallback_value)
+            value, method, original_text = entity_list, FROM_FALLBACK_VALUE, original_text_list
+        else:
+            return None
+
+        return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
+                                            detection_method=method, detection_language=self._processing_language)
 
 
 class DateDetector(object):

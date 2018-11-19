@@ -211,9 +211,9 @@ Create a method inside language date detection class accepting params `date_list
 class DateDetector(BaseRegexDate):
     def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
         ##
-        self.custom_detectors = [self.custom_chritmast_date_detector]
+        self.custom_detectors = [self.custom_christmas_date_detector]
 
-    def custom_chritmast_date_detector(self, date_list=None, original_list=None):
+    def custom_christmas_date_detector(self, date_list=None, original_list=None):
         """
         Method to detect chritmast
         Args:
@@ -226,7 +226,7 @@ class DateDetector(BaseRegexDate):
         date_list = date_list or []
         original_list = original_list or []
 
-        chritmas_regex = re.compile(r'((chritmas|xmas|x-mas|chistmas))')
+        chritmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
         day_match = chritmas_regex.findall(self.processed_text)
         for match in day_match:
             original = match[0]

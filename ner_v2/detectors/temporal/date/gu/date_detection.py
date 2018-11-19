@@ -1,5 +1,5 @@
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
+from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
 import os
 
 

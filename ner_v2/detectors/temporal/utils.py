@@ -5,41 +5,6 @@ import pandas as pd
 from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF, CONSTANT_FILE_KEY
 
 
-def separate_digit_text(text):
-    """
-    Separate digit and text with space
-    Args:
-        text (str): text
-    Returns:
-        clean_text (str): cleaned text with separated digits and chars
-    """
-    regex_patter = re.compile(r'([\d]+)(nd|st|th|rd)')
-    clean_text = regex_patter.sub(r'\1', text)
-    return clean_text
-
-
-def convert_numeral_to_number(text, numbers_dict):
-    """
-    Method to convert numeral present in text to numeric digites
-    Args:
-        text (str): text string containing numerals
-        numbers_dict (dict):  dict containing mapping of numeral to number
-    Returns:
-        text (str): text with numeral replaced with numeric
-
-    Examples:
-        >> convert_numeral_to_number('teesri tarikh ko')
-        >> '3 tarikh ko'
-
-    """
-    text = separate_digit_text(text)
-    common = set(text.split()) & set(numbers_dict.keys())
-    if common:
-        for each in list(common):
-            text = re.sub(each, str(numbers_dict[each][0]), text)
-    return text
-
-
 def nth_weekday(weekday, n, ref_date):
     """
     Method to return python datetime object for given nth weekday w.r.t ref_date (reference date)
@@ -66,7 +31,7 @@ def next_weekday(current_date, weekday, n):
         n (int): 0 for coming weekday, 1 for next weekday, 2 for next to next weekday
 
     Returns:
-
+        (datetime): next weekday datetime from current date
     """
     days_ahead = weekday - current_date.weekday()
     if days_ahead < 0:
