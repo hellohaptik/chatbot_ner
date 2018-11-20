@@ -1,5 +1,4 @@
 import re
-
 import os
 
 from ner_v2.constant import TYPE_EXACT

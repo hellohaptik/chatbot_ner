@@ -64,49 +64,7 @@ In order to add any new language you have to follow below steps:
 
 2. Create a folder named `data` inside language_code folder.
 
-3.  Add three files named `time_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv` inside data folder. Data these files will have is discussed later.
-
-4. Create a file `time_detection.py ` inside language_code folder and put below code inside that file.
-
-   ```python
-   from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
-   from ner_v2.detectors.temporal.time.standard_time_regex import BaseRegexTime
-   
-   import os
-   
-   
-   class TimeDetector(BaseRegexTime):
-       def __init__(self, entity_name, timezone='UTC'):
-           data_directory_path = os.path.join(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
-                                              LANGUAGE_DATA_DIRECTORY)
-   
-           super(TimeDetector, self).__init__(entity_name=entity_name, timezone=timezone,
-                                              data_directory_path=data_directory_path)
-   		self.custom_detectors = []
-       def detect_time(self, text):
-           """
-           Detects exact time for complete time information - hour, minute, time_type available in text
-   
-           Returns:
-               A tuple of two lists with first list containing the detected time entities and second list containing their
-               corresponding substrings in the given text.
-           """
-   
-           self.text = text
-           self.processed_text = self.text
-           self.tagged_text = self.text
-   
-           time_list, original_list = self._detect_time_from_standard_regex()
-   
-           # run custom date detectors
-           for detector in self.custom_detectors:
-               time_list, original_list = detector(time_list, original_list)
-               self._update_processed_text(original_list)
-   
-           return time_list, original_list
-   ```
-
-    
+3. Add three files named `time_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv` inside data folder. 
 
    Below is the folder structure of same after adding all the files for new language `xy`.
 
@@ -120,11 +78,10 @@ In order to add any new language you have to follow below steps:
                      |   |   |___time_constant.csv
                      |   |   |___datetime_diff_constant.csv
                      |   |   |___numbers_constant.csv
-                     |   |
-                     |	  |___time_detection.py
                      |
                      |__time_detection.py 
    ```
+
 
 
 

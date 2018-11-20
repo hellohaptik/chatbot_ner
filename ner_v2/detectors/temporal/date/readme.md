@@ -72,51 +72,7 @@ In order to add any new language you have to follow below steps:
 
 2. Create a folder named `data` inside language_code folder.
 
-3.  Add three files named `date_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv`inside data folder. Data these files will have is discussed later.
-
-4. Create a file `date_detection.py ` inside language_code folder and put below code inside that file.
-
-   ```python
-   from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
-   from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
-   import os
-   
-   
-   class DateDetector(BaseRegexDate):
-       def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
-   
-           data_directory_path = os.path.join(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
-                                              LANGUAGE_DATA_DIRECTORY)
-           super(DateDetector, self).__init__(entity_name=entity_name, timezone=timezone,
-                                              data_directory_path=data_directory_path,
-                                              is_past_referenced=past_date_referenced)
-           self.custom_detectors = []
-   
-       def detect_date(self, text):
-           """
-           Detects exact date for complete date information - day, month, year are available in text
-           and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults.
-   
-           Returns:
-               A tuple of two lists with first list containing the detected date entities and second list containing their
-               corresponding substrings in the given text.
-           """
-   
-           self.text = text
-           self.processed_text = self.text
-           self.tagged_text = self.text
-   
-           date_list, original_list  = self._detect_date_from_standard_regex()
-   
-           # run custom date detectors
-           for detector in self.custom_detectors:
-               date_list, original_list = detector(date_list, original_list)
-               self._update_processed_text(original_list)
-   
-           return date_list, original_list
-   ```
-
-    
+3. Add three files named `date_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv`inside data folder.  
 
    Below is the folder structure of same after adding all the files for new language `xy`.
 
@@ -127,18 +83,17 @@ In order to add any new language you have to follow below steps:
                  |___date
                      |___xy    # <- New language Added 
                      |	  |___data
-                     |   |   |___date_constant.csv
-                     |   |   |___datetime_diff_constant.csv
-                     |   |   |___numbers_constant.csv
-                     |   |
-                     |	  |___date_detection.py
+                     |      |___date_constant.csv
+                     |      |___datetime_diff_constant.csv
+                     |      |___numbers_constant.csv
                      |
                      |__date_detection.py 
    ```
 
 
 
-#### GuideLines to create data files
+
+####  GuideLines to create data files
 
 Below is the brief about how to create three data files `date_constant.csv`, `datetime_diff_constant.csv`, `numbers_constant.csv`.  All the description of each file is explained using hindi as a reference language. 
 
@@ -204,14 +159,39 @@ Below is the brief about how to create three data files `date_constant.csv`, `da
 
 #### GuideLines to add new Regex pattern for date apart from standared Regex:
 
-Create a method inside language date detection class accepting params `date_list` and `original_list` and return the their updated list. Defined method will have custom regex patterns and parser within same method. Also you need to add the method to `custom_ detector` class property . For reference check the below method `def custom_christmas_date_detector` defined here to detect date for patterns like 'christmas', 'x-mas'
+Create a new class `date_detection.py`  inside language directory.  Define init class as defined below and create a new detector method (here `custom_christmas_date_detector`) for new pattern and also define the detector_preference param having priority in which all standard detectors and new custom detector will run. For reference check the below class defined inside `date/hi/date_detection.py` to detect new date for patterns like 'christmas', 'x-mas'.
 
 ```python
+import re
+import os
+
+from ner_v2.constant import TYPE_EXACT
+from ner_v2.detectors.temporal.date.date_detection import get_lang_data_path
+from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
+
 
 class DateDetector(BaseRegexDate):
+    data_directory_path = get_lang_data_path(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep))
+
     def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
-        ##
-        self.custom_detectors = [self.custom_christmas_date_detector]
+        super(DateDetector, self).__init__(entity_name,
+                                           data_directory_path=DateDetector.data_directory_path,
+                                           timezone=timezone,
+                                           past_date_referenced=past_date_referenced)
+        self.detector_preferences = [
+            self._detect_relative_date,
+            self._detect_date_month,
+            self._detect_date_ref_month_1,
+            self._detect_date_ref_month_2,
+            self._detect_date_ref_month_3,
+            self.custom_christmas_date_detector,
+            self._detect_date_diff,
+            self._detect_after_days,
+            self._detect_weekday_ref_month_1,
+            self._detect_weekday_ref_month_2,
+            self._detect_weekday_diff,
+            self._detect_weekday
+        ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
         """
@@ -221,7 +201,10 @@ class DateDetector(BaseRegexDate):
         Returns:
             date_list (list): list of dict containing day, month, year from detected text
             original_list (list): list of original text corresponding to values detected
-
+        Examples:
+            >> self.processed_text = 'christmas'
+            >> self.custom_christmas_date_detector()
+            >> [{'dd': 25, 'mm': 12, 'yy': 2018, 'type': 'exact_date'}], ['christmas']
         """
         date_list = date_list or []
         original_list = original_list or []
@@ -239,7 +222,4 @@ class DateDetector(BaseRegexDate):
             date_list.append(date)
             original_list.append(original)
         return date_list, original_list
-
-    def detect_date(self, text):
- 		###
 ```
