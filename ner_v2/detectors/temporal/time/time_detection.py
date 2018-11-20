@@ -89,15 +89,11 @@ class TimeDetector(BaseDetector):
         self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
         self.language = language
-        time_detector_module = importlib.import_module(
-            'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
-
-        self.language_time_detector = time_detector_module.TimeDetector(self.entity_name)
 
         try:
             time_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
-            self.language_time_detector = time_detector_module.DateDetector(entity_name=self.entity_name)
+            self.language_time_detector = time_detector_module.TimeDetector(entity_name=self.entity_name)
 
         except ImportError:
             standard_time_regex = importlib.import_module(
