@@ -20,13 +20,13 @@ class DateDetector(BaseRegexDate):
             self._detect_date_ref_month_1,
             self._detect_date_ref_month_2,
             self._detect_date_ref_month_3,
-            self.custom_christmas_date_detector,
             self._detect_date_diff,
             self._detect_after_days,
             self._detect_weekday_ref_month_1,
             self._detect_weekday_ref_month_2,
             self._detect_weekday_diff,
-            self._detect_weekday
+            self._detect_weekday,
+            self.custom_christmas_date_detector,
         ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
@@ -45,8 +45,8 @@ class DateDetector(BaseRegexDate):
         date_list = date_list or []
         original_list = original_list or []
 
-        chritmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
-        day_match = chritmas_regex.findall(self.processed_text)
+        christmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
+        day_match = christmas_regex.findall(self.processed_text)
         for match in day_match:
             original = match[0]
             date = {
