@@ -38,7 +38,10 @@ class DateDetector(BaseRegexDate):
         Returns:
             date_list (list): list of dict containing day, month, year from detected text
             original_list (list): list of original text corresponding to values detected
-
+        Examples:
+            >> self.processed_text = 'christmas'
+            >> self.custom_christmas_date_detector()
+            >> [{'dd': 25, 'mm': 12, 'yy': 2018, 'type': 'exact_date'}], ['christmas']
         """
         date_list = date_list or []
         original_list = original_list or []
