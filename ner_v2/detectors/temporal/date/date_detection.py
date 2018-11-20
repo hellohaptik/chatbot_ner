@@ -772,7 +772,7 @@ class DateDetector(object):
             self.language_date_detector = standard_date_regex.DateDetector(
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(self.language),
-                timezone=timezone,
+                timezone=self.timezone,
                 past_date_referenced=past_date_referenced
             )
 
