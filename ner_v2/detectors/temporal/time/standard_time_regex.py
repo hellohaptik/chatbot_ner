@@ -12,15 +12,14 @@ from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
 
 class BaseRegexTime(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_time_referenced=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False,
+                 form_check=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
         Args:
             data_directory_path (str): path of data folder for given language
             timezone (str): user timezone default UTC
-            past_time_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
-                                          'parso' to know if the reference is past or future.
         """
         self.text = ''
         self.tagged_text = ''
@@ -35,8 +34,6 @@ class BaseRegexTime(object):
             ner_logger.debug('Default timezone passed as "UTC"')
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
-
-        self.is_past_referenced = past_time_referenced
 
         # dict to store words for time, numerals and words which comes in reference to some date
         self.time_constant_dict = {}
@@ -66,9 +63,8 @@ class BaseRegexTime(object):
         self.processed_text = self.text
         self.tagged_text = self.text
 
-        time_list, original_list = self._detect_time_from_standard_regex()
+        time_list, original_list = [], []
 
-        # run custom date detectors
         for detector in self.detector_preferences:
             time_list, original_list = detector(time_list, original_list)
             self._update_processed_text(original_list)
@@ -272,25 +268,11 @@ class BaseRegexTime(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _detect_time_from_standard_regex(self):
-        """
-        Method to detect time running parsers in order defined in self.detector_preferences
-        Args:
-
-        Returns:
-            time_list (list): list of dict containing hour, minute, time type from detected text
-            original_list (list): list of original text corresponding to values detected
-        """
-        time_list, original_list = None, None
-        for detector in self.detector_preferences:
-            time_list, original_list = detector(time_list, original_list)
-            self._update_processed_text(original_list)
-
-        return time_list, original_list
-
 
 class TimeDetector(BaseRegexTime):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False, form_check=False):
         super(TimeDetector, self).__init__(entity_name=entity_name,
                                            data_directory_path=data_directory_path,
-                                           timezone=timezone)
+                                           timezone=timezone,
+                                           range_enabled=range_enabled,
+                                           form_check=form_check)

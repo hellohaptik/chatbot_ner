@@ -93,7 +93,10 @@ class TimeDetector(BaseDetector):
         try:
             time_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
-            self.language_time_detector = time_detector_module.TimeDetector(entity_name=self.entity_name)
+            self.language_time_detector = time_detector_module.TimeDetector(entity_name=self.entity_name,
+                                                                            timezone=self.timezone,
+                                                                            range_enabled=range_enabled,
+                                                                            form_check=form_check)
 
         except ImportError:
             standard_time_regex = importlib.import_module(
@@ -102,6 +105,9 @@ class TimeDetector(BaseDetector):
             self.language_time_detector = standard_time_regex.TimeDetector(
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(self.language),
+                timezone=self.timezone,
+                range_enabled=range_enabled,
+                form_check=form_check
             )
 
     @property

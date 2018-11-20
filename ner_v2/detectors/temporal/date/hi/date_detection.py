@@ -20,13 +20,13 @@ class DateDetector(BaseRegexDate):
             self._detect_date_ref_month_1,
             self._detect_date_ref_month_2,
             self._detect_date_ref_month_3,
-            self.custom_christmas_date_detector,
             self._detect_date_diff,
             self._detect_after_days,
             self._detect_weekday_ref_month_1,
             self._detect_weekday_ref_month_2,
             self._detect_weekday_diff,
-            self._detect_weekday
+            self._detect_weekday,
+            self.custom_christmas_date_detector,
         ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):

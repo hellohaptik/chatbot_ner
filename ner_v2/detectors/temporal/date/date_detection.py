@@ -763,7 +763,8 @@ class DateDetector(object):
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
             self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
-                                                                            past_date_referenced=past_date_referenced)
+                                                                            past_date_referenced=past_date_referenced,
+                                                                            timezone=self.timezone)
         except ImportError:
             standard_date_regex = importlib.import_module(
                 'ner_v2.detectors.temporal.date.standard_date_regex'
@@ -771,6 +772,7 @@ class DateDetector(object):
             self.language_date_detector = standard_date_regex.DateDetector(
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(self.language),
+                timezone=timezone,
                 past_date_referenced=past_date_referenced
             )
 
