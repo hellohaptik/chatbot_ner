@@ -45,8 +45,8 @@ class DateDetector(BaseRegexDate):
         date_list = date_list or []
         original_list = original_list or []
 
-        chritmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
-        day_match = chritmas_regex.findall(self.processed_text)
+        christmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
+        day_match = christmas_regex.findall(self.processed_text)
         for match in day_match:
             original = match[0]
             date = {
