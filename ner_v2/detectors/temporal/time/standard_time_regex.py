@@ -162,32 +162,18 @@ class BaseRegexTime(object):
             if values[0] == DAYTIME_MERIDIAN and key in original_text:
                 return values[1]
 
-        if not self.is_past_referenced:
-            if current_hour > TWELVE_HOUR:
-                current_hour -= 12
-                if current_hour < hours:
-                    return PM_MERIDIEM
-                elif current_hour == hours and current_min < mins:
-                    return PM_MERIDIEM
-            else:
-                if current_hour > hours:
-                    return PM_MERIDIEM
-                elif current_hour == hours and current_min < mins:
-                    return PM_MERIDIEM
-            return AM_MERIDIEM
+        if current_hour >= TWELVE_HOUR:
+            current_hour -= 12
+            if current_hour < hours:
+                return PM_MERIDIEM
+            elif current_hour == hours and current_min < mins:
+                return PM_MERIDIEM
         else:
-            if current_hour > TWELVE_HOUR:
-                current_hour -= 12
-                if current_hour < hours:
-                    return AM_MERIDIEM
-                elif current_hour == hours and current_min < mins:
-                    return AM_MERIDIEM
-            else:
-                if current_hour > hours:
-                    return AM_MERIDIEM
-                elif current_hour == hours and current_min < mins:
-                    return AM_MERIDIEM
-            return PM_MERIDIEM
+            if current_hour > hours:
+                return PM_MERIDIEM
+            elif current_hour == hours and current_min > mins:
+                return PM_MERIDIEM
+        return AM_MERIDIEM
 
     def _detect_hour_minute(self, time_list, original_list):
         """
