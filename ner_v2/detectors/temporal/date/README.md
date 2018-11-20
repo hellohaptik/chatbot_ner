@@ -191,11 +191,14 @@ Next we define a custom detector. For our purposes we will add a deector to dete
 2. The two arguments `date_list` and `original_list` can both be either None or lists of same length.
    `date_list` contains parsed date values and `original_list` contains their corresponding text substrings
    in the passed text that were detected as dates.
-3. Your detector must appened parsed date dicts with keys 'dd', 'mm', 'yy' and 'type' to `date_list`
+3. Your detector must appened parsed date dicts with keys `'dd', 'mm', 'yy', 'type'` to `date_list`
    and to `original_list` their corresponding substrings from `self.processed_text` that were parsed into dates.
-4. Finally your detector must return a tuple of (date_list, original_list)
+4. Take care to not mutate `self.processed_text` in any way as main detect method in base class depends on it
+   to eliminate already detected dates from it after each detector is run.
+5. Finally your detector must return a tuple of (date_list, original_list). Ensure that `date_list` and `original_list`
+   are of equal lengths before returning them.
 
-Types of dates that go under 'type' key are defined at ner_v2/constant.py
+Types of dates that go under `'type'` key are defined at `ner_v2/constant.py`
 
 ```python
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
@@ -298,8 +301,8 @@ class DateDetector(BaseRegexDate):
         return date_list, original_list
 ```
 
-For a working example, please refer ner_v2/detectors/temporal/date/hi/date_detection.py
+For a working example, please refer `ner_v2/detectors/temporal/date/hi/date_detection.py`
 
-Please Note that the API right now is too rigid
-and we plan to change it to make it much more easier to extend in the future
+**Please note that the API right now is too rigid and we plan to change it to make it much more
+easier to extend in the future**
 
