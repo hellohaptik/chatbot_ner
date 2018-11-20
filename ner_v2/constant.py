@@ -3,6 +3,7 @@
 ENTITY_MONTH = 'month_list'
 ENTITY_DAY = 'day_list'
 
+# DATE TYPES
 TYPE_EXACT = 'date'
 TYPE_EVERYDAY = 'everyday'
 TYPE_PAST = 'past'  # for dates in the past
@@ -14,13 +15,12 @@ TYPE_DAY_BEFORE = 'day_before'
 TYPE_N_DAYS_AFTER = 'after_n_days'
 TYPE_NEXT_DAY = 'day_in_next_week'
 TYPE_THIS_DAY = 'day_within_one_week'
+TYPE_POSSIBLE_DAY = 'possible_day'
 
 
 # ORIGINAL constants
 # TYPE_NEXT_DAY = 'next_day'
 # TYPE_CURRENT_DAY = 'current_day'
-
-TYPE_POSSIBLE_DAY = 'possible_day'
 
 # TIME DETECTION
 AM_MERIDIEM = 'am'

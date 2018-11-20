@@ -2,22 +2,33 @@
 import copy
 import datetime
 import importlib
-import re
 import os
+import re
+
 import pytz
 
 import models.crf.constant as model_constant
-import ner_v1.constant as detector_constant
+import ner_v2.constant as detector_constant
 from chatbot_ner.config import ner_logger
+from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
 from language_utilities.utils import translate_text
-from ner_v2.detectors.base_detector import BaseDetector
 from models.crf.models import Models
 from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED, \
     FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE
 from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
+from ner_v2.detectors.base_detector import BaseDetector
+from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
 
-from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
-from ner_v2.detectors.temporal.constant import LANGUAGE_DATE_DETECTION_FILE
+
+def get_lang_data_path(lang_code):
+    data_directory_path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
+            lang_code,
+            LANGUAGE_DATA_DIRECTORY
+        )
+    )
+    return data_directory_path
 
 
 class DateAdvancedDetector(BaseDetector):
@@ -39,6 +50,7 @@ class DateAdvancedDetector(BaseDetector):
         date_detector_object: DateDetector object used to detect dates in the given text
         bot_message: str, set as the outgoing bot text/message
     """
+
     @staticmethod
     def get_supported_languages():
         """
@@ -50,7 +62,7 @@ class DateAdvancedDetector(BaseDetector):
         cwd = os.path.dirname(os.path.abspath(__file__))
         cwd_dirs = [x for x in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, x))]
         for _dir in cwd_dirs:
-            if os.path.exists(os.path.join(cwd, _dir, LANGUAGE_DATE_DETECTION_FILE)):
+            if len(_dir.rstrip(os.sep)) == 2:
                 supported_languages.append(_dir)
         return supported_languages
 
@@ -75,7 +87,9 @@ class DateAdvancedDetector(BaseDetector):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.date_detector_object = DateDetector(entity_name=entity_name, language=language, timezone=timezone,
+        self.date_detector_object = DateDetector(entity_name=entity_name,
+                                                 language=language,
+                                                 timezone=timezone,
                                                  past_date_referenced=past_date_referenced)
         self.bot_message = None
 
@@ -744,10 +758,23 @@ class DateDetector(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.language = language
-        date_detector_module = importlib.import_module(
-            'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
-        self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
-                                                                        past_date_referenced=past_date_referenced)
+
+        try:
+            date_detector_module = importlib.import_module(
+                'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
+            self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
+                                                                            past_date_referenced=past_date_referenced,
+                                                                            timezone=self.timezone)
+        except ImportError:
+            standard_date_regex = importlib.import_module(
+                'ner_v2.detectors.temporal.date.standard_date_regex'
+            )
+            self.language_date_detector = standard_date_regex.DateDetector(
+                entity_name=self.entity_name,
+                data_directory_path=get_lang_data_path(self.language),
+                timezone=self.timezone,
+                past_date_referenced=past_date_referenced
+            )
 
     def detect_entity(self, text, **kwargs):
         """
@@ -779,7 +806,19 @@ class DateDetector(object):
         self.tagged_text = self.text
         if self.language_date_detector:
             self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text)
-        return self.date, self.original_date_text
+
+        validated_date_list, validated_original_list = [], []
+
+        # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
+        for date, original_text in zip(self.date, self.original_date_text):
+            try:
+                datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
+                validated_date_list.append(date)
+                validated_original_list.append(original_text)
+            except ValueError:
+                pass
+
+        return validated_date_list, validated_original_list
 
     def set_bot_message(self, bot_message):
         """

@@ -1,27 +1,28 @@
 # coding=utf-8
+
+import datetime
+import re
+
+import pytz
+from dateutil.relativedelta import relativedelta
+
 from chatbot_ner.config import ner_logger
 from ner_v2.constant import TYPE_EXACT
 from ner_v2.detectors.temporal.constant import DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE, \
     RELATIVE_DATE, DATE_LITERAL_TYPE, MONTH_LITERAL_TYPE, WEEKDAY_TYPE, \
     MONTH_TYPE, ADD_DIFF_DATETIME_TYPE, MONTH_DATE_REF_TYPE, NUMERALS_CONSTANT_FILE
-import pytz
-import re
-import abc
-import datetime
-from dateutil.relativedelta import relativedelta
-
 from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple_dict
 
 
 class BaseRegexDate(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', is_past_referenced=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
         Args:
             data_directory_path (str): path of data folder for given language
             timezone (str): user timezone default UTC
-            is_past_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
+            past_date_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
                                           'parso' to know if the reference is past or future.
         """
         self.text = ''
@@ -41,7 +42,7 @@ class BaseRegexDate(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
-        self.is_past_referenced = is_past_referenced
+        self.is_past_referenced = past_date_referenced
 
         # dict to store words for date, numerals and words which comes in reference to some date
         self.date_constant_dict = {}
@@ -78,9 +79,16 @@ class BaseRegexDate(object):
                                      self._detect_weekday
                                      ]
 
-    @abc.abstractmethod
     def detect_date(self, text):
-        return [], []
+        self.text = text
+        self.processed_text = text
+        self.tagged_text = text
+
+        date_list, original_list = None, None
+        for detector in self.detector_preferences:
+            date_list, original_list = detector(date_list, original_list)
+            self._update_processed_text(original_list)
+        return date_list, original_list
 
     @staticmethod
     def _sort_choices_on_word_counts(choices_list):
@@ -550,30 +558,10 @@ class BaseRegexDate(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def _detect_date_from_standard_regex(self):
-        """
-        Method to detect date running parser in order defined in self.detector_preferences
-        Args:
 
-        Returns:
-            validated_date_list (list): list of dict containing day, month, year from detected text
-            validated_original_list (list): list of original text corresponding to values detected
-        """
-        date_list, original_list = None, None
-        for detector in self.detector_preferences:
-            date_list, original_list = detector(date_list, original_list)
-            self._update_processed_text(original_list)
-
-        validated_date_list, validated_original_list = [], []
-
-        # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
-        for date, original_text in zip(date_list, original_list):
-            try:
-                datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
-                validated_date_list.append(date)
-                validated_original_list.append(original_text)
-            except ValueError:
-                pass
-
-        return validated_date_list, validated_original_list
-
+class DateDetector(BaseRegexDate):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
+        super(DateDetector, self).__init__(entity_name=entity_name,
+                                           data_directory_path=data_directory_path,
+                                           timezone=timezone,
+                                           past_date_referenced=past_date_referenced)
