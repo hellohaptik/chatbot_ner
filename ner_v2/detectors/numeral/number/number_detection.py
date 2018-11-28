@@ -106,7 +106,7 @@ class NumberDetector(BaseDetector):
 
         except ImportError:
             standard_number_regex = importlib.import_module(
-                'ner_v2.detectors.numeral.number.standard_number_regex'
+                'ner_v2.detectors.numeral.number.standard_number_detector'
             )
             self.language_number_detector = standard_number_regex.NumberDetector(
                 entity_name=self.entity_name,
