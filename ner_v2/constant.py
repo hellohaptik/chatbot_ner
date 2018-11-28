@@ -73,3 +73,21 @@ DATE_TYPE_PROPERTY = 'type'
 DATE_VALUE = 'value'
 ORIGINAL_DATE_TEXT = 'text'
 DATE_DETECTION_METHOD = 'detection_method'
+
+# Number detector constants
+NUMBER_DIGIT_UNITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+DIGIT_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
+NUMERIC_VARIANTS = DIGIT_UNITS + [
+    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+    "sixteen", "seventeen", "eighteen", "nineteen", "and",
+    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+    "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
+]
+
+NUMBER_DATA_FILE_NUMBER = 'number'
+NUMBER_DATA_FILE_NUMERALS = 'numerals'
+NUMBER_DATA_FILE_VALUE = 'value'
+NUMBER_DATA_FILE_TYPE = 'type'
+
+NUMBER_TYPE_UNIT = 'unit'
+NUMBER_TYPE_SCALE = 'scale'

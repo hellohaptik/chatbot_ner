@@ -1,0 +1,105 @@
+number,numerals,value,type
+०,शून्य|zero|sunya,0,unit
+१,एक|ek|ik,1,unit
+२,दो|do|du,2,unit
+३,तीन|teen|tin,3,unit
+४,चार |char|chaar,4,unit
+५,पाँच |panch|paanch|paach,5,unit
+६,छह |chhe|chhah|chheh,6,unit
+७,सात |saat,7,unit
+८,आठ |ath|aath,8,unit
+९,नौ |nau|nao,9,unit
+१०,दस | dus|das,10,unit
+११,ग्यारह |gyareh|gyarah,11,unit
+१२,बारह | bareh|barah,12,unit
+१३,तेरह | terah|tereh,13,unit
+१४,चौदह |chaudeh|chaudah|chauda,14,unit
+१५,पन्द्रह | pandreh | pandrah|pehdrah|pendreh,15,unit
+१६,सोलह |solah|soleh|sholah|sholeh,16,unit
+१७,सत्रह |satreh|starah,17,unit
+१८,अठारह | athrah|athreh|aththarah|aththareh,18,unit
+१९,उन्नीस | unnis| unnish,19,unit
+२०,बीस | bis|bish|bees|beesh,20,unit
+२१,इक्कीस | ikkis|ikkish|ekkis|ekkish,21,unit
+२२,बाईस | bais| baish|bayis|bayish,22,unit
+२३,तेईस | teis|teish|teyis|teyish,23,unit
+२४,चौबीस | chaubis|chaubish|chaubees|chaubeesh,24,unit
+२५,पच्चीस |pachis|pachish|pachchis|pachchish|pachees|pacheesh|pachchees|pachcheesh,25,unit
+२६,छब्बीस | chhabis|chhabish|chhabees|chhabeesh|chhabbis|chhabbish|chhabbees|chhabbeesh,26,unit
+२७,सत्ताईस | sattais|sattaish|sattaees|sattaeesh,27,unit
+२८,अट्ठाईस | athais|athaish|athaees|athaeesh|aththais|aththaish|aththaees|aththaeesh,28,unit
+२९,उनतीस | untis|untish|untees|unteesh,29,unit
+३०,तीस | tis| tish|tees|teesh,30,unit
+३१,इकतीस ,31,unit
+३२,बत्तीस ,32,unit
+३३,तैंतीस ,33,unit
+३४,चौंतीस ,34,unit
+३५,पैंतीस ,35,unit
+३६,छत्तीस ,36,unit
+३७,सैंतीस ,37,unit
+३८,अड़तीस ,38,unit
+३९,उनतालीस ,39,unit
+४०,चालीस ,40,unit
+४१,इकतालीस ,41,unit
+४२,बयालीस ,42,unit
+४३,तैंतालीस ,43,unit
+४४,चौंतालीस ,44,unit
+४५,पैंतालीस ,45,unit
+४६,छियालीस ,46,unit
+४७,सैंतालीस ,47,unit
+४८,अड़तालीस ,48,unit
+४९,उनचास ,49,unit
+५०,पचास ,50,unit
+५१,इक्याबन ,51,unit
+५२,बावन ,52,unit
+५३,तिरेपन ,53,unit
+५४,चौबन ,54,unit
+५५,पचपन ,55,unit
+५६,छप्पन ,56,unit
+५७,सत्तावन ,57,unit
+५८,अट्ठावन ,58,unit
+५९,उनसठ ,59,unit
+६०,साठ ,60,unit
+६१,इकसठ ,61,unit
+६२,बासठ ,62,unit
+६३,तिरसठ ,63,unit
+६४,चौंसठ ,64,unit
+६५,पैंसठ ,65,unit
+६६,छियासठ ,66,unit
+६७,सड़सठ ,67,unit
+६८,अड़सठ ,68,unit
+६९,उनहत्तर ,69,unit
+७०,सत्तर ,70,unit
+७१,इकहत्तर ,71,unit
+७२,बहत्तर ,72,unit
+७३,तिहत्तर ,73,unit
+७४,चौहत्तर ,74,unit
+७५,पचहत्तर ,75,unit
+७६,छिहत्तर ,76,unit
+७७,सतहत्तर ,77,unit
+७८,अठहत्तर ,78,unit
+७९,उनासी ,79,unit
+८०,अस्सी ,80,unit
+८१,इक्यासी ,81,unit
+८२,बयासी ,82,unit
+८३,तिरासी ,83,unit
+८४,चौरासी ,84,unit
+८५,पचासी ,85,unit
+८६,छियासी ,86,unit
+८७,सतासी ,87,unit
+८८,अठासी ,88,unit
+८९,नवासी ,89,unit
+९०,नब्बे ,90,unit
+९१,इक्यानबे ,91,unit
+९२,बानवे ,92,unit
+९३,तिरानवे ,93,unit
+९४,चौरानवे ,94,unit
+९५,पचानवे ,95,unit
+९६,छियानवे ,96,unit
+९७,सत्तानवे ,97,unit
+९८,अट्ठानवे ,98,unit
+९९,निन्यानवे ,99,unit
+१००,सौ ,100,scale
+१०००,हज़ार ,1000,scale
+१०००००,लाख ,100000,scale
+१०००००००,करोड़ ,10000000,scale
