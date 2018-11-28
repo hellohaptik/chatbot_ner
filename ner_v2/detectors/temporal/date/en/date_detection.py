@@ -166,6 +166,9 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_month_format_for_arrival_departure_2(date_list, original_list)
         self._update_processed_text(original_list)
+        date_list, original_list = self._date_departure_arrival_identification_given_day_and_next_month(date_list,
+                                                                                                        original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
@@ -1620,6 +1623,69 @@ class DateDetector(object):
 
                 original_list.append(original)
                 original_list.append(original)
+
+        return date_list, original_list
+
+    def _date_departure_arrival_identification_given_day_and_next_month(self, date_list=None, original_list=None):
+        """
+        Detects probable "start_date to/till/- end_date of coming/next month" format and its variants and returns both
+        start date and end date
+        format: <day><ordinal indicator><range separator><day><ordinal indicator><separator><Optional "of">
+        (coming/next)<month>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: mmm, mmmm (abbreviation or spelled out in full)
+            separator: ",", space
+            range separator: "to", "-", "till"
+
+        Few valid examples:
+            "21st to 30th of coming month", "2 till 15 next month", "10 - 15 of next month"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?'
+                                   r'(?:next|nxt|comm?ing?|foll?owing?|)\s*(mo?nth))\b')
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd1 = pattern[1]
+            dd2 = pattern[2]
+            previous_mm = self.now_date.month
+            yy = self.now_date.year
+            mm = previous_mm + 1
+            if mm > 12:
+                mm = 1
+                yy += 1
+
+            date_dict_1 = {
+                'dd': int(dd1),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_EXACT
+                }
+            date_dict_2 = {
+                'dd': int(dd2),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_EXACT
+                }
+            date_list.append(date_dict_1)
+            date_list.append(date_dict_2)
+
+            original_list.append(original)
+            original_list.append(original)
 
         return date_list, original_list
 
