@@ -164,6 +164,8 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
         self._update_processed_text(original_list)
+        date_list, original_list = self._day_month_format_for_arrival_departure_2(date_list, original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
