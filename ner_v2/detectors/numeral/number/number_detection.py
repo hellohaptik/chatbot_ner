@@ -139,7 +139,7 @@ class NumberDetector(BaseDetector):
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        number_data = self.language_number_detector.detect_number()
+        number_data = self.language_number_detector.detect_number(self.processed_text)
         self.number = number_data[0]
         self.original_number_text = number_data[1]
         return number_data

@@ -30,7 +30,7 @@ class BaseNumberDetector(object):
         self.detector_preferences = [self._detect_number_from_numerals,
                                      self._detect_numeric_digit]
 
-    def detect_time(self, text):
+    def detect_number(self, text):
         self.text = text
         self.processed_text = text
         self.tagged_text = text
