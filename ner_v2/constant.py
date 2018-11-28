@@ -91,3 +91,5 @@ NUMBER_DATA_FILE_TYPE = 'type'
 
 NUMBER_TYPE_UNIT = 'unit'
 NUMBER_TYPE_SCALE = 'scale'
+
+NUMBER_DATA_CONSTANT_FILE = 'numerals_constant.csv'

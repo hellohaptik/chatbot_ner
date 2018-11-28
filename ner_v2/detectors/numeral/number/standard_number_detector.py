@@ -1,8 +1,9 @@
 # coding=utf-8
 import pandas as pd
+import os
 
 from ner_v2.constant import NUMBER_DATA_FILE_NUMBER, NUMBER_DATA_FILE_NUMERALS, NUMBER_DATA_FILE_VALUE, \
-    NUMBER_TYPE_UNIT, NUMBER_DATA_FILE_TYPE, NUMBER_DIGIT_UNITS
+    NUMBER_TYPE_UNIT, NUMBER_DATA_FILE_TYPE, NUMBER_DIGIT_UNITS, NUMBER_DATA_CONSTANT_FILE
 
 
 class BaseNumberDetector(object):
@@ -20,8 +21,8 @@ class BaseNumberDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.numbers_word = None
-        self.language_number_map = None
+        self.numbers_word = {}
+        self.language_number_map = {}
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
@@ -61,7 +62,7 @@ class BaseNumberDetector(object):
         Returns:
             None
         """
-        data_df = pd.read_csv(data_directory_path)
+        data_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_DATA_CONSTANT_FILE), encoding='utf-8')
         for index, row in data_df.iterrows():
             if row[NUMBER_DATA_FILE_VALUE] in NUMBER_DIGIT_UNITS:
                 self.language_number_map[row[NUMBER_DATA_FILE_NUMBER]] = row[NUMBER_DATA_FILE_VALUE]
@@ -70,10 +71,12 @@ class BaseNumberDetector(object):
             numerals_list = self._get_numerals_list(row[NUMBER_DATA_FILE_NUMERALS])
             if row[NUMBER_DATA_FILE_TYPE] == NUMBER_TYPE_UNIT:
                 self.numbers_word[row[NUMBER_DATA_FILE_NUMBER]] = (1, row[NUMBER_DATA_FILE_VALUE])
+                self.numbers_word[str(row[NUMBER_DATA_FILE_VALUE])] = (1, row[NUMBER_DATA_FILE_VALUE])
                 for each in numerals_list:
                     self.numbers_word[each] = (1, row[NUMBER_DATA_FILE_VALUE])
             else:
                 self.numbers_word[row[NUMBER_DATA_FILE_NUMBER]] = (row[NUMBER_DATA_FILE_VALUE], 0)
+                self.numbers_word[str(row[NUMBER_DATA_FILE_VALUE])] = (row[NUMBER_DATA_FILE_VALUE], 0)
                 for each in numerals_list:
                     self.numbers_word[each] = (row[NUMBER_DATA_FILE_VALUE], 0)
 
@@ -87,7 +90,7 @@ class BaseNumberDetector(object):
         for word in self.processed_text.split():
             if word not in self.numbers_word:
                 if on_number:
-                    original = result_text.strip() + " " + current_text.strip()
+                    original = (result_text.strip() + " " + current_text.strip()).strip()
                     number_list.append(repr(result + current))
                     original_list.append(original)
 
@@ -106,7 +109,7 @@ class BaseNumberDetector(object):
                 on_number = True
 
         if on_number:
-            original = result_text.strip() + " " + current_text.strip()
+            original = (result_text.strip() + " " + current_text.strip()).strip()
             number_list.append(repr(result + current))
             original_list.append(original)
 
@@ -119,7 +122,7 @@ class BaseNumberDetector(object):
         for word in self.processed_text.split():
             word_chars = list(word)
             if not (set(word_chars) - set(self.language_number_map.keys())):
-                number = [str(self.language_number_map[ch]) for ch in word_chars]
+                number = "".join([str(self.language_number_map[ch]) for ch in word_chars])
                 number_list.append(number)
                 original_list.append(word)
 
