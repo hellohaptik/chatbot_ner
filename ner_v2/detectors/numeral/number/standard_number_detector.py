@@ -52,7 +52,7 @@ class BaseNumberDetector(object):
             (list) : list containing numeral after split
         """
         numerals_list = numerals_text.split("|")
-        return [num.strip() for num in numerals_list if num.strip()]
+        return [num.lower().strip() for num in numerals_list if num.strip()]
 
     def init_regex_and_parser(self, data_directory_path):
         """
@@ -128,7 +128,7 @@ class BaseNumberDetector(object):
 
         return number_list, original_list
 
-    def _update_processed_text(self, original_date_list):
+    def _update_processed_text(self, original_number_list):
         """
         Replaces detected date with tag generated from entity_name used to initialize the object with
 
@@ -136,10 +136,10 @@ class BaseNumberDetector(object):
         A string with all dates removed will be stored in object's processed_text attribute
 
         Args:
-            original_date_list (list): list of substrings of original text to be replaced with tag
+            original_number_list (list): list of substrings of original text to be replaced with tag
                                        created from entity_name
         """
-        for detected_text in original_date_list:
+        for detected_text in original_number_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
