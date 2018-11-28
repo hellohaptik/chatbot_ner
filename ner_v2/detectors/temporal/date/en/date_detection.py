@@ -1186,7 +1186,7 @@ class DateDetector(object):
             date = datetime.date(year=yy, month=mm, day=dd)
             if date < self.now_date.date():
                 mm += 1
-                if mm + 1 > 12:
+                if mm > 12:
                     mm = 1
                     yy += 1
 
@@ -1540,6 +1540,64 @@ class DateDetector(object):
             dd1 = pattern[1]
             dd2 = pattern[2]
             probable_mm = pattern[3]
+            mm = self.__get_month_index(probable_mm)
+            yy = self.now_date.year
+            if mm:
+                date_dict_1 = {
+                    'dd': int(dd1),
+                    'mm': int(mm),
+                    'yy': int(yy),
+                    'type': TYPE_EXACT
+                }
+                date_dict_2 = {
+                    'dd': int(dd2),
+                    'mm': int(mm),
+                    'yy': int(yy),
+                    'type': TYPE_EXACT
+                }
+                date_list.append(date_dict_1)
+                date_list.append(date_dict_2)
+
+                original_list.append(original)
+                original_list.append(original)
+
+        return date_list, original_list
+
+    def _day_month_format_for_arrival_departure_2(self, date_list=None, original_list=None):
+        """
+        Detects probable "start_date month to/till/- end_date" format and its variants and returns both start date
+        and end date
+        format: <day><ordinal indicator><Optional "of"><month><range separator><day><ordinal indicator><separator>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: mmm, mmmm (abbreviation or spelled out in full)
+            separator: ",", space
+            range separator: "to", "-", "till"
+
+        Few valid examples:
+            "21st jan to 30th", "2 nov till 15", "10 february - 15"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?\s?([A-Za-z]+)\s?'
+                                   r'(?:-|to|-|till)\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd1 = pattern[1]
+            dd2 = pattern[3]
+            probable_mm = pattern[2]
             mm = self.__get_month_index(probable_mm)
             yy = self.now_date.year
             if mm:
