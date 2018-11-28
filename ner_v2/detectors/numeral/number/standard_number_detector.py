@@ -81,6 +81,15 @@ class BaseNumberDetector(object):
                     self.numbers_word[each] = (row[NUMBER_DATA_FILE_VALUE], 0)
 
     def _detect_number_from_numerals(self, number_list, original_list):
+        """
+        Detect number from numerals
+        Args:
+            number_list (list): list containing detected numeric text
+            original_list (list): list containing original numeral text
+        Returns:
+            number_list (list): list containing updated detected numeric text
+            original_list (list): list containing updated original numeral text
+        """
         number_list = number_list or []
         original_list = original_list or []
 
@@ -116,6 +125,15 @@ class BaseNumberDetector(object):
         return number_list, original_list
 
     def _detect_numeric_digit(self, number_list, original_list):
+        """
+        Detect number from numeric text
+        Args:
+            number_list (list): list containing detected numeric text
+            original_list (list): list containing original numeral text
+        Returns:
+            number_list (list): list containing updated detected numeric text
+            original_list (list): list containing updated original numeral text
+        """
         number_list = number_list or []
         original_list = original_list or []
 
