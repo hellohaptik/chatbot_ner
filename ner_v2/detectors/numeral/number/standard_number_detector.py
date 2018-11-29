@@ -69,10 +69,9 @@ class BaseNumberDetector(object):
         for index, row in data_df.iterrows():
             number = row[NUMBER_DATA_FILE_NUMBER]
             numerals = row[NUMBER_DATA_FILE_NUMERALS]
-            try:
-                value = int(str(row[NUMBER_DATA_FILE_VALUE]))
-            except ValueError:
-                value = float(str(row[NUMBER_DATA_FILE_VALUE]))
+            value = row[NUMBER_DATA_FILE_VALUE]
+            if value.is_integer():
+                value = int(row[NUMBER_DATA_FILE_VALUE])
             number_type = row[NUMBER_DATA_FILE_TYPE]
 
             if value in NUMBER_DIGIT_UNITS:
