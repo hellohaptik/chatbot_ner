@@ -70,12 +70,12 @@ class BaseNumberDetector(object):
             number = row[NUMBER_DATA_FILE_NUMBER]
             numerals = row[NUMBER_DATA_FILE_NUMERALS]
             try:
-                value = int(row[NUMBER_DATA_FILE_VALUE])
+                value = int(str(row[NUMBER_DATA_FILE_VALUE]))
             except ValueError:
-                value = float(row[NUMBER_DATA_FILE_VALUE])
+                value = float(str(row[NUMBER_DATA_FILE_VALUE]))
             number_type = row[NUMBER_DATA_FILE_TYPE]
 
-            if number in NUMBER_DIGIT_UNITS:
+            if value in NUMBER_DIGIT_UNITS:
                 self.language_number_map[number] = value
                 self.language_number_map[str(value)] = value
 
