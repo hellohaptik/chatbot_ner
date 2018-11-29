@@ -67,21 +67,27 @@ class BaseNumberDetector(object):
         """
         data_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_DATA_CONSTANT_FILE), encoding='utf-8')
         for index, row in data_df.iterrows():
-            if row[NUMBER_DATA_FILE_VALUE] in NUMBER_DIGIT_UNITS:
-                self.language_number_map[row[NUMBER_DATA_FILE_NUMBER]] = row[NUMBER_DATA_FILE_VALUE]
-                self.language_number_map[str(row[NUMBER_DATA_FILE_VALUE])] = row[NUMBER_DATA_FILE_VALUE]
+            number = row[NUMBER_DATA_FILE_NUMBER]
+            numerals = row[NUMBER_DATA_FILE_NUMERALS]
+            value = int(row[NUMBER_DATA_FILE_VALUE]) if row[NUMBER_DATA_FILE_VALUE].isdigit() \
+                else row[NUMBER_DATA_FILE_VALUE]
+            number_type = row[NUMBER_DATA_FILE_VALUE]
 
-            numerals_list = self._get_numerals_list(row[NUMBER_DATA_FILE_NUMERALS])
-            if row[NUMBER_DATA_FILE_TYPE] == NUMBER_TYPE_UNIT:
-                self.numbers_word[row[NUMBER_DATA_FILE_NUMBER]] = (1, row[NUMBER_DATA_FILE_VALUE])
-                self.numbers_word[str(row[NUMBER_DATA_FILE_VALUE])] = (1, row[NUMBER_DATA_FILE_VALUE])
-                for each in numerals_list:
-                    self.numbers_word[each] = (1, row[NUMBER_DATA_FILE_VALUE])
+            if number in NUMBER_DIGIT_UNITS:
+                self.language_number_map[number] = value
+                self.language_number_map[str(value)] = value
+
+            numerals_list = self._get_numerals_list(numerals)
+            if number_type == NUMBER_TYPE_UNIT:
+                self.numbers_word[number] = (1, value)
+                self.numbers_word[str(value)] = (1, value)
+                for numeral in numerals_list:
+                    self.numbers_word[numeral] = (1, value)
             else:
-                self.numbers_word[row[NUMBER_DATA_FILE_NUMBER]] = (row[NUMBER_DATA_FILE_VALUE], 0)
-                self.numbers_word[str(row[NUMBER_DATA_FILE_VALUE])] = (row[NUMBER_DATA_FILE_VALUE], 0)
-                for each in numerals_list:
-                    self.numbers_word[each] = (row[NUMBER_DATA_FILE_VALUE], 0)
+                self.numbers_word[number] = (value, 0)
+                self.numbers_word[str(value)] = (value, 0)
+                for numeral in numerals_list:
+                    self.numbers_word[numeral] = (value, 0)
 
     def _detect_number_from_numerals(self, number_list, original_list):
         """
