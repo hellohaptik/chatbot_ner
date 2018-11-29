@@ -2,10 +2,11 @@ from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
-    PARAMETER_PAST_DATE_REFERENCED
+    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
+from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
 
 from django.http import HttpResponse
@@ -159,6 +160,82 @@ def time(request):
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for time: %s ' % e)
+        return HttpResponse(status=500)
+
+    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
+def number(request):
+    """Use NumberDetector to detect numerals
+
+       Attributes:
+        request: url parameters:
+
+        request params:
+           message (str): natural text on which detection logic is to be run. Note if structured value is
+                                   detection is run on structured value instead of message
+           entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                              if entity uses elastic-search lookup
+           structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                   detection is run on structured value instead of message
+                                   (For example, UI elements like form, payload, etc)
+           fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                             or message then we return a fallback_value as an output.
+           bot_message (str): previous message from a bot/agent.
+           min_digit (str): min digit
+           max_digit (str): max digit
+
+
+       Returns:
+           dict or None: dictionary containing entity_value, original_text and detection;
+                         entity_value is in itself a dict with its keys varying from entity to entity
+
+       Example:
+
+           message = "I want to purchase 30 units of mobile and 40 units of Television"
+           entity_name = 'number_of_unit'
+           structured_value = None
+           fallback_value = None
+           bot_message = None
+           output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
+                              fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
+           print output
+
+               >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
+                   {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
+
+
+           message = "I want to reserve a table for 3 people"
+           entity_name = 'number_of_people'
+           structured_value = None
+           fallback_value = None
+           bot_message = None
+           output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
+                              fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
+           print output
+
+               >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
+
+       """
+    try:
+        parameters_dict = get_parameters_dictionary(request)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+
+        number_detection = NumberDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+                                          language=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
+
+        if parameters_dict[PARAMETER_MIN_DIGITS] and parameters_dict[PARAMETER_MAX_DIGITS]:
+            min_digit = int(parameters_dict[PARAMETER_MIN_DIGITS])
+            max_digit = int(parameters_dict[PARAMETER_MAX_DIGITS])
+            number_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
+
+        entity_output = number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
+                                                structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+    except TypeError as e:
+        ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')

@@ -189,17 +189,6 @@ class NumberDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
 
-    def set_min_max_digits(self, min_digit, max_digit):
-        """
-        Update min max digit
-
-        Args:
-            min_digit (int): min digit
-            max_digit (int): max digit
-        """
-        self.min_digit = min_digit
-        self.max_digit = max_digit
-
     def _detect_numerals(self):
         """
         1. Detects numerals from the given text

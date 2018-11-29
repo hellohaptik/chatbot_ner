@@ -7,7 +7,7 @@ from ner_v2.constant import NUMBER_DATA_FILE_NUMBER, NUMBER_DATA_FILE_NUMERALS, 
 
 
 class BaseNumberDetector(object):
-    def __init__(self, entity_name, data_directory_path):
+    def __init__(self, entity_name, data_directory_path, min_digit, max_digit):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -21,6 +21,9 @@ class BaseNumberDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
+        self.min_digit = min_digit
+        self.max_digit = max_digit
+
         self.numbers_word = {}
         self.language_number_map = {}
 
@@ -119,8 +122,9 @@ class BaseNumberDetector(object):
 
         if on_number:
             original = (result_text.strip() + " " + current_text.strip()).strip()
-            number_list.append(repr(result + current))
-            original_list.append(original)
+            if self.max_digit >= len(repr(result + current)) >= self.min_digit:
+                number_list.append(repr(result + current))
+                original_list.append(original)
 
         return number_list, original_list
 
@@ -141,8 +145,9 @@ class BaseNumberDetector(object):
             word_chars = list(word)
             if not (set(word_chars) - set(self.language_number_map.keys())):
                 number = "".join([str(self.language_number_map[ch]) for ch in word_chars])
-                number_list.append(number)
-                original_list.append(word)
+                if self.max_digit >= len(number) >= self.min_digit:
+                    number_list.append(number)
+                    original_list.append(word)
 
         return number_list, original_list
 
@@ -163,5 +168,6 @@ class BaseNumberDetector(object):
 
 
 class NumberDetector(BaseNumberDetector):
-    def __init__(self, entity_name, data_directory_path):
-        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path)
+    def __init__(self, entity_name, data_directory_path, min_digit, max_digit):
+        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path,
+                                             min_digit=min_digit, max_digit=max_digit)

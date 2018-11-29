@@ -102,7 +102,9 @@ class NumberDetector(BaseDetector):
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
-            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name)
+            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name,
+                                                                                  min_digit=self.min_digit,
+                                                                                  max_digit=self.max_digit)
 
         except ImportError:
             standard_number_regex = importlib.import_module(
@@ -110,7 +112,9 @@ class NumberDetector(BaseDetector):
             )
             self.language_number_detector = standard_number_regex.NumberDetector(
                 entity_name=self.entity_name,
-                data_directory_path=get_lang_data_path(self.language)
+                data_directory_path=get_lang_data_path(self.language),
+                min_digit=self.min_digit,
+                max_digit=self.max_digit
             )
 
     @property
@@ -143,3 +147,14 @@ class NumberDetector(BaseDetector):
         self.number = number_data[0]
         self.original_number_text = number_data[1]
         return number_data
+
+    def set_min_max_digits(self, min_digit, max_digit):
+        """
+        Update min max digit
+
+        Args:
+            min_digit (int): min digit
+            max_digit (int): max digit
+        """
+        self.min_digit = min_digit
+        self.max_digit = max_digit
