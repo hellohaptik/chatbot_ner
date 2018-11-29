@@ -110,7 +110,8 @@ class BaseNumberDetector(object):
             if word not in self.numbers_word:
                 if on_number:
                     original = (result_text.strip() + " " + current_text.strip()).strip()
-                    number_detected = int(result + current) if (result + current).is_integer() else result + current
+                    number_detected = int(result + current) if float(result + current).is_integer() \
+                        else result + current
                     if self.max_digit >= len(str(number_detected)) >= self.min_digit:
                         number_list.append(str(number_detected))
                         original_list.append(original)
@@ -131,7 +132,7 @@ class BaseNumberDetector(object):
 
         if on_number:
             original = (result_text.strip() + " " + current_text.strip()).strip()
-            number_detected = int(result + current) if (result + current).is_integer() else result + current
+            number_detected = int(result + current) if float(result + current).is_integer() else result + current
             if self.max_digit >= len(str(number_detected)) >= self.min_digit:
                 number_list.append(str(number_detected))
                 original_list.append(original)
