@@ -1550,9 +1550,9 @@ class DateDetector(object):
             probable_mm = pattern[3]
             mm = self.__get_month_index(probable_mm)
             yy = self.now_date.year
-            if self.now_date.month > mm:
-                yy += 1
             if mm:
+                if self.now_date.month > int(mm):
+                    yy += 1
                 date_dict_1 = {
                     'dd': int(dd1),
                     'mm': int(mm),
@@ -1668,9 +1668,9 @@ class DateDetector(object):
             probable_mm = pattern[2]
             mm = self.__get_month_index(probable_mm)
             yy = self.now_date.year
-            if self.now_date.month > mm:
-                yy += 1
             if mm:
+                if self.now_date.month > int(mm):
+                    yy += 1
                 date_dict_1 = {
                     'dd': int(dd1),
                     'mm': int(mm),
