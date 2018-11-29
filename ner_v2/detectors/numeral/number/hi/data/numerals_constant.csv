@@ -1,7 +1,9 @@
 number,numerals,value,type
 ०,शून्य|zero|sunya,0,unit
 १,एक|ek|ik,1,unit
+१.५,डेढ़|ढेड़|देढ़|dedh|dhed,1.5,unit
 २,दो|do|du,2,unit
+२.५,ढाई|ढ़ाई|धाइ|धाई|dhaai|daai|dhai|dai,2.5,unit
 ३,तीन|teen|tin,3,unit
 ४,चार |char|chaar,4,unit
 ५,पाँच |panch|paanch|paach,5,unit
@@ -30,76 +32,76 @@ number,numerals,value,type
 २८,अट्ठाईस | athais|athaish|athaees|athaeesh|aththais|aththaish|aththaees|aththaeesh,28,unit
 २९,उनतीस | untis|untish|untees|unteesh,29,unit
 ३०,तीस | tis| tish|tees|teesh,30,unit
-३१,इकतीस ,31,unit
-३२,बत्तीस ,32,unit
-३३,तैंतीस ,33,unit
-३४,चौंतीस ,34,unit
-३५,पैंतीस ,35,unit
-३६,छत्तीस ,36,unit
-३७,सैंतीस ,37,unit
-३८,अड़तीस ,38,unit
-३९,उनतालीस ,39,unit
-४०,चालीस ,40,unit
-४१,इकतालीस ,41,unit
-४२,बयालीस ,42,unit
-४३,तैंतालीस ,43,unit
-४४,चौंतालीस ,44,unit
-४५,पैंतालीस ,45,unit
-४६,छियालीस ,46,unit
-४७,सैंतालीस ,47,unit
-४८,अड़तालीस ,48,unit
-४९,उनचास ,49,unit
-५०,पचास ,50,unit
-५१,इक्याबन ,51,unit
-५२,बावन ,52,unit
-५३,तिरेपन ,53,unit
-५४,चौबन ,54,unit
-५५,पचपन ,55,unit
-५६,छप्पन ,56,unit
-५७,सत्तावन ,57,unit
-५८,अट्ठावन ,58,unit
-५९,उनसठ ,59,unit
-६०,साठ ,60,unit
-६१,इकसठ ,61,unit
-६२,बासठ ,62,unit
-६३,तिरसठ ,63,unit
-६४,चौंसठ ,64,unit
-६५,पैंसठ ,65,unit
-६६,छियासठ ,66,unit
-६७,सड़सठ ,67,unit
-६८,अड़सठ ,68,unit
-६९,उनहत्तर ,69,unit
-७०,सत्तर ,70,unit
-७१,इकहत्तर ,71,unit
-७२,बहत्तर ,72,unit
-७३,तिहत्तर ,73,unit
-७४,चौहत्तर ,74,unit
-७५,पचहत्तर ,75,unit
-७६,छिहत्तर ,76,unit
-७७,सतहत्तर ,77,unit
-७८,अठहत्तर ,78,unit
-७९,उनासी ,79,unit
-८०,अस्सी ,80,unit
-८१,इक्यासी ,81,unit
-८२,बयासी ,82,unit
-८३,तिरासी ,83,unit
-८४,चौरासी ,84,unit
-८५,पचासी ,85,unit
-८६,छियासी ,86,unit
-८७,सतासी ,87,unit
-८८,अठासी ,88,unit
-८९,नवासी ,89,unit
-९०,नब्बे ,90,unit
-९१,इक्यानबे ,91,unit
-९२,बानवे ,92,unit
-९३,तिरानवे ,93,unit
-९४,चौरानवे ,94,unit
-९५,पचानवे ,95,unit
-९६,छियानवे ,96,unit
-९७,सत्तानवे ,97,unit
-९८,अट्ठानवे ,98,unit
-९९,निन्यानवे ,99,unit
-१००,सौ ,100,scale
-१०००,हज़ार ,1000,scale
-१०००००,लाख ,100000,scale
-१०००००००,करोड़ ,10000000,scale
+३१,इकतीस |ikkatis|ikkatish|ikattis|ikattish|ikkattis|ikkattish|ekkatis|ekkatish|ekattis|ekattish|ekkattis|ekkattish,31,unit
+३२,बत्तीस| batis|batish|battis|battish|batees|bateesh|battees|batteesh,32,unit
+३३,तैंतीस|taitis|taitish|taitees|taiteesh|taintis|taintish|taintees|tainteesh,33,unit
+३४,चौंतीस | chautis|chautish|chautees|chauteesh|chauntis|chauntish|chauntees|chaunteesh,34,unit
+३५,पैंतीस|paitis|paitish|paitees|paiteesh|paintis|paintish|paintees|painteesh,35,unit
+३६,छत्तीस|chhatis|chhatish|chhatees|chhateesh|chhattis|chhattish|chhattees|chhatteesh,36,unit
+३७,सैंतीस|saitis|saitish|saitees|saiteesh|saintis|saintish|saintees|sainteesh,37,unit
+३८,अड़तीस|adtis|adtish|adtees|adteesh,38,unit
+३९,उनतालीस |unchalis|unchalish|unchalees|unchaleesh,39,unit
+४०,चालीस|chalis|chalish|chalees|chaleesh,40,unit
+४१,इकतालीस|iktalis|iktalish|iktalees|iktaleesh|ektalis|ektalish|ektalees|ektaleesh,41,unit
+४२,बयालीस|bayalis|bayalish|bayalees|bayaleesh,42,unit
+४३,तैंतालीस|taitalis|taitalish|taitalees|taitaleesh|taintalis|taintalish|taintalees|taintaleesh,43,unit
+४४,चौंतालीस|चौवालिश|चौवालिस|chautalis|chautalish|chautalees|chautaleesh|chauntalis|chauntalish|chauntalees|chauntaleesh|chauvalis|chauvalish|chauvalees|chauvaleesh,44,unit
+४५,पैंतालीस |paitalis|paitalish|paitalees|paitaleesh|paintalis|paintalish|paintalees|paintaleesh,45,unit
+४६,छियालीस|chhiyalis|chhiyalish|chhiyalees|chhiyaleesh|chhialis|chhialish|chhialees|chhialeesh,46,unit
+४७,सैंतालीस |saitalis|saitalish|saitalees|saitaleesh|saintalis|saintalish|saintalees|saintaleesh,47,unit
+४८,अड़तालीस |adtalis|adtalish|adtalees|adtaleesh,48,unit
+४९,उनचास|unchaas|unchaash|unchas|unchash,49,unit
+५०,पचास|pachas|pachash|pachaas|pachaash,50,unit
+५१,इक्याबन|इक्याबन|ikyavan|ikyawan|ekyavan|ekyawan,51,unit
+५२,बावन|bawan|bavan,52,unit
+५३,तिरेपन|तिरप्पन|तिरपन|tirpan|tirappan|tirepan,53,unit
+५४,चौबन|चौव्वन|चौवन|chauvan|chauwan|chauvvan|chauwwan,54,unit
+५५,पचपन|pachpan,55,unit
+५६,छप्पन|chhappan,56,unit
+५७,सत्तावन|satavan|sattavan|satawan|sattawan,57,unit
+५८,अट्ठावन|aththavan|aththawan|athavan|athawan|atthavan|atthawan,58,unit
+५९,उनसठ|unsath|unshath,59,unit
+६०,साठ|sath|shath,60,unit
+६१,इकसठ|iksath|ikshath|eksath|ekshath,61,unit
+६२,बासठ|basath|bashath,62,unit
+६३,तिरसठ|tirsath|tirshath,63,unit
+६४,चौंसठ|chausath|chaushath|chaunsath|chaunshath,64,unit
+६५,पैंसठ|paisath|paishath|painsath|painshath,65,unit
+६६,छियासठ|chhiyasath|chhiyashath|chhiasath|chhiashath,66,unit
+६७,सड़सठ|sadsath|sadshath,67,unit
+६८,अड़सठ|adsath|adshath,68,unit
+६९,उनहत्तर|unhatar|unhattar|unnatar|unnattar,69,unit
+७०,सत्तर|sattar,70,unit
+७१,इकहत्तर|ikhatar|ikhattar|ekhatar|ekhattar,71,unit
+७२,बहत्तर| bahatar|bahattar,72,unit
+७३,तिहत्तर|tihatar|tihattar,73,unit
+७४,चौहत्तर|chauhatar|chauhattar,74,unit
+७५,पचहत्तर|pachhatar|pachhattar,75,unit
+७६,छिहत्तर|chhiyatar|chhiyattar|chhihatar|chhihattar,76,unit
+७७,सतहत्तर|sathatar|sathattar,77,unit
+७८,अठहत्तर|athhatar|athhattar,78,unit
+७९,उनासी|unasi|unashi|unnasi|unnashi,79,unit
+८०,अस्सी|assi|asshi|ashshi,80,unit
+८१,इक्यासी|ikyasi|ikyashi|ekyasi|ekyashi,81,unit
+८२,बयासी|bayasi|bayashi,82,unit
+८३,तिरासी|tirasi|tirashi,83,unit
+८४,चौरासी|chaurasi|chaurashi,84,unit
+८५,पचासी|pachasi|pachashi|pachchasi|pachchashi,85,unit
+८६,छियासी|chhiyasi|chhiyashi|chhiasi|chhiashi,86,unit
+८७,सतासी|सत्तासी|satasi|satashi|sattasi|sattashi,87,unit
+८८,अठासी|अठ्ठासी|aththasi|aththashi|athasi|athashi,88,unit
+८९,नवासी|navasi|navashi|nawasi|nawashi,89,unit
+९०,नब्बे|nabbe|nabbay|nabay,90,unit
+९१,इक्यानबे|ikyanabe|ikyanabay|ikyanbe|ikyanbay|ekyanabe|ekyanabay|ekyanbe|ekyanbay,91,unit
+९२,बानवे|बनाबे|banabe|banabay|banbe|banbay,92,unit
+९३,तिरानवे|tiranave|tiranawe|tirannave|tirannawe,93,unit
+९४,चौरानवे|chauranave|chauranawe|chauranve|chauranwe,94,unit
+९५,पचानवे|पंचानवे|pachanave|pachanawe|pachanve|pachanwe|panchanave|panchanawe|panchanve|panchanwe,95,unit
+९६,छियानवे|chhiyanave|chhiyanawe|chhiyanve|chhiyanwe|chhianave|chhianawe|chhianve|chhianwe,96,unit
+९७,सत्तानवे|सतानवे|satanve|satanwe|sattanve|sattanwe|satanave|satanawe|sattanave|sattanawe,97,unit
+९८,अट्ठानवे|aththanve|aththanwe|aththanave|aththanawe|athanve|athanwe|athanave|athanawe,98,unit
+९९,निन्यानवे|निन्यानबे|ninyanbe|ninyanabe|ninyanve|ninyanave|ninyanwe|ninyanawe,99,unit
+१००,सौ|sau|sao,100,scale
+१०००,हज़ार|hajar|hajaar|hazar|hazaar,1000,scale
+१०००००,लाख|lakh|laakh|lac,100000,scale
+१०००००००,करोड़|crore|karor|caror,10000000,scale
