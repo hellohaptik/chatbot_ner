@@ -73,7 +73,7 @@ class BaseNumberDetector(object):
                 value = int(row[NUMBER_DATA_FILE_VALUE])
             except ValueError:
                 value = float(row[NUMBER_DATA_FILE_VALUE])
-            number_type = row[NUMBER_DATA_FILE_VALUE]
+            number_type = row[NUMBER_DATA_FILE_TYPE]
 
             if number in NUMBER_DIGIT_UNITS:
                 self.language_number_map[number] = value
