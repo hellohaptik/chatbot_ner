@@ -53,11 +53,13 @@ class NumberDetector(object):
         else any name can be passed as entity_name.
         We can detect numbers from 1 digit to 3 digit.
     """
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, min_digit, max_digit):
         """Initializes a NumberDetector object
 
         Args:
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
+            min_digit: minimum digit that a number can take
+            max_digit: maximum digit that a number can take
         """
         self.entity_name = entity_name
         self.text = ''
@@ -66,8 +68,8 @@ class NumberDetector(object):
         self.number = []
         self.original_number_text = []
         self.tag = '__' + self.entity_name + '__'
-        self.min_digit = 1
-        self.max_digit = 3
+        self.min_digit = min_digit
+        self.max_digit = max_digit
         self.task_dict = {
             'number_of_people': self._detect_number_of_people_format,
             'number_of_ticket': self._detect_number_of_people_format,
