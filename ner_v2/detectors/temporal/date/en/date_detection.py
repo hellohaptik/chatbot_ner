@@ -10,7 +10,8 @@ from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                              TYPE_NEXT_DAY, TYPE_THIS_DAY,
                              TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS,
                              REPEAT_WEEKDAYS, REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT,
-                             TYPE_N_DAYS_AFTER)
+                             TYPE_N_DAYS_AFTER, ORDINALS_MAP)
+from ner_v2.detectors.temporal.utils import get_weekdays_for_month
 
 
 class DateDetector(object):
@@ -197,6 +198,8 @@ class DateDetector(object):
         date_list, original_list = self._yesterdays_date(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._day_in_next_week(date_list, original_list)
+        self._update_processed_text(original_list)
+        date_list, original_list = self._day_range_for_week_month(date_list, original_list)
         self._update_processed_text(original_list)
 
         return date_list, original_list
@@ -1565,6 +1568,64 @@ class DateDetector(object):
 
                 original_list.append(original)
                 original_list.append(original)
+
+        return date_list, original_list
+
+    def _day_range_for_week_month(self, date_list=None, original_list=None):
+        """
+        Detects probable "first week of month" format and its variants and returns list of dates in those week
+        and end date
+        format: <ordinal><separator><week><separator><Optional "of"><month>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: mmm, mmmm (abbreviation or spelled out in full)
+            separator: ",", space
+            range separator: "to", "-", "till"
+
+        Few valid examples:
+            "first week of Jan", "second week of coming month", "last week of december"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        ordinal_choices = "|".join(ORDINALS_MAP.keys())
+        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s*week\s*(of)?\s*([a-zA-z]+)\s*(month)?)')
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            probable_mm = pattern[3]
+            mm = self.__get_month_index(probable_mm)
+            yy = self.now_date.year
+            if mm:
+                if self.now_date.month > mm:
+                    yy += 1
+            elif probable_mm in ['coming', 'comming', 'next', 'nxt', 'following', 'folowing']:
+                mm = self.now_date.month + 1
+                if mm > 12:
+                    mm = 1
+                    yy += 1
+            if mm:
+                weeknumber = ORDINALS_MAP[pattern[1]]
+                weekdays = get_weekdays_for_month(weeknumber, mm, yy)
+                for day in weekdays:
+                    date_dict = {
+                        'dd': int(day),
+                        'mm': int(mm),
+                        'yy': int(yy),
+                        'type': TYPE_EXACT
+                    }
+                    date_list.append(date_dict)
+                    original_list.append(original)
 
         return date_list, original_list
 

@@ -73,3 +73,17 @@ DATE_TYPE_PROPERTY = 'type'
 DATE_VALUE = 'value'
 ORIGINAL_DATE_TEXT = 'text'
 DATE_DETECTION_METHOD = 'detection_method'
+
+ORDINALS_MAP = {
+    'first': 1,
+    'second': 2,
+    'third': 3,
+    'fourth': 4,
+    'fifth': 5,
+    'sixth': 6,
+    'seventh': 7,
+    'eighth': 8,
+    'ninth': 9,
+    'tenth': 10,
+    'last': -1   # used to get last week of any month
+}
