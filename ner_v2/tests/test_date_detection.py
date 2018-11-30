@@ -27,14 +27,20 @@ class DateDetectionTest(TestCase):
             year += 1
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
-        response = date_detector_object.detect_entity(message)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
 
-        self.assertEqual(response[0][0], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
-                                          'to': False, 'value': {'dd': day1, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertEqual(response[0][1], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
-                                          'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertEqual(response[1][0], message)
-        self.assertEqual(response[1][1], message)
+        self.assertIn({'end_range': False,
+                       'from': False,
+                       'normal': False,
+                       'start_range': True,
+                       'to': False, 'value': {'dd': 2, 'mm': 1, 'type': 'date', 'yy': year}}, date_dicts)
+        self.assertIn({'end_range': True,
+                       'from': False,
+                       'normal': False,
+                       'start_range': False,
+                       'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}})
+
+        self.assertEqual(original_texts.count(message), 2)
 
     @mock.patch('ner_v2.detectors.temporal.date.en.date_detection.get_weekdays_for_month')
     def test_en_date_detection_day_range_for_nth_week_month(self, mocked_get_weekdays_for_month):
@@ -50,10 +56,16 @@ class DateDetectionTest(TestCase):
         mocked_get_weekdays_for_month.return_value = [1, 2]
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
-        response = date_detector_object.detect_entity(message)
-        self.assertEqual(response[0][0], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
-                                          'to': False, 'value': {'dd': 1, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertEqual(response[0][1], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
-                                          'to': False, 'value': {'dd': 2, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertEqual(response[1][0], message)
-        self.assertEqual(response[1][1], message)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+        self.assertIn({'end_range': False,
+                       'from': False,
+                       'normal': True,
+                       'start_range': False,
+                       'to': False, 'value': {'dd': 1, 'mm': month, 'type': 'date', 'yy': year}}, date_dicts)
+        self.assertIn({'end_range': False,
+                       'from': False,
+                       'normal': True,
+                       'start_range': False,
+                       'to': False, 'value': {'dd': 2, 'mm': month, 'type': 'date', 'yy': year}}, date_dicts)
+        self.assertEqual(original_texts.count(message), 2)
+
