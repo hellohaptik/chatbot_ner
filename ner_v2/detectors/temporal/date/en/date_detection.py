@@ -1601,7 +1601,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         ordinal_choices = "|".join(ORDINALS_MAP.keys())
-        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of)?\s*([a-zA-z]+)\s?(?:month)?)\s+')
+        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of\s+)?([a-zA-z]+)(?:\s+month)?)\s+')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]

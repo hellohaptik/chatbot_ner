@@ -95,7 +95,7 @@ def get_weekdays_for_month(weeknumber, month, year):
     """
     calendar_month = calendar.monthcalendar(year, month)
     if weeknumber == -1:
-        return list(set(calendar_month[-1]) - {0})
+        return [day for day in calendar_month[-1] if day != 0]
     elif 0 < weeknumber <= len(calendar_month):
-        return list(set(calendar_month[weeknumber-1]) - {0})
+        return [day for day in calendar_month[weeknumber - 1] if day != 0]
     return []
