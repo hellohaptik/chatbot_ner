@@ -116,7 +116,7 @@ class DateDetector(object):
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
         """
-        self.text = ' ' + text.lower() + ' '
+        self.text = text
         self.processed_text = self.text
         self.tagged_text = self.text
 
@@ -1601,7 +1601,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         ordinal_choices = "|".join(ORDINALS_MAP.keys())
-        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of)?\s*([a-zA-z]+)\s+(?:month)?)')
+        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of)?\s*([a-zA-z]+)\s?(?:month)?)\s+')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1609,6 +1609,7 @@ class DateDetector(object):
             mm = self.__get_month_index(probable_mm)
             yy = self.now_date.year
             if mm:
+                mm = int(mm)
                 if self.now_date.month > mm:
                     yy += 1
             elif probable_mm in ['coming', 'comming', 'next', 'nxt', 'following', 'folowing']:

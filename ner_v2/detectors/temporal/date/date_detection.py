@@ -822,7 +822,7 @@ class DateDetector(object):
 
         """
 
-        self.text = ' ' + text.lower() + ' '
+        self.text = ' ' + text.strip().lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
         if self.language_date_detector:
