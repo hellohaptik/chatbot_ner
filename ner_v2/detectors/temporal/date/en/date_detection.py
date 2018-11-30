@@ -165,10 +165,10 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._day_month_format_for_arrival_departure_2(date_list, original_list)
+        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._date_departure_arrival_identification_given_day_and_next_month(date_list,
-                                                                                                        original_list)
+        date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list,
+                                                                               original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
         self._update_processed_text(original_list)
@@ -199,7 +199,7 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_in_next_week(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._day_range_for_week_month(date_list, original_list)
+        date_list, original_list = self._day_range_for_nth_week_month(date_list, original_list)
         self._update_processed_text(original_list)
 
         return date_list, original_list
@@ -1573,7 +1573,7 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    def _day_range_for_week_month(self, date_list=None, original_list=None):
+    def _day_range_for_nth_week_month(self, date_list=None, original_list=None):
         """
         Detects probable "first week of month" format and its variants and returns list of dates in those week
         and end date
@@ -1601,7 +1601,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         ordinal_choices = "|".join(ORDINALS_MAP.keys())
-        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s*week\s*(of)?\s*([a-zA-z]+)\s*(month)?)')
+        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of)?\s*([a-zA-z]+)\s+(?:month)?)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1631,7 +1631,7 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    def _day_month_format_for_arrival_departure_2(self, date_list=None, original_list=None):
+    def _date_range_ddth_of_mmm_to_ddth(self, date_list=None, original_list=None):
         """
         Detects probable "start_date month to/till/- end_date" format and its variants and returns both start date
         and end date
@@ -1658,8 +1658,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?\s?([A-Za-z]+)\s?'
-                                   r'(?:-|to|-|till)\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s+(?:of\s+)?([A-Za-z]+)\s+'
+                                   r'(?:-|to|-|till)\s+([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1691,7 +1691,7 @@ class DateDetector(object):
 
         return date_list, original_list
 
-    def _date_departure_arrival_identification_given_day_and_next_month(self, date_list=None, original_list=None):
+    def _date_range_ddth_to_ddth_of_next_month(self, date_list=None, original_list=None):
         """
         Detects probable "start_date to/till/- end_date of coming/next month" format and its variants and returns both
         start date and end date
@@ -1719,9 +1719,9 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?'
-                                   r'(?:next|nxt|comm?ing?|foll?owing?|)\s*(mo?nth))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s+(?:-|to|-|till)\s+'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,\s]+(?:of\s+)?'
+                                   r'(?:next|nxt|comm?ing?|foll?owing?|)\s+(?:mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
