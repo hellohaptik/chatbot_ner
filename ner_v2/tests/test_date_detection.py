@@ -8,10 +8,6 @@ import mock
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 
 
-def mocked_get_weekdays_for_month(**kargs):
-    return [1, 2]
-
-
 class DateDetectionTest(TestCase):
     def setUp(self):
         self.entity_name = 'date'
@@ -33,17 +29,15 @@ class DateDetectionTest(TestCase):
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
         response = date_detector_object.detect_entity(message)
 
-        self.assertJSONEqual(response[0][0], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
-                                              'to': False, 'value':
-                                                  {'dd': day1, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertJSONEqual(response[0][1], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
-                                              'to': False, 'value':
-                                                  {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}})
+        self.assertEqual(response[0][0], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
+                                          'to': False, 'value': {'dd': day1, 'mm': month, 'type': 'date', 'yy': year}})
+        self.assertEqual(response[0][1], {'end_range': False, 'from': False, 'normal': False, 'start_range': True,
+                                          'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}})
         self.assertEqual(response[1][0], message)
         self.assertEqual(response[1][1], message)
 
-    @mock.patch('ner_v2.detectors.temporal.utils.get_weekdays_for_month', side_effect=mocked_get_weekdays_for_month)
-    def test_en_date_detection_day_range_for_nth_week_month(self):
+    @mock.patch('ner_v2.detectors.temporal.date.en.date_detection.get_weekdays_for_month')
+    def test_en_date_detection_day_range_for_nth_week_month(self, mocked_get_weekdays_for_month):
         """
         Date detection for pattern 'first week of jan'
         """
@@ -53,13 +47,13 @@ class DateDetectionTest(TestCase):
         if self.now_date.month > month:
             year += 1
 
+        mocked_get_weekdays_for_month.return_value = [1, 2]
+
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
         response = date_detector_object.detect_entity(message)
-        self.assertJSONEqual(response[0][0], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
-                                              'to': False, 'value':
-                                                  {'dd': 1, 'mm': month, 'type': 'date', 'yy': year}})
-        self.assertJSONEqual(response[0][1], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
-                                              'to': False, 'value':
-                                                  {'dd': 2, 'mm': month, 'type': 'date', 'yy': year}})
+        self.assertEqual(response[0][0], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
+                                          'to': False, 'value': {'dd': 1, 'mm': month, 'type': 'date', 'yy': year}})
+        self.assertEqual(response[0][1], {'end_range': False, 'from': False, 'normal': True, 'start_range': False,
+                                          'to': False, 'value': {'dd': 2, 'mm': month, 'type': 'date', 'yy': year}})
         self.assertEqual(response[1][0], message)
         self.assertEqual(response[1][1], message)
