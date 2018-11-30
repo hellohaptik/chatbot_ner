@@ -38,7 +38,7 @@ class DateDetectionTest(TestCase):
                        'from': False,
                        'normal': False,
                        'start_range': False,
-                       'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}})
+                       'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}}, date_dicts)
 
         self.assertEqual(original_texts.count(message), 2)
 

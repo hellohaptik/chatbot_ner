@@ -116,7 +116,7 @@ class DateDetector(object):
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
         """
-        self.text = text
+        self.text = " " + text.strip().lower() + " "
         self.processed_text = self.text
         self.tagged_text = self.text
 
