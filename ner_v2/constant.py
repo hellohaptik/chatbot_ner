@@ -74,7 +74,7 @@ DATE_VALUE = 'value'
 ORIGINAL_DATE_TEXT = 'text'
 DATE_DETECTION_METHOD = 'detection_method'
 
-<<<<<<< HEAD
+
 # Number detector constants
 NUMBER_DIGIT_UNITS = [0, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9]
 DIGIT_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
