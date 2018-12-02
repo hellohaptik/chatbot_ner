@@ -200,15 +200,36 @@ class DateAdvancedDetector(BaseDetector):
                                    r'(?:of)?'
                                    r'\s?'
                                    r'([A-Za-z]+))\b', flags=re.UNICODE)
+
+        regex_pattern_2 = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])'
+                                     r'\s?'
+                                     r'(?:nd|st|rd|th)?'
+                                     r'\s+'
+                                     r'([A-Za-z]+)'
+                                     r'\s+'
+                                     r'(?:to|\-|till)'
+                                     r'\s+'
+                                     r'([12][0-9]|3[01]|0?[1-9])'
+                                     r'\s?'
+                                     r'(?:nd|st|rd|th)?)\b', flags=re.UNICODE)
+
         patterns = regex_pattern.findall(self.processed_text.lower())
+        patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
         if patterns:
             for pattern in patterns:
-                date_dict_list.extend(
-                    self._date_dict_from_text(text=pattern[0])
-                )
-            date_dict_list[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
-            date_dict_list[-1][detector_constant.DATE_END_RANGE_PROPERTY] = True
+                date_dicts = self._date_dict_from_text(text=pattern[0])
+                if len(date_dicts) == 2:
+                    date_dicts[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
+                    date_dicts[1][detector_constant.DATE_END_RANGE_PROPERTY] = True
+                    date_dict_list.extend(date_dicts)
 
+        elif patterns_2:
+            for pattern in patterns_2:
+                date_dicts = self._date_dict_from_text(text=pattern[0])
+                if len(date_dicts) == 2:
+                    date_dicts[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
+                    date_dicts[1][detector_constant.DATE_END_RANGE_PROPERTY] = True
+                    date_dict_list.extend(date_dicts)
         else:
             parts = re.split(r'\s+(?:\-|to|se)\s+', self.processed_text.lower())
             if len(parts) > 1:
@@ -801,7 +822,7 @@ class DateDetector(object):
 
         """
 
-        self.text = ' ' + text.lower() + ' '
+        self.text = ' ' + text.strip().lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
         if self.language_date_detector:
