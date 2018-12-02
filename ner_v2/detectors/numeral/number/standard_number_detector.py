@@ -153,10 +153,12 @@ class BaseNumberDetector(object):
         """
         number_list = number_list or []
         original_list = original_list or []
+        numbers_char_set = set(self.language_number_map.keys())
 
         for word in self.processed_text.split():
             word_chars = list(word)
-            if not (set(word_chars) - set(self.language_number_map.keys())):
+            word_chars = [ch for ch in word_chars if ch != ',']
+            if not (set(word_chars) - numbers_char_set):
                 number = "".join([str(self.language_number_map[ch]) for ch in word_chars])
                 if self.max_digit >= len(number) >= self.min_digit:
                     number_list.append(number)
