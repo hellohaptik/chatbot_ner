@@ -121,6 +121,8 @@ class BaseNumberDetector(object):
                 on_number = False
             else:
                 scale, increment = self.numbers_word[word]
+                # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
+                current = 1 if(scale > 0 and current == 0 and increment == 0) else current
                 current = current * scale + increment
                 current_text += word + " "
                 if scale > 100:
