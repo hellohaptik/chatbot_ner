@@ -70,7 +70,7 @@ class BaseNumberDetector(object):
             number = row[NUMBER_DATA_FILE_NUMBER]
             numerals = row[NUMBER_DATA_FILE_NUMERALS]
             value = row[NUMBER_DATA_FILE_VALUE]
-            if value.is_integer():
+            if float(value).is_integer():
                 value = int(row[NUMBER_DATA_FILE_VALUE])
             number_type = row[NUMBER_DATA_FILE_TYPE]
 
