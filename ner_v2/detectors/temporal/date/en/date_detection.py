@@ -165,6 +165,8 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
         self._update_processed_text(original_list)
+        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list,
                                                                                original_list)
         self._update_processed_text(original_list)
@@ -180,8 +182,7 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_month_day_format(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
-        self._update_processed_text(original_list)
+
         date_list, original_list = self._day_after_tomorrow(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_days_after(date_list, original_list)
@@ -1659,28 +1660,35 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s+(?:of\s+)?([A-Za-z]+)\s+'
-                                   r'(?:-|to|-|till)\s+([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
+                                   r'(?:-|to|-|till)\s+([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?([a-zA-Z]+)?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             dd1 = pattern[1]
             dd2 = pattern[3]
-            probable_mm = pattern[2]
-            mm = self.__get_month_index(probable_mm)
-            yy = self.now_date.year
-            if mm:
-                if self.now_date.month > int(mm):
-                    yy += 1
+            probable_mm1 = pattern[2]
+            probable_mm2 = pattern[4]
+            mm1 = self.__get_month_index(probable_mm1)
+            mm2 = mm1
+            if probable_mm2:
+                mm2 = self.__get_month_index(probable_mm2)
+            yy1 = self.now_date.year
+            yy2 = self.now_date.year
+            if mm1 and mm2:
+                if self.now_date.month > int(mm1):
+                    yy1 += 1
+                if self.now_date.month > int(mm2):
+                    yy2 += 1
                 date_dict_1 = {
                     'dd': int(dd1),
-                    'mm': int(mm),
-                    'yy': int(yy),
+                    'mm': int(mm1),
+                    'yy': int(yy1),
                     'type': TYPE_EXACT
                 }
                 date_dict_2 = {
                     'dd': int(dd2),
-                    'mm': int(mm),
-                    'yy': int(yy),
+                    'mm': int(mm2),
+                    'yy': int(yy2),
                     'type': TYPE_EXACT
                 }
                 date_list.append(date_dict_1)
