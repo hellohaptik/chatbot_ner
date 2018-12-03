@@ -158,3 +158,5 @@ class NumberDetector(BaseDetector):
         """
         self.min_digit = min_digit
         self.max_digit = max_digit
+        self.language_number_detector.min_digit = min_digit
+        self.language_number_detector.max_digit = max_digit
