@@ -165,8 +165,6 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
         self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
-        self._update_processed_text(original_list)
         date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list,
                                                                                original_list)
         self._update_processed_text(original_list)
@@ -182,7 +180,8 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_month_day_format(date_list, original_list)
         self._update_processed_text(original_list)
-
+        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
+        self._update_processed_text(original_list)
         date_list, original_list = self._day_after_tomorrow(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_days_after(date_list, original_list)

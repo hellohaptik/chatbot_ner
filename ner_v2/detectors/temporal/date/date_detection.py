@@ -211,7 +211,9 @@ class DateAdvancedDetector(BaseDetector):
                                      r'\s+'
                                      r'([12][0-9]|3[01]|0?[1-9])'
                                      r'\s?'
-                                     r'(?:nd|st|rd|th)?)\b', flags=re.UNICODE)
+                                     r'(?:nd|st|rd|th)?'
+                                     r'\s?'
+                                     r'([a-zA-Z]+)?)\b', flags=re.UNICODE)
 
         patterns = regex_pattern.findall(self.processed_text.lower())
         patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
