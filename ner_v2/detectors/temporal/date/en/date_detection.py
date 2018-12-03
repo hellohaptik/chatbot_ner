@@ -1664,23 +1664,39 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            dd1 = pattern[1]
-            dd2 = pattern[3]
+            dd1 = int(pattern[1])
+            dd2 = int(pattern[3])
             probable_mm1 = pattern[2]
             probable_mm2 = pattern[4]
             mm1 = self.__get_month_index(probable_mm1)
-            mm2 = self.__get_month_index(probable_mm2)
+            mm2_mention = self.__get_month_index(probable_mm2)
+
+            mm2 = mm2_mention
             if not mm2:
                 mm2 = mm1
+
             yy1 = self.now_date.year
-            yy2 = self.now_date.year
+
             if mm1 and mm2:
-                if int(dd2) < int(dd1):
-                    mm2 = int(mm1) + 1
-                if self.now_date.month > int(mm1):
+                mm1 = int(mm1)
+                mm2 = int(mm2)
+
+                if not mm2_mention and dd2 < dd1:
+                    mm2 += 1
+                    if mm2 > 12:
+                        mm2 = 1
+
+                dt1 = datetime.datetime(year=yy1, month=mm1, day=dd1)
+                if dt1 < self.now_date:
                     yy1 += 1
-                if self.now_date.month > int(mm2):
+
+                yy2 = yy1
+                dt1 = datetime.datetime(year=yy1, month=mm1, day=dd1)
+                dt2 = datetime.datetime(year=yy2, month=mm2, day=dd2)
+
+                if dt2 < dt1:
                     yy2 += 1
+
                 date_dict_1 = {
                     'dd': int(dd1),
                     'mm': int(mm1),
