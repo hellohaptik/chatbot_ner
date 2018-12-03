@@ -1686,13 +1686,14 @@ class DateDetector(object):
                     if mm2 > 12:
                         mm2 = 1
 
-                dt1 = datetime.datetime(year=yy1, month=mm1, day=dd1)
+                dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
+
                 if dt1 < self.now_date:
                     yy1 += 1
 
                 yy2 = yy1
-                dt1 = datetime.datetime(year=yy1, month=mm1, day=dd1)
-                dt2 = datetime.datetime(year=yy2, month=mm2, day=dd2)
+                dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
+                dt2 = self.timezone.localize(datetime.datetime(year=yy2, month=mm2, day=dd2))
 
                 if dt2 < dt1:
                     yy2 += 1
