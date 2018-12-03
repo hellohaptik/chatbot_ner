@@ -1669,12 +1669,14 @@ class DateDetector(object):
             probable_mm1 = pattern[2]
             probable_mm2 = pattern[4]
             mm1 = self.__get_month_index(probable_mm1)
-            mm2 = mm1
-            if probable_mm2:
-                mm2 = self.__get_month_index(probable_mm2)
+            mm2 = self.__get_month_index(probable_mm2)
+            if not mm2:
+                mm2 = mm1
             yy1 = self.now_date.year
             yy2 = self.now_date.year
             if mm1 and mm2:
+                if int(dd2) < int(dd1):
+                    mm2 = int(mm1) + 1
                 if self.now_date.month > int(mm1):
                     yy1 += 1
                 if self.now_date.month > int(mm2):
