@@ -32,6 +32,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
                        PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
                        PARAMETER_PAST_DATE_REFERENCED: request.GET.get('date_past_reference', 'False')
+                       PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
+                       PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        }
 
     return parameters_dict
@@ -234,6 +236,7 @@ def number(request):
                                                 fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                                 bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+
     except TypeError as e:
         ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
