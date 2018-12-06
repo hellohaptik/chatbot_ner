@@ -31,7 +31,7 @@ class BaseNumberDetector(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which detector will work
-        self.detector_preferences = [self._detect_number_from_numerals,
+        self.detector_preferences = [self._get_number_from_numerals,
                                      self._detect_numeric_digit]
 
     def detect_number(self, text):
@@ -90,31 +90,28 @@ class BaseNumberDetector(object):
                 for numeral in numerals_list:
                     self.numbers_word[numeral] = (value, 0)
 
-    def _detect_number_from_numerals(self, number_list, original_list):
+    def _get_number_from_numerals(self, text):
         """
         Detect number from numerals
         Args:
-            number_list (list): list containing detected numeric text
-            original_list (list): list containing original numeral text
+            text (str):
         Returns:
-            number_list (list): list containing updated detected numeric text
-            original_list (list): list containing updated original numeral text
+            detected_number_list (list):
+            detected_original_text_list (list):
         """
-        number_list = number_list or []
-        original_list = original_list or []
-
+        detected_number_list = []
+        detected_original_text_list = []
         current = result = 0
         current_text, result_text = '', ''
         on_number = False
-        for word in self.processed_text.split():
+        for word in text.split():
             if word not in self.numbers_word:
                 if on_number:
                     original = (result_text.strip() + " " + current_text.strip()).strip()
                     number_detected = int(result + current) if float(result + current).is_integer() \
                         else result + current
-                    if self.max_digit >= len(str(number_detected)) >= self.min_digit:
-                        number_list.append(str(number_detected))
-                        original_list.append(original)
+                    detected_number_list.append(number_detected)
+                    detected_original_text_list.append(original)
 
                 result = current = 0
                 result_text, current_text = '', ''
@@ -135,11 +132,10 @@ class BaseNumberDetector(object):
         if on_number:
             original = (result_text.strip() + " " + current_text.strip()).strip()
             number_detected = int(result + current) if float(result + current).is_integer() else result + current
-            if self.max_digit >= len(str(number_detected)) >= self.min_digit:
-                number_list.append(str(number_detected))
-                original_list.append(original)
+            detected_number_list.append(number_detected)
+            detected_original_text_list.append(original)
 
-        return number_list, original_list
+        return detected_number_list, detected_original_text_list
 
     def _detect_numeric_digit(self, number_list, original_list):
         """
@@ -156,12 +152,15 @@ class BaseNumberDetector(object):
         numbers_char_set = set(self.language_number_map.keys())
 
         for word in self.processed_text.split():
-            word_chars = list(word)
-            word_chars = [ch for ch in word_chars if ch != ',']
+            clean_word = word.replace(",", "")
+            word_chars = list(clean_word)
             if not (set(word_chars) - numbers_char_set):
                 number = "".join([str(self.language_number_map[ch]) for ch in word_chars])
                 if self.max_digit >= len(number) >= self.min_digit:
-                    number_list.append(number)
+                    number_list.append({
+                        'value': number,
+                        'unit': None
+                    })
                     original_list.append(word)
 
         return number_list, original_list
