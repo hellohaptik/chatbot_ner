@@ -1,4 +1,4 @@
-number,numerals,value,type
+number,name_variants,value,type
 0,zero,0,unit
 1,one,1,unit
 2,two,2,unit
@@ -28,6 +28,7 @@ number,numerals,value,type
 80,eighty,80,unit
 90,ninty|ninety,90,unit
 100,hundred,100,scale
-1000,Thousand | thousands,1000,scale
-100000,lakh|lakhs|lac|lacs,100000,scale
-10000000,crore|crores,10000000,scale
+1000,Thousand|thousands|k,1000,scale
+100000,lakh|lakhs|lac|lacs|l,100000,scale
+100000,million|mil|ml|m,1000000,scale
+10000000,crore|crores|c|cr,10000000,scale

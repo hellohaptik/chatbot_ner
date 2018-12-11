@@ -1,4 +1,4 @@
-number,numerals,value,type
+number,name_variants,value,type
 ௦,பூஜ்ஜியம்|pujjiyam|zero|pujiyam,0,unit
 ௧,ஒன்று|Oru|mutal|Onavatu ,1,unit
 ௨,இரண்டு|Irantu|Irandavatu ,2,unit
@@ -47,9 +47,6 @@ number,numerals,value,type
 ௯௰,தொன்னூறு|tonnuru|tonoor,90,unit
 ௱,நூறு|Nuru|noor,100,scale
 ௲,ஆயிரம்|Ayiram|Airam,1000,scale
-௱௲,"நூறாயிரம் (TS)|Nurayiram|noorairam|oru lacham
-இலட்சம் (SS)|ilatcam",100000,scale
-௲௲,"மெய்யிரம் (TS)|Meyyiram
-பத்து இலட்சம் (SS)|Pattu Ilatcam|Pattulacaham",1000000,scale
-௲௲௲,"தொள்ளுண் (TS)|Tollun|Pattukodi
-நிகர்ப்புதம் (SS)|Nikarpputam|Pattukodi",100000000,scale
+௱௲,நூறாயிரம்|Nurayiram|noorairam|oru lacham இலட்சம்|ilatcam,100000,scale
+௲௲,மெய்யிரம்|Meyyiram |பத்து இலட்சம்|Pattu Ilatcam|Pattulacaham,1000000,scale
+௲௲௲,தொள்ளுண்|Tollun|Pattukodi|நிகர்ப்புதம்|Nikarpputam|Pattukodi,100000000,scale

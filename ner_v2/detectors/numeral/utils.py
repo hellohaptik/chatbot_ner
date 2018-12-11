@@ -16,7 +16,7 @@ def get_number_from_numerals(text, number_word_dict):
                                       }
 
         [In]  >>  _get_number_from_numerals('one thousand two',  number_word_dict)
-        [Out] >> (['1002'], ['one thousand two']
+        [Out] >> (['1002'], ['one thousand two'])
 
         [In]  >> _get_number_from_numerals('one two three',  number_word_dict)
         [Out] >> (['1', '2', '3'], ['one', 'two', 'three'])
@@ -48,11 +48,12 @@ def get_number_from_numerals(text, number_word_dict):
             digit_len = max(len(str(increment)), len(str(scale)))
 
             if digit_len == prev_digit_len:
-                original = (result_text.strip() + " " + current_text.strip()).strip()
-                number_detected = int(result + current) if float(result + current).is_integer() \
-                    else result + current
-                detected_number_list.append(number_detected)
-                detected_original_text_list.append(original)
+                if on_number:
+                    original = (result_text.strip() + " " + current_text.strip()).strip()
+                    number_detected = int(result + current) if float(result + current).is_integer() \
+                        else result + current
+                    detected_number_list.append(number_detected)
+                    detected_original_text_list.append(original)
 
                 result = current = 0
                 result_text, current_text = '', ''

@@ -1,0 +1,1 @@
+LANGUAGE_DATA_DIRECTORY = 'data'

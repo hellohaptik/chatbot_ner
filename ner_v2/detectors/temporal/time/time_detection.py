@@ -4,7 +4,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
-from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 
 def get_lang_data_path(lang_code):

@@ -20,7 +20,7 @@ class NumberDetector(BaseNumberDetector):
             self._detect_number_from_digit
         ]
 
-    def _custom_detect_number_of_people_format(self):
+    def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         """Detects any numbers from text
         This is a function which will be called when we want to detect the number of persons from the text
 
@@ -35,10 +35,10 @@ class NumberDetector(BaseNumberDetector):
         Note: Currently, we can detect numbers from 1 digit to 3 digit. This function will be enabled only
         if entity_name is set to  'number_of_people'
         """
-        number_list = []
-        original_list = []
+        number_list = number_list or []
+        original_list = original_list or []
         patterns = re.findall(
-            r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?)*)\s',
+            r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
             self.processed_text.lower()
         )
         for pattern in patterns:

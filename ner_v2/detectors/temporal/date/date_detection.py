@@ -8,7 +8,7 @@ import re
 import pytz
 
 import models.crf.constant as model_constant
-import ner_v2.constant as detector_constant
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 import ner_v2.detectors.temporal.constant
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
@@ -17,7 +17,7 @@ from models.crf.models import Models
 from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED, \
     FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE
 from ner_v2.detectors.base_detector import BaseDetector
-from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY, TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST, \
+from ner_v2.detectors.temporal.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST, \
     TYPE_NEXT_DAY, TYPE_REPEAT_DAY
 
 

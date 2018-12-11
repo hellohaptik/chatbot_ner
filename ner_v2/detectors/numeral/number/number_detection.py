@@ -4,7 +4,7 @@ import os
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.numeral.constant import NUMBER_DETECT_VALUE
-from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 
 def get_lang_data_path(lang_code):
@@ -59,12 +59,6 @@ class NumberDetector(BaseDetector):
         min_digit: minimum digit that a number can take
         max_digit: maximum digit that a number can take
 
-    Note:
-        text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
-        Currently, there are two detection logics for detecting numbers from text one to detect number of people
-        and other any number. If we want detect number of people entity_name should be set to 'number_of_people'
-        else any name can be passed as entity_name.
-        We can detect numbers from 1 digit to 3 digit.
     """
     @staticmethod
     def get_supported_languages():
@@ -86,6 +80,7 @@ class NumberDetector(BaseDetector):
 
         Args:
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
+            language (str, optional): language code of number text, defaults to 'en'
         """
         # assigning values to superclass attributes
         self._supported_languages = self.get_supported_languages()
@@ -98,7 +93,7 @@ class NumberDetector(BaseDetector):
         self.original_number_text = []
         self.tag = '__' + self.entity_name + '__'
         self.min_digit = 1
-        self.max_digit = 3
+        self.max_digit = 6
         self.language = language
         try:
             number_detector_module = importlib.import_module(
@@ -149,6 +144,9 @@ class NumberDetector(BaseDetector):
 
         self.number = validated_number
         self.original_number_text = validated_number_text
+        self.processed_text = self.language_number_detector.processed_text
+        self.tagged_text = self.language_number_detector.tagged_text
+
         return validated_number, validated_number_text
 
     def set_min_max_digits(self, min_digit, max_digit):

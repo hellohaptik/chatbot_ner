@@ -9,11 +9,12 @@ NUMERIC_VARIANTS = DIGIT_UNITS + [
     "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
 ]
 NUMBER_DATA_FILE_NUMBER = 'number'
-NUMBER_DATA_FILE_NUMERALS = 'numerals'
+NUMBER_DATA_FILE_NAME_VARIANTS = 'name_variants'
 NUMBER_DATA_FILE_VALUE = 'value'
 NUMBER_DATA_FILE_TYPE = 'type'
 NUMBER_TYPE_UNIT = 'unit'
 NUMBER_TYPE_SCALE = 'scale'
+
 NUMBER_DATA_CONSTANT_FILE = 'numerals_constant.csv'
 
 ORDINALS_MAP = {
@@ -42,3 +43,5 @@ ORDINALS_MAP = {
 
 NUMBER_DETECT_VALUE = 'value'
 NUMBER_DETECT_UNIT = 'unit'
+
+LANGUAGE_DATA_DIRECTORY = 'data'

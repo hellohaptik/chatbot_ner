@@ -36,8 +36,6 @@ DAYTIME_MERIDIAN = 'daytime_meridian'
 POSITIVE_TIME_DIFF = 'df'
 NEGATIVE_TIME_DIFF = 'ndf'
 
-LANGUAGE_DATA_DIRECTORY = 'data'
-
 # DATE IDENTIFICATION constant
 ENTITY_MONTH = 'month_list'
 ENTITY_DAY = 'day_list'

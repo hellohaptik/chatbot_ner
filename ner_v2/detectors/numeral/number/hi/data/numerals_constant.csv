@@ -1,4 +1,4 @@
-number,numerals,value,type
+number,name_variants,value,type
 ०,शून्य|zero|sunya,0,unit
 १,एक|ek|ik,1,unit
 १.५,डेढ़|ढेड़|देढ़|dedh|dhed,1.5,unit
@@ -102,6 +102,6 @@ number,numerals,value,type
 ९८,अट्ठानवे|aththanve|aththanwe|aththanave|aththanawe|athanve|athanwe|athanave|athanawe,98,unit
 ९९,निन्यानवे|निन्यानबे|ninyanbe|ninyanabe|ninyanve|ninyanave|ninyanwe|ninyanawe,99,unit
 १००,सौ|sau|sao,100,scale
-१०००,हज़ार|hajar|hajaar|hazar|hazaar,1000,scale
+१०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar,1000,scale
 १०००००,लाख|lakh|laakh|lac,100000,scale
 १०००००००,करोड़|crore|karor|caror,10000000,scale
