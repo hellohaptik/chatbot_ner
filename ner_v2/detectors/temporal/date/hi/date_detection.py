@@ -1,7 +1,7 @@
 import re
 import os
 
-from ner_v2.constant import TYPE_EXACT
+from ner_v2.detectors.temporal.constant import TYPE_EXACT
 from ner_v2.detectors.temporal.date.date_detection import get_lang_data_path
 from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
 

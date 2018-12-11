@@ -1,13 +1,16 @@
 # coding=utf-8
 import pandas as pd
 import os
+import re
 
-from ner_v2.constant import NUMBER_DATA_FILE_NUMBER, NUMBER_DATA_FILE_NUMERALS, NUMBER_DATA_FILE_VALUE, \
-    NUMBER_TYPE_UNIT, NUMBER_DATA_FILE_TYPE, NUMBER_DIGIT_UNITS, NUMBER_DATA_CONSTANT_FILE
+from ner_v2.detectors.numeral.constant import NUMBER_DATA_FILE_NUMBER, NUMBER_DATA_FILE_NUMERALS, \
+    NUMBER_DATA_FILE_VALUE, NUMBER_DATA_FILE_TYPE, NUMBER_TYPE_UNIT, NUMBER_DATA_CONSTANT_FILE, NUMBER_DETECT_VALUE, \
+    NUMBER_DETECT_UNIT
+from ner_v2.detectors.numeral.utils import get_number_from_numerals
 
 
 class BaseNumberDetector(object):
-    def __init__(self, entity_name, data_directory_path, min_digit, max_digit):
+    def __init__(self, entity_name, data_directory_path):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -21,18 +24,19 @@ class BaseNumberDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.min_digit = min_digit
-        self.max_digit = max_digit
 
         self.numbers_word = {}
-        self.language_number_map = {}
+        self.language_scale_map = {}
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
 
+        self.regex_numeric_patterns = re.compile(r'\s(([\d,]+[.]?[\d]*)\s?(' + str(self.language_scale_map.keys())
+                                                 + r'?))\s')
+
         # Variable to define default order in which detector will work
-        self.detector_preferences = [self._get_number_from_numerals,
-                                     self._detect_numeric_digit]
+        self.detector_preferences = [
+                                     self._detect_number_from_digit]
 
     def detect_number(self, text):
         self.text = text
@@ -74,10 +78,6 @@ class BaseNumberDetector(object):
                 value = int(row[NUMBER_DATA_FILE_VALUE])
             number_type = row[NUMBER_DATA_FILE_TYPE]
 
-            if value in NUMBER_DIGIT_UNITS:
-                self.language_number_map[number] = value
-                self.language_number_map[str(value)] = value
-
             numerals_list = self._get_numerals_list(numerals)
             if number_type == NUMBER_TYPE_UNIT:
                 self.numbers_word[number] = (1, value)
@@ -89,55 +89,33 @@ class BaseNumberDetector(object):
                 self.numbers_word[str(value)] = (value, 0)
                 for numeral in numerals_list:
                     self.numbers_word[numeral] = (value, 0)
+                    self.language_scale_map[numeral] = value
 
-    def _get_number_from_numerals(self, text):
+    def _detect_number_from_numerals(self, number_list, original_list):
         """
-        Detect number from numerals
+        Detect number from numeral text
         Args:
-            text (str):
+            number_list (list): list containing detected numeric text
+            original_list (list): list containing original numeral text
         Returns:
-            detected_number_list (list):
-            detected_original_text_list (list):
+            number_list (list): list containing updated detected numeric text
+            original_list (list): list containing updated original numeral text
         """
-        detected_number_list = []
-        detected_original_text_list = []
-        current = result = 0
-        current_text, result_text = '', ''
-        on_number = False
-        for word in text.split():
-            if word not in self.numbers_word:
-                if on_number:
-                    original = (result_text.strip() + " " + current_text.strip()).strip()
-                    number_detected = int(result + current) if float(result + current).is_integer() \
-                        else result + current
-                    detected_number_list.append(number_detected)
-                    detected_original_text_list.append(original)
+        number_list = number_list or []
+        original_list = original_list or []
 
-                result = current = 0
-                result_text, current_text = '', ''
-                on_number = False
-            else:
-                scale, increment = self.numbers_word[word]
-                # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
-                current = 1 if(scale > 0 and current == 0 and increment == 0) else current
-                current = current * scale + increment
-                current_text = (current_text + " " + word).strip()
-                if scale > 100:
-                    result += current
-                    result_text = (result_text + " " + current_text).strip()
-                    current = 0
-                    current_text = ''
-                on_number = True
+        numeral_text_list = re.split(r'[\-\:]', self.processed_text)
+        for numeral_text in numeral_text_list:
+            number_data = get_number_from_numerals(numeral_text, self.numbers_word)
+            for number, original_text in zip(number_data[0], number_data[1]):
+                number_list.extend({
+                    NUMBER_DETECT_VALUE: number,
+                    NUMBER_DETECT_UNIT: None
+                })
+                original_list.append(original_text)
+        return number_list, original_list
 
-        if on_number:
-            original = (result_text.strip() + " " + current_text.strip()).strip()
-            number_detected = int(result + current) if float(result + current).is_integer() else result + current
-            detected_number_list.append(number_detected)
-            detected_original_text_list.append(original)
-
-        return detected_number_list, detected_original_text_list
-
-    def _detect_numeric_digit(self, number_list, original_list):
+    def _detect_number_from_digit(self, number_list, original_list):
         """
         Detect number from numeric text
         Args:
@@ -149,19 +127,21 @@ class BaseNumberDetector(object):
         """
         number_list = number_list or []
         original_list = original_list or []
-        numbers_char_set = set(self.language_number_map.keys())
 
-        for word in self.processed_text.split():
-            clean_word = word.replace(",", "")
-            word_chars = list(clean_word)
-            if not (set(word_chars) - numbers_char_set):
-                number = "".join([str(self.language_number_map[ch]) for ch in word_chars])
-                if self.max_digit >= len(number) >= self.min_digit:
-                    number_list.append({
-                        'value': number,
-                        'unit': None
-                    })
-                    original_list.append(word)
+        patterns = self.regex_numeric_patterns.findall(self.processed_text)
+        for pattern in patterns:
+            original = pattern[0]
+            number = pattern[1].replace(",", "")
+            scale = pattern[2]
+            scale = self.language_scale_map[scale] if scale else 1
+            number = float(number) * scale
+            number = int(number) if number.is_integer() else number
+
+            number_list.append({
+                NUMBER_DETECT_VALUE: number,
+                NUMBER_DETECT_UNIT: None
+            })
+            original_list.append(original)
 
         return number_list, original_list
 
@@ -182,6 +162,5 @@ class BaseNumberDetector(object):
 
 
 class NumberDetector(BaseNumberDetector):
-    def __init__(self, entity_name, data_directory_path, min_digit, max_digit):
-        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path,
-                                             min_digit=min_digit, max_digit=max_digit)
+    def __init__(self, entity_name, data_directory_path):
+        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path)

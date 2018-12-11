@@ -3,6 +3,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.numeral.constant import NUMBER_DETECT_VALUE
 from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
 
 
@@ -102,9 +103,7 @@ class NumberDetector(BaseDetector):
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
-            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name,
-                                                                                  min_digit=self.min_digit,
-                                                                                  max_digit=self.max_digit)
+            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name)
 
         except ImportError:
             standard_number_regex = importlib.import_module(
@@ -112,9 +111,7 @@ class NumberDetector(BaseDetector):
             )
             self.language_number_detector = standard_number_regex.NumberDetector(
                 entity_name=self.entity_name,
-                data_directory_path=get_lang_data_path(self.language),
-                min_digit=self.min_digit,
-                max_digit=self.max_digit
+                data_directory_path=get_lang_data_path(self.language)
             )
 
     @property
@@ -144,9 +141,15 @@ class NumberDetector(BaseDetector):
         self.processed_text = self.text
         self.tagged_text = self.text
         number_data = self.language_number_detector.detect_number(self.processed_text)
-        self.number = number_data[0]
-        self.original_number_text = number_data[1]
-        return number_data
+        validated_number, validated_number_text = [], []
+        for number_value_dict, original_text in zip(number_data[0], number_data[1]):
+            if self.min_digit <= len(number_value_dict[NUMBER_DETECT_VALUE]) <= self.max_digit:
+                validated_number.append(number_value_dict)
+                validated_number_text.append(original_text)
+
+        self.number = validated_number
+        self.original_number_text = validated_number_text
+        return validated_number, validated_number_text
 
     def set_min_max_digits(self, min_digit, max_digit):
         """
@@ -158,5 +161,3 @@ class NumberDetector(BaseDetector):
         """
         self.min_digit = min_digit
         self.max_digit = max_digit
-        self.language_number_detector.min_digit = min_digit
-        self.language_number_detector.max_digit = max_digit

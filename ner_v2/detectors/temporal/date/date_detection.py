@@ -9,15 +9,16 @@ import pytz
 
 import models.crf.constant as model_constant
 import ner_v2.constant as detector_constant
+import ner_v2.detectors.temporal.constant
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
 from language_utilities.utils import translate_text
 from models.crf.models import Models
 from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED, \
     FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE
-from ner_v2.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_NEXT_DAY, TYPE_PAST, TYPE_REPEAT_DAY)
 from ner_v2.detectors.base_detector import BaseDetector
-from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
+from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY, TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST, \
+    TYPE_NEXT_DAY, TYPE_REPEAT_DAY
 
 
 def get_lang_data_path(lang_code):
@@ -219,16 +220,16 @@ class DateAdvancedDetector(BaseDetector):
             for pattern in patterns:
                 date_dicts = self._date_dict_from_text(text=pattern[0])
                 if len(date_dicts) == 2:
-                    date_dicts[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
-                    date_dicts[1][detector_constant.DATE_END_RANGE_PROPERTY] = True
+                    date_dicts[0][ner_v2.detectors.temporal.constant.DATE_START_RANGE_PROPERTY] = True
+                    date_dicts[1][ner_v2.detectors.temporal.constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
 
         elif patterns_2:
             for pattern in patterns_2:
                 date_dicts = self._date_dict_from_text(text=pattern[0])
                 if len(date_dicts) == 2:
-                    date_dicts[0][detector_constant.DATE_START_RANGE_PROPERTY] = True
-                    date_dicts[1][detector_constant.DATE_END_RANGE_PROPERTY] = True
+                    date_dicts[0][ner_v2.detectors.temporal.constant.DATE_START_RANGE_PROPERTY] = True
+                    date_dicts[1][ner_v2.detectors.temporal.constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
         else:
             parts = re.split(r'\s+(?:\-|to|se)\s+', self.processed_text.lower())
@@ -262,33 +263,35 @@ class DateAdvancedDetector(BaseDetector):
                 list containing dictionaries of end of range dates
 
         """
-        repeat_flag = start_date_dict[detector_constant.DATE_VALUE]['type'] in [TYPE_EVERYDAY, TYPE_REPEAT_DAY]
+        repeat_flag = start_date_dict[ner_v2.detectors.temporal.constant.DATE_VALUE]['type'] in [TYPE_EVERYDAY, TYPE_REPEAT_DAY]
         start_date_list, end_date_list = [start_date_dict], [end_date_dict]
-        start_date = self.date_detector_object.to_datetime_object(start_date_dict[detector_constant.DATE_VALUE])
-        end_date = self.date_detector_object.to_datetime_object(end_date_dict[detector_constant.DATE_VALUE])
+        start_date = self.date_detector_object.to_datetime_object(start_date_dict[
+                                                                      ner_v2.detectors.temporal.constant.DATE_VALUE])
+        end_date = self.date_detector_object.to_datetime_object(end_date_dict[
+                                                                    ner_v2.detectors.temporal.constant.DATE_VALUE])
         if end_date < start_date:
             current_range_start_date = start_date - datetime.timedelta(days=7)
             current_range_start_dict = self.date_detector_object.to_date_dict(current_range_start_date,
                                                                               date_type=TYPE_PAST)
             output_dict = copy.copy(start_date_dict)
-            output_dict[detector_constant.DATE_VALUE] = current_range_start_dict
+            output_dict[ner_v2.detectors.temporal.constant.DATE_VALUE] = current_range_start_dict
             start_date_list.insert(0, output_dict)
 
             next_range_end_date = end_date + datetime.timedelta(days=7)
             next_range_end_dict = self.date_detector_object.to_date_dict(next_range_end_date, date_type=TYPE_NEXT_DAY)
             output_dict = copy.copy(end_date_dict)
-            output_dict[detector_constant.DATE_VALUE] = next_range_end_dict
+            output_dict[ner_v2.detectors.temporal.constant.DATE_VALUE] = next_range_end_dict
             end_date_list.append(output_dict)
 
         if repeat_flag:
             _start_date_list = []
             for date_dict in start_date_list:
-                date_dict[detector_constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
+                date_dict[ner_v2.detectors.temporal.constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
                 _start_date_list.append(date_dict)
 
             _end_date_list = []
             for date_dict in end_date_list:
-                date_dict[detector_constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
+                date_dict[ner_v2.detectors.temporal.constant.DATE_VALUE]['type'] = TYPE_REPEAT_DAY
                 _end_date_list.append(date_dict)
 
             start_date_list, end_date_dict = _start_date_list, _end_date_list
@@ -394,14 +397,14 @@ class DateAdvancedDetector(BaseDetector):
             if date_dict_list:
                 if len(date_dict_list) > 1:
                     for i in range(len(date_dict_list)):
-                        date_dict_list[i][detector_constant.DATE_NORMAL_PROPERTY] = True
+                        date_dict_list[i][ner_v2.detectors.temporal.constant.DATE_NORMAL_PROPERTY] = True
                 else:
                     if departure_date_flag:
-                        date_dict_list[0][detector_constant.DATE_FROM_PROPERTY] = True
+                        date_dict_list[0][ner_v2.detectors.temporal.constant.DATE_FROM_PROPERTY] = True
                     elif return_date_flag:
-                        date_dict_list[0][detector_constant.DATE_TO_PROPERTY] = True
+                        date_dict_list[0][ner_v2.detectors.temporal.constant.DATE_TO_PROPERTY] = True
                     else:
-                        date_dict_list[0][detector_constant.DATE_NORMAL_PROPERTY] = True
+                        date_dict_list[0][ner_v2.detectors.temporal.constant.DATE_NORMAL_PROPERTY] = True
         return date_dict_list
 
     def _update_processed_text(self, date_dict_list):
@@ -415,8 +418,10 @@ class DateAdvancedDetector(BaseDetector):
             date_dict_list: list of substrings of original text to be replaced with tag created from entity_name
         """
         for date_dict in date_dict_list:
-            self.tagged_text = self.tagged_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], self.tag)
-            self.processed_text = self.processed_text.replace(date_dict[detector_constant.ORIGINAL_DATE_TEXT], '')
+            self.tagged_text = self.tagged_text.replace(date_dict[
+                                                            ner_v2.detectors.temporal.constant.ORIGINAL_DATE_TEXT], self.tag)
+            self.processed_text = self.processed_text.replace(date_dict[
+                                                                  ner_v2.detectors.temporal.constant.ORIGINAL_DATE_TEXT], '')
 
     def set_bot_message(self, bot_message):
         """
@@ -517,17 +522,22 @@ class DateAdvancedDetector(BaseDetector):
         for entity_dict in entity_dict_list:
             entity_list.append(
                 {
-                    detector_constant.DATE_VALUE: entity_dict[detector_constant.DATE_VALUE],
-                    detector_constant.DATE_FROM_PROPERTY: entity_dict[detector_constant.DATE_FROM_PROPERTY],
-                    detector_constant.DATE_TO_PROPERTY: entity_dict[detector_constant.DATE_TO_PROPERTY],
-                    detector_constant.DATE_START_RANGE_PROPERTY: entity_dict[
-                        detector_constant.DATE_START_RANGE_PROPERTY],
-                    detector_constant.DATE_END_RANGE_PROPERTY: entity_dict[detector_constant.DATE_END_RANGE_PROPERTY],
-                    detector_constant.DATE_NORMAL_PROPERTY: entity_dict[detector_constant.DATE_NORMAL_PROPERTY],
+                    ner_v2.detectors.temporal.constant.DATE_VALUE: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_VALUE],
+                    ner_v2.detectors.temporal.constant.DATE_FROM_PROPERTY: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_FROM_PROPERTY],
+                    ner_v2.detectors.temporal.constant.DATE_TO_PROPERTY: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_TO_PROPERTY],
+                    ner_v2.detectors.temporal.constant.DATE_START_RANGE_PROPERTY: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_START_RANGE_PROPERTY],
+                    ner_v2.detectors.temporal.constant.DATE_END_RANGE_PROPERTY: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_END_RANGE_PROPERTY],
+                    ner_v2.detectors.temporal.constant.DATE_NORMAL_PROPERTY: entity_dict[
+                        ner_v2.detectors.temporal.constant.DATE_NORMAL_PROPERTY],
 
                 }
             )
-            original_list.append(entity_dict[detector_constant.ORIGINAL_DATE_TEXT])
+            original_list.append(entity_dict[ner_v2.detectors.temporal.constant.ORIGINAL_DATE_TEXT])
         return entity_list, original_list
 
     @staticmethod
@@ -551,14 +561,14 @@ class DateAdvancedDetector(BaseDetector):
                   'end', 'normal'
         """
         return {
-            detector_constant.DATE_VALUE: date_dict,
-            detector_constant.ORIGINAL_DATE_TEXT: original_text,
-            detector_constant.DATE_FROM_PROPERTY: from_property,
-            detector_constant.DATE_TO_PROPERTY: to_property,
-            detector_constant.DATE_START_RANGE_PROPERTY: start_range_property,
-            detector_constant.DATE_END_RANGE_PROPERTY: end_range_property,
-            detector_constant.DATE_NORMAL_PROPERTY: normal_property,
-            detector_constant.DATE_DETECTION_METHOD: detection_method,
+            ner_v2.detectors.temporal.constant.DATE_VALUE: date_dict,
+            ner_v2.detectors.temporal.constant.ORIGINAL_DATE_TEXT: original_text,
+            ner_v2.detectors.temporal.constant.DATE_FROM_PROPERTY: from_property,
+            ner_v2.detectors.temporal.constant.DATE_TO_PROPERTY: to_property,
+            ner_v2.detectors.temporal.constant.DATE_START_RANGE_PROPERTY: start_range_property,
+            ner_v2.detectors.temporal.constant.DATE_END_RANGE_PROPERTY: end_range_property,
+            ner_v2.detectors.temporal.constant.DATE_NORMAL_PROPERTY: normal_property,
+            ner_v2.detectors.temporal.constant.DATE_DETECTION_METHOD: detection_method,
         }
 
     def _date_model_detection(self):
