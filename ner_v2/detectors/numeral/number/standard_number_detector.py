@@ -35,8 +35,9 @@ class BaseNumberDetector(object):
                                                  + r')?)\s*', re.UNICODE)
 
         # Variable to define default order in which detector will work
-        self.detector_preferences = [self._detect_number_from_numerals,
-                                     self._detect_number_from_digit]
+        self.detector_preferences = [self._detect_number_from_digit,
+                                     self._detect_number_from_numerals
+                                     ]
 
     def detect_number(self, text):
         self.text = text
@@ -71,7 +72,6 @@ class BaseNumberDetector(object):
         """
         data_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_DATA_CONSTANT_FILE), encoding='utf-8')
         for index, row in data_df.iterrows():
-            number = row[NUMBER_DATA_FILE_NUMBER]
             name_variants = row[NUMBER_DATA_FILE_NAME_VARIANTS]
             value = row[NUMBER_DATA_FILE_VALUE]
             if float(value).is_integer():
@@ -80,13 +80,9 @@ class BaseNumberDetector(object):
 
             numerals_list = self._get_numerals_list(name_variants)
             if number_type == NUMBER_TYPE_UNIT:
-                self.numbers_word[number] = (1, value)
-                self.numbers_word[str(value)] = (1, value)
                 for numeral in numerals_list:
                     self.numbers_word[numeral] = (1, value)
             else:
-                self.numbers_word[number] = (value, 0)
-                self.numbers_word[str(value)] = (value, 0)
                 for numeral in numerals_list:
                     self.numbers_word[numeral] = (value, 0)
                     self.language_scale_map[numeral] = value

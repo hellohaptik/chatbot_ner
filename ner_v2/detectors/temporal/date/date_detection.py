@@ -8,7 +8,6 @@ import re
 import pytz
 
 import models.crf.constant as model_constant
-from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 import ner_v2.detectors.temporal.constant
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
@@ -19,17 +18,7 @@ from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERI
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.temporal.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST, \
     TYPE_NEXT_DAY, TYPE_REPEAT_DAY
-
-
-def get_lang_data_path(lang_code):
-    data_directory_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
-            lang_code,
-            LANGUAGE_DATA_DIRECTORY
-        )
-    )
-    return data_directory_path
+from ner_v2.detectors.utils import get_lang_data_path
 
 
 class DateAdvancedDetector(BaseDetector):
@@ -804,7 +793,8 @@ class DateDetector(object):
             )
             self.language_date_detector = standard_date_regex.DateDetector(
                 entity_name=self.entity_name,
-                data_directory_path=get_lang_data_path(self.language),
+                data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
+                                                       lang_code=self.language),
                 timezone=self.timezone,
                 past_date_referenced=past_date_referenced
             )

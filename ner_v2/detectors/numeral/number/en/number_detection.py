@@ -1,13 +1,14 @@
 import re
 import os
 
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.numeral.constant import NUMBER_DETECT_UNIT, NUMBER_DETECT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
-from ner_v2.detectors.numeral.number.number_detection import get_lang_data_path
 
 
 class NumberDetector(BaseNumberDetector):
-    data_directory_path = get_lang_data_path(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep))
+    data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
+                                       LANGUAGE_DATA_DIRECTORY)
 
     def __init__(self, entity_name):
         super(NumberDetector, self).__init__(entity_name=entity_name,
@@ -16,8 +17,8 @@ class NumberDetector(BaseNumberDetector):
         self.numbers_word['and'] = (1, 0)
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
-            self._detect_number_from_numerals,
-            self._detect_number_from_digit
+            self._detect_number_from_digit,
+            self._detect_number_from_numerals
         ]
 
     def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
