@@ -7,7 +7,7 @@ from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT
                         ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE)
 from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                          EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
-
+from language_utilities.constant import ENGLISH_LANG
 
 class DataStore(object):
     """
@@ -182,10 +182,11 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def get_entity_dictionary(self, entity_name,language_script='en', **kwargs):
+    def get_entity_dictionary(self, entity_name, language_script=ENGLISH_LANG, **kwargs):
         """
         Args:
-            entity_name: the name of the entity to get the stored data for
+            entity_name (str): the name of the entity to get the stored data for
+            language_script (str): language code corresponding the script of the entity
             kwargs:
                 For Elasticsearch:
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search

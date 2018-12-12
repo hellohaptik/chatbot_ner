@@ -18,6 +18,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, language_scr
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
+        language_script (str): language code corresponding the script of the entity
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
