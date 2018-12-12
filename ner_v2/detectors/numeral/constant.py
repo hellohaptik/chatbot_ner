@@ -15,7 +15,12 @@ NUMBER_DATA_FILE_TYPE = 'type'
 NUMBER_TYPE_UNIT = 'unit'
 NUMBER_TYPE_SCALE = 'scale'
 
-NUMBER_DATA_CONSTANT_FILE = 'numerals_constant.csv'
+NUMBER_NUMERAL_CONSTANT_FILE = 'numerals_constant.csv'
+NUMBER_UNITS_FILE = 'units.csv'
+
+NUMBER_UNIT_VARIANTS = 'unit_variants'
+NUMBER_UNIT_VALUE = 'unit_value'
+
 
 ORDINALS_MAP = {
     'first': 1,

@@ -3,9 +3,9 @@ import pandas as pd
 import os
 import re
 
-from ner_v2.detectors.numeral.constant import NUMBER_DATA_FILE_NUMBER, NUMBER_DATA_FILE_NAME_VARIANTS, \
-    NUMBER_DATA_FILE_VALUE, NUMBER_DATA_FILE_TYPE, NUMBER_TYPE_UNIT, NUMBER_DATA_CONSTANT_FILE, NUMBER_DETECT_VALUE, \
-    NUMBER_DETECT_UNIT
+from ner_v2.detectors.numeral.constant import NUMBER_DATA_FILE_NAME_VARIANTS, \
+    NUMBER_DATA_FILE_VALUE, NUMBER_DATA_FILE_TYPE, NUMBER_TYPE_UNIT, NUMBER_NUMERAL_CONSTANT_FILE, NUMBER_DETECT_VALUE, \
+    NUMBER_DETECT_UNIT, NUMBER_UNITS_FILE, NUMBER_UNIT_VARIANTS, NUMBER_UNIT_VALUE
 from ner_v2.detectors.numeral.utils import get_number_from_numerals
 
 
@@ -27,6 +27,7 @@ class BaseNumberDetector(object):
 
         self.numbers_word = {}
         self.language_scale_map = {}
+        self.units_map = {}
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
@@ -51,7 +52,7 @@ class BaseNumberDetector(object):
         return number_list, original_list
 
     @staticmethod
-    def _get_numerals_list(numerals_text):
+    def _get_list_from_pipe_sep_string(numerals_text):
         """
         Split numerals
         Args:
@@ -70,22 +71,61 @@ class BaseNumberDetector(object):
         Returns:
             None
         """
-        data_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_DATA_CONSTANT_FILE), encoding='utf-8')
-        for index, row in data_df.iterrows():
-            name_variants = row[NUMBER_DATA_FILE_NAME_VARIANTS]
+        # create number_words dict having number variants and their corresponding scale and increment value
+        # create language_scale_map dict having scale variants and their corresponding value
+        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE), encoding='utf-8')
+        for index, row in numeral_df.iterrows():
+            name_variants = self._get_list_from_pipe_sep_string(row[NUMBER_DATA_FILE_NAME_VARIANTS])
             value = row[NUMBER_DATA_FILE_VALUE]
             if float(value).is_integer():
                 value = int(row[NUMBER_DATA_FILE_VALUE])
             number_type = row[NUMBER_DATA_FILE_TYPE]
 
-            numerals_list = self._get_numerals_list(name_variants)
             if number_type == NUMBER_TYPE_UNIT:
-                for numeral in numerals_list:
+                for numeral in name_variants:
                     self.numbers_word[numeral] = (1, value)
             else:
-                for numeral in numerals_list:
+                for numeral in name_variants:
                     self.numbers_word[numeral] = (value, 0)
                     self.language_scale_map[numeral] = value
+
+        # create units_dict having unit variants and their corresponding value
+        unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE)
+        if os.path.exists(unit_file_path):
+            units_df = pd.read_csv(unit_file_path, encoding='utf-8')
+            for index, row in units_df.iterrows():
+                unit_variants = self._get_list_from_pipe_sep_string(row[NUMBER_UNIT_VARIANTS])
+                unit_value = row[NUMBER_UNIT_VALUE]
+                for unit in unit_variants:
+                    self.units_map[unit] = unit_value
+
+    def _get_unit_from_text(self, detected_original, processed_text):
+        """
+        Method to detect unit from detected original text.
+        Args:
+            detected_original (str): detected number text from processed text
+            processed_text (str): processed text
+        Returns:
+            unit(str|<None>): unit detected
+            original_text(str): original text adding unit text if detected
+        """
+        unit = None
+        original_text = detected_original
+        if not self.units_map:
+            return unit, original_text
+
+        unit_choices = "|".join(self.units_map)
+        unit_matches = re.findall(r'((' + unit_choices + r')?[\.\,\s]*?' + detected_original + r'\s*(' + unit_choices +
+                                  r')?)', processed_text)
+        if unit_matches:
+            original_text = original_text[0][0]
+            unit_pre = original_text[0][1].strip()
+            unit_suc = original_text[0][2].strip()
+            if unit_pre:
+                unit = self.units_map[unit_pre]
+            elif unit_suc:
+                unit = self.units_map[unit_suc]
+        return unit, original_text
 
     def _detect_number_from_numerals(self, number_list=None, original_list=None):
         """
@@ -119,9 +159,10 @@ class BaseNumberDetector(object):
         for numeral_text in numeral_text_list:
             number_data = get_number_from_numerals(numeral_text, self.numbers_word)
             for number, original_text in zip(number_data[0], number_data[1]):
+                unit, original_text = self._get_unit_from_text(original_text, numeral_text)
                 number_list.append({
                     NUMBER_DETECT_VALUE: str(number),
-                    NUMBER_DETECT_UNIT: None
+                    NUMBER_DETECT_UNIT: unit
                 })
                 original_list.append(original_text)
         return number_list, original_list
@@ -169,18 +210,18 @@ class BaseNumberDetector(object):
 
         patterns = self.regex_numeric_patterns.findall(self.processed_text)
         for pattern in patterns:
-            original = pattern[0].strip()
+            original_text = pattern[0].strip()
             number = pattern[1].replace(",", "")
             scale = pattern[2].strip()
             scale = self.language_scale_map[scale] if scale else 1
             number = float(number) * scale
             number = int(number) if number.is_integer() else number
-
+            unit, original_text = self._get_unit_from_text(original_text, self.processed_text)
             number_list.append({
                 NUMBER_DETECT_VALUE: str(number),
-                NUMBER_DETECT_UNIT: None
+                NUMBER_DETECT_UNIT: unit
             })
-            original_list.append(original)
+            original_list.append(original_text)
 
         return number_list, original_list
 
