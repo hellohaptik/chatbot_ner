@@ -9,7 +9,7 @@ from language_utilities.constant import ENGLISH_LANG
 log_prefix = 'datastore.elastic_search.query'
 
 
-def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
+def dictionary_query(connection, index_name, doc_type, entity_name, language_script=ENGLISH_LANG, **kwargs):
     """
     Get all variants data for a entity stored in the index as a dictionary
 
@@ -27,13 +27,16 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
     """
     results_dictionary = {}
     data = {
-        'query': {
-            'term': {
-                'entity_data': {
-                    'value': entity_name
-                }
-            }
-        }
+        "query": {
+            "constant_score": {
+                "filter":
+                    {"bool": {"must": [
+                        {
+                            "term": {"entity_data": entity_name}
+                        },
+                        {
+                            "term": {"language_script": language_script}
+                        }]}}}}
     }
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')

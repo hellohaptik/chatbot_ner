@@ -182,7 +182,7 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
-    def get_entity_dictionary(self, entity_name, **kwargs):
+    def get_entity_dictionary(self, entity_name,language_script='en', **kwargs):
         """
         Args:
             entity_name: the name of the entity to get the stored data for
@@ -227,6 +227,7 @@ class DataStore(object):
                                                                            ELASTICSEARCH_DOC_TYPE],
                                                                        entity_name=entity_name,
                                                                        request_timeout=request_timeout,
+                                                                       language_script=language_script,
                                                                        **kwargs)
 
         return results_dictionary

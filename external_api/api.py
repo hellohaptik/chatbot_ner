@@ -29,8 +29,9 @@ def get_entity_word_variants(request):
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
+        language_script = request.GET.get(LANGUAGE_SCRIPT)
         datastore_obj = DataStore()
-        result = datastore_obj.get_entity_dictionary(entity_name=entity_name)
+        result = datastore_obj.get_entity_dictionary(entity_name=entity_name, language_script=language_script)
 
         structured_result = []
         # The list around result.keys() is to make it compatible to python3
