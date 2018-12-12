@@ -4,18 +4,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
-from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
-
-
-def get_lang_data_path(lang_code):
-    data_directory_path = os.path.abspath(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
-            lang_code,
-            LANGUAGE_DATA_DIRECTORY
-        )
-    )
-    return data_directory_path
+from ner_v2.detectors.utils import get_lang_data_path
 
 
 class TimeDetector(BaseDetector):
@@ -104,7 +93,8 @@ class TimeDetector(BaseDetector):
             )
             self.language_time_detector = standard_time_regex.TimeDetector(
                 entity_name=self.entity_name,
-                data_directory_path=get_lang_data_path(self.language),
+                data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
+                                                       lang_code=self.language),
                 timezone=self.timezone,
                 range_enabled=range_enabled,
                 form_check=form_check

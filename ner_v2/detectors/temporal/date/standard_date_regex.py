@@ -7,7 +7,7 @@ import pytz
 from dateutil.relativedelta import relativedelta
 
 from chatbot_ner.config import ner_logger
-from ner_v2.constant import TYPE_EXACT
+from ner_v2.detectors.temporal.constant import TYPE_EXACT
 from ner_v2.detectors.temporal.constant import DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE, \
     RELATIVE_DATE, DATE_LITERAL_TYPE, MONTH_LITERAL_TYPE, WEEKDAY_TYPE, \
     MONTH_TYPE, ADD_DIFF_DATETIME_TYPE, MONTH_DATE_REF_TYPE, NUMERALS_CONSTANT_FILE
