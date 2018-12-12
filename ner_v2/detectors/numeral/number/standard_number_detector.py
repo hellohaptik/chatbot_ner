@@ -111,6 +111,7 @@ class BaseNumberDetector(object):
         """
         unit = None
         original_text = detected_original
+
         if not self.units_map:
             return unit, original_text
 
