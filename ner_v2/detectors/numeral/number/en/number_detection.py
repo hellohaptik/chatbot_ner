@@ -38,10 +38,8 @@ class NumberDetector(BaseNumberDetector):
         """
         number_list = number_list or []
         original_list = original_list or []
-        patterns = re.findall(
-            r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
-            self.processed_text.lower()
-        )
+        patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
+                              self.processed_text.lower())
         for pattern in patterns:
             number_list.append({
                 NUMBER_DETECT_VALUE: pattern[2],
