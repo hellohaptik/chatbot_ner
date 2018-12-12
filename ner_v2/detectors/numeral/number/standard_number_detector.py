@@ -116,11 +116,11 @@ class BaseNumberDetector(object):
 
         unit_choices = "|".join(self.units_map)
         unit_matches = re.findall(r'((' + unit_choices + r')?[\.\,\s]*?' + detected_original + r'\s*(' + unit_choices +
-                                  r')?)', processed_text)
+                                  r')?)', processed_text, re.UNICODE)
         if unit_matches:
-            original_text = original_text[0][0]
-            unit_pre = original_text[0][1].strip()
-            unit_suc = original_text[0][2].strip()
+            original_text = original_text[0][0].strip()
+            unit_pre = unit_matches[0][1].strip()
+            unit_suc = unit_matches[0][2].strip()
             if unit_pre:
                 unit = self.units_map[unit_pre]
             elif unit_suc:
