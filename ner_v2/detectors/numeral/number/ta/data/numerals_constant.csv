@@ -47,6 +47,6 @@ number,name_variants,value,type
 ௯௰,தொன்னூறு|tonnuru|tonoor,90,unit
 ௱,நூறு|Nuru|noor,100,scale
 ௲,ஆயிரம்|Ayiram|Airam,1000,scale
-௱௲,நூறாயிரம்|Nurayiram|noorairam|oru lacham இலட்சம்|ilatcam,100000,scale
+௱௲,நூறாயிரம்|Nurayiram|noorairam|oru lacham| இலட்சம்|ilatcam,100000,scale
 ௲௲,மெய்யிரம்|Meyyiram |பத்து இலட்சம்|Pattu Ilatcam|Pattulacaham,1000000,scale
 ௲௲௲,தொள்ளுண்|Tollun|Pattukodi|நிகர்ப்புதம்|Nikarpputam|Pattukodi,100000000,scale
