@@ -12,6 +12,7 @@ from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
     EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, \
     LIVE_CRF_MODEL_PATH
+from language_utilities.constant import ENGLISH_LANG
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -29,7 +30,7 @@ def get_entity_word_variants(request):
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
-        language_script = request.GET.get(LANGUAGE_SCRIPT)
+        language_script = request.GET.get(LANGUAGE_SCRIPT, ENGLISH_LANG)
         datastore_obj = DataStore()
         result = datastore_obj.get_entity_dictionary(entity_name=entity_name,
                                                      language_script=language_script)
