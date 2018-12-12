@@ -194,15 +194,20 @@ def create_dictionary_data_from_file(connection, index_name, doc_type, csv_file_
         os.path.basename(csv_file_path)
 
 
-def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger, **kwargs):
+def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
+                          language_script=ENGLISH_LANG,
+                          **kwargs):
     data = {
-        'query': {
-            'term': {
-                'entity_data': {
-                    'value': entity_name
-                }
-            }
-        },
+        "query": {
+            "constant_score": {
+                "filter":
+                    {"bool": {"must": [
+                        {
+                            "term": {"entity_data": entity_name}
+                        },
+                        {
+                            "term": {"language_script": language_script}
+                        }]}}}},
         "size": ELASTICSEARCH_SEARCH_SIZE
     }
     results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
@@ -249,7 +254,7 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
     logger.debug('%s: +++ Started: external_api_entity_update() +++' % log_prefix)
     logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
     delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                          entity_name=entity_name, logger=logger, **kwargs)
+                          entity_name=entity_name, logger=logger,language_script=language_script, **kwargs)
     logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
     if entity_data:
@@ -282,7 +287,8 @@ def update_entity_crf_data_populate(connection, index_name, doc_type, entity_lis
     logger.debug('%s: +++ Started: external_api_training_data_entity_update() +++' % log_prefix)
     logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
     delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                          entity_name=entity_name, logger=logger, **kwargs)
+                          entity_name=entity_name, logger=logger, language_script=language_script,
+                          **kwargs)
     logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
 
     logger.debug('%s: +++ Started: add_training_data_elastic_search() +++' % log_prefix)
