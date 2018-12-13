@@ -122,7 +122,8 @@ class BaseNumberDetector(object):
         if not self.units_map:
             return unit, original_text
 
-        unit_choices = "|".join([re.escape(x) for x in self.units_map.keys()])
+        sorted_len_units_keys = sorted(self.units_map.keys(), key=len, reverse=True)
+        unit_choices = "|".join([re.escape(x) for x in sorted_len_units_keys])
         unit_matches = re.search(r'((' + unit_choices + r')[\.\,\s]*' + detected_original + r')|(' + detected_original +
                                  r'\s*(' + unit_choices + r'))', processed_text, re.UNICODE)
         if unit_matches:
@@ -227,9 +228,9 @@ class BaseNumberDetector(object):
         original_list = original_list or []
         processed_text = self.processed_text
 
-        sorted_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
+        sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        scale_map_choices = "|".join([re.escape(x) for x in sorted_scale_map])
+        scale_map_choices = "|".join([re.escape(x) for x in sorted_len_scale_map])
         regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + scale_map_choices
                                             + r')?)\s*', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
