@@ -64,20 +64,18 @@ class NumberDetectionTest(TestCase):
         """
         Number detection from word with multiple unit numbers like 'one two three twenty one'
         """
-        message = 'one two three twenty one'
+        message = 'one two three'
         number_word_map = {
             'one': NumberVariant(scale=1, increment=1),
             'two': NumberVariant(scale=1, increment=2),
-            'three': NumberVariant(scale=1, increment=3),
-            'twenty': NumberVariant(scale=1, increment=20),
+            'three': NumberVariant(scale=1, increment=3)
         }
         detect_texts, original_texts = get_number_from_number_word(message, number_word_map)
         zipped = zip(detect_texts, original_texts)
-        self.assertEqual(len(zipped), 4)
+        self.assertEqual(len(zipped), 3)
         self.assertIn((1, 'one'), zipped)
         self.assertIn((2, 'two'), zipped)
         self.assertIn((3, 'three'), zipped)
-        self.assertIn((21, 'twenty one'), zipped)
 
     def test_get_number_with_multiple_unit_scale_number_word(self):
         """
@@ -180,7 +178,7 @@ class NumberDetectionTest(TestCase):
         """
         Number detection for english language for integer number with scale like '1 thousand', '1k', '1m'
         """
-        message = '1 thousand people were killed in war'
+        message = '1 thousand men were killed in war'
         number_detector_object = NumberDetector(entity_name=self.entity_name, language='en')
         number_dicts, original_texts = number_detector_object.detect_entity(message)
 
