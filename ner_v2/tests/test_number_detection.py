@@ -132,7 +132,7 @@ class NumberDetectionTest(TestCase):
         """
         Number detection for english language for integer number like '100', '2'
         """
-        message = u'100 men got selected for interview'
+        message = u'100 got selected for interview'
         number_detector_object = NumberDetector(entity_name=self.entity_name, language='en')
         number_dicts, original_texts = number_detector_object.detect_entity(message)
         zipped = zip(number_dicts, original_texts)
