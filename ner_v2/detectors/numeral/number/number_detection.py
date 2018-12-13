@@ -3,7 +3,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
-from ner_v2.detectors.numeral.constant import NUMBER_DETECT_VALUE
+from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.utils import get_lang_data_path
 
 
@@ -127,7 +127,7 @@ class NumberDetector(BaseDetector):
         number_data = self.language_number_detector.detect_number(self.processed_text)
         validated_number, validated_number_text = [], []
         for number_value_dict, original_text in zip(number_data[0], number_data[1]):
-            if self.min_digit <= len(number_value_dict[NUMBER_DETECT_VALUE]) <= self.max_digit:
+            if self.min_digit <= len(number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]) <= self.max_digit:
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)
 

@@ -4,7 +4,8 @@ def get_number_from_numerals(text, number_word_dict):
     Detect numbers from numerals text
     Args:
         text (str): text to detect number from number words
-        number_word_dict (dict): dict containing scale and increment of each number word
+        number_word_dict (collections.namedtuple('NumberVariant', ['scale', 'increment'])):
+                    Named tuple containing scale and increment of each number word
 
     Returns:
         detected_number_list (list): list of numeric value detected from text
@@ -44,7 +45,7 @@ def get_number_from_numerals(text, number_word_dict):
             result_text, current_text = '', ''
             on_number = False
         else:
-            scale, increment = number_word_dict[word]
+            scale, increment = number_word_dict[word].scale, number_word_dict[word].increment
             digit_len = max(len(str(increment)), len(str(scale)))
 
             if digit_len == prev_digit_len:
@@ -77,3 +78,15 @@ def get_number_from_numerals(text, number_word_dict):
         detected_original_text_list.append(original)
 
     return detected_number_list, detected_original_text_list
+
+
+def get_list_from_pipe_sep_string(text_string):
+    """
+    Split numerals
+    Args:
+        text_string (str):  text
+    Returns:
+        (list) : list containing numeral after split
+    """
+    text_list = text_string.split("|")
+    return [x.lower().strip() for x in text_list if x.strip()]

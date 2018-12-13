@@ -1,8 +1,8 @@
 ## Number Detector 
 
-This is the V2 version of Number detector module that will detect number and number word from text in multiple languages. This detector module add an additional feature of detecting units along with number. Example -  for a given text "5 kg", this module will return `5`  as detected value and `kg` as detected unit. 
+This is the V2 version of Number detector module that will detect number and number word from text in multiple languages. This detector module adds an additional feature of detecting units along with number in text. Example -  for a given text "5 kg", this module will return `5`  as detected value and `kg` as detected unit. 
 
- We are currently we provide number detection supports in 6 languages, which are
+ We are currently providing number detection supports in 6 languages, which are
 
 - English
 - Hindi

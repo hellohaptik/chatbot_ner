@@ -1,12 +1,17 @@
 # coding=utf-8
 import pandas as pd
+import collections
 import os
 import re
 
-from ner_v2.detectors.numeral.constant import NUMBER_DATA_FILE_NAME_VARIANTS, \
-    NUMBER_DATA_FILE_VALUE, NUMBER_DATA_FILE_TYPE, NUMBER_TYPE_UNIT, NUMBER_NUMERAL_CONSTANT_FILE, NUMBER_DETECT_VALUE, \
-    NUMBER_DETECT_UNIT, NUMBER_UNITS_FILE, NUMBER_UNIT_VARIANTS, NUMBER_UNIT_VALUE
-from ner_v2.detectors.numeral.utils import get_number_from_numerals
+from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
+    NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
+    NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, \
+    NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
+    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE
+from ner_v2.detectors.numeral.utils import get_number_from_numerals, get_list_from_pipe_sep_string
+
+NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
 
 
 class BaseNumberDetector(object):
@@ -25,19 +30,16 @@ class BaseNumberDetector(object):
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 
-        self.numbers_word = {}
-        self.language_scale_map = {}
+        self.numbers_word_map = {}
+        self.scale_map = {}
         self.units_map = {}
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
 
-        self.regex_numeric_patterns = re.compile(r'(([\d,]+[.]?[\d]*)\s?(' + "|".join(self.language_scale_map.keys())
-                                                 + r')?)\s*', re.UNICODE)
-
         # Variable to define default order in which detector will work
         self.detector_preferences = [self._detect_number_from_digit,
-                                     self._detect_number_from_numerals
+                                     self._detect_number_from_words
                                      ]
 
     def detect_number(self, text):
@@ -51,18 +53,6 @@ class BaseNumberDetector(object):
             self._update_processed_text(original_list)
         return number_list, original_list
 
-    @staticmethod
-    def _get_list_from_pipe_sep_string(numerals_text):
-        """
-        Split numerals
-        Args:
-            numerals_text (str): numerals text
-        Returns:
-            (list) : list containing numeral after split
-        """
-        numerals_list = numerals_text.split("|")
-        return [num.lower().strip() for num in numerals_list if num.strip()]
-
     def init_regex_and_parser(self, data_directory_path):
         """
         Initialise numbers word from from data file
@@ -73,41 +63,58 @@ class BaseNumberDetector(object):
         """
         # create number_words dict having number variants and their corresponding scale and increment value
         # create language_scale_map dict having scale variants and their corresponding value
-        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE), encoding='utf-8')
+        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME), encoding='utf-8')
         for index, row in numeral_df.iterrows():
-            name_variants = self._get_list_from_pipe_sep_string(row[NUMBER_DATA_FILE_NAME_VARIANTS])
-            value = row[NUMBER_DATA_FILE_VALUE]
+            name_variants = get_list_from_pipe_sep_string(row[NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME])
+            value = row[NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME]
             if float(value).is_integer():
-                value = int(row[NUMBER_DATA_FILE_VALUE])
-            number_type = row[NUMBER_DATA_FILE_TYPE]
+                value = int(row[NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME])
+            number_type = row[NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME]
 
             if number_type == NUMBER_TYPE_UNIT:
                 for numeral in name_variants:
-                    self.numbers_word[numeral] = (1, value)
-            else:
+                    # tuple values to corresponds to (scale, increment), for unit type, scale will always be 1.
+                    self.numbers_word_map[numeral] = NumberVariant(scale=1, increment=value)
+
+            elif number_type == NUMBER_TYPE_SCALE:
                 for numeral in name_variants:
-                    self.numbers_word[numeral] = (value, 0)
-                    self.language_scale_map[numeral] = value
+                    # tuple values to corresponds to (scale, increment), for scale type, increment will always be 0.
+                    self.numbers_word_map[numeral] = NumberVariant(scale=value, increment=0)
+                    # Dict map to store scale and their values
+                    self.scale_map[numeral] = value
 
         # create units_dict having unit variants and their corresponding value
-        unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE)
+        unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE_NAME)
         if os.path.exists(unit_file_path):
             units_df = pd.read_csv(unit_file_path, encoding='utf-8')
             for index, row in units_df.iterrows():
-                unit_variants = self._get_list_from_pipe_sep_string(row[NUMBER_UNIT_VARIANTS])
-                unit_value = row[NUMBER_UNIT_VALUE]
+                unit_variants = get_list_from_pipe_sep_string(row[NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME])
+                unit_value = row[NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME]
                 for unit in unit_variants:
                     self.units_map[unit] = unit_value
 
     def _get_unit_from_text(self, detected_original, processed_text):
         """
-        Method to detect unit from detected original text.
+        Method to detect units present in prefix or suffix of number from detected original string. It will also return
+        updated original text with units included if found.
+            Example - For number 'one hundred rupees', our number detector will detect "one hundred" as 100.
+                      To detect unit we pass original string "one hundred" and processed text "one hundred rupees" to
+                      this method, which will apply regex to find if any unit text (here rupees) is present in
+                      prefix or suffix of original string and return corresponding value if found.
         Args:
             detected_original (str): detected number text from processed text
             processed_text (str): processed text
         Returns:
             unit(str|<None>): unit detected
             original_text(str): original text adding unit text if detected
+
+        Examples:
+            [In]  >> _get_unit_from_text('100', '100 Rs')
+            [Out] >> ('rupees', '100 Rs')
+
+            [In]  >> _get_unit_from_text('one hundred', 'rupees one hundred')
+            [Out] >> ('rupees', 'rupees one hundred')
+
         """
         unit = None
         original_text = detected_original
@@ -116,21 +123,24 @@ class BaseNumberDetector(object):
             return unit, original_text
 
         unit_choices = "|".join(self.units_map)
-        unit_matches = re.findall(r'((' + unit_choices + r')?[\.\,\s]*?' + detected_original + r'\s*(' + unit_choices +
-                                  r')?)', processed_text, re.UNICODE)
-        if unit_matches:
-            original_text = original_text[0][0].strip()
-            unit_pre = unit_matches[0][1].strip()
-            unit_suc = unit_matches[0][2].strip()
-            if unit_pre:
-                unit = self.units_map[unit_pre]
-            elif unit_suc:
-                unit = self.units_map[unit_suc]
+        unit_matches = re.search(r'((' + unit_choices + r')?[\.\,\s]*' + detected_original + r'\s*(' + unit_choices +
+                                 r')?)', processed_text, re.UNICODE)
+        original_text, unit_prefix, unit_suffix = unit_matches.groups()
+        original_text = original_text.strip()
+        if unit_suffix:
+            unit = self.units_map[unit_suffix.strip()]
+        elif unit_prefix:
+            unit = self.units_map[unit_prefix.strip()]
+
         return unit, original_text
 
-    def _detect_number_from_numerals(self, number_list=None, original_list=None):
+    def _detect_number_from_words(self, number_list=None, original_list=None):
         """
-        Detect number from numeral text like "two thousand", "One hundred twenty two"
+        Detect numbers from number words, for example - "two thousand", "One hundred twenty two".
+        How it works?
+            First it splits the text checking if any of '-' or ':' is present in text, and pass the split text
+            to number word detector, which return the number value and original word from which it is being detected.
+            Further we check for unit in suffix and prefix of original string and update that if any units are found.
         Args:
             number_list (list): list containing detected numeric text
             original_list (list): list containing original numeral text
@@ -156,21 +166,26 @@ class BaseNumberDetector(object):
         number_list = number_list or []
         original_list = original_list or []
 
+        # Splitting text based on "-" and ":",  as in case of text "two thousand-three thousand", simple splitting
+        # will give list as [two, thousand-three, thousand], result in number word detector giving wrong result,
+        # hence we need to separate them into [two thousand, three thousand] using '-' or ':' as split char
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
-            number_data = get_number_from_numerals(numeral_text, self.numbers_word)
-            for number, original_text in zip(number_data[0], number_data[1]):
+            numbers, original_texts = get_number_from_numerals(numeral_text, self.numbers_word_map)
+            for number, original_text in zip(numbers, original_texts):
                 unit, original_text = self._get_unit_from_text(original_text, numeral_text)
                 number_list.append({
-                    NUMBER_DETECT_VALUE: str(number),
-                    NUMBER_DETECT_UNIT: unit
+                    NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
+                    NUMBER_DETECTION_RETURN_DICT_UNIT: unit
                 })
                 original_list.append(original_text)
         return number_list, original_list
 
     def _detect_number_from_digit(self, number_list=None, original_list=None):
         """
-        Detect number from numeric text like 200 , 2.2k , 300.12
+        Detect number from numeric(digit) text considering integer and float both. It also check for cases where
+        scales are also present in suffix of digit like '200 thousand' or '2.2k'.
+
         Args:
             number_list (list): list containing detected numeric text
             original_list (list): list containing original numeral text
@@ -208,19 +223,22 @@ class BaseNumberDetector(object):
         """
         number_list = number_list or []
         original_list = original_list or []
-
-        patterns = self.regex_numeric_patterns.findall(self.processed_text)
+        # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
+        scale_map_choices = re.escape("|".join(self.scale_map.keys()))
+        regex_numeric_patterns = re.compile(r'(([\d,]*\.?[\d]*)\s?(' + scale_map_choices
+                                            + r')?)\s*', re.UNICODE)
+        patterns = regex_numeric_patterns.findall(self.processed_text)
         for pattern in patterns:
             original_text = pattern[0].strip()
             number = pattern[1].replace(",", "")
             scale = pattern[2].strip()
-            scale = self.language_scale_map[scale] if scale else 1
+            scale = self.scale_map[scale] if scale else 1
             number = float(number) * scale
             number = int(number) if number.is_integer() else number
             unit, original_text = self._get_unit_from_text(original_text, self.processed_text)
             number_list.append({
-                NUMBER_DETECT_VALUE: str(number),
-                NUMBER_DETECT_UNIT: unit
+                NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
+                NUMBER_DETECTION_RETURN_DICT_UNIT: unit
             })
             original_list.append(original_text)
 

@@ -1,4 +1,4 @@
-number,name_variants,value,type
+number,name_variants,number_value,number_type
 0,zero,0,unit
 1,one,1,unit
 2,two,2,unit
@@ -11,7 +11,7 @@ number,name_variants,value,type
 9,nine,9,unit
 10,ten,10,unit
 11,eleven,11,unit
-12,tweleve,12,unit
+12,twelve|tweleve,12,unit
 13,thirteen,13,unit
 14,fourteen,14,unit
 15,fifteen,15,unit

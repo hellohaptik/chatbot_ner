@@ -5,10 +5,9 @@ import re
 import pytz
 
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.numeral.constant import ORDINALS_MAP
 from ner_v2.detectors.temporal.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, TYPE_TOMORROW, TYPE_YESTERDAY, \
     TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_N_DAYS_AFTER, TYPE_NEXT_DAY, TYPE_THIS_DAY, TYPE_POSSIBLE_DAY, WEEKDAYS, \
-    REPEAT_WEEKDAYS, WEEKENDS, REPEAT_WEEKENDS, TYPE_REPEAT_DAY, MONTH_DICT, DAY_DICT
+    REPEAT_WEEKDAYS, WEEKENDS, REPEAT_WEEKENDS, TYPE_REPEAT_DAY, MONTH_DICT, DAY_DICT, ORDINALS_MAP
 from ner_v2.detectors.temporal.utils import get_weekdays_for_month
 
 

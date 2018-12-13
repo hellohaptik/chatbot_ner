@@ -1,4 +1,4 @@
-number,name_variants,value,type
+number,name_variants,number_value,number_type
 ০,শুন্য|Shunyo|Sunya,0,unit
 ১,এক|Ek|Eka,1,unit
 ২,দুই|Dui|Duto,2,unit
@@ -13,8 +13,8 @@ number,name_variants,value,type
 ১১,এগারো|Egaro|Egarota,11,unit
 ১২,বারো|Baro|Barota,12,unit
 ১৩,তেরো|Tero|Terota,13,unit
-১৪,চৌদ্দ|Choddo/Choddota,14,unit
-১৫,পনেরো|Ponero|Panero/Ponerota,15,unit
+১৪,চৌদ্দ|Choddo|Choddota,14,unit
+১৫,পনেরো|Ponero|Panero|Ponerota,15,unit
 ১৬,ষোল|Sollo|Sola,16,unit
 ১৭,সতেরো|Satero|Sotero,17,unit
 ১৮,আঠারো|Atharo|Atharota,18,unit
@@ -46,7 +46,7 @@ number,name_variants,value,type
 ৪৪,চুয়াল্লিশ|Chaualish|Cuyalish|Cuyalis,44,unit
 ৪৫,পঁয়তাল্লিশ|Pointalish|Pantalish|Pointalis,45,unit
 ৪৬,ছেচল্লিশ|Cheyalish|Checallis|Choialish,46,unit
-৪৭,সাতচল্লিশ|Chontalish/Satacallis|Chantalish,47,unit
+৪৭,সাতচল্লিশ|Chontalish|Satacallis|Chantalish,47,unit
 ৪৮,আটচল্লিশ|Atacholish|Atacallis|Atachalish|Atcholish,48,unit
 ৪৯,ঊনপঞ্চাশ|Unpanchas|Unponchas|Unpanchash,49,unit
 ৫০,পঞ্চাশ|Ponchas|Pancas,50,unit

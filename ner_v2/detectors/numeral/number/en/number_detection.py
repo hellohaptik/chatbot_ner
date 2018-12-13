@@ -2,7 +2,7 @@ import re
 import os
 
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.numeral.constant import NUMBER_DETECT_UNIT, NUMBER_DETECT_VALUE
+from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
 
 
@@ -14,11 +14,11 @@ class NumberDetector(BaseNumberDetector):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path)
 
-        self.numbers_word['and'] = (1, 0)
+        self.numbers_word_map['and'] = (1, 0)
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
             self._detect_number_from_digit,
-            self._detect_number_from_numerals
+            self._detect_number_from_words
         ]
 
     def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
@@ -38,12 +38,12 @@ class NumberDetector(BaseNumberDetector):
         """
         number_list = number_list or []
         original_list = original_list or []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
+        patterns = re.findall(r'\s((fo?r\s+)?([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
                               self.processed_text.lower())
         for pattern in patterns:
             number_list.append({
-                NUMBER_DETECT_VALUE: pattern[2],
-                NUMBER_DETECT_UNIT: 'people'
+                NUMBER_DETECTION_RETURN_DICT_VALUE: pattern[2],
+                NUMBER_DETECTION_RETURN_DICT_UNIT: 'people'
             })
             original_list.append(pattern[0])
 
