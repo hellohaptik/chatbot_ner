@@ -203,8 +203,8 @@ def number(request):
                               fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
            print output
 
-               >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30'}},
-                   {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40'}}]
+               >> [{'detection': 'message', 'original_text': '30', 'entity_value': {'value': '30', 'unit': None}},
+                   {'detection': 'message', 'original_text': '40', 'entity_value': {'value': '40', 'unit': None}}]
 
 
            message = "I want to reserve a table for 3 people"
@@ -216,7 +216,8 @@ def number(request):
                               fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
            print output
 
-               >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value': {'value': '3'}}]
+               >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value':
+                                                                        {'value': '3', 'unit': 'people'}}]
 
        """
     try:
