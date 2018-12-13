@@ -122,16 +122,17 @@ class BaseNumberDetector(object):
         if not self.units_map:
             return unit, original_text
 
-        unit_choices = "|".join(self.units_map)
-        unit_matches = re.search(r'((' + unit_choices + r')?[\.\,\s]*' + detected_original + r'\s*(' + unit_choices +
-                                 r')?)', processed_text, re.UNICODE)
-        original_text, unit_prefix, unit_suffix = unit_matches.groups()
-        original_text = original_text.strip()
-        if unit_suffix:
-            unit = self.units_map[unit_suffix.strip()]
-        elif unit_prefix:
-            unit = self.units_map[unit_prefix.strip()]
-
+        unit_choices = "|".join([re.escape(x) for x in self.units_map.keys()])
+        unit_matches = re.search(r'((' + unit_choices + r')[\.\,\s]*' + detected_original + r')|(' + detected_original +
+                                 r'\s*(' + unit_choices + r'))', processed_text, re.UNICODE)
+        if unit_matches:
+            original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
+            if unit_suffix:
+                unit = self.units_map[unit_suffix.strip()]
+                original_text = original_text_suffix.strip()
+            elif unit_prefix:
+                unit = self.units_map[unit_prefix.strip()]
+                original_text = original_text_prefix.strip()
         return unit, original_text
 
     def _detect_number_from_words(self, number_list=None, original_list=None):
@@ -174,6 +175,7 @@ class BaseNumberDetector(object):
             numbers, original_texts = get_number_from_numerals(numeral_text, self.numbers_word_map)
             for number, original_text in zip(numbers, original_texts):
                 unit, original_text = self._get_unit_from_text(original_text, numeral_text)
+                numeral_text = numeral_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
@@ -223,11 +225,13 @@ class BaseNumberDetector(object):
         """
         number_list = number_list or []
         original_list = original_list or []
+        processed_text = self.processed_text
+
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        scale_map_choices = re.escape("|".join(self.scale_map.keys()))
-        regex_numeric_patterns = re.compile(r'(([\d,]*\.?[\d]*)\s?(' + scale_map_choices
+        scale_map_choices = "|".join([re.escape(x) for x in self.scale_map.keys()])
+        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + scale_map_choices
                                             + r')?)\s*', re.UNICODE)
-        patterns = regex_numeric_patterns.findall(self.processed_text)
+        patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             original_text = pattern[0].strip()
             number = pattern[1].replace(",", "")
@@ -235,7 +239,8 @@ class BaseNumberDetector(object):
             scale = self.scale_map[scale] if scale else 1
             number = float(number) * scale
             number = int(number) if number.is_integer() else number
-            unit, original_text = self._get_unit_from_text(original_text, self.processed_text)
+            unit, original_text = self._get_unit_from_text(original_text, processed_text)
+            processed_text = processed_text.replace(original_text, self.tag)
             number_list.append({
                 NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                 NUMBER_DETECTION_RETURN_DICT_UNIT: unit
