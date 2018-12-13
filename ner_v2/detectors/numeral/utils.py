@@ -1,43 +1,53 @@
+import re
 
-def get_number_from_numerals(text, number_word_dict):
+
+def get_number_from_number_word(text, number_word_dict):
     """
     Detect numbers from numerals text
     Args:
         text (str): text to detect number from number words
-        number_word_dict (collections.namedtuple('NumberVariant', ['scale', 'increment'])):
-                    Named tuple containing scale and increment of each number word
-
+        number_word_dict (dict): dict containing scale and increment of each number word
     Returns:
         detected_number_list (list): list of numeric value detected from text
         detected_original_text_list (list): list of original text for numeric value detected
-
     Examples:
         [In]  >>  number_word_dict = {'one': (1, 1), 'two': (1, 2), 'three': (1, 3), 'thousand': (1000, 0),
                                       'four': (1, 4), 'hundred': (100, 0)
                                       }
-
         [In]  >>  _get_number_from_numerals('one thousand two',  number_word_dict)
         [Out] >> (['1002'], ['one thousand two'])
-
         [In]  >> _get_number_from_numerals('one two three',  number_word_dict)
         [Out] >> (['1', '2', '3'], ['one', 'two', 'three'])
-
         [In]  >> _get_number_from_numerals('two hundred three four hundred three',  number_word_dict)
         [Out] >> (['103', '403'], ['one hundred three', 'four hundred three'])
-
     """
     detected_number_list = []
     detected_original_text_list = []
+
+    text = text.strip()
+    if not text:
+        return detected_number_list, detected_original_text_list
+
+    whitespace_pattern = re.compile(r'(\s+)', re.UNICODE)
+    parts = []
+    _parts = whitespace_pattern.split(u' ' + text)
+    for i in range(2, len(_parts), 2):
+        parts.append(_parts[i - 1] + _parts[i])
+
     current = result = 0
     current_text, result_text = '', ''
     on_number = False
     prev_digit_len = 0
-    for word in text.split():
+
+    for part in parts:
+        word = part.strip()
         if word not in number_word_dict:
             if on_number:
-                original = (result_text.strip() + " " + current_text.strip()).strip()
-                number_detected = int(result + current) if float(result + current).is_integer() \
-                    else result + current
+                result_text += current_text
+                original = result_text.strip()
+                number_detected = result + current
+                if float(number_detected).is_integer():
+                    number_detected = int(number_detected)
                 detected_number_list.append(number_detected)
                 detected_original_text_list.append(original)
 
@@ -50,9 +60,11 @@ def get_number_from_numerals(text, number_word_dict):
 
             if digit_len == prev_digit_len:
                 if on_number:
-                    original = (result_text.strip() + " " + current_text.strip()).strip()
-                    number_detected = int(result + current) if float(result + current).is_integer() \
-                        else result + current
+                    result_text += current_text
+                    original = result_text.strip()
+                    number_detected = result + current
+                    if float(number_detected).is_integer():
+                        number_detected = int(number_detected)
                     detected_number_list.append(number_detected)
                     detected_original_text_list.append(original)
 
@@ -62,18 +74,21 @@ def get_number_from_numerals(text, number_word_dict):
             # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
             current = 1 if (scale > 0 and current == 0 and increment == 0) else current
             current = current * scale + increment
-            current_text = (current_text + " " + word).strip()
+            current_text += part
             if scale > 1:
                 result += current
-                result_text = (result_text + " " + current_text).strip()
+                result_text += current_text
                 current = 0
                 current_text = ''
             on_number = True
             prev_digit_len = digit_len
 
     if on_number:
-        original = (result_text.strip() + " " + current_text.strip()).strip()
-        number_detected = int(result + current) if float(result + current).is_integer() else result + current
+        result_text += current_text
+        original = result_text.strip()
+        number_detected = result + current
+        if float(number_detected).is_integer():
+            number_detected = int(number_detected)
         detected_number_list.append(number_detected)
         detected_original_text_list.append(original)
 

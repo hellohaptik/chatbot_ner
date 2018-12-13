@@ -9,7 +9,7 @@ from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUM
     NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, \
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
     NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE
-from ner_v2.detectors.numeral.utils import get_number_from_numerals, get_list_from_pipe_sep_string
+from ner_v2.detectors.numeral.utils import get_number_from_number_word, get_list_from_pipe_sep_string
 
 NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
 
@@ -172,7 +172,7 @@ class BaseNumberDetector(object):
         # hence we need to separate them into [two thousand, three thousand] using '-' or ':' as split char
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
-            numbers, original_texts = get_number_from_numerals(numeral_text, self.numbers_word_map)
+            numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
             for number, original_text in zip(numbers, original_texts):
                 unit, original_text = self._get_unit_from_text(original_text, numeral_text)
                 numeral_text = numeral_text.replace(original_text, self.tag)
