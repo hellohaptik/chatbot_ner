@@ -41,6 +41,7 @@ def get_number_from_number_word(text, number_word_dict):
 
     for part in parts:
         word = part.strip()
+
         if word not in number_word_dict:
             if on_number:
                 result_text += current_text
