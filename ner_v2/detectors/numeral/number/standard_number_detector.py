@@ -240,7 +240,7 @@ class BaseNumberDetector(object):
 
         sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        scale_map_choices = "|".join([re.escape(x) for x in sorted_len_scale_map])
+        scale_map_choices = "|".join([re.escape(x) + " " for x in sorted_len_scale_map])
         regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + scale_map_choices
                                             + r')?)\s*', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
