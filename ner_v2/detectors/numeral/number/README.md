@@ -224,7 +224,7 @@ class NumberDetector(BaseNumberDetector):
 
 ```
 
-For a working example, please refer `ner_v2/detectors/numerals/number/en/date_detection.py`
+For a working example, please refer `ner_v2/detectors/numerals/number/en/number_detection.py`
 
 **Please note that the API right now is too rigid and we plan to change it to make it much more
 easier to extend in the future**
