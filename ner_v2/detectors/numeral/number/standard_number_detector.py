@@ -42,7 +42,7 @@ class BaseNumberDetector(object):
 
         sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        self.scale_map_choices = "|".join([re.escape(x) + " " for x in sorted_len_scale_map])
+        self.scale_map_choices = "|".join([re.escape(x) for x in sorted_len_scale_map])
 
         # Variable to define default order in which detector will work
         self.detector_preferences = [self._detect_number_from_digit,
@@ -252,14 +252,22 @@ class BaseNumberDetector(object):
         original_list = original_list or []
         processed_text = self.processed_text
 
-        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r')?)\s*', re.UNICODE)
+        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))[\s\-\:]' +
+                                            r'|([\d,]+\.?[\d]*)', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
-            number = pattern[1].replace(",", "")
-            if number:
+            number, scale, original_text = None, None, None
+            if pattern[1].replace(',', ''):
+                number = pattern[1].replace(',', '')
                 original_text = pattern[0].strip()
-                scale = pattern[2].strip()
-                scale = self.scale_map[scale] if scale else 1
+                scale = self.scale_map[pattern[2].strip()]
+
+            elif pattern[3].replace(',', ''):
+                number = pattern[3].replace(',', '')
+                original_text = pattern[3].strip()
+                scale = 1
+
+            if number:
                 number = float(number) * scale
                 number = int(number) if number.is_integer() else number
                 unit, original_text = self._get_unit_from_text(original_text, processed_text)
