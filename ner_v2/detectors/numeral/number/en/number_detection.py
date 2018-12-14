@@ -3,7 +3,7 @@ import os
 
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
-from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
+from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector, NumberVariant
 
 
 class NumberDetector(BaseNumberDetector):
@@ -14,7 +14,7 @@ class NumberDetector(BaseNumberDetector):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path)
 
-        self.numbers_word_map['and'] = (1, 0)
+        self.numbers_word_map['and'] = NumberVariant(scale=1, increment=0)
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
             self._detect_number_from_digit,
