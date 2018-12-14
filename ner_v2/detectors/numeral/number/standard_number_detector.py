@@ -43,6 +43,16 @@ class BaseNumberDetector(object):
                                      ]
 
     def detect_number(self, text):
+        """
+        Detect number from numeric and number word. Run through list of detectors defined in detector_preferences in
+        the preferences.
+        Args:
+            text(str): text string
+        Returns:
+            number_list (list): list containing detected numeric text
+            original_list (list): list containing original numeral text
+
+        """
         self.text = text
         self.processed_text = text
         self.tagged_text = text
