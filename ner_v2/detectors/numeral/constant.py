@@ -1,14 +1,5 @@
 # Number detector constants
 
-NUMBER_DIGIT_UNITS = [0, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9]
-DIGIT_UNITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
-NUMERIC_VARIANTS = DIGIT_UNITS + [
-    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-    "sixteen", "seventeen", "eighteen", "nineteen", "and",
-    "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
-    "hundred", "thousand", "million", "billion", "trillion", "fourty", "ninty"
-]
-
 # Numeral data file name and their columns
 NUMBER_NUMERAL_CONSTANT_FILE_NAME = 'numerals_constant.csv'
 NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME = 'name_variants'

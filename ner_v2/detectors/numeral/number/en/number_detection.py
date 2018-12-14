@@ -28,7 +28,7 @@ class NumberDetector(BaseNumberDetector):
             A tuple of two lists with first list containing the detected numbers and second list containing their
             corresponding substrings in the original message.
 
-            For example:9
+            For example:
                 input text: "Can you please help me to book tickets for 3 people"
                 output: (['3'], ['for 3 people'])
 

@@ -37,6 +37,13 @@ class BaseNumberDetector(object):
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
 
+        sorted_len_units_keys = sorted(self.units_map.keys(), key=len, reverse=True)
+        self.unit_choices = "|".join([re.escape(x) for x in sorted_len_units_keys])
+
+        sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
+        # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
+        self.scale_map_choices = "|".join([re.escape(x) + " " for x in sorted_len_scale_map])
+
         # Variable to define default order in which detector will work
         self.detector_preferences = [self._detect_number_from_digit,
                                      self._detect_number_from_words
@@ -132,10 +139,10 @@ class BaseNumberDetector(object):
         if not self.units_map:
             return unit, original_text
 
-        sorted_len_units_keys = sorted(self.units_map.keys(), key=len, reverse=True)
-        unit_choices = "|".join([re.escape(x) for x in sorted_len_units_keys])
-        unit_matches = re.search(r'((' + unit_choices + r')[\.\,\s]*' + detected_original + r')|(' + detected_original +
-                                 r'\s*(' + unit_choices + r'))', processed_text, re.UNICODE)
+        # add re.escape to handle decimal cases in detected original
+        detected_original = re.escape(detected_original)
+        unit_matches = re.search(r'((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')|(' +
+                                 detected_original + r'\s*(' + self.unit_choices + r'))', processed_text, re.UNICODE)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
             if unit_suffix:
@@ -174,6 +181,13 @@ class BaseNumberDetector(object):
             [In]  >>  _detect_number_from_numerals()
             [Out] >> ([{'value': '2', 'unit': None}, {'value': '2', 'unit': None}, {'value': '3', 'unit': None}],
                       ['one', 'two', 'three'])
+
+            *Notes*
+                Some Limitations:
+                i) Cannot detect decimals without the integer part. E.g. .25, .5, etc
+                ii) Cannot detect one with "a/an". E.g. I want an apple
+                iii) Detects wrong for multiple scales mentioned consecutively E.g. three hundred thousand,
+                     hundred thousand
         """
         number_list = number_list or []
         original_list = original_list or []
@@ -238,11 +252,7 @@ class BaseNumberDetector(object):
         original_list = original_list or []
         processed_text = self.processed_text
 
-        sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
-        # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        scale_map_choices = "|".join([re.escape(x) + " " for x in sorted_len_scale_map])
-        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + scale_map_choices
-                                            + r')?)\s*', re.UNICODE)
+        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r')?)\s*', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             number = pattern[1].replace(",", "")
