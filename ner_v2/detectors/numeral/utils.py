@@ -57,7 +57,7 @@ def get_number_from_number_word(text, number_word_dict):
             on_number = False
         else:
             scale, increment = number_word_dict[word].scale, number_word_dict[word].increment
-            digit_len = max(len(str(increment)), len(str(scale)))
+            digit_len = max(len(str(int(increment))), len(str(scale)))
 
             if digit_len == prev_digit_len:
                 if on_number:
