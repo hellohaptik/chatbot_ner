@@ -245,19 +245,20 @@ class BaseNumberDetector(object):
                                             + r')?)\s*', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
-            original_text = pattern[0].strip()
             number = pattern[1].replace(",", "")
-            scale = pattern[2].strip()
-            scale = self.scale_map[scale] if scale else 1
-            number = float(number) * scale
-            number = int(number) if number.is_integer() else number
-            unit, original_text = self._get_unit_from_text(original_text, processed_text)
-            processed_text = processed_text.replace(original_text, self.tag)
-            number_list.append({
-                NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
-                NUMBER_DETECTION_RETURN_DICT_UNIT: unit
-            })
-            original_list.append(original_text)
+            if number:
+                original_text = pattern[0].strip()
+                scale = pattern[2].strip()
+                scale = self.scale_map[scale] if scale else 1
+                number = float(number) * scale
+                number = int(number) if number.is_integer() else number
+                unit, original_text = self._get_unit_from_text(original_text, processed_text)
+                processed_text = processed_text.replace(original_text, self.tag)
+                number_list.append({
+                    NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
+                    NUMBER_DETECTION_RETURN_DICT_UNIT: unit
+                })
+                original_list.append(original_text)
 
         return number_list, original_list
 
