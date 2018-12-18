@@ -14,11 +14,13 @@ class NumberDetector(BaseNumberDetector):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path)
 
-        self.detector_preferences = [
-            self._custom_detect_number_of_people_format,
-            self._detect_number_from_digit,
-            self._detect_number_from_words
-        ]
+        if entity_name in ['number_of_people', 'number_of_ticket', 'no_of_guests', 'no_of_adults',
+                           'travel_no_of_people']:
+            self.detector_preferences = [
+                self._custom_detect_number_of_people_format,
+                self._detect_number_from_digit,
+                self._detect_number_from_words
+            ]
 
     def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         """Detects any numbers from text
