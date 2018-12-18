@@ -69,7 +69,7 @@ This is the V2 version of date detector module that will detect date in multiple
 
 In order to add any new language you have to follow below steps:
 
-1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/temporal/detector/date/`.  
+1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/detectors/temporal/date/`.  
 
 2. Create a folder named `data` inside language_code folder.
 
@@ -79,7 +79,7 @@ In order to add any new language you have to follow below steps:
 
    ```python
    |__ner_v2
-         |___detector
+         |___detectors
              |___temporal
                  |___date
                      |___xy    # <- New language Added 
@@ -168,13 +168,12 @@ import re
 import os
 
 from ner_v2.constant import TYPE_EXACT
-from ner_v2.detectors.temporal.date.date_detection import get_lang_data_path
 from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
-
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 class DateDetector(BaseRegexDate):
-    data_directory_path = get_lang_data_path(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep))
-
+    data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
+                                       LANGUAGE_DATA_DIRECTORY)
     def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
         super(DateDetector, self).__init__(entity_name,
                                            data_directory_path=DateDetector.data_directory_path,

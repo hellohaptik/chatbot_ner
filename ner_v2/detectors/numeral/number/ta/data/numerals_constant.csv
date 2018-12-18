@@ -1,0 +1,52 @@
+number,name_variants,number_value,number_type
+௦,பூஜ்ஜியம்|pujjiyam|zero|pujiyam,0,unit
+௧,ஒன்று|Oru|mutal|Onavatu ,1,unit
+௨,இரண்டு|Irantu|Irandavatu ,2,unit
+௩,மூன்று|Munru|Munavatu ,3,unit
+௪,நான்கு|nanku|Nalavatu ,4,unit
+௫,ஐந்து|Aintu|Ainavatu ,5,unit
+௬,ஆறு|Aru|Aruavatu ,6,unit
+௭,ஏழு|Elu|Elavatu ,7,unit
+௮,எட்டு|Ettu|Ettaavatu ,8,unit
+௯,ஒன்பது|Onpatu|Ompadavatu ,9,unit
+௰,பத்து|Pattu|pattuavatu ,10,unit
+௰௧,பதினொன்று|Patinolru|pationavatu ,11,unit
+௰௨,பன்னிரண்டு|Pannirantu|Pannirandavatu,12,unit
+௰௩,பதின்மூன்று|Patinmunru||Patimunavatu ,13,unit
+௰௪,பதினான்கு|Patinanku|Patinalavatu ,14,unit
+௰௫,பதினைந்து|Patinaintu|Patiainavatu ,15,unit
+௰௬,பதினாறு|Patinaru|Patiaruavatu ,16,unit
+௰௭,பதினேழு|Patinelu|Patielavatu ,17,unit
+௰௮,பதினெட்டு|Patinettu|Patiettaavatu ,18,unit
+௰௯,பத்தொன்பது|Pattonpatu|Patiompadavatu ,19,unit
+௨௰,இருபது|Irupatu|Iruavatu ,20,unit
+௨௰௧,இருபத்தி ஒன்று|Irupatti onru|Iruvattionavatu ,21,unit
+௨௰௨,இருபத்தி இரண்டு|Irupatti irantu|Iruvarttiirandavatu ,22,unit
+௨௰௩,இருபத்தி மூன்று|Irupatti munru|Iruvattimunavatu ,23,unit
+௨௰௪,இருபத்தி நான்கு|Irupatti nanku|Iruvattinalavatu ,24,unit
+௨௰௫,இருபத்தி ஐந்து|Irupatti aintu|Iruvattiainavatu ,25,unit
+௨௰௬,இருபத்தி ஆறு|Irupatti aru|Iruvattiaruavatu,26,unit
+௨௰௭,இருபத்தி ஏழு|Irupatti elu|Iruvattielavatu ,27,unit
+௨௰௮,இருபத்தி எட்டு|Irupatti ettu|Iruvattiettaavatu ,28,unit
+௨௰௯,இருபத்தி ஒன்பது|Irupatti onpatu|IruvattiOmpadavatu ,29,unit
+௩௰,முப்பது|Muppatu|Muppadavatu|Nuppatu ,30,unit
+௩௰௧,முப்பத்தி ஒன்று|Muppatti olru|MuppattiOnavatu|NuppattiOnavatu ,31,unit
+௩௰௨,முப்பத்தி இரண்டு|muppatti irantu|muppattiirundu|mupatiirundu|nupatiirundu,32,unit
+௩௰௩,முப்பத்தி மூன்று|muppatti munru|muppattimunu|nupatimunu,33,unit
+௩௰௪,முப்பத்தி நான்கு|muppatti nanku|muppattinala|mupatinal,34,unit
+௩௰௫,முப்பத்தி ஐந்து|Muppatti aintu|Mupatiaintu|,35,unit
+௩௰௬,முப்பத்தி ஆறு|muppatti aru|mupatiaru,36,unit
+௩௰௭,முப்பத்தி ஏழு|muppatti elu|mupatielu,37,unit
+௩௰௮,முப்பத்தி எட்டு|muppatti ettu|mupatiettu,38,unit
+௩௰௯,முப்பத்தி ஒன்பது|muppatti onpatu|mupationpatu,39,unit
+௪௰,நாற்பது|Narpatu|napatu,40,unit
+௫௰,ஐம்பது|Aimpatu|Ambavtu,50,unit
+௬௰,அறுபது|Arupatu|arvathu,60,unit
+௭௰,எழுபது|Elupatu|eluvathu,70,unit
+௮௰,எண்பது|enpatu|embatu,80,unit
+௯௰,தொன்னூறு|tonnuru|tonoor,90,unit
+௱,நூறு|Nuru|noor,100,scale
+௲,ஆயிரம்|Ayiram|Airam,1000,scale
+௱௲,நூறாயிரம்|Nurayiram|noorairam|oru lacham| இலட்சம்|ilatcam,100000,scale
+௲௲,மெய்யிரம்|Meyyiram |பத்து இலட்சம்|Pattu Ilatcam|Pattulacaham,1000000,scale
+௲௲௲,தொள்ளுண்|Tollun|Pattukodi|நிகர்ப்புதம்|Nikarpputam|Pattukodi,100000000,scale

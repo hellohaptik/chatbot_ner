@@ -60,7 +60,7 @@ This is the V2 version of time detector module that will detect time in multiple
 
 In order to add any new language you have to follow below steps:
 
-1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/temporal/detector/time/`.  
+1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/detectors/temporal/time/`.  
 
 2. Create a folder named `data` inside language_code folder.
 
@@ -70,7 +70,7 @@ In order to add any new language you have to follow below steps:
 
    ```python
    |__ner_v2
-         |___detector
+         |___detectors
              |___temporal
                  |___time
                      |___xy    # <- New language Added 
