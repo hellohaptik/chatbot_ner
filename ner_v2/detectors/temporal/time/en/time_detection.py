@@ -2,8 +2,7 @@ from datetime import datetime
 import re
 import pytz
 
-from ner_v2.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
-from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
 
 
 class TimeDetector(object):
@@ -61,9 +60,7 @@ class TimeDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
-                 language=ENGLISH_LANG,
-                 translation_enabled=False):
+    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:

@@ -81,3 +81,21 @@ def get_tuple_dict(csv_file):
         for key in keys:
             tuple_records[key] = tuple(list(record)[1:])
     return tuple_records
+
+
+def get_weekdays_for_month(weeknumber, month, year):
+    """
+    Return list of day for given weeknumber of given month and year
+    Args:
+        weeknumber (int): week number
+        month (int): month
+        year (int): year
+    Returns:
+        (list): list of days
+    """
+    calendar_month = calendar.monthcalendar(year, month)
+    if weeknumber == -1:
+        return [day for day in calendar_month[-1] if day != 0]
+    elif 0 < weeknumber <= len(calendar_month):
+        return [day for day in calendar_month[weeknumber - 1] if day != 0]
+    return []

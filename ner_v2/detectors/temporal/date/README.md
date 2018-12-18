@@ -1,6 +1,6 @@
 ## Date Detector 
 
-This is the V2 version of date detector module that will detect date in multiple languages from raw text containing date entity. Currently we provide supports for 6 languages, which are
+This is the V2 version of date detector module that will detect date in multiple languages from natural language text containing date entity. Currently we provide supports for 6 languages, which are
 
 - English
 - Hindi
@@ -23,14 +23,15 @@ This is the V2 version of date detector module that will detect date in multiple
 - **Curl Command**
 
   ```bash
-  message = "agle mahine ka doosra somvar"
-  entity_name = 'date'
-  structured_value = None
-  fallback_value = None
-  bot_message = None
-  timezone='UTC'
-  source_language='hi'
-  language_script='en'
+  # For a sample query with following parameters
+  # message="agle mahine ka doosra somvar"
+  # entity_name='date'
+  # structured_value=None
+  # fallback_value=None
+  # bot_message=None
+  # timezone='UTC'
+  # source_language='hi'
+  # language_script='en'
   
   $ URL='localhost'
   $ PORT=8081
@@ -68,77 +69,32 @@ This is the V2 version of date detector module that will detect date in multiple
 
 In order to add any new language you have to follow below steps:
 
-1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/temporal/detector/date/`.  
+1. Create a new folder with `ISO 639-1`  code of that language inside `ner_v2/detectors/temporal/date/`.  
 
 2. Create a folder named `data` inside language_code folder.
 
-3.  Add three files named `date_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv`inside data folder. Data these files will have is discussed later.
-
-4. Create a file `date_detection.py ` inside language_code folder and put below code inside that file.
-
-   ```python
-   from ner_v2.detectors.temporal.constant import LANGUAGE_DATA_DIRECTORY
-   from ner_v2.detectors.temporal.date.standard_regex_date import BaseRegexDate
-   import os
-   
-   
-   class DateDetector(BaseRegexDate):
-       def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
-   
-           data_directory_path = os.path.join(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep),
-                                              LANGUAGE_DATA_DIRECTORY)
-           super(DateDetector, self).__init__(entity_name=entity_name, timezone=timezone,
-                                              data_directory_path=data_directory_path,
-                                              is_past_referenced=past_date_referenced)
-           self.custom_detectors = []
-   
-       def detect_date(self, text):
-           """
-           Detects exact date for complete date information - day, month, year are available in text
-           and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults.
-   
-           Returns:
-               A tuple of two lists with first list containing the detected date entities and second list containing their
-               corresponding substrings in the given text.
-           """
-   
-           self.text = text
-           self.processed_text = self.text
-           self.tagged_text = self.text
-   
-           date_list, original_list  = self._detect_date_from_standard_regex()
-   
-           # run custom date detectors
-           for detector in self.custom_detectors:
-               date_list, original_list = detector(date_list, original_list)
-               self._update_processed_text(original_list)
-   
-           return date_list, original_list
-   ```
-
-    
+3. Add three files named `date_constant.csv`, `numbers_constant.csv`, `datetime_diff_constant.csv`inside data folder.  
 
    Below is the folder structure of same after adding all the files for new language `xy`.
 
    ```python
    |__ner_v2
-         |___detector
+         |___detectors
              |___temporal
                  |___date
                      |___xy    # <- New language Added 
                      |	  |___data
-                     |   |   |___date_constant.csv
-                     |   |   |___datetime_diff_constant.csv
-                     |   |   |___numbers_constant.csv
-                     |   |
-                     |	  |___date_detection.py
+                     |      |___date_constant.csv
+                     |      |___datetime_diff_constant.csv
+                     |      |___numbers_constant.csv
                      |
                      |__date_detection.py 
    ```
 
 
 
-#### GuideLines to create data files
+
+####  GuideLines to create data files
 
 Below is the brief about how to create three data files `date_constant.csv`, `datetime_diff_constant.csv`, `numbers_constant.csv`.  All the description of each file is explained using hindi as a reference language. 
 
@@ -202,27 +158,130 @@ Below is the brief about how to create three data files `date_constant.csv`, `da
 
 
 
-#### GuideLines to add new Regex pattern for date apart from standared Regex:
+#### Guidelines to add new detectors for date apart from builtin ones:
 
-Create a method inside language date detection class accepting params `date_list` and `original_list` and return the their updated list. Defined method will have custom regex patterns and parser within same method. Also you need to add the method to `custom_ detector` class property . For reference check the below method `def custom_christmas_date_detector` defined here to detect date for patterns like 'christmas', 'x-mas'
+Create a new class `date_detection.py`  inside language directory.
+To start with copy the code below
 
 ```python
+import re
+import os
+
+from ner_v2.constant import TYPE_EXACT
+from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 class DateDetector(BaseRegexDate):
+    data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
+                                       LANGUAGE_DATA_DIRECTORY)
     def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
-        ##
-        self.custom_detectors = [self.custom_christmas_date_detector]
+        super(DateDetector, self).__init__(entity_name,
+                                           data_directory_path=DateDetector.data_directory_path,
+                                           timezone=timezone,
+                                           past_date_referenced=past_date_referenced)
+```
+
+Note that the class name must be `DateDetector` 
+and should inherit from `ner_v2.detectors.temporal.date.standard_date_regex.BaseRegexDate`
+
+Next we define a custom detector. For our purposes we will add a deector to detect 'christmas' and return 25th Dec.
+
+1. The custom detector must accept two arguments `date_list` and `original_list` and must operate on `self.processed_text`
+2. The two arguments `date_list` and `original_list` can both be either None or lists of same length.
+   `date_list` contains parsed date values and `original_list` contains their corresponding text substrings
+   in the passed text that were detected as dates.
+3. Your detector must appened parsed date dicts with keys `'dd', 'mm', 'yy', 'type'` to `date_list`
+   and to `original_list` their corresponding substrings from `self.processed_text` that were parsed into dates.
+4. Take care to not mutate `self.processed_text` in any way as main detect method in base class depends on it
+   to eliminate already detected dates from it after each detector is run.
+5. Finally your detector must return a tuple of (date_list, original_list). Ensure that `date_list` and `original_list`
+   are of equal lengths before returning them.
+
+Types of dates that go under `'type'` key are defined at `ner_v2/constant.py`
+
+```python
+    def custom_christmas_date_detector(self, date_list=None, original_list=None):
+            date_list = date_list or []
+            original_list = original_list or []
+    
+            christmas_regex = re.compile(r'((christmas|xmas|x-mas|chistmas))')
+            day_match = christmas_regex.findall(self.processed_text)
+            for match in day_match:
+                original = match[0]
+                date = {
+                    'dd': 25,
+                    'mm': 12,
+                    'yy': self.now_date.year,
+                    'type': TYPE_EXACT
+                }
+                date_list.append(date)
+                original_list.append(original)
+            return date_list, original_list
+```
+
+Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply
+append your custom detectors at the end of this list or you can copy the default ordering from 
+`detectors.temporal.date.standard_date_regex.BaseRegexDate` and inject your own detectors in between.
+Below we show an example where we put our custom detector in middle to execute it before some builtin detectors.
+
+```python
+    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
+            super(DateDetector, self).__init__(entity_name,
+                                               data_directory_path=DateDetector.data_directory_path,
+                                               timezone=timezone,
+                                               past_date_referenced=past_date_referenced)
+            self.detector_preferences = [
+                self._detect_relative_date,
+                self._detect_date_month,
+                self._detect_date_ref_month_1,
+                self._detect_date_ref_month_2,
+                self._detect_date_ref_month_3,
+                self.custom_christmas_date_detector,
+                self._detect_date_diff,
+                self._detect_after_days,
+                self._detect_weekday_ref_month_1,
+                self._detect_weekday_ref_month_2,
+                self._detect_weekday_diff,
+                self._detect_weekday
+            ]
+
+```
+
+Putting it all together, we have
+
+```python
+import re
+import os
+
+from ner_v2.constant import TYPE_EXACT
+from ner_v2.detectors.temporal.date.date_detection import get_lang_data_path
+from ner_v2.detectors.temporal.date.standard_date_regex import BaseRegexDate
+
+
+class DateDetector(BaseRegexDate):
+    data_directory_path = get_lang_data_path(os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep))
+
+    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
+        super(DateDetector, self).__init__(entity_name,
+                                           data_directory_path=DateDetector.data_directory_path,
+                                           timezone=timezone,
+                                           past_date_referenced=past_date_referenced)
+        self.detector_preferences = [
+            self._detect_relative_date,
+            self._detect_date_month,
+            self._detect_date_ref_month_1,
+            self._detect_date_ref_month_2,
+            self._detect_date_ref_month_3,
+            self.custom_christmas_date_detector,
+            self._detect_date_diff,
+            self._detect_after_days,
+            self._detect_weekday_ref_month_1,
+            self._detect_weekday_ref_month_2,
+            self._detect_weekday_diff,
+            self._detect_weekday
+        ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
-        """
-        Method to detect chritmast
-        Args:
-
-        Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
-        """
         date_list = date_list or []
         original_list = original_list or []
 
@@ -239,7 +298,10 @@ class DateDetector(BaseRegexDate):
             date_list.append(date)
             original_list.append(original)
         return date_list, original_list
-
-    def detect_date(self, text):
- 		###
 ```
+
+For a working example, please refer `ner_v2/detectors/temporal/date/hi/date_detection.py`
+
+**Please note that the API right now is too rigid and we plan to change it to make it much more
+easier to extend in the future**
+
