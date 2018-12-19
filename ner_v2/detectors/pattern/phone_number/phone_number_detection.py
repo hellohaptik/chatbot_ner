@@ -36,19 +36,19 @@ class PhoneDetector(BaseDetector):
 
     def get_phone_number(self):
         phone_number_original_list = self.get_number_regex()
-        phone_number_list = ''.join([self.clean_phone_number(p) for p in phone_number_original_list])
+        phone_number_original_list = [p[0] for p in phone_number_original_list]
+        phone_number_list = [self.clean_phone_number(p) for p in phone_number_original_list]
         return phone_number_list, phone_number_original_list
 
     def clean_phone_number(self, number):
-        clean_regex = re.compile('\+()\s-')
+        clean_regex = re.compile('[\+()\sext]+')
         return clean_regex.sub(string=number, repl='')
 
     def get_number_regex(self):
-        # phone_number_regex = re.compile(r'(?:\(?(\+\d{1,2})\)?[\s\-\.]*)?'
-        #                  r'((?=[\-\d()\s\.]{6,16}(?:\s*e?xt?\.?\s*(?:\d{1,20}))?'
-        #                  r'(?:[^\d]+|$))(?:[\d(]{1,20}(?:[\-)\s\.]*\d{1,20}){0,20}){1,20})'
-        #                  r'(?:\s*e?xt?\.?\s*(\d{1,20}))?', re.U)
-
-        phone_number_regex = re.compile(r'([\d+\-*\+\s()]{10,16})', re.U)
+        phone_number_regex = re.compile(
+            r'((?:\(?\+(\d{1,2})\)?[\s\-\.]*)?((?=[\-\d()\s\.]{9,16}'
+            r'(?:\s*e?xt?\.?\s*(?:\d{1,20}))?(?:[^\d]+|$))'
+            r'(?:[\d(]{1,20}(?:[\-)\s\.]*\d{1,20}){0,20}){1,20})'
+            r'(?:\s*e?xt?\.?\s*(\d{1,20}))?)')
         phone_number_list = phone_number_regex.findall(self.text)
         return phone_number_list
