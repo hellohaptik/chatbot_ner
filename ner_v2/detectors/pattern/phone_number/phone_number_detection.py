@@ -1,13 +1,13 @@
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
-
+import re
 
 class PhoneDetector(BaseDetector):
 
     def __init__(self, entity_name, language=ENGLISH_LANG):
-        super(PhoneDetector, self).__init__(language)
         self._supported_languages = NumberDetector.get_supported_languages()
+        super(PhoneDetector, self).__init__(language)
         self.language = language
         self.number_detector = NumberDetector(entity_name=entity_name, language=self.language)
         self.entity_name = entity_name
@@ -22,11 +22,15 @@ class PhoneDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
-    def get_number(self, text):
+    def get_number(self):
         self.number_detector.set_min_max_digits(min_digit=8, max_digit=14)
-        self.number_detector.detect_entity(text=text)
-        number_list, original_number_list = self.number_detector.detect_entity(text=text)
+        self.number_detector.detect_entity(text=self.text)
+        number_list, original_number_list = self.number_detector.detect_entity(text=self.text)
         return number_list, original_number_list
 
     def detect_entity(self, text, **kwargs):
-        return self.get_number(text=text)
+        self.text = text
+        number_list, original_list = self.get_number()
+
+        for number_dict, original_number in zip(number_list, original_list):
+            value = number_dict.get('value')

@@ -10,6 +10,7 @@ from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
+from ner_v2.detectors.pattern.phone_number.phone_number_detection import
 
 from django.http import HttpResponse
 import json
@@ -270,10 +271,6 @@ def phone_number(request):
                                                       structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                       fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                                       bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
-        # entity_output = get_phone_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-        #                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
-        #                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
-        #                                  parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for phone_number: %s ' % e)
