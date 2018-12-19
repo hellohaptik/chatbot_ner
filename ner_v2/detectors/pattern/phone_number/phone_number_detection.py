@@ -31,6 +31,8 @@ class PhoneDetector(BaseDetector):
 
     def detect_entity(self, text, **kwargs):
         self.text = text
+        self.processed_text = self.text
+        self.tagged_text = self.text
         # number_list, original_list = self.get_number()
         return self.get_phone_number()
 
@@ -52,3 +54,8 @@ class PhoneDetector(BaseDetector):
             r'(?:\s*e?xt?\.?\s*(\d{1,20}))?)')
         phone_number_list = phone_number_regex.findall(self.text)
         return phone_number_list
+
+    def get_tagged_text(self, phone_number_original_list):
+        for detected_text in phone_number_original_list:
+            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            self.processed_text = self.processed_text.replace(detected_text, '')
