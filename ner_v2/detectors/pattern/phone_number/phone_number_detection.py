@@ -3,6 +3,7 @@ from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
 import re
 
+
 class PhoneDetector(BaseDetector):
 
     def __init__(self, entity_name, language=ENGLISH_LANG):
@@ -30,7 +31,24 @@ class PhoneDetector(BaseDetector):
 
     def detect_entity(self, text, **kwargs):
         self.text = text
-        number_list, original_list = self.get_number()
+        # number_list, original_list = self.get_number()
+        return self.get_phone_number()
 
-        for number_dict, original_number in zip(number_list, original_list):
-            value = number_dict.get('value')
+    def get_phone_number(self):
+        phone_number_original_list = self.get_number_regex()
+        phone_number_list = ''.join([self.clean_phone_number(p) for p in phone_number_original_list])
+        return phone_number_list, phone_number_original_list
+
+    def clean_phone_number(self, number):
+        clean_regex = re.compile('\+()\s-')
+        return clean_regex.sub(string=number, repl='')
+
+    def get_number_regex(self):
+        # phone_number_regex = re.compile(r'(?:\(?(\+\d{1,2})\)?[\s\-\.]*)?'
+        #                  r'((?=[\-\d()\s\.]{6,16}(?:\s*e?xt?\.?\s*(?:\d{1,20}))?'
+        #                  r'(?:[^\d]+|$))(?:[\d(]{1,20}(?:[\-)\s\.]*\d{1,20}){0,20}){1,20})'
+        #                  r'(?:\s*e?xt?\.?\s*(\d{1,20}))?', re.U)
+
+        phone_number_regex = re.compile(r'([\d+\-*\+\s()]{10,16})', re.U)
+        phone_number_list = phone_number_regex.findall(self.text)
+        return phone_number_list
