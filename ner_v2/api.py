@@ -4,11 +4,12 @@ from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_ST
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
     PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS
 
-from ner_v1.chatbot.entity_detection import get_phone_number
+# from ner_v1.chatbot.entity_detection import get_phone_number
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 from django.http import HttpResponse
 import json
@@ -257,10 +258,22 @@ def phone_number(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        entity_output = get_phone_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                         parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                         parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                         parameters_dict[PARAMETER_BOT_MESSAGE])
+        entity_name = parameters_dict[PARAMETER_ENTITY_NAME]
+        language = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
+
+        ner_logger.debug('Entity Name %s' % entity_name)
+        ner_logger.debug('Source Language %s' % language)
+
+        phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
+
+        entity_output = phone_number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
+                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        # entity_output = get_phone_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
+        #                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
+        #                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
+        #                                  parameters_dict[PARAMETER_BOT_MESSAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for phone_number: %s ' % e)
