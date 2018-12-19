@@ -25,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^v2/date/$', 'ner_v2.api.date'),
     url(r'^v2/time/$', 'ner_v2.api.time'),
     url(r'^v2/number/$', 'ner_v2.api.number'),
+    url(r'^v2/phone_number/$', 'ner_v2.api.phone_number'),
 
     # Dictionary Read Write
     url(r'^entities/get_entity_word_variants', 'external_api.api.get_entity_word_variants'),
