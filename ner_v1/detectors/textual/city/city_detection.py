@@ -144,7 +144,7 @@ class CityDetector(object):
             Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
-        patterns = re.findall(ur'\s(([A-Za-z\u0900-\u097F]+)\s+(\-|to|2|se|से|and)\s+([A-Za-z\u0900-\u097F\s]+))\.?\b',
+        patterns = re.findall(ur'\s(([A-Za-z\u0900-\u097F]+)\s+(\-|to|2|se|से|and)\s+([A-Za-z\u0900-\u097F\s]+))\.?',
                               self.processed_text.lower(), re.UNICODE)
         for pattern in patterns:
             city_dict_list.extend(
@@ -175,7 +175,7 @@ class CityDetector(object):
         city_dict_list = []
         patterns = re.findall(ur'\s((?:from|frm|departing|depart|leaving|leave)\s+([A-Za-z\u0900-\u097F]+)'
                               ur'\s+(?:and|to|se|से|2|for|fr|arriving|arrive|reaching|reach|rch)'
-                              ur'\s+([A-Za-z\u0900-\u097F]+))\.?\b',
+                              ur'\s+([A-Za-z\u0900-\u097F]+))\.?',
                               self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
@@ -208,7 +208,7 @@ class CityDetector(object):
         city_dict_list = []
         patterns = re.findall(ur'\s((?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)'
                               ur'\s+([A-Za-z\u0900-\u097F]+)\s+(?:from|frm|departing|depart|leaving|leave)'
-                              ur'\s+([A-Za-z\u0900-\u097F]+))\.?\b',
+                              ur'\s+([A-Za-z\u0900-\u097F]+))\.?',
                               self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
@@ -267,7 +267,8 @@ class CityDetector(object):
                                 ur'reach|rch|destination city\:|arrival city\:)'
                                 ur'\s+([A-Za-z\u0900-\u097F]+))\.?\s',
                                 self.processed_text.lower(), re.UNICODE)
-        patterns_2 = re.findall(ur'(.+)\s+(jana|jaana|jau|ghum|ghoom|जाना|जाऊं|जाऊँ|घूम)', self.processed_text.lower(),
+        patterns_2 = re.findall(ur'([A-Za-z\u0900-\u097F]+)\s+(jana|jaana|jau|ghum|ghoom|जाना|जाऊं|जाऊँ|घूम)',
+                                self.processed_text.lower(),
                                 re.UNICODE)
         for pattern in patterns_1:
             city_dict_list.extend(
