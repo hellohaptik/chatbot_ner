@@ -3,7 +3,7 @@ import os
 
 from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
-from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE
+from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
 
 
@@ -64,12 +64,14 @@ class NumberDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name, language=ENGLISH_LANG):
+    def __init__(self, entity_name, language=ENGLISH_LANG, unit_type=None):
         """Initializes a NumberDetector object
 
         Args:
             entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
             language (str, optional): language code of number text, defaults to 'en'
+            unit_type (str): number unit types like weight, currency, temperature, used to detect number with
+                               specific unit type.
         """
         # assigning values to superclass attributes
         self._supported_languages = self.get_supported_languages()
@@ -84,6 +86,7 @@ class NumberDetector(BaseDetector):
         self.min_digit = 1
         self.max_digit = 6
         self.language = language
+        self.unit_type = unit_type
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
@@ -128,6 +131,10 @@ class NumberDetector(BaseDetector):
         validated_number, validated_number_text = [], []
         for number_value_dict, original_text in zip(number_data[0], number_data[1]):
             if self.min_digit <= len(number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]) <= self.max_digit:
+                if self.unit_type and self.language_number_detector.unit_map and \
+                        self.unit_type != \
+                        self.language_number_detector.unit_map[number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]]:
+                    continue
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)
 
