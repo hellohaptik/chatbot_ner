@@ -130,10 +130,11 @@ class NumberDetector(BaseDetector):
         number_data = self.language_number_detector.detect_number(self.processed_text)
         validated_number, validated_number_text = [], []
         for number_value_dict, original_text in zip(number_data[0], number_data[1]):
-            if self.min_digit <= len(number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]) <= self.max_digit:
-                if self.unit_type and self.language_number_detector.unit_map and \
-                        self.unit_type != \
-                        self.language_number_detector.unit_map[number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]]:
+            number_value = number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]
+            number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
+            if self.min_digit <= len(number_value) <= self.max_digit:
+                if self.unit_type and self.language_number_detector.units_map.get(number_unit) and \
+                        self.language_number_detector.units_map[number_unit].type != self.unit_type:
                     continue
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)
