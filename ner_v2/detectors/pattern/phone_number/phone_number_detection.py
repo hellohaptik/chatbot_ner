@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
@@ -151,7 +152,7 @@ class PhoneDetector(BaseDetector):
             number (str): The number post cleaning
         """
         # Remove (), -, whistespace, +
-        clean_regex = re.compile('([()\-\s\+]+)')
+        clean_regex = re.compile('([()\-\s\+]+)', re.U)
         number = clean_regex.sub(string=number, repl='')
         return number
 

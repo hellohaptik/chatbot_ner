@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
@@ -267,12 +268,51 @@ def phone_number(request):
             response (django.http.response.HttpResponse): HttpResponse object
         Examples:
 
-        message = "Call 02226129857 and message +1 (408) 92-124 and send 100rs to 91 9820334416 9920441344"
+        message = "Call 02226129857 and message +1(408) 92-124 and send 100rs to 91 9820334416 9920441344"
         entity_name = 'number_of_unit'
         structured_value = None
         fallback_value = None
         bot_message = None
         source_language = 'en'
+
+        output:
+
+        {
+    "data": [
+        {
+            "detection": "message",
+            "original_text": "91 9820334416",
+            "entity_value": {
+                "value": "919820334416"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "9920441344",
+            "entity_value": {
+                "value": "9920441344"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "02226129857",
+            "entity_value": {
+                "value": "02226129857"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "+1(408) 92-124",
+            "entity_value": {
+                "value": "140892124"
+            },
+            "language": "en"
+        }
+    ]
+}
         """
     try:
         parameters_dict = get_parameters_dictionary(request)
