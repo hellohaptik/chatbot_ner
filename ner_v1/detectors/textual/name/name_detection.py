@@ -4,7 +4,7 @@ from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import *
 from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-
+from ner_v1.constant import EMOJI_RANGES, HINDI_QUESTIONS
 
 class NameDetector(object):
     """
@@ -230,3 +230,24 @@ class NameDetector(object):
         if "name" in botmessage:
             return True
         return False
+
+
+    def detect_abusive_words_hindi(self, text):
+        for word in text.split():
+            if word in HINDI_QUESTIONS:
+                return True
+        return False
+
+    def remove_emojis(self, text):
+        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
+        text = emoji_pattern.sub(repl='', string=text)
+        return text
+
+    def detect_question_hindi(self, text):
+        for word in text.split():
+            if word in HINDI_QUESTIONS:
+                return True
+        return False
+
+
+

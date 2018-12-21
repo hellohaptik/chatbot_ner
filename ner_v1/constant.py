@@ -119,3 +119,25 @@ CRF_MODEL_VERIFIED = 'crf_model_verified'
 PARAMETER_READ_MODEL_FROM_S3 = 'read_model_from_s3'
 PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL = 'read_embeddings_from_remote_url'
 PARAMETER_LIVE_CRF_MODEL_PATH = 'live_crf_model_path'
+
+#  ********************** emoji removal ******************************************************
+EMOJI_RANGES = {
+    'regional_indicators': u'\U0001f1e6-\U0001f1ff',
+    'misc_pictograms': u'\U0001f300-\U0001f5ff',
+    'emoticons': u'\U0001f600-\U0001f64f',
+    'transport': u'\U0001f680-\U0001f6ff',
+    'supplemental': u'\U0001f900-\U0001f9ff\U0001f980-\U0001f984\U0001f9c0',
+    'zero_width_separator': u'\U0000200d',
+    'variation_selector': u'\U0000fe0f',
+    'misc_dingbats': u'\U00002600-\U000027bf',
+    'emoticon_skintones': u'\U0001f3fb-\U0001f3ff',
+    'letterlike_symbols': u'\U00002100-\U0000214F',
+    'arrows': u'\U00002190-\U000021FF',
+    'miscellaneous_technical': u'\U00002300-\U000023FF',
+    'enclosed_alphanumerics': u'\U00002460-\U000024FF',
+    'geometric_shapes': u'\U000025A0-\U000025FF',
+}
+
+# ****************** Hindi Questions ********************************************************
+HINDI_QUESTIONS = ['क्या', 'कब', 'कहा', 'क्यों', 'कौन', 'कौन', 'जिसे', 'जिसका', 'कैसे', 'कितने']
+HINDI_ABUSIVE_WORDS = []
