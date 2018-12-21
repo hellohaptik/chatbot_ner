@@ -9,21 +9,6 @@ class PhoneDetectionTest(TestCase):
     def setUp(self):
         self.phone_number_detection = PhoneDetector(entity_name='phone_number')
 
-    def runTest(self):
-        self.test_phone_detection_landline_no_spaces()
-        self.test_phone_detection_landline_with_no_spaces_area_code()
-        self.test_phone_detection_landline_with_spaces_area_code()
-        self.test_phone_detection_mobile_no_spaces()
-        self.test_phone_detection_mobile_with_no_spaces_code()
-        self.test_phone_detection_mobile_with_spaces_code()
-        self.test_phone_detection_mobile_with_spaces_code_plus()
-        self.test_phone_detection_mobile_no_spaces_code_plus()
-        self.test_phone_detection_mobile_with_spaces_code_hyphens()
-        self.test_phone_detection_mobile_international_brackets_hyphens()
-        self.test_phone_detection_mobile_international_plus()
-        self.test_phone_detection_mobile_international()
-        self.test_phone_detection_two_phone_nunbers()
-
     def test_phone_detection_landline_no_spaces(self):
         message = 'Call the number 26129854'
         self.phone_number_detection = PhoneDetector(entity_name='phone_number')

@@ -79,7 +79,6 @@ class PhoneDetector(BaseDetector):
         phone_number_original_list = self.get_number_regex()
 
         original_phone_texts = [p[0] for p in phone_number_original_list]
-        # self.original_phone_texts = self.check_length(original_phone_texts=original_phone_texts)
         self.original_phone_text = self.check_length(original_phone_texts=original_phone_texts)
         clean_phone_list = [self.clean_phone_number(p) for p in self.original_phone_text]
         self.phone = [self.get_number(phone) for phone in clean_phone_list]
