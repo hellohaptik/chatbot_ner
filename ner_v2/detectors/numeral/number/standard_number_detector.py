@@ -302,5 +302,7 @@ class BaseNumberDetector(object):
 
 
 class NumberDetector(BaseNumberDetector):
-    def __init__(self, entity_name, data_directory_path):
-        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path)
+    def __init__(self, entity_name, data_directory_path, unit_type):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             unit_type=unit_type,
+                                             data_directory_path=data_directory_path)
