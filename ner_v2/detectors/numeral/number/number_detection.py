@@ -90,7 +90,8 @@ class NumberDetector(BaseDetector):
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
-            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name)
+            self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name,
+                                                                                  unit_type=self.unit_type)
 
         except ImportError:
             standard_number_regex = importlib.import_module(
@@ -98,6 +99,7 @@ class NumberDetector(BaseDetector):
             )
             self.language_number_detector = standard_number_regex.NumberDetector(
                 entity_name=self.entity_name,
+                unit_type=self.unit_type,
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__), lang_code=self.language)
             )
 
@@ -133,9 +135,8 @@ class NumberDetector(BaseDetector):
             number_value = number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]
             number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
             if self.min_digit <= len(number_value) <= self.max_digit:
-                if self.unit_type and (not self.language_number_detector.units_map.get(number_unit) or
-                                       (self.language_number_detector.units_map.get(number_unit) and
-                                        self.language_number_detector.units_map[number_unit].type != self.unit_type)):
+                if self.unit_type and (number_unit is None or
+                                       self.language_number_detector.units_map[number_unit].type != self.unit_type):
                     continue
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)

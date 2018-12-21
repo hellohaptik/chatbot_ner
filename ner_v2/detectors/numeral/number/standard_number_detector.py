@@ -16,7 +16,7 @@ NumberUnit = collections.namedtuple('NumberUnit', ['value', 'type'])
 
 
 class BaseNumberDetector(object):
-    def __init__(self, entity_name, data_directory_path):
+    def __init__(self, entity_name, data_directory_path, unit_type=None):
         """
         Standard Number detection class, read data from language data path and help to detect number and numbers words
         for given languages.
@@ -34,6 +34,7 @@ class BaseNumberDetector(object):
         self.numbers_word_map = {}
         self.scale_map = {}
         self.units_map = {}
+        self.unit_type = unit_type
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
@@ -105,6 +106,8 @@ class BaseNumberDetector(object):
         unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE_NAME)
         if os.path.exists(unit_file_path):
             units_df = pd.read_csv(unit_file_path, encoding='utf-8')
+            if self.unit_type:
+                units_df = units_df[units_df[NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME] == self.unit_type]
             for index, row in units_df.iterrows():
                 unit_variants = get_list_from_pipe_sep_string(row[NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME])
                 unit_value = row[NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME]

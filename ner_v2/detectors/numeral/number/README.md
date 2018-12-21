@@ -109,12 +109,12 @@ Below is the brief about how to create data files `numerals_constant.csv`, `unit
 
 2. **units.csv**:  This files contains the vocabs of units for number and their correspoding all variants possible .
 
-   | unit_value |                        unit_variants                         |
-   | :--------: | :----------------------------------------------------------: |
-   |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
-   |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
+   | unit_type | unit_value |                        unit_variants                         |
+   | --------- | :--------: | :----------------------------------------------------------: |
+   | currency  |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
+   | currency  |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
 
-   Here, 1st column will contain the value of unit which will be return by detector module, while 2nd column contain all the possible variants of units in language and english script.
+   Here, 1st column have the type of unit variants it have correspoding to unit variants, 2nd contain the value of unit which will be return by number detector and 3rd column contains all the possible variants of units in language and english script.
 
 #### Guidelines to add new detectors for number apart from builtin ones:
 
@@ -134,8 +134,11 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name):
-        super(NumberDetector, self).__init__(entity_name=entity_name,                                      data_directory_path=NumberDetector.data_directory_path)
+    def __init__(self, entity_name, unit_type=None):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             unit_type=unit_type,
+                                        data_directory_path=NumberDetector.data_directory_path)
+
 ```
 
 Note that the class name must be `NumberDetector` 
@@ -198,9 +201,11 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             unit_type=unit_type,
                                              data_directory_path=NumberDetector.data_directory_path)
+
 
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
