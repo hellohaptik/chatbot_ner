@@ -10,10 +10,10 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name, unit_type=None):
+    def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             unit_type=unit_type,
-                                             data_directory_path=NumberDetector.data_directory_path)
+                                             data_directory_path=NumberDetector.data_directory_path,
+                                             unit_type=unit_type)
 
         if entity_name in ['number_of_people', 'number_of_ticket', 'no_of_guests', 'no_of_adults',
                            'travel_no_of_people']:

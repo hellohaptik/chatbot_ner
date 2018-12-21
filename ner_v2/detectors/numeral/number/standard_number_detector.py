@@ -21,7 +21,11 @@ class BaseNumberDetector(object):
         Standard Number detection class, read data from language data path and help to detect number and numbers words
         for given languages.
         Args:
+            entity_name (str): entity_name: string by which the detected number would be replaced
             data_directory_path (str): path of data folder for given language
+            unit_type (str): number unit types like weight, currency, temperature, used to detect number with
+                               specific unit type.
+
         """
         self.text = ''
         self.tagged_text = ''
@@ -302,7 +306,7 @@ class BaseNumberDetector(object):
 
 
 class NumberDetector(BaseNumberDetector):
-    def __init__(self, entity_name, data_directory_path, unit_type):
+    def __init__(self, data_directory_path, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             unit_type=unit_type,
-                                             data_directory_path=data_directory_path)
+                                             data_directory_path=data_directory_path,
+                                             unit_type=unit_type)
