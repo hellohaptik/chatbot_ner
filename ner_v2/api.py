@@ -1,16 +1,15 @@
 from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
-    PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
+    PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
     PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS
 
-# from ner_v1.chatbot.entity_detection import get_phone_number
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
-from ner_v2.detectors.pattern.phone_number.phone_number_detection import
+
 
 from django.http import HttpResponse
 import json
@@ -249,13 +248,32 @@ def number(request):
 
 
 def phone_number(request):
-    """This functionality calls the get_phone_number() functionality to detect phone numbers. It is called through
-    api call
+    """Uses PhoneDetector to detect phone numbers
 
-    Attributes:
-        request: url parameters
+        request params:
+            message (str): natural text on which detection logic is to be run. Note if structured value is
+                                   detection is run on structured value instead of message
+            entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                              if entity uses elastic-search lookup
+            structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                   detection is run on structured value instead of message
+                                   (For example, UI elements like form, payload, etc)
+            fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                             or message then we return a fallback_value as an output.
+            bot_message (str): previous message from a bot/agent.
+            source_language (str): language for which the phone numbers have to be detected
 
-    """
+        Returns:
+            response (django.http.response.HttpResponse): HttpResponse object
+        Examples:
+
+        message = "Call 02226129857 and message +1 (408) 92-124 and send 100rs to 91 9820334416 9920441344"
+        entity_name = 'number_of_unit'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        source_language = 'en'
+        """
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
