@@ -132,6 +132,11 @@ class PhoneDetector(BaseDetector):
 
         Returns:
             phone (str): The string phone number converted to English script
+
+        Examples:
+            phone = u'९१९८१९९८३१३२'
+            get_number(phone=phone)
+            '919819983132'
         """
         phone_length = len(phone)
         phone = str(int(phone))
@@ -162,6 +167,17 @@ class PhoneDetector(BaseDetector):
         Returns:
             phone_number_list (list): list of patterns detected from the regex pattern
 
+            (each pattern: (complete original text, area code, number))
+            (we further utitlize only the complete original text)
+        Example:
+            p = PhoneDetector(entity_name='phone_number', language='hi')
+            text = u'Set a reminder on +1 (408) 912-6172'
+            p.text = text
+            p.get_number_regex()
+
+            [(u'+1 (408) 912-6172', u'1', u'(408) 912-6172'),
+             (u'+91 9820334416', u'91', u'9820334416'),
+            (u'022 26129857', u'022', u'26129857')]
         """
         phone_number_regex = re.compile(
             r'((?:\(?\+(\d{1,2})\)?[\s\-\.]*)?((?=[\-\d()\s\.]{8,16}(?:[^\d]+|$))'
