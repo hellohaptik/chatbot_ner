@@ -11,6 +11,12 @@ class PhoneDetectionTest(TestCase):
         self.data = pd.read_csv('ner_v2/tests/pattern/phone_number/data/phone_detection_test_cases.csv')
         self.test_dict = self.preprocess_test_cases()
 
+    def runTest(self):
+        self.phone_number_detection = PhoneDetector(entity_name='phone_number')
+        self.data = pd.read_csv('ner_v2/tests/pattern/phone_number/data/phone_detection_test_cases.csv')
+        self.test_dict = self.preprocess_test_cases()
+        self.run_from_dict()
+
     def preprocess_test_cases(self):
         self.data['original_entities'] = self.data['original_entities'].apply(lambda x: x.decode('utf-8'))
 
