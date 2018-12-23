@@ -95,6 +95,14 @@ class PhoneDetector(BaseDetector):
         space within them.
         Args:
             original_phone_texts (list): list of text substrings detected by the regex
+
+        Returns:
+            phone_number_list (list): list of phone numbers splitting based on length
+
+        Examples:
+             original_phone_texts = ['9820334415 91 9920441388', '9820551388982347']
+             check_length(original_phone_texts=original_phone_texts)
+             >> ['9820334415', '91 9920441388']
         """
         phone_number_list_1, phone_number_list2 = [], []
 

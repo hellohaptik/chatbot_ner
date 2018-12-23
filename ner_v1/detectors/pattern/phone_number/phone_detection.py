@@ -137,7 +137,6 @@ class PhoneDetector(BaseDetector):
             original_list.append(original)
         return phone_list, original_list
 
-
     def _detect_mobile_number_pattern(self, text):
         """
         Detects phone numbers from text that match the defined regex pattern

@@ -269,16 +269,15 @@ def phone_number(request):
         Examples:
 
         message = "Call 02226129857 and message +1(408) 92-124 and send 100rs to 91 9820334416 9920441344"
-        entity_name = 'number_of_unit'
+        entity_name = 'phone_number'
         structured_value = None
         fallback_value = None
         bot_message = None
         source_language = 'en'
 
-        output:
+        entity_output:
 
-        {
-    "data": [
+         [
         {
             "detection": "message",
             "original_text": "91 9820334416",
@@ -312,7 +311,7 @@ def phone_number(request):
             "language": "en"
         }
     ]
-}
+
         """
     try:
         parameters_dict = get_parameters_dictionary(request)
