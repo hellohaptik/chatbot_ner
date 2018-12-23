@@ -72,7 +72,7 @@ class PhoneDetector(BaseDetector):
 
         """
 
-        self.text = text.decode('utf-8')
+        self.text = text
         self.processed_text = self.text
         self.tagged_text = self.text
 
