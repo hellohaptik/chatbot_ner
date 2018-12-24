@@ -4,7 +4,10 @@ from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import *
 from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import EMOJI_RANGES, HINDI_QUESTIONS
+from ner_v1.constant import EMOJI_RANGES
+from ner_v1.detectors.textual.name.hindi_const import HINDI_BADPHRASES, \
+    HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS
+
 
 class NameDetector(object):
     """
@@ -231,23 +234,48 @@ class NameDetector(object):
             return True
         return False
 
+    def detect_hindi_name(self, text):
+
+        if self.detect_abusive_words_hindi(text=text) or self.detect_question_hindi(text=text):
+            return [], []
+
+        text = self.remove_emojis(text=text)
+        original_text_list = self.detect_name_patterns(text=text)
+        original_text_list = [self.replace_stopwords_hindi(text=x) for x in original_text_list]
+
+        if original_text_list:
+
+
+    def detect_name_patterns(self, text):
+
+        pattern_1 = re.compile()
+        return text
+
+    def replace_stopwords_hindi(self, text):
+        split_list = text.split(" ")
+        split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
+        return " ".join(split_list)
 
     def detect_abusive_words_hindi(self, text):
+
+        pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)", re.U)
+        pattern2 = re.compile(r"myself\s+([\w\s]+)")
+        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
+
+
+        pattern_1 = re.compile(r"")
         for word in text.split():
-            if word in HINDI_QUESTIONS:
+            if word in HINDI_BADWORDS:
                 return True
         return False
 
     def remove_emojis(self, text):
-        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
+        emoji_pattern = re.compile(r'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
         text = emoji_pattern.sub(repl='', string=text)
         return text
 
     def detect_question_hindi(self, text):
         for word in text.split():
-            if word in HINDI_QUESTIONS:
+            if word in HINDI_QUESTIONWORDS:
                 return True
         return False
-
-
-

@@ -137,7 +137,3 @@ EMOJI_RANGES = {
     'enclosed_alphanumerics': u'\U00002460-\U000024FF',
     'geometric_shapes': u'\U000025A0-\U000025FF',
 }
-
-# ****************** Hindi Questions ********************************************************
-HINDI_QUESTIONS = ['क्या', 'कब', 'कहा', 'क्यों', 'कौन', 'कौन', 'जिसे', 'जिसका', 'कैसे', 'कितने']
-HINDI_ABUSIVE_WORDS = []
