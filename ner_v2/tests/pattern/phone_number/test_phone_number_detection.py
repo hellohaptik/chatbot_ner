@@ -39,6 +39,6 @@ class PhoneDetectionTest(TestCase):
             message = self.test_dict['message'][i]
             expected_value = self.test_dict['expected_value'][i]
             detected_texts, original_texts = self.phone_number_detection.\
-                detect_entity(text=message.deocde('utf-8'))
+                detect_entity(text=message.decode('utf-8'))
             zipped = zip(detected_texts, original_texts)
             self.assertEqual(expected_value, zipped)
