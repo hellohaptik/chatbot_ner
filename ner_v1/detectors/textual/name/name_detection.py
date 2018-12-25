@@ -104,7 +104,6 @@ class NameDetector(object):
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
         name_tokens = text.split(' ')
-        print(name_tokens)
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
@@ -158,24 +157,23 @@ class NameDetector(object):
         if self.language_script == ENGLISH_LANG:
             entity_value, original_text = self.detect_entity_english()
         elif self.language_script == HINDI_LANG:
-            print('in hindi')
             entity_value, original_text = self.detect_entity_hindi()
 
         return entity_value, original_text
 
     def detect_entity_english(self):
         """
-        Takes text as input and  returns two lists
-        1.entity_value in the form of first, middle and last names
-        2.original text.
-        Args:
-           text(string): the original text
-           bot_message(string): previous bot message
+        This method is used to detect English names from the provided text
+        Returns:
+            detect_text_lists (tuple): two dimensional tuple
+            1. entity_value (list): representing the entity values of names
+            2. original_text (list): representing the original text detected
 
-           Example:
-                    text=my name is yash doshi
-       Returns:
-                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
+        Example:
+
+            text=my name is yash doshi
+            detect_entity_english()
+            >>[{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
 
         text_detection_result = self.text_detection_name()
@@ -188,16 +186,22 @@ class NameDetector(object):
         return entity_value, original_text
 
     def detect_entity_hindi(self):
-        if self.detect_abusive_words_hindi(text=self.text) or self.detect_question_hindi(text=self.text):
-            print('in abusive or question')
+        """
+        This method is used to detect Hindi names from the provided text
+        Returns:
+
+        """
+        if self.detect_abusive_phrases_hindi(text=self.text) or self.detect_question_hindi(text=self.text):
             return [], []
 
-        regex_detection_result = self.get_hindi_names_from_regex(text=self.text)
+        text = self.remove_emojis(text=self.text)
+
+        regex_detection_result = self.get_hindi_names_from_regex(text=text)
         replaced_text = self.replace_detected_text(regex_detection_result)
         entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
-            entity_value, original_text = self.get_hindi_name(text=self.text)
+            entity_value, original_text = self.get_hindi_names_without_regex(text=text)
 
         return entity_value, original_text
 
@@ -277,9 +281,22 @@ class NameDetector(object):
         return False
 
     def get_hindi_names_from_regex(self, text):
-        print(text, 'text')
+        """
+        This method is used to detect hindi names which obey the regexes
+        Args:
+            text (str): text from which hindi names obeying the regex have to be extracted
 
-        text = self.remove_emojis(text=text)
+        Returns:
+            detect_text_lists (tuple): two dimensional tuple
+            1. text_list (list): representing the detected text
+            2. text_list (list): representing the original text
+
+        Examples:
+            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
+            get_hindi_text_from_regex(text=text)
+            >>([u'प्रतिक', u'श्रीदत्त', u'जयराओ'], [u'प्रतिक', u'श्रीदत्त', u'जयराओ'])
+
+        """
         text_list = self.get_hindi_text_from_regex(text=text)
 
         detected_names = []
@@ -291,23 +308,65 @@ class NameDetector(object):
 
         return text_list, text_list
 
-    def get_hindi_name(self, text):
-        print('in hindi name')
+    def get_hindi_names_without_regex(self, text):
+        """
+        This method is used to get detect hindi names without any regex pattern (This method is called only if
+        detection from regex patterns fails)
+        Args:
+            text (str): the text from which hindi text has to be detected
+        Returns:
+            person_name (tuple): two dimensional tuple
+            1. entity_value (list): representing the entity values of names
+            2. original_text (list): representing the original text detected
+
+
+        Example:
+            text = u'प्रतिक श्रीदत्त जयराओ'
+            get_hindi_names_without_regex(text=text)
+
+            >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
+
+        """
         original_text_list = self.get_devnagri_text(text=text)
-        print('second', original_text_list)
         replaced_text = self.replace_detected_text((original_text_list, original_text_list))
         return self.detect_person_name_entity(replaced_text=replaced_text)
 
     def get_devnagri_text(self, text):
-        print('in devnagri text')
-        text = self.replace_stopwords_hindi(text)
+        """
+        This method is used to detect devnagri text from the text and additionally check is
+        length is less than 5
+        Args:
+            text (str): the string from which devnagri text has to be detected
+        Returns:
+            split_list (list): list of devanagri text split on basis of whitespaces
+
+        Examples:
+            text = u'प्रतिक श्रीदत्त जयराओ'
+            get_devnagri_text(text=text)
+            >>[u'प्रतिक', u'श्रीदत्त', u'जयराओ']
+        """
+#        text = self.replace_stopwords_hindi(text)
         regex = re.compile(ur"[^\u0900-\u097F\s]+", re.U)
         text = regex.sub(string=text, repl='')
         split_text = text.split()
-        if len(split_text) < 4:
+        if len(split_text) <= 4:
             return split_text
 
     def get_hindi_text_from_regex(self, text):
+        """
+        This method is used to detect hindi names using regexes from the given text
+        Args:
+            text (str): text from which hindi names which follow the regex pattern have to be extracted
+
+        Returns:
+            pattern_match (list): list consisting of detected words
+
+        Examples:
+            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
+            get_hindi_text_from_regex(text=text)
+            >>[u'प्रतिक श्रीदत्त जयराओ']
+
+        """
         regex_list = [ur"(?:नाम|मैं|हम)\s*([\u0900-\u097F\s]+)",
                       ur"(?:मुझे|हमें|मुझको|हमको)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
                       ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं)(?:कहते|बुलाते|बुलाओ)?",
@@ -323,26 +382,26 @@ class NameDetector(object):
 
     def replace_stopwords_hindi(self, text):
         """
-
+        This method is used to replace hindi stop words from the text
         Args:
-            text:
+            text (str): The text from which hindi stop words have to be removed
 
         Returns:
-
+            clean_text (str): text from which hindi stop words have been removed
         """
         split_list = text.split(" ")
         split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
         if split_list:
             return " ".join(split_list)
 
-    def detect_abusive_words_hindi(self, text):
+    def detect_abusive_phrases_hindi(self, text):
         """
-
+        This method is used to check for hindi abuses in the sentence
         Args:
-            text:
+            text (str): text in which abuses have to be checked
 
         Returns:
-
+            status (bool): returns if the text consists of abuses
         """
         text = ' ' + text + ' '
         for abuse in HINDI_BADWORDS:
@@ -352,12 +411,11 @@ class NameDetector(object):
 
     def remove_emojis(self, text):
         """
-
+        This method is used to remove emojis from the given text
         Args:
-            text:
-
+            text (str): the text from which the emojis have to be removed
         Returns:
-
+            text (str): text with emojis replaced with ''
         """
         emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
         text = emoji_pattern.sub(repl='', string=text)
@@ -365,12 +423,12 @@ class NameDetector(object):
 
     def detect_question_hindi(self, text):
         """
-
+        This method is used to detect if the given text has a hindi question present in it
         Args:
-            text:
+            text (str): the text for which the question check has to be run
 
         Returns:
-
+            status (bool): returns if the text has a question in it
         """
         for word in text.split():
             if word in HINDI_QUESTIONWORDS:
