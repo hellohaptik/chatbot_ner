@@ -104,6 +104,7 @@ class NameDetector(object):
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
         name_tokens = text.split(' ')
+        print(name_tokens)
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
@@ -149,7 +150,7 @@ class NameDetector(object):
             if not self.context_check_botmessage(bot_message):
                 return [], []
 
-        self.text = ' ' + text + ' '
+        self.text = text
         self.tagged_text = self.text
 
         entity_value, original_text = ([], [])
@@ -343,7 +344,7 @@ class NameDetector(object):
         Returns:
 
         """
-
+        text = ' ' + text + ' '
         for abuse in HINDI_BADWORDS:
             if ' ' + abuse + ' ' in text:
                 return True
