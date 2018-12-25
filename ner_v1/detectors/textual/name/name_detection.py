@@ -1,11 +1,11 @@
+# coding=utf-8
 import re
-
-from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import *
 from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.constant import EMOJI_RANGES
-from ner_v1.detectors.textual.name.hindi_const import HINDI_BADPHRASES, \
+from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
+from ner_v1.detectors.textual.name.hindi_const import  \
     HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS
 
 
@@ -23,7 +23,7 @@ class NameDetector(object):
         text_detection_object: the object which is used to call the TextDetector
     """
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, language_script=ENGLISH_LANG):
         """
         Initializes a NameDetector object with given entity_name
 
@@ -32,6 +32,7 @@ class NameDetector(object):
                          with on calling detect_entity()
         """
         self.entity_name = entity_name
+        self.language_script = language_script
         self.text = ''
         self.names = []
         self.tagged_text = ''
@@ -144,20 +145,61 @@ class NameDetector(object):
        Returns:
                 [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
-
         if bot_message:
             if not self.context_check_botmessage(bot_message):
                 return [], []
-        self.text = text
+
+        self.text = ' ' + text + ' '
         self.tagged_text = self.text
+
+        entity_value, original_text = ([], [])
+
+        if self.language_script == ENGLISH_LANG:
+            entity_value, original_text = self.detect_entity_english()
+        elif self.language_script == HINDI_LANG:
+            print('in hindi')
+            entity_value, original_text = self.detect_entity_hindi()
+
+        return entity_value, original_text
+
+    def detect_entity_english(self):
+        """
+        Takes text as input and  returns two lists
+        1.entity_value in the form of first, middle and last names
+        2.original text.
+        Args:
+           text(string): the original text
+           bot_message(string): previous bot message
+
+           Example:
+                    text=my name is yash doshi
+       Returns:
+                [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
+        """
+
         text_detection_result = self.text_detection_name()
         replaced_text = self.replace_detected_text(text_detection_result)
         entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
-            entity_value, original_text = self.get_name_using_pos_tagger(text)
+            entity_value, original_text = self.get_name_using_pos_tagger(self.text)
 
         return entity_value, original_text
+
+    def detect_entity_hindi(self):
+        if self.detect_abusive_words_hindi(text=self.text) or self.detect_question_hindi(text=self.text):
+            print('in abusive or question')
+            return [], []
+
+        regex_detection_result = self.get_hindi_names_from_regex(text=self.text)
+        replaced_text = self.replace_detected_text(regex_detection_result)
+        entity_value, original_text = self.detect_person_name_entity(replaced_text)
+
+        if not entity_value:
+            entity_value, original_text = self.get_hindi_name(text=self.text)
+
+        return entity_value, original_text
+
 
     def replace_detected_text(self, text_detection_result):
         """
@@ -175,8 +217,7 @@ class NameDetector(object):
                     ['my', 'name', 'is', 'yash', 'doshi']
 
         """
-
-        replaced_text = nltk_tokenizer.tokenize(self.text.lower())
+        replaced_text = self.text.lower().split()
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
@@ -230,51 +271,106 @@ class NameDetector(object):
             True
         """
 
-        if "name" in botmessage:
+        if "name" in botmessage or u'नाम' in botmessage:
             return True
         return False
 
-    def detect_hindi_name(self, text):
-
-        if self.detect_abusive_words_hindi(text=text) or self.detect_question_hindi(text=text):
-            return [], []
+    def get_hindi_names_from_regex(self, text):
+        print(text, 'text')
 
         text = self.remove_emojis(text=text)
-        original_text_list = self.detect_name_patterns(text=text)
-        original_text_list = [self.replace_stopwords_hindi(text=x) for x in original_text_list]
+        text_list = self.get_hindi_text_from_regex(text=text)
 
-        if original_text_list:
+        detected_names = []
+        if text_list:
+            text_list = [self.replace_stopwords_hindi(text=x) for x in text_list]
+            for each in text_list:
+                detected_names.extend(each.split())
+        text_list = detected_names
 
+        return text_list, text_list
 
-    def detect_name_patterns(self, text):
+    def get_hindi_name(self, text):
+        print('in hindi name')
+        original_text_list = self.get_devnagri_text(text=text)
+        print('second', original_text_list)
+        replaced_text = self.replace_detected_text((original_text_list, original_text_list))
+        return self.detect_person_name_entity(replaced_text=replaced_text)
 
-        pattern_1 = re.compile()
-        return text
+    def get_devnagri_text(self, text):
+        print('in devnagri text')
+        text = self.replace_stopwords_hindi(text)
+        regex = re.compile(ur"[^\u0900-\u097F\s]+", re.U)
+        text = regex.sub(string=text, repl='')
+        split_text = text.split()
+        if len(split_text) < 4:
+            return split_text
+
+    def get_hindi_text_from_regex(self, text):
+        regex_list = [ur"(?:नाम|मैं|हम)\s*([\u0900-\u097F\s]+)",
+                      ur"(?:मुझे|हमें|मुझको|हमको)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
+                      ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं)(?:कहते|बुलाते|बुलाओ)?",
+                      ]
+
+        for regex in regex_list:
+            regex_ = re.compile(regex, re.U)
+            pattern_match = regex_.findall(text)
+            pattern_match = [self.replace_stopwords_hindi(x) for x in pattern_match if x]
+            if pattern_match:
+                if None != pattern_match[0]:
+                    return pattern_match
 
     def replace_stopwords_hindi(self, text):
+        """
+
+        Args:
+            text:
+
+        Returns:
+
+        """
         split_list = text.split(" ")
         split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
-        return " ".join(split_list)
+        if split_list:
+            return " ".join(split_list)
 
     def detect_abusive_words_hindi(self, text):
+        """
 
-        pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)", re.U)
-        pattern2 = re.compile(r"myself\s+([\w\s]+)")
-        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
+        Args:
+            text:
 
+        Returns:
 
-        pattern_1 = re.compile(r"")
-        for word in text.split():
-            if word in HINDI_BADWORDS:
+        """
+
+        for abuse in HINDI_BADWORDS:
+            if ' ' + abuse + ' ' in text:
                 return True
         return False
 
     def remove_emojis(self, text):
-        emoji_pattern = re.compile(r'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
+        """
+
+        Args:
+            text:
+
+        Returns:
+
+        """
+        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
         text = emoji_pattern.sub(repl='', string=text)
         return text
 
     def detect_question_hindi(self, text):
+        """
+
+        Args:
+            text:
+
+        Returns:
+
+        """
         for word in text.split():
             if word in HINDI_QUESTIONWORDS:
                 return True
