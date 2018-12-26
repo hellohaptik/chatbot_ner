@@ -188,7 +188,7 @@ class PhoneDetector(BaseDetector):
             (u'022 26129857', u'022', u'26129857')]
         """
         phone_number_regex = re.compile(
-            r'((?:\(?\+(\d{1,2})\)?[\s\-\.]*)?((?=[\-\d()\s\.]{8,16}(?:[^\d]+|$))'
+            r'((?:\(?\+(\d{1,2})\)?[\s\-\.]*)?((?=[\-\d()\s\.]{10,16}(?:[^\d]+|$))'
             r'(?:[\d(]{1,20}(?:[\-)\s\.]*\d{1,20}){0,20}){1,20}))', re.U)
 
         phone_number_list = phone_number_regex.findall(self.text)
