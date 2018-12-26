@@ -38,6 +38,7 @@ class NameDetector(object):
         self.tagged_text = ''
         self.processed_text = ''
         self.original_name_text = []
+        self.tag = '_' + entity_name + '_'
         self.text_detection_object = TextDetector(entity_name=entity_name)
 
     @staticmethod
@@ -159,6 +160,8 @@ class NameDetector(object):
         elif self.language_script == HINDI_LANG:
             entity_value, original_text = self.detect_entity_hindi()
 
+        self._update_processed_text(person_name_list=original_text)
+
         return entity_value, original_text
 
     def detect_entity_english(self):
@@ -188,7 +191,16 @@ class NameDetector(object):
     def detect_entity_hindi(self):
         """
         This method is used to detect Hindi names from the provided text
+
         Returns:
+            detect_text_lists (tuple): two dimensional tuple
+            1. entity_value (list): representing the entity values of names
+            2. original_text (list): representing the original text detected
+
+        Examples:
+            text = u'प्रतिक श्रीदत्त जयराओ'
+            detect_entity_hindi(text=text)
+            >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
 
         """
         if self.detect_abusive_phrases_hindi(text=self.text) or self.detect_question_hindi(text=self.text):
@@ -345,7 +357,7 @@ class NameDetector(object):
             get_devnagri_text(text=text)
             >>[u'प्रतिक', u'श्रीदत्त', u'जयराओ']
         """
-#        text = self.replace_stopwords_hindi(text)
+        text = self.replace_stopwords_hindi(text)
         regex = re.compile(ur"[^\u0900-\u097F\s]+", re.U)
         text = regex.sub(string=text, repl='')
         split_text = text.split()
@@ -369,7 +381,7 @@ class NameDetector(object):
         """
         regex_list = [ur"(?:नाम|मैं|हम)\s*([\u0900-\u097F\s]+)",
                       ur"(?:मुझे|हमें|मुझको|हमको)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
-                      ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं)(?:कहते|बुलाते|बुलाओ)?",
+                      ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं)(?:कहते|बुलाते|बुलाओ)?"
                       ]
 
         for regex in regex_list:
@@ -434,3 +446,18 @@ class NameDetector(object):
             if word in HINDI_QUESTIONWORDS:
                 return True
         return False
+
+    def _update_processed_text(self, person_name_list):
+        """
+        Replaces detected date with tag generated from entity_name used to initialize the object with
+
+        A final string with all dates replaced will be stored in object's tagged_text attribute
+        A string with all dates removed will be stored in object's processed_text attribute
+
+        Args:
+            person_name_list (list): list of substrings of original text to be replaced with tag
+                                       created from entity_name
+        """
+        for detected_text in person_name_list:
+            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            self.processed_text = self.processed_text.replace(detected_text, '')
