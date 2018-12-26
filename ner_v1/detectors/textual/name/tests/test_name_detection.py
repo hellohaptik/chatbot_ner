@@ -13,7 +13,7 @@ class NameDetectionTest(TestCase):
     def runTest(self):
         self.data = pd.read_csv('ner_v1/detectors/textual/name/tests/test_cases_person_name.csv')
         self.test_dict = self.preprocess_data()
-        self.test_from_dict()
+        self.test_person_name_detection()
 
     def preprocess_data(self):
         self.data = pd.read_csv('name_test.csv')
@@ -53,7 +53,7 @@ class NameDetectionTest(TestCase):
 
         return test_dict
 
-    def test_from_dict(self):
+    def test_person_name_detection(self):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
             print(message)
