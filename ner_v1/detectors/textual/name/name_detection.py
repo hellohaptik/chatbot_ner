@@ -180,7 +180,7 @@ class NameDetector(object):
         """
 
         text_detection_result = self.text_detection_name()
-        replaced_text = self.replace_detected_text(text_detection_result)
+        replaced_text = self.replace_detected_text(text_detection_result, text=self.text)
         entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
@@ -209,7 +209,7 @@ class NameDetector(object):
         text = self.remove_emojis(text=self.text)
 
         regex_detection_result = self.get_hindi_names_from_regex(text=text)
-        replaced_text = self.replace_detected_text(regex_detection_result)
+        replaced_text = self.replace_detected_text(regex_detection_result, text=text)
         entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         if not entity_value:
@@ -218,7 +218,7 @@ class NameDetector(object):
         return entity_value, original_text
 
 
-    def replace_detected_text(self, text_detection_result):
+    def replace_detected_text(self, text_detection_result, text):
         """
         Replaces the detected name from text_detection_result by _<name>_
         Args:
@@ -234,7 +234,7 @@ class NameDetector(object):
                     ['my', 'name', 'is', 'yash', 'doshi']
 
         """
-        replaced_text = self.text.lower().strip().split()
+        replaced_text = text.lower().strip().split()
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
@@ -346,7 +346,7 @@ class NameDetector(object):
         original_text_list = text.strip().split()
         if len(original_text_list) > 4:
             original_text_list = []
-        replaced_text = self.replace_detected_text((original_text_list, original_text_list))
+        replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
 
 
