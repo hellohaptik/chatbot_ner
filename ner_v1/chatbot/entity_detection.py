@@ -427,7 +427,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language_script=ENGLISH_LANG):
+                    language=ENGLISH_LANG):
     """Use NameDetector to detect names
 
     Args:
@@ -458,7 +458,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
-    name_detection = NameDetector(entity_name=entity_name, language_script=language_script)
+    name_detection = NameDetector(entity_name=entity_name, language=language)
     if structured_value:
         entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
         if entity_list:

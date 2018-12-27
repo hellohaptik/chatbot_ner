@@ -196,7 +196,7 @@ def person_name(request):
                                         structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                         fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                         bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
-                                        language_script=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
+                                        language=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for person_name: %s ' % e)

@@ -6,7 +6,7 @@ from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.constant import EMOJI_RANGES
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from ner_v1.detectors.textual.name.hindi_const import  \
-    HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS
+    HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS, NAME_VARIATIONS
 
 
 class NameDetector(object):
@@ -23,7 +23,7 @@ class NameDetector(object):
         text_detection_object: the object which is used to call the TextDetector
     """
 
-    def __init__(self, entity_name, language_script=ENGLISH_LANG):
+    def __init__(self, entity_name, language=ENGLISH_LANG):
         """
         Initializes a NameDetector object with given entity_name
 
@@ -32,7 +32,7 @@ class NameDetector(object):
                          with on calling detect_entity()
         """
         self.entity_name = entity_name
-        self.language_script = language_script
+        self.language = language
         self.text = ''
         self.names = []
         self.tagged_text = ''
@@ -155,16 +155,16 @@ class NameDetector(object):
 
         entity_value, original_text = ([], [])
 
-        if self.language_script == ENGLISH_LANG:
-            entity_value, original_text = self.detect_entity_english()
-        elif self.language_script == HINDI_LANG:
-            entity_value, original_text = self.detect_entity_hindi()
+        if self.language == ENGLISH_LANG:
+            entity_value, original_text = self.detect_english_name()
+        elif self.language == HINDI_LANG:
+            entity_value, original_text = self.detect_hindi_name()
 
         self._update_processed_text(person_name_list=original_text)
 
         return entity_value, original_text
 
-    def detect_entity_english(self):
+    def detect_english_name(self):
         """
         This method is used to detect English names from the provided text
         Returns:
@@ -188,7 +188,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity_hindi(self):
+    def detect_hindi_name(self):
         """
         This method is used to detect Hindi names from the provided text
 
@@ -234,7 +234,7 @@ class NameDetector(object):
                     ['my', 'name', 'is', 'yash', 'doshi']
 
         """
-        replaced_text = self.text.lower().split()
+        replaced_text = self.text.lower().strip().split()
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
@@ -287,9 +287,9 @@ class NameDetector(object):
         Returns:
             True
         """
-
-        if "name" in botmessage or u'नाम' in botmessage:
-            return True
+        for word in botmessage.lower().strip().split():
+            if word in NAME_VARIATIONS:
+                return True
         return False
 
     def get_hindi_names_from_regex(self, text):
@@ -339,30 +339,16 @@ class NameDetector(object):
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
 
         """
-        original_text_list = self.get_devnagri_text(text=text)
+
+        text = self.replace_stopwords_hindi(text)
+        regex = re.compile(ur'[^\u0900-\u097F\s]+', re.U)
+        text = regex.sub(string=text, repl='')
+        original_text_list = text.strip().split()
+        if len(original_text_list) > 4:
+            original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list))
         return self.detect_person_name_entity(replaced_text=replaced_text)
 
-    def get_devnagri_text(self, text):
-        """
-        This method is used to detect devnagri text from the text and additionally check is
-        length is less than 5
-        Args:
-            text (str): the string from which devnagri text has to be detected
-        Returns:
-            split_list (list): list of devanagri text split on basis of whitespaces
-
-        Examples:
-            text = u'प्रतिक श्रीदत्त जयराओ'
-            get_devnagri_text(text=text)
-            >>[u'प्रतिक', u'श्रीदत्त', u'जयराओ']
-        """
-        text = self.replace_stopwords_hindi(text)
-        regex = re.compile(ur"[^\u0900-\u097F\s]+", re.U)
-        text = regex.sub(string=text, repl='')
-        split_text = text.split()
-        if len(split_text) <= 4:
-            return split_text
 
     def get_hindi_text_from_regex(self, text):
         """
@@ -379,8 +365,8 @@ class NameDetector(object):
             >>[u'प्रतिक श्रीदत्त जयराओ']
 
         """
-        regex_list = [ur"(?:नाम|मैं|हम)\s*([\u0900-\u097F\s]+)",
-                      ur"(?:मुझे|हमें|मुझको|हमको)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
+        regex_list = [ur"(?:नाम|मैं|हम|मै)\s*([\u0900-\u097F\s]+)",
+                      ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
                       ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं)(?:कहते|बुलाते|बुलाओ)?"
                       ]
 
@@ -389,7 +375,7 @@ class NameDetector(object):
             pattern_match = regex_.findall(text)
             pattern_match = [self.replace_stopwords_hindi(x) for x in pattern_match if x]
             if pattern_match:
-                if None != pattern_match[0]:
+                if pattern_match[0]:
                     return pattern_match
 
     def replace_stopwords_hindi(self, text):

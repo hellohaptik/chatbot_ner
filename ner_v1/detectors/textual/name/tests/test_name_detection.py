@@ -58,7 +58,7 @@ class NameDetectionTest(TestCase):
             message = self.test_dict['message'][i]
             print(message)
             expected_value = self.test_dict['expected_value'][i]
-            name_detector = NameDetector(language_script=self.test_dict['language'][i],
+            name_detector = NameDetector(language=self.test_dict['language'][i],
                                          entity_name='person_name')
             detected_texts, original_texts = name_detector.\
                 detect_entity(text=message.decode('utf-8'))
