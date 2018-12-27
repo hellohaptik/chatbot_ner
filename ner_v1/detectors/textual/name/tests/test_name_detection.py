@@ -56,14 +56,12 @@ class NameDetectionTest(TestCase):
     def test_person_name_detection(self):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
-            print(message)
             expected_value = self.test_dict['expected_value'][i]
             name_detector = NameDetector(language=self.test_dict['language'][i],
                                          entity_name='person_name')
             detected_texts, original_texts = name_detector.\
                 detect_entity(text=message)
             zipped = zip(detected_texts, original_texts)
-            print(detected_texts, original_texts)
             self.assertEqual(expected_value, zipped)
 
     def generate_person_name_dict(self, person_name_dict):

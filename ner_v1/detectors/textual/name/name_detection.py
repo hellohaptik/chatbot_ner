@@ -313,11 +313,11 @@ class NameDetector(object):
 
         detected_names = []
         if text_list:
-            text_list = [self.replace_stopwords_hindi(text=x) for x in text_list]
             for each in text_list:
-                detected_names.extend(each.split())
-        text_list = detected_names
+                if each:
+                    detected_names.extend(each.split())
 
+        text_list = detected_names
         return text_list, text_list
 
     def get_hindi_names_without_regex(self, text):
@@ -391,6 +391,8 @@ class NameDetector(object):
         split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
         if split_list:
             return " ".join(split_list)
+        else:
+            return ""
 
     def detect_abusive_phrases_hindi(self, text):
         """
