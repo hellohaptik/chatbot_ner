@@ -20,13 +20,13 @@ class PhoneDetectionTest(TestCase):
             'expected_value': [],
         }
         for language, message, detected_entity, original_entity in zip(self.data['language'], self.data['message'],
-                                                                       self.data['detected_entities'],
-                                                                       self.data['original_entities']):
-            de, oe = [], []
-            de.extend(detected_entity.split('|'))
-            oe.extend(original_entity.split('|'))
+                                                                       self.data['entity_value'],
+                                                                       self.data['original_text']):
+            entity_value_list, original_text_list = [], []
+            entity_value_list.extend(detected_entity.split('|'))
+            original_text_list.extend(original_entity.split('|'))
             temp = []
-            for d, o in zip(de, oe):
+            for d, o in zip(entity_value_list, original_text_list):
                 temp.append((d, o))
             test_dict['language'].append(language)
             test_dict['message'].append(message)

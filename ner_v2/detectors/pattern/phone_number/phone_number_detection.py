@@ -54,7 +54,7 @@ class PhoneDetector(BaseDetector):
 
         Returns:
 
-            self.phone (list): list consisting the detected phone numbers
+            self.phone (list): list consisting the detected phone numbers in the same order as mentioned in message
             self.original_phone_text (list): list containing their corresponding substrings in the original message.
 
         Examples:
