@@ -16,8 +16,7 @@ class NameDetectionTest(TestCase):
         self.test_person_name_detection()
 
     def preprocess_data(self):
-        self.data = pd.read_csv('name_test.csv')
-        self.data['original_entities'] = self.data['original_entities'].apply(lambda x: x.decode('utf-8'))
+        self.data = pd.read_csv('name_test.csv', encoding='utf-8')
 
         test_dict = {
             'language': [],
@@ -25,11 +24,12 @@ class NameDetectionTest(TestCase):
             'expected_value': [],
         }
         for language, message, first_name, middle_name, last_name, original_entity in zip(self.data['language'],
-                                                                       self.data['message'],
-                                                                       self.data['first_name'],
-                                                                       self.data['middle_name'],
-                                                                       self.data['last_name'],
-                                                                       self.data['original_entities']):
+                                                                                          self.data['message'],
+                                                                                          self.data['first_name'],
+                                                                                          self.data['middle_name'],
+                                                                                          self.data['last_name'],
+                                                                                          self.data
+                                                                                          ['original_entities']):
             fn = []
             mn = []
             ln = []
@@ -61,7 +61,7 @@ class NameDetectionTest(TestCase):
             name_detector = NameDetector(language=self.test_dict['language'][i],
                                          entity_name='person_name')
             detected_texts, original_texts = name_detector.\
-                detect_entity(text=message.decode('utf-8'))
+                detect_entity(text=message)
             zipped = zip(detected_texts, original_texts)
             print(detected_texts, original_texts)
             self.assertEqual(expected_value, zipped)
@@ -70,7 +70,5 @@ class NameDetectionTest(TestCase):
         for person_name_key in person_name_dict:
             if person_name_dict[person_name_key] == "None":
                 person_name_dict[person_name_key] = None
-            else:
-                person_name_dict[person_name_key] = person_name_dict[person_name_key].decode('utf-8')
 
         return person_name_dict
