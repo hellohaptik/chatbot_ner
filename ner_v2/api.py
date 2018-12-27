@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
@@ -8,6 +9,8 @@ from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
+
 
 from django.http import HttpResponse
 import json
@@ -242,6 +245,94 @@ def number(request):
 
     except TypeError as e:
         ner_logger.exception('Exception for numeric: %s ' % e)
+        return HttpResponse(status=500)
+
+    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
+def phone_number(request):
+    """Uses PhoneDetector to detect phone numbers
+
+        request params:
+            message (str): natural text on which detection logic is to be run. Note if structured value is
+                                   detection is run on structured value instead of message
+            entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                              if entity uses elastic-search lookup
+            structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                   detection is run on structured value instead of message
+                                   (For example, UI elements like form, payload, etc)
+            fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                             or message then we return a fallback_value as an output.
+            bot_message (str): previous message from a bot/agent.
+            source_language (str): language for which the phone numbers have to be detected
+
+        Returns:
+            response (django.http.response.HttpResponse): HttpResponse object
+        Examples:
+
+        message = "Call 02226129857 and message +1(408) 92-124 and send 100rs to 91 9820334416 9920441344"
+        entity_name = 'phone_number'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        source_language = 'en'
+
+        entity_output:
+
+         [
+        {
+            "detection": "message",
+            "original_text": "91 9820334416",
+            "entity_value": {
+                "value": "919820334416"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "9920441344",
+            "entity_value": {
+                "value": "9920441344"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "02226129857",
+            "entity_value": {
+                "value": "02226129857"
+            },
+            "language": "en"
+        },
+        {
+            "detection": "message",
+            "original_text": "+1(408) 92-124",
+            "entity_value": {
+                "value": "140892124"
+            },
+            "language": "en"
+        }
+    ]
+
+        """
+    try:
+        parameters_dict = get_parameters_dictionary(request)
+        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        entity_name = parameters_dict[PARAMETER_ENTITY_NAME]
+        language = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
+
+        ner_logger.debug('Entity Name %s' % entity_name)
+        ner_logger.debug('Source Language %s' % language)
+
+        phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
+
+        entity_output = phone_number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
+                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+    except TypeError as e:
+        ner_logger.exception('Exception for phone_number: %s ' % e)
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
