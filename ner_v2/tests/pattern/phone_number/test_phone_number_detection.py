@@ -12,7 +12,7 @@ class PhoneDetectionTest(TestCase):
         self.test_dict = self.preprocess_test_cases()
 
     def preprocess_test_cases(self):
-        self.data['original_entities'] = self.data['original_entities'].apply(lambda x: x.decode('utf-8'))
+        self.data['original_text'] = self.data['original_text'].apply(lambda x: x.decode('utf-8'))
 
         test_dict = {
             'language': [],

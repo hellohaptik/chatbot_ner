@@ -1,8 +1,0 @@
-language, message, dd, mm, yy, original_text
-en, my birthdate is on 18/01/1992, 18,01,1992, 18/01/1992
-en, "my birthdate is on 18 January, 1992", 18,01,1992, "18 january, 1992"
-en, "my birthdate is on 18th January, 1992", 18,01,1992, "18th january, 1992"
-en, my birthdate is on 18-01-1992, 18,01,1992, 18-01-1992
-hi, "मेरा जन्मदिन १८ जनुअरी, १९९२ को हे", 18,01,1992, "१८ जनुअरी, १९९२"
-hi, "मेरा जन्मदिन १८/०१/१९९२ को हे",18,01,1992, "१८/०१/१९९२"
-hi, "मेरा जन्मदिन १८-०१-१९९२ को हे",18,01,1992,"१८-०१-१९९२"
