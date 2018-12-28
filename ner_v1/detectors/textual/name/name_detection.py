@@ -391,8 +391,8 @@ class NameDetector(object):
         split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
         if split_list:
             return " ".join(split_list)
-        else:
-            return ""
+
+        return ""
 
     def detect_abusive_phrases_hindi(self, text):
         """

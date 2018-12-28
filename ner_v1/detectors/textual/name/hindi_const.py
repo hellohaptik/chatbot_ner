@@ -299,4 +299,5 @@ u'हूँ']
 
 HINDI_QUESTIONWORDS = [u'क्या', u'कब', u'कहा', u'क्यों', u'कौन', u'कौन', u'जिसे', u'जिसका', u'कैसे', u'कितने']
 
+# Variants in "name" to check for previous context flag
 NAME_VARIATIONS = ['name', u'नाम']
