@@ -23,7 +23,6 @@ class TimeDetector(BaseDetector):
         original_time_text: list to store substrings of the text detected as time entities
         tag: entity_name prepended and appended with '__'
         timezone: Optional, timezone identifier string that is used to create a pytz timezone object
-        bot_message: str, set as the outgoing bot text/message
     """
 
     @staticmethod
