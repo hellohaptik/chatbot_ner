@@ -378,6 +378,8 @@ class NameDetector(object):
                 if pattern_match[0]:
                     return pattern_match
 
+        return None
+
     def replace_stopwords_hindi(self, text):
         """
         This method is used to replace hindi stop words from the text
