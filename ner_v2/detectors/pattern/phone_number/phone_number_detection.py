@@ -89,7 +89,6 @@ class PhoneDetector(BaseDetector):
             if len(phone_number) >= 10:
                 self.phone.append(phone_number)
                 self.original_phone_text.append(original_phone_number)
-
         self.get_tagged_text()
 
         return self.phone, self.original_phone_text
