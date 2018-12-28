@@ -198,18 +198,23 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                           language_script=ENGLISH_LANG,
                           **kwargs):
     data = {
-        "query": {
-            "constant_score": {
-                "filter":
-                    {"bool": {"must": [
-                        {
-                            "term": {"entity_data": entity_name}
-                        },
-                        {
-                            "term": {"language_script": language_script}
-                        }]}}}},
-        "size": ELASTICSEARCH_SEARCH_SIZE
-    }
+            "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "entity_data": entity_name
+                        }
+                    },
+                    "filter": {
+                        "term": {
+                            "language_script": language_script
+                        }
+                    }
+                }
+            },
+            "size": ELASTICSEARCH_SEARCH_SIZE
+        }
+
     results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
     sid = results['_scroll_id']
     scroll_size = results['hits']['total']

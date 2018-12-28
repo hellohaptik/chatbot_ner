@@ -28,17 +28,22 @@ def dictionary_query(connection, index_name, doc_type, entity_name, language_scr
     """
     results_dictionary = {}
     data = {
-        "query": {
-            "constant_score": {
-                "filter":
-                    {"bool": {"must": [
-                        {
-                            "term": {"entity_data": entity_name}
-                        },
-                        {
-                            "term": {"language_script": language_script}
-                        }]}}}}
-    }
+            "query": {
+                "bool": {
+                    "must": {
+                        "term": {
+                            "entity_data": entity_name
+                        }
+                    },
+                    "filter": {
+                        "term": {
+                            "language_script": language_script
+                        }
+                    }
+                }
+            },
+            "size": ELASTICSEARCH_SEARCH_SIZE
+        }
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
