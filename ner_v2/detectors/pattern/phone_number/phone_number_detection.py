@@ -79,9 +79,17 @@ class PhoneDetector(BaseDetector):
         phone_number_original_list = self.get_number_regex()
 
         original_phone_texts = [p[0].strip() for p in phone_number_original_list]
-        self.original_phone_text = self.check_length(original_phone_texts=original_phone_texts)
-        clean_phone_list = [self.clean_phone_number(p) for p in self.original_phone_text]
-        self.phone = [self.get_number(phone) for phone in clean_phone_list]
+        original_phone_text = self.check_length(original_phone_texts=original_phone_texts)
+        clean_phone_list = [self.clean_phone_number(p) for p in original_phone_text]
+        phone = [self.get_number(phone) for phone in clean_phone_list]
+
+        self.phone, self.original_phone_text = [], []
+
+        for phone_number, original_phone_number in zip(phone, original_phone_text):
+            if len(phone_number) >= 10:
+                self.phone.append(phone_number)
+                self.original_phone_text.append(self.original_phone_text)
+
         self.get_tagged_text()
 
         return self.phone, self.original_phone_text
