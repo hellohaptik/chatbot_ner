@@ -14,7 +14,7 @@ from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
 
 class BaseRegexTime(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False, form_check=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -52,13 +52,30 @@ class BaseRegexTime(object):
             self._detect_hour_minute
         ]
 
-    def detect_time(self, text):
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message (str): previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
+
+    def detect_time(self, text, range_enabled=False, form_check=False, **kwargs):
         """
         Detects exact time for complete time information - hour, minute, time_type available in text
 
+         Args:
+            text (Union[str, unicode]): text to detect times from
+            range_enabled (bool, optional): whether to detect time ranges. Defaults to False
+            form_check (bool, optional): boolean set to False, used when passed text is a form type message
+
         Returns:
-            A tuple of two lists with first list containing the detected time entities and second list containing their
-            corresponding substrings in the given text.
+            Tuple[List[Dict[str, str]], List[Union[str, unicode]]]: tuple containing two lists,
+                first containing dictionaries, each containing containing hour, minutes
+                and meridiem/notation - either 'am', 'pm', 'hrs', 'df'
+                ('df' denotes relative difference to current time)
+                for each detected time, and second list containing corresponding original substrings in text
         """
 
         self.text = text
@@ -218,8 +235,8 @@ class BaseRegexTime(object):
         time_list = time_list or []
         original_list = original_list or []
 
-        regex_hour_match = self.regex_time.findall(self.processed_text)
-        for time_match in regex_hour_match:
+        time_matches = self.regex_time.findall(self.processed_text)
+        for time_match in time_matches:
             hh = 0
             mm = 0
             nn = None
@@ -239,7 +256,8 @@ class BaseRegexTime(object):
                 mm = self._get_float_from_numeral(time_match[5])
 
             if time_match[7]:
-                ref_date = self.now_date + int(self.datetime_constant_dict[time_match[7]][1]) * \
+                ref_date = self.now_date + \
+                           int(self.datetime_constant_dict[time_match[7]][1]) * \
                            datetime.timedelta(hours=hh, minutes=mm)
 
                 hh, mm, nn = get_hour_min_diff(self.now_date, ref_date)
@@ -280,9 +298,7 @@ class BaseRegexTime(object):
 
 
 class TimeDetector(BaseRegexTime):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False, form_check=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
         super(TimeDetector, self).__init__(entity_name=entity_name,
                                            data_directory_path=data_directory_path,
-                                           timezone=timezone,
-                                           range_enabled=range_enabled,
-                                           form_check=form_check)
+                                           timezone=timezone)

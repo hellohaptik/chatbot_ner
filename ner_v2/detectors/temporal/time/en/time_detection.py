@@ -1,5 +1,6 @@
-from datetime import datetime
 import re
+from datetime import datetime
+
 import pytz
 
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
@@ -21,11 +22,9 @@ class TimeDetector(object):
         original_time_text: list to store substrings of the text detected as time entities
         tag: entity_name prepended and appended with '__'
         timezone: Optional, timezone identifier string that is used to create a pytz timezone object
-        form_check: boolean, set to True at initialization, used when passed text is a form type message
         bot_message: str, set as the outgoing bot text/message
         departure_flag: bool, whether departure time is being detected
         return_flag: bool, whether return time is being detected
-        range_enabled: bool, whether time range needs to be detected
 
     SUPPORTED FORMAT                                            METHOD NAME
     ------------------------------------------------------------------------------------------------------------
@@ -60,7 +59,7 @@ class TimeDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False):
+    def __init__(self, entity_name, timezone='UTC'):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:
@@ -68,13 +67,6 @@ class TimeDetector(object):
                         detect_entity()
             timezone (str): timezone identifier string that is used to create a pytz timezone object
                             default is UTC
-            range_enabled (bool): whether time range needs to be detected
-            form_check (bool): Optional, boolean set to False, used when passed text is a form type message
-            language (str): ISO 639 code for language of entities to be detected by the instance of this
-                                          class
-            translation_enabled (bool): True if messages needs to be translated in case detector does not support a
-                                        particular language, else False
-
         """
         # assigning values to superclass attributes
         self.entity_name = entity_name
@@ -85,13 +77,20 @@ class TimeDetector(object):
         self.processed_text = ''
         self.time = []
         self.original_time_text = []
-        self.form_check = form_check
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
         self.timezone = timezone or 'UTC'
-        self.range_enabled = range_enabled
 
-    def _detect_time(self):
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message (str): previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
+
+    def _detect_time(self, range_enabled=False, form_check=False):
         """
         Detects all time strings in text and returns list of detected time entities and their corresponding original
         substrings in text
@@ -129,7 +128,7 @@ class TimeDetector(object):
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_time_with_once_in_x_day(time_list, original_list)
         self._update_processed_text(original_list)
-        if self.form_check:
+        if form_check:
             time_list, original_list = self._detect_24_hour_format(time_list, original_list)
             self._update_processed_text(original_list)
         time_list, original_list = self._detect_restricted_24_hour_format(time_list, original_list)
@@ -155,40 +154,42 @@ class TimeDetector(object):
             self._update_processed_text(original_list)
             time_list, original_list = self._get_default_time_range(time_list, original_list)
             self._update_processed_text(original_list)
-        if not self.range_enabled and time_list:
+        if not range_enabled and time_list:
             time_list, original_list = self._remove_time_range_entities(time_list=time_list,
                                                                         original_list=original_list)
         return time_list, original_list
 
-    def detect_time(self, text, **kwargs):
+    def detect_time(self, text, range_enabled=False, form_check=False, **kwargs):
         """
         Detects all time strings in text and returns two lists of detected time entities and their corresponding
         original substrings in text respectively.
 
         Args:
-            text (str): string to extract time entities from
-            **kwargs: it can be used to send specific arguments in future.
+            text (Union[str, unicode]): text to detect times from
+            range_enabled (bool, optional): whether to detect time ranges. Defaults to False
+            form_check (bool, optional): boolean set to False, used when passed text is a form type message
 
         Returns:
-            Tuple containing two lists, first containing dictionaries, containing
-            hour, minutes and meridiem/notation - either 'am', 'pm', 'hrs', 'df' ('df' denotes relative
-            difference to current time) for each detected time, and second list containing corresponding original
-            substrings in text
+            Tuple[List[Dict[str, str]], List[Union[str, unicode]]]: tuple containing two lists,
+                first containing dictionaries, each containing containing hour, minutes
+                and meridiem/notation - either 'am', 'pm', 'hrs', 'df'
+                ('df' denotes relative difference to current time)
+                for each detected time, and second list containing corresponding original substrings in text
 
-            Example:
-                time_detector = TimeDetector("time")
-                time_detector.detect_entity('John arrived at the bus stop at 13:50 hrs, expecting the bus to be
-                                            there in 15 mins. But the bus was scheduled for 12:30 pm')
+        Examples:
+            >>> time_detector = TimeDetector("time")
+            >>> time_detector.detect_time("John arrived at the bus stop at 13:50 hrs, expecting the bus to be"
+            >>>                           "there in 15 mins. But the bus was scheduled for 12:30 pm")
 
-                    ([{'hh': 13, 'mm': 50, 'nn': 'hrs'},
-                      {'hh': 0, 'mm': '15', 'nn': 'df'},
-                      {'hh': 11, 'mm': 50, 'nn': 'pm'}],
-                     ['12:30 pm', 'in 15 mins', '13:50'])
+            ([{'hh': 13, 'mm': 50, 'nn': 'hrs'},
+              {'hh': 0, 'mm': '15', 'nn': 'df'},
+              {'hh': 11, 'mm': 50, 'nn': 'pm'}],
+             ['12:30 pm', 'in 15 mins', '13:50'])
 
-                time_detector.tagged_text
+            >>> time_detector.tagged_text
 
-                    ' john arrived at the bus stop at __time__ hrs, expecting the bus to be there __time__.
-                    but the bus was scheduled for __time__ '
+            ' john arrived at the bus stop at __time__ hrs, expecting the bus to be there __time__.
+            but the bus was scheduled for __time__ '
 
         Additionally this function assigns these lists to self.time and self.original_time_text attributes
         respectively.
@@ -199,25 +200,10 @@ class TimeDetector(object):
         self.departure_flag = True if re.search(r'depart', self.text.lower()) else False
         self.return_flag = True if re.search(r'return', self.text.lower()) else False
         self.tagged_text = self.text.lower()
-        time_data = self._detect_time()
+        time_data = self._detect_time(range_enabled=range_enabled, form_check=form_check)
         self.time = time_data[0]
         self.original_time_text = time_data[1]
         return time_data
-
-    def _update_processed_text(self, original_time_strings):
-        """
-        Replaces detected time entities with tag generated from entity_name used to initialize the object with
-
-        A final string with all time entities replaced will be stored in object's tagged_text attribute
-        A string with all time entities removed will be stored in object's processed_text attribute
-
-        Args:
-            original_time_strings (list): list of substrings of original text to be replaced with tag created
-                                          from entity_name
-        """
-        for detected_text in original_time_strings:
-            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
-            self.processed_text = self.processed_text.replace(detected_text, '')
 
     def _detect_range_12_hour_format(self, time_list=None, original_list=None):
         """
@@ -1090,7 +1076,6 @@ class TimeDetector(object):
             suffix: "o'clock", "o' clock", "clock", "oclock", "o clock", "hours"
 
         The meridiem is given assuming the time detected to be in within 12 hour span from the current timestamp.
-        The meridiem is given assuming the time detected to be in within 12 hour span from the current timestamp.
 
         For example,
             If it is 12:30 PM at the moment of invoking this method, 1:45 would be assigned 'PM'
@@ -1424,15 +1409,6 @@ class TimeDetector(object):
 
         return time_list, original_list
 
-    def set_bot_message(self, bot_message):
-        """
-        Sets the object's bot_message attribute
-
-        Args:
-            bot_message (str): previous message that is sent by the bot
-        """
-        self.bot_message = bot_message
-
     def _remove_time_range_entities(self, time_list, original_list):
         """
         This function removes time ranges from the time list and keeps only absolute time
@@ -1457,3 +1433,18 @@ class TimeDetector(object):
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
         return time_list_final, original_list_final
+
+    def _update_processed_text(self, original_time_strings):
+        """
+        Replaces detected time entities with tag generated from entity_name used to initialize the object with
+
+        A final string with all time entities replaced will be stored in object's tagged_text attribute
+        A string with all time entities removed will be stored in object's processed_text attribute
+
+        Args:
+            original_time_strings (list): list of substrings of original text to be replaced with tag created
+                                          from entity_name
+        """
+        for detected_text in original_time_strings:
+            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            self.processed_text = self.processed_text.replace(detected_text, '')

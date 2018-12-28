@@ -154,13 +154,13 @@ def time(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         time_detection = TimeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                       language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
-                                      timezone=timezone,
-                                      form_check=form_check)
+                                      timezone=timezone)
 
         time_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         entity_output = time_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                               structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE])
+                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                              form_check=form_check)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:

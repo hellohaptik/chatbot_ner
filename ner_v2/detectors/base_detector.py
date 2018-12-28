@@ -79,7 +79,6 @@ class BaseDetector(object):
                                     (For example, UI elements like form, payload, etc)
             fallback_value (str): If the detection logic fails to detect any value either from structured_value
                               or message then we return a fallback_value as an output.
-            bot_message (str): previous message from a bot/agent.
 
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
@@ -138,7 +137,7 @@ class BaseDetector(object):
                 message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
-        entity_list, original_text_list = self.detect_entity(text=text)
+        entity_list, original_text_list = self.detect_entity(text=text, **kwargs)
 
         if structured_value:
             if entity_list:
