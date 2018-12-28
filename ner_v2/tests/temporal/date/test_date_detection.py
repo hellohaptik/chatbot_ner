@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import os
 
 from django.test import TestCase
 import datetime
@@ -13,9 +14,13 @@ class DateDetectionTest(TestCase):
         self.entity_name = 'date'
         self.timezone = pytz.timezone('UTC')
         self.now_date = datetime.datetime.now(tz=self.timezone)
+        self.TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
-    # @staticmethod
-    # def test_basic_patterns(self):
-    #     self.data = pd.read_csv('ner_v2/tests/temporal/date/data/basic_test_case.csv')
-    #     self.data['original_text'] = self.data['original_text'].apply(lambda x: x.decode('utf-8'))
-    #     for
+    @staticmethod
+    def test_basic_patterns(self):
+        list_languages = os.listdir(self.TEST_DATA_DIR)
+        for lang in list_languages:
+            file_basic_patterns = os.path.join(self.TEST_DATA_DIR, lang, 'basic_test_case.csv')
+            if os.path.isfile(file_basic_patterns):
+                self.data = pd.read_csv(file_basic_patterns)
+                date_detector = DateDetector(self.entity_name, language=lang)
