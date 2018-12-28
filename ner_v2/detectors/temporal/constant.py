@@ -31,7 +31,7 @@ REF_DATETIME_TYPE = 'ref_datetime'
 
 HOUR_TIME_TYPE = 'hour'
 MINUTE_TIME_TYPE = 'minute'
-DAYTIME_MERIDIAN = 'daytime_meridian'
+DAYTIME_MERIDIEM = 'daytime_meridiem'
 
 POSITIVE_TIME_DIFF = 'df'
 NEGATIVE_TIME_DIFF = 'ndf'
