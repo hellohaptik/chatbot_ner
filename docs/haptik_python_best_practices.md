@@ -23,38 +23,6 @@ format.
 * Instance methods in classes should use `self` as the name of the first parameter (which refers to the object).
 * Class methods should use `cls` as the name of the first parameter (which refers to the class).
 
-# Docstrings and Comments
-* Always write a function with docstring. The docstring for a function or method should summarize its behavior and
- document its arguments, return value(s), side effects, exceptions raised, and restrictions on when it can be called
-  (all if applicable). Optional arguments should be indicated. For consistency, always use
-   """triple double quotes""" around docstrings.
-
-```python
-
-def get_surge_msg(cab_list):
-    """It will create surge msg if surge exist.
-
-    Params
-        cab_list (list)
-            list of dict which will contain cabs info
-
-    Returns
-        surge_msg (str)
-            Surge coupon msg if surge exist in cabs and surge cache exist
-
-    Raises
-        NoMessageFoundException
-            It is raised when expected key is missing from content store
-    """
-    .
-    .
-```
-* Comments should be complete sentences. Its first word should be capitalized, unless it is an identifier.
-* Use one space after "#" for one liner comments
-* Use inline comments sparingly. It should be separated by at least two spaces from the statement.
-
-
-
 # Expressions and Statements
 * Don’t check for empty values (like [] or '') by checking the length 
 `if len(somelist) == 0)`. Use `if not somelist` and assume empty values implicitly evaluate to False.
@@ -63,6 +31,7 @@ def get_surge_msg(cab_list):
 * Always put import statements at the top of a file.
 * Never user `import *`.
 * Imports should be in sections in the following order: standard library modules, thirdparty modules, your own modules.
+
 ```python
 # Standard library modules
 import datetime
@@ -76,6 +45,7 @@ from django.db.models import Q
 from haptik_chats.models import ChatCollections
 
 ```
+
 * Python’s syntax makes it all too easy to write single-line expressions that are overly complicated and difficult to read. Move complex expressions into helper functions, especially if you need to use the same logic repeatedly.
 * Prefer using List comprehensions instead of map and filter. Its easier to read as they don’t require extra lambda expressions.
 ```python
