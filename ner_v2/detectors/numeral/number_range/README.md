@@ -86,34 +86,28 @@ In order to add any new language you have to follow below steps:
 
 Below is the brief about how to create data file `number_range_keywords.csv` All the description of the file is explained using hindi as a reference language. 
 
-1. **number_range_keywords.csv**:  This files contains the vocabs for keywords which are present before or after or in between number values which defines whether the given is min or max value .
+1. **number_range_keywords.csv**:  This files contains the vocabs for range keywords, their position around number values and their range type.
 
    |                        range_variants                        | position | range_type |
    | :----------------------------------------------------------: | :------: | :--------: |
-   | k uper\| se upar\| se jada \| se adhik \| के ऊपर\|  से ज्यादा \|से जादा \| से अधिक |    1     |    max     |
+   | k uper\| se upar\| se jada \| se adhik \| के ऊपर\|  से ज्यादा \|से जादा \| से अधिक |    1     |    min     |
    |                     kam se kam\| कम से कम                     |    -1    |    min     |
    | jyada se jyada \| lagbhag \| ज्यादा से ज्यादा \| जादा से जादा \| लगभग |    -1    |    max     |
    | se niche \| se kam \| se sasta \| se saste k aas paas\|  k aas pas\| k lagbhag \|  से नीचे \| से कम \| से सस्ता \| से सस्ते \|   के आस पास  \| के लगभग |    1     |    max     |
    |                           se\|-\|से                           |    0     |  min_max   |
 
-   Here, 1st column will contain the number in their respective language script. 2nd column corresponds to numerals or name variants of number in respective language script and in english script.  
+   Here, 1st column will contain the variants of range keywords seperated by pipes, which are present before or after or in between number values and defines what type of number value is present, either min or max. 
 
-   3rd column contains the value representation of language number. 
+   2rd column corresponds to position of the keyword. If 1 means it will be present after number value, -1 if present before number.  
 
-   4th column define the whether the number is unit or scale. Units are individual numbers while scale are used with unit number to form numbers. Example - for number "200" , `2` is unit number and scale of  `100` is used to form a new number i.e `200`.    
+   3rd column define the range type of number i.e if it contains min value or max value or both.    
 
-2. **units.csv**:  This files contains the vocabs of units for number and their correspoding all variants possible .
+   **For example** - *mujhe 2000 se jada log chahiye kal ki rally me* . In this text, range keyword `se jada` which is present in position `1` (after number) defines that number `2000` is minimum value defined in text, no maximum value given in text, hence it will be null.
 
-   | unit_type | unit_value |                        unit_variants                         |
-   | --------- | :--------: | :----------------------------------------------------------: |
-   | currency  |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
-   | currency  |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
 
-   Here, the 1st column contains the type of unit (E.g. dollars, euros are "currency", centimetre, metre, kilometre are "distance"), 2nd column contains the value of unit which will be returned by number detector and 3rd column contains all the possible variants of that unit value (delimited by pipe `|`) for the language you are adding. (It is recommended to add Romanised versions of the variants you are adding)
+#### Guidelines to add new detectors for number range apart from builtin ones:
 
-#### Guidelines to add new detectors for number apart from builtin ones:
-
-Create a new class `number_detection.py`  inside language directory.
+Create a new class `number_range_detection.py`  inside language directory.
 To start with copy the code below
 
 ```python
@@ -121,66 +115,68 @@ import re
 import os
 
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.numeral.constant import NUMBER_DETECT_UNIT, NUMBER_DETECT_VALUE
-from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
+from ner_v2.detectors.numeral.constant import NUMBER_REPLACE_TEXT
+from ner_v2.detectors.numeral.number_range.standard_number_range_detector import BaseNumberRangeDetector
 
 
-class NumberDetector(BaseNumberDetector):
+class NumberRangeDetector(BaseNumberRangeDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name='number', unit_type=None):
-        super(NumberDetector, self).__init__(entity_name=entity_name,
-                                            
-                                        data_directory_path=NumberDetector.data_directory_path,
-                                             unit_type=unit_type)
-
+    def __init__(self, entity_name, language, unit_type=None):
+        super(NumberRangeDetector, self).__init__(entity_name=entity_name,
+                                                  language=language,
+                                                  data_directory_path=NumberRangeDetector.data_directory_path,
+                                                  unit_type=unit_type)
 ```
 
-Note that the class name must be `NumberDetector` 
-and should inherit from `ner_v2.detectors.numeral.number.standard_number_detector.BaseNumberDetector`
+Note that the class name must be `NumberRangeDetector` 
+and should inherit from `ner_v2.detectors.numeral.number_range.standard_number_range_detector.BaseNumberRangeDetector`
 
-Next we define a custom detector. For our purposes we will add a detector to detect text '2 people' and `2` as number and unit as `people`.
+Next we define a custom detector. For our purposes we will add a detector to detect number range from text 'between 2k and 3k' and `2000` as minimum value and `3000` as maximum value and unit as `None`.
 
-1. The custom detector must accept two arguments `number_list` and `original_list` and must operate on `self.processed_text`
-2. The two arguments `number_list` and `original_list` can both be either None or lists of same length.
-   `number_list` contains parsed number values and `original_list` contains their corresponding text substrings in the passed text that were detected as numbers.
-3. Your detector must appened parsed number dicts with keys `'value', 'unit'` to `number_list`
+1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.number_tagged_processed_text` (This text contained tagged number text i.e number will be replace with `__dnumber__<number>`) . So in your pattern you just have to include pattern with number tag instead of `\d+` for number. (as it handle all number having decimal, ordinal and int)
+2. The two arguments `number_range_list` and `original_list` can both be either None or lists of same length.
+   `number_range_list` contains parsed min and max value  along with unit and `original_list` contains their corresponding text substrings in the passed text that were detected as numbers range.
+3. Your detector must appened parsed number range dicts with keys `'min_value', 'max_value', 'unit'` to `number_range_list`
    and to `original_list` their corresponding substrings from `self.processed_text` that were parsed into numbers.
 4. Take care to not mutate `self.processed_text` in any way as main detect method in base class depends on it to eliminate already detected number from it after each detector is run.
-5. Finally your detector must return a tuple of (number_list, original_list). Ensure that `number_list` and `original_list` are of equal lengths before returning them.
+5. Finally your detector must return a tuple of (number_range_list, original_list). Ensure that `number_range_list` and `original_list` are of equal lengths before returning them.
 
 ```python
-    def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
-        number_list = number_list or []
+    def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
+        number_range_list = number_range_list or []
         original_list = original_list or []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
-                              self.processed_text.lower())
-        for pattern in patterns:
-            number_list.append({
-                NUMBER_DETECT_VALUE: pattern[2],
-                NUMBER_DETECT_UNIT: 'people'
-            })
-            original_list.append(pattern[0])
-
-        return number_list, original_list
+        between_min_max_range_regex = re.compile(r'(between\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:and|to)\s*('
+                                                 + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
+        number_range_matches = between_min_max_range_regex.findall(self.number_tagged_processed_text)
+        for match in number_range_matches:
+            number_range_list, original_list = \
+                self._update_number_range_and_original_list(number_tag_min=match[1], number_tag_max=match[2],
+                                                            matched_text=match[0],
+                                                            number_range_list=number_range_list,
+                                                            original_list=original_list)
+        return number_range_list, original_list
 ```
 
 Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default ordering from 
-`detectors.numeral.number.standard_number_detector.BaseNumberDetector` and inject your own detectors in between.
+`detectors.numeral.number_range.standard_number_range_detector.BaseNumberRangeDetector` and inject your own detectors in between.
 Below we show an example where we put our custom detector on top to execute it before some builtin detectors.
 
 ```python
-	def __init__(self, entity_name='number', unit_type=None):
-        super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             data_directory_path=NumberDetector.data_directory_path,
-                                            unit_type=unit_type)
+    def __init__(self, entity_name, language, unit_type=None):
+        super(NumberRangeDetector, self).__init__(entity_name=entity_name,
+                                                  language=language,
+                                                  data_directory_path=NumberRangeDetector.data_directory_path,
+                                                  unit_type=unit_type)
 
-        self.detector_preferences = [
-            self._custom_detect_number_of_people_format,
-            self._detect_number_from_digit,
-            self._detect_number_from_numerals
-        ]
+        self.detector_preferences = [self._detect_min_num_range_with_start_variant,
+                                     self._detect_min_num_range_with_end_variant,
+                                     self._detect_max_num_range_with_start_variant,
+                                     self._detect_max_num_range_with_end_variant,
+                                     self._detect_min_max_num_range,
+                                     self._custom_num_range_between_num_and_num
+                                     ]
 ```
 
 Putting it all together, we have
@@ -190,44 +186,57 @@ import re
 import os
 
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.numeral.constant import NUMBER_DETECT_UNIT, NUMBER_DETECT_VALUE
-from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
+from ner_v2.detectors.numeral.constant import NUMBER_REPLACE_TEXT
+from ner_v2.detectors.numeral.number_range.standard_number_range_detector import BaseNumberRangeDetector
 
 
-class NumberDetector(BaseNumberDetector):
+class NumberRangeDetector(BaseNumberRangeDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name='number', unit_type=None):
-        super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             
-                                             data_directory_path=NumberDetector.data_directory_path,
-                                             unit_type=unit_type)
+    def __init__(self, entity_name, language, unit_type=None):
+        super(NumberRangeDetector, self).__init__(entity_name=entity_name,
+                                                  language=language,
+                                                  data_directory_path=NumberRangeDetector.data_directory_path,
+                                                  unit_type=unit_type)
 
+        self.detector_preferences = [self._detect_min_num_range_with_start_variant,
+                                     self._detect_min_num_range_with_end_variant,
+                                     self._detect_max_num_range_with_start_variant,
+                                     self._detect_max_num_range_with_end_variant,
+                                     self._detect_min_max_num_range,
+                                     self._custom_num_range_between_num_and_num
+                                     ]
 
-        self.detector_preferences = [
-            self._custom_detect_number_of_people_format,
-            self._detect_number_from_digit,
-            self._detect_number_from_numerals
-        ]
+    def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
+        """Detects number range of text of pattern between number1 to number2
+        This is a custom created patterns which will be called after all the standard detector will ran.
 
-    def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
-        number_list = number_list or []
+        Returns:
+            A tuple of two lists with first list containing the detected number ranges and second list
+            containing their corresponding substrings in the original message.
+
+            For example:
+                input text: "my salary range is between 2000 to 3000"
+                output: ([{'min_value': '2000', 'max_value': '3000', 'unit': None}], ['between 2000 to 3000'])
+
+        """
+        number_range_list = number_range_list or []
         original_list = original_list or []
-        patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
-                              self.processed_text.lower())
-        for pattern in patterns:
-            number_list.append({
-                NUMBER_DETECT_VALUE: pattern[2],
-                NUMBER_DETECT_UNIT: 'people'
-            })
-            original_list.append(pattern[0])
-
-        return number_list, original_list
+        between_min_max_range_regex = re.compile(r'(between\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:and|to)\s*('
+                                                 + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
+        number_range_matches = between_min_max_range_regex.findall(self.number_tagged_processed_text)
+        for match in number_range_matches:
+            number_range_list, original_list = \
+                self._update_number_range_and_original_list(number_tag_min=match[1], number_tag_max=match[2],
+                                                            matched_text=match[0],
+                                                            number_range_list=number_range_list,
+                                                            original_list=original_list)
+        return number_range_list, original_list
 
 ```
 
-For a working example, please refer `ner_v2/detectors/numerals/number/en/number_detection.py`
+For a working example, please refer `ner_v2/detectors/numerals/number_range/en/number_range_detection.py`
 
 **Please note that the API right now is too rigid and we plan to change it to make it much more
 easier to extend in the future**
