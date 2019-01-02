@@ -31,7 +31,7 @@ NUMBER_RANGE_FILE_RANGE_TYPE_COLUMN_NAME = 'range_type'
 
 # Number range types
 NUMBER_RANGE_MIN_TYPE = 'min'
-NUMBER_RANGE_MAX_TYPE = 'min'
+NUMBER_RANGE_MAX_TYPE = 'max'
 NUMBER_RANGE_MIN_MAX_TYPE = 'min_max'
 
 # Replace text for number detected in number range
