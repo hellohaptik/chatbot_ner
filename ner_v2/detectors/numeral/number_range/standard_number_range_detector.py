@@ -208,7 +208,7 @@ class BaseNumberRangeDetector(object):
 
         original_text = self._get_original_text_from_tagged_text(matched_text)
         if entity_value_min or entity_value_max and original_text:
-            original_list.append(original_text)
+            original_list.append(original_text.strip())
             number_range_list.append({
                 NUMBER_RANGE_MIN_VALUE: entity_value_min,
                 NUMBER_RANGE_MAX_VALUE: entity_value_max,
@@ -314,7 +314,7 @@ class BaseNumberRangeDetector(object):
         original_list = original_list or []
 
         if self.max_range_end_variants:
-            max_end_choices = "|".join(self.min_range_end_variants)
+            max_end_choices = "|".join(self.max_range_end_variants)
             max_range_end_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s+(?:' + max_end_choices + r'))',
                                              re.UNICODE)
             number_range_matches = max_range_end_regex.findall(self.number_tagged_processed_text)
