@@ -115,8 +115,10 @@ class BaseNumberRangeDetector(object):
             [Out] >> 'i want to buy __number__1 apples and more than __number__2 bananas'
         """
         tagged_number_text = processed_text
-        for number_tag, value in self.number_detected_map.items():
-            tagged_number_text = tagged_number_text.replace(value[1], number_tag, 1)
+        sorted_number_detected_map = sorted(self.number_detected_map.items(), key=lambda kv: len(kv[1][1]),
+                                            reverse=True)
+        for number_tag in sorted_number_detected_map:
+            tagged_number_text = tagged_number_text.replace(number_tag[0], number_tag[1][1], 1)
         return tagged_number_text
 
     def _get_number_tag_dict(self):
