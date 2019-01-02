@@ -118,7 +118,7 @@ class BaseNumberRangeDetector(object):
         sorted_number_detected_map = sorted(self.number_detected_map.items(), key=lambda kv: len(kv[1][1]),
                                             reverse=True)
         for number_tag in sorted_number_detected_map:
-            tagged_number_text = tagged_number_text.replace(number_tag[0], number_tag[1][1], 1)
+            tagged_number_text = tagged_number_text.replace(number_tag[1][1], number_tag[0], 1)
         return tagged_number_text
 
     def _get_number_tag_dict(self):
