@@ -46,8 +46,8 @@ class BaseNumberRangeDetector(object):
         self.min_max_range_variants = None
         self.number_detected_map = None
 
-        self.language_number_detector = NumberDetector(entity_name=entity_name, language=language, unit_type=unit_type)
-        self.language_number_detector.set_min_max_digits(1, 100)
+        self.number_detector_object = NumberDetector(entity_name=entity_name, language=language)
+        self.number_detector_object.set_min_max_digits(1, 100)
 
         # Method to initialise regex params
         self.init_regex_for_range(data_directory_path)
@@ -133,7 +133,7 @@ class BaseNumberRangeDetector(object):
             [Out] >> {'__number_1': ({'value': 12, 'unit': None}, '12')}
         """
         detected_number_dict = {}
-        entity_value_list, original_text_list = self.language_number_detector.detect_entity(self.processed_text)
+        entity_value_list, original_text_list = self.number_detector_object.detect_entity(self.processed_text)
         index = 1
         for entity_value, original_text in zip(entity_value_list, original_text_list):
             detected_number_dict[NUMBER_REPLACE_TEXT + str(index)] = (entity_value, original_text)
@@ -207,6 +207,11 @@ class BaseNumberRangeDetector(object):
             entity_dict = self.number_detected_map[number_tag_max][0]
             entity_value_max = entity_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]
             entity_unit = entity_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
+
+        if self.unit_type and \
+                (entity_unit is None or
+                 self.number_detector_object.language_number_detector.units_map[entity_unit].type != self.unit_type):
+            return number_range_list, original_list
 
         original_text = self._get_original_text_from_tagged_text(matched_text)
         if entity_value_min or entity_value_max and original_text:
