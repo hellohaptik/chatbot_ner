@@ -12,28 +12,30 @@ class NumberRangeDetectorTest(TestCase):
         self.csv_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'number_range_detection_test.csv')
 
     @staticmethod
-    def _get_value(val):
-        if not val:
-            return None
+    def _get_value_list(val):
         val = val.lower().strip()
-        if val == 'na':
-            return None
-        return val
+        val_list = []
+        for v in val.split('|'):
+            if v == 'na':
+                val_list.append(None)
+            else:
+                val_list.append(v)
+        return val_list
 
     def _make_expected_output(self, min_values, max_values, units, original_texts):
         entity_values_list = []
         original_texts_list = []
 
-        if not original_texts:
+        if original_texts == 'NA':
             return entity_values_list, original_texts_list
 
-        min_values = [self._get_value(x) for x in min_values.split('|')]
-        max_values = [self._get_value(x) for x in max_values.split('|')]
-        units = [self._get_value(x) for x in units.split('|')]
-        original_texts = [self._get_value(x) for x in original_texts.split('|')]
+        min_values = self._get_value_list(min_values)
+        max_values = self._get_value_list(max_values)
+        units = self._get_value_list(units)
+        original_texts = self._get_value_list(original_texts)
 
         for min_value, max_value, unit, original_text in zip(min_values, max_values, units, original_texts):
-            entity_values_list.append({'min_value': min_value, 'max_value': max_values, 'unit': unit})
+            entity_values_list.append({'min_value': min_value, 'max_value': max_value, 'unit': unit})
             original_texts_list.append(original_text)
 
         return entity_values_list, original_texts_list
@@ -45,7 +47,7 @@ class NumberRangeDetectorTest(TestCase):
             print('Running tests for language {}'.format(language))
             for index, row in language_tests_df.iterrows():
                 message = row['message']
-                unit_type = row['unit_type'] or None
+                unit_type = None if row['unit_type'] == 'NA' else row['unit_type']
                 number_range_detector = NumberRangeDetector(entity_name='number_range', language=language,
                                                             unit_type=unit_type)
                 expected_entity_values_list, expected_original_texts_list = \
