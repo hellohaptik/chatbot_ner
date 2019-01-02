@@ -68,5 +68,5 @@ hi,२०० -  ३००  रुपया,currency,200,300,rupees,२०० -  
 hi,२०० रुपया -  ३००  ,currency,200,300,rupees,२०० रुपया -  ३००  
 hi,२०० रुपया -  ३०० रुपया  ,currency,200,300,rupees,२०० रुपया -  ३०० रुपया  
 hi,२००-३०० रुपया  ,currency,200,300,rupees,२००-३०० रुपया  
-en,200k-300k men and around 400 women,NA,200000|NA,300000|400,NA|NA,200k-300k|400
-en,200k-300k men and around 300k women,NA,200000|NA,300000|300000,NA|NA,200k-300k|300k
+en,200k-300k men and around 400 women,NA,200000|NA,300000|400,NA|NA,200k-300k|around 400
+en,200k-300k men and around 300k women,NA,200000|NA,300000|300000,NA|NA,200k-300k| around 300k
