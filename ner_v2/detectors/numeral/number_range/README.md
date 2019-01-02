@@ -1,57 +1,53 @@
-## Number Detector 
+## Number Range Detector 
 
-This is the V2 version of Number detector module that will detect number and number word from text in multiple languages. This detector module adds an additional feature of detecting units along with number in text. Example -  for a given text "5 kg", this module will return `5`  as detected value and `kg` as detected unit. 
+This detector module will help to detect minimum and maximum number values from text containing range values. For example - "200 to 300" (minimum=200 and maximum=300),  "more than 2000" (mininum=2000, maximum=Not define) 
 
  We are currently providing number detection supports in 6 languages, which are
 
 - English
 - Hindi
-- Marathi
-- Gujarati
-- Telgu
-- Tamil
 
 ### Usage
 
 - **Python Shell**
 
   ```python
-  >> from ner_v2.detector.number.number.number_detection import NumberDetector
-  >> detector = NumberDetector(entity_name='number', language='en')  # here language will be ISO 639-1 code
-  >> detector.detect_entity(text= 'I want 4000 rs')
-  >> {'entity_value': [{'value': '4000', 'unit': 'rupees'}], 'original_text':['4000 rs']}
+  >> from ner_v2.detector.number.number_range.number_range_detection import NumberRangeDetector
+  >> detector = NumberRangeDetector(entity_name='number_range', language='en')  # here language will be ISO 639-1 code
+  >> detector.detect_entity(text= 'I annual salary is 200k-500k rupees')
+  >> {'entity_value': [{'min_val': '200000', 'max_value': '500000', 'unit': 'rupees'}], 'original_text':['200k-500k rupees']}
   ```
 
 - **Curl Command**
 
   ```bash
   # For a sample query with following parameters
-  # message="do hajaar chaar sau"
-  # entity_name='number'
+  # message="i want more than 12 mangoes"
+  # entity_name='number_range'
   # structured_value=None
   # fallback_value=None
   # bot_message=None
-  # min_number_digits=1
-  # max_number_digits=6
-  # source_language='hi'
-  # language_script='hi'
+  # unit_type=None
+  # source_language='en'
+  # language_script='en'
   
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi'
+  $ curl -i 'http://'$URL':'$PORT'/v2/number_range?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&source_language=en&language_script=en&unit_type='
   
   # Curl output
   $ {
       "data": [
           {
               "detection": "message",
-              "original_text": "do hajaar chaar sau",
+              "original_text": "more than 12",
               "entity_value": {
-                  "unit": null,
-                  "value": "2400"
+                  "max_value": null,
+                  "min_value": "12",
+                  "unit": null
               },
-              "language": "hi"
+              "language": "en"
           }
       ]
   }
@@ -59,15 +55,15 @@ This is the V2 version of Number detector module that will detect number and num
 
   
 
-### Steps to add new language for Number detection
+### Steps to add new language for Number Range detection
 
 In order to add any new language you have to follow below steps:
 
-1. Create a directory with `ISO 639-1` code of that language inside `ner_v2/detectors/numeral/number/`.  
+1. Create a directory with `ISO 639-1` code of that language inside `ner_v2/detectors/numeral/number_range/`.  
 
 2. Create a directory named `data` inside language_code folder.
 
-3. Add two files named `numerals_constant.csv`, `units.csv` inside data folder.  
+3. Add a CSV files named `number_range_keywords.csv` inside data folder.  
 
    Below is the folder structure of same after adding all the files for new language `xy`.
 
@@ -75,12 +71,11 @@ In order to add any new language you have to follow below steps:
    |__ner_v2
          |___detectors
              |___numeral
-                 |___number
+                 |___number_range
                      |___xy    # <- New language Added 
                      |	  |___data
-                     |      |___numerals_constant.csv
-                     |      |___units.csv
-                     |
+                     |      |___number_range_keywords.csv
+                     |      
                      |__number_detection.py 
    ```
 
@@ -89,17 +84,17 @@ In order to add any new language you have to follow below steps:
 
 ####  GuideLines to create data files
 
-Below is the brief about how to create data files `numerals_constant.csv`, `units.csv. `  All the description of each file is explained using hindi as a reference language. 
+Below is the brief about how to create data file `number_range_keywords.csv` All the description of the file is explained using hindi as a reference language. 
 
-1. **numerals_constant.csv**:  This files contains the vocabs for number, their numerals/name variants, correspoding number value and their type .
+1. **number_range_keywords.csv**:  This files contains the vocabs for keywords which are present before or after or in between number values which defines whether the given is min or max value .
 
-   | number |     name_variants      | value  | type  |
-   | :----: | :--------------------: | :----: | :---: |
-   |   ०    |    शून्य\|zero\|sunya    |   0    | unit  |
-   |   १    |       एक\|ek\|ik       |   1    | unit  |
-   |  १.५   | डेढ़\|ढेड़\|देढ़\|dedh\|dhed |  1.5   | unit  |
-   |  १००   |      सौ\|sau\|sao      |  100   | scale |
-   | १००००० | लाख\|lakh\|laakh\|lac  | 100000 | scale |
+   |                        range_variants                        | position | range_type |
+   | :----------------------------------------------------------: | :------: | :--------: |
+   | k uper\| se upar\| se jada \| se adhik \| के ऊपर\|  से ज्यादा \|से जादा \| से अधिक |    1     |    max     |
+   |                     kam se kam\| कम से कम                     |    -1    |    min     |
+   | jyada se jyada \| lagbhag \| ज्यादा से ज्यादा \| जादा से जादा \| लगभग |    -1    |    max     |
+   | se niche \| se kam \| se sasta \| se saste k aas paas\|  k aas pas\| k lagbhag \|  से नीचे \| से कम \| से सस्ता \| से सस्ते \|   के आस पास  \| के लगभग |    1     |    max     |
+   |                           se\|-\|से                           |    0     |  min_max   |
 
    Here, 1st column will contain the number in their respective language script. 2nd column corresponds to numerals or name variants of number in respective language script and in english script.  
 
