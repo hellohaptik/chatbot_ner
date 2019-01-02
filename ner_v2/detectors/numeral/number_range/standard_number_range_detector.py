@@ -233,8 +233,8 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_start_variants:
             min_start_choices = "|".join(self.min_range_start_variants)
-            min_range_start_regex = re.compile(r'(' + min_start_choices + r'\s+(' + NUMBER_REPLACE_TEXT +
-                                               r'[\d+])' + r')')
+            min_range_start_regex = re.compile(r'((?:' + min_start_choices + r')\s+(' + NUMBER_REPLACE_TEXT +
+                                               r'[\d+])' + r')', re.UNICODE)
             number_range_matches = min_range_start_regex.findall(self.number_tagged_processed_text)
             for match in number_range_matches:
                 number_range_list, original_list = \
@@ -260,7 +260,8 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_end_variants:
             min_end_choices = "|".join(self.min_range_end_variants)
-            min_range_end_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s+' + min_end_choices + r')')
+            min_range_end_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s+(?:' + min_end_choices + r'))',
+                                             re.UNICODE)
             number_range_matches = min_range_end_regex.findall(self.number_tagged_processed_text)
             for match in number_range_matches:
                 number_range_list, original_list = \
@@ -287,8 +288,8 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_start_variants:
             max_start_choices = "|".join(self.max_range_start_variants)
-            max_range_start_regex = re.compile(r'(' + max_start_choices + r'\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])'
-                                               + r')')
+            max_range_start_regex = re.compile(r'((?:' + max_start_choices + r')\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])'
+                                               + r')', re.UNICODE)
             number_range_matches = max_range_start_regex.findall(self.number_tagged_processed_text)
             for match in number_range_matches:
                 number_range_list, original_list = \
@@ -314,7 +315,8 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_end_variants:
             max_end_choices = "|".join(self.min_range_end_variants)
-            max_range_end_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s+' + max_end_choices + r')')
+            max_range_end_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s+(?:' + max_end_choices + r'))',
+                                             re.UNICODE)
             number_range_matches = max_range_end_regex.findall(self.number_tagged_processed_text)
             for match in number_range_matches:
                 number_range_list, original_list = \
@@ -341,8 +343,8 @@ class BaseNumberRangeDetector(object):
 
         if self.min_max_range_variants:
             min_max_choices = "|".join(self.min_max_range_variants)
-            min_max_range_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s*' + min_max_choices + r'\s*('
-                                             + NUMBER_REPLACE_TEXT + r'[\d+]))')
+            min_max_range_regex = re.compile(r'((' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:' + min_max_choices + r')\s*('
+                                             + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
             number_range_matches = min_max_range_regex.findall(self.number_tagged_processed_text)
             for match in number_range_matches:
                 number_range_list, original_list = \

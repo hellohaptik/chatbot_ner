@@ -73,7 +73,7 @@ class NumberRangeDetector(BaseDetector):
         # assigning values to superclass attributes
         self._supported_languages = self.get_supported_languages()
         super(NumberRangeDetector, self).__init__(language)
-        self.entity_name = entity_name
+        self.entity_name = entity_nam
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
