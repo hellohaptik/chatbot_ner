@@ -24,19 +24,19 @@ en,200 rupees – 300 rupees,currency,200,300,rupees,200 rupees – 300 rupees
 en,200-300 rupees,currency,200,300,rupees,200-300 rupees
 hi,200 se jyada,NA,200,NA,NA,200 se jyada
 hi,2k se upar,NA,2000,NA,NA,2k se upar
-hi,jada se jada 2.5k,NA,2500,NA,NA,jada se jada 2.5k
-hi,200 se jyada,currency,NA,NA,NA,200 se jyada
-hi,2k se upar,currency,NA,NA,NA,2k se upar
-hi,jada se jada 2.5k,currency,NA,NA,NA,jada se jada 2.5k
+hi,jada se jada 2500,NA,NA,2500,NA,jada se jada 2500
+hi,200 se jyada,currency,NA,NA,NA,NA
+hi,2k se upar,currency,NA,NA,NA,NA
+hi,jada se jada 2500,currency,NA,NA,NA,NA
 hi,200 rupees se jyada ,currency,200,NA,rupees,200 rupees se jyada 
-hi,Rupees 2k se upar,currency,2000,NA,rupees,Rupees 2k se upar
-hi,jada se jada 2.5k rupees,currency,2500,NA,rupees,jada se jada 2.5k rupees
+hi,Rupees 2000 se upar,currency,2000,NA,rupees,Rupees 2000 se upar
+hi,jada se jada 2500 rupees,currency,NA,2500,rupees,jada se jada 2500 rupees
 hi,200 se 300,NA,200,300,NA,200 se 300
 hi,200 – 300,NA,200,300,NA,200 – 300
 hi,200-300,NA,200,300,NA,200-300
-hi,200 se 300,currency,NA,NA,NA,200 se 300
-hi,200 – 300,currency,NA,NA,NA,200 – 300
-hi,200-300,currency,NA,NA,NA,200-300
+hi,200 se 300,currency,NA,NA,NA,NA
+hi,200 – 300,currency,NA,NA,NA,NA
+hi,200-300,currency,NA,NA,NA,NA
 hi,200 se 300 rupees,currency,200,300,rupees,200 se 300 rupees
 hi,200 – 300 rupees,currency,200,300,rupees,200 – 300 rupees
 hi,200-300 rupees,currency,200,300,rupees,200-300 rupees
@@ -47,19 +47,19 @@ hi,200 rupees – 300 rupees,currency,200,300,rupees,200 rupees – 300 rupees
 hi,200-300 rupees,currency,200,300,rupees,200-300 rupees
 hi,२०० से ज्यादा,NA,200,NA,NA,२०० से ज्यादा
 hi,२ हजार से ऊपर  ,NA,2000,NA,NA,२ हजार से ऊपर  
-hi,ज्यादा से ज्यादा २.५ हजार,NA,2500,NA,NA,ज्यादा से ज्यादा २.५ हजार
-hi,२०० से ज्यादा,currency,NA,NA,NA,२०० से ज्यादा
-hi,२ हजार से ऊपर  ,currency,NA,NA,NA,२ हजार से ऊपर  
-hi,ज्यादा से ज्यादा २.५ हजार,currency,NA,NA,NA,ज्यादा से ज्यादा २.५ हजार
+hi,ज्यादा से ज्यादा २ हजार,NA,NA,2000,NA,ज्यादा से ज्यादा २ हजार
+hi,२०० से ज्यादा,currency,NA,NA,NA,NA
+hi,२ हजार से ऊपर  ,currency,NA,NA,NA,NA
+hi,ज्यादा से ज्यादा ५ हजार,currency,NA,NA,NA,NA
 hi,२०० रूपीस से ज्यादा,currency,200,NA,rupees,२०० रूपीस से ज्यादा
 hi,रूपीस २ हजार से ऊपर  ,currency,2000,NA,rupees,रूपीस २ हजार से ऊपर  
-hi,ज्यादा से ज्यादा २.५ हजार रुपया,currency,2500,NA,rupees,ज्यादा से ज्यादा २.५ हजार रुपया
+hi,ज्यादा से ज्यादा ५ हजार रुपया,currency,NA,5000,rupees,ज्यादा से ज्यादा ५ हजार रुपया
 hi,२०० से  ३००  ,NA,200,300,NA,२०० से  ३००  
 hi,२०० – ३००,NA,200,300,NA,२०० – ३००
 hi,२००-३००,NA,200,300,NA,२००-३००
-hi,२०० से  ३००  ,currency,NA,NA,NA,२०० से  ३००  
-hi,२०० – ३००,currency,NA,NA,NA,२०० – ३००
-hi,२००-३००,currency,NA,NA,NA,२००-३००
+hi,२०० से  ३००  ,currency,NA,NA,NA,NA
+hi,२०० – ३००,currency,NA,NA,NA,NA
+hi,२००-३००,currency,NA,NA,NA,NA
 hi,२०० से  ३००  रुपया,currency,200,300,rupees,२०० से  ३००  रुपया
 hi,२००-३००  रुपया,currency,200,300,rupees,२००-३००  रुपया
 hi,२०० रुपया से ३०० ,currency,200,300,rupees,२०० रुपया से ३०० 

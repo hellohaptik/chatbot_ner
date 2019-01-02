@@ -19,7 +19,7 @@ class NumberRangeDetectorTest(TestCase):
             if v == 'na':
                 val_list.append(None)
             else:
-                val_list.append(v)
+                val_list.append(v.strip())
         return val_list
 
     def _make_expected_output(self, min_values, max_values, units, original_texts):
