@@ -21,8 +21,9 @@ class NumberDetector(BaseDetector):
         print numbers, ' -- ', original_numbers
         print 'Tagged text: ', tagged_text
 
-         >> ['30', '40'] -- ['30', '40']
-            Tagged text: I want to purchase 30 units of mobile and 40 units of Television'
+         >> [{'value': '30', 'unit': None}, {'value': 40, 'unit': None}] -- ['30', '40']
+            Tagged text: I want to purchase __number_of_units__ units of mobile and __number)of_units__
+            units of Television'
 
 
         number_detector = NumberDetector("number_of_people")
@@ -33,7 +34,7 @@ class NumberDetector(BaseDetector):
         print numbers, ' -- ', original_numbers
         print 'Tagged text: ', tagged_text
 
-         >> ['3'] -- ['for 3 people']
+         >> [{'value': '3', 'unit': 'people'}] -- ['3 people']
             Tagged text: Can you please help me to book tickets __number_of_people__
 
     Attributes:
@@ -120,7 +121,7 @@ class NumberDetector(BaseDetector):
 
             For example:
 
-                (['3'], ['3 people'])
+                ([{'value': '3', 'unit': 'people'}], ['3 people'])
 
             Additionally this function assigns these lists to self.number and self.original_number_text attributes
             respectively.

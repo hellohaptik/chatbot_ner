@@ -20,3 +20,27 @@ NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME = 'unit_type'
 # Return type keys of number detection
 NUMBER_DETECTION_RETURN_DICT_VALUE = 'value'
 NUMBER_DETECTION_RETURN_DICT_UNIT = 'unit'
+
+
+# Number range data file name and columns
+NUMBER_RANGE_KEYWORD_FILE_NAME = 'number_range_keywords.csv'
+NUMBER_RANGE_FILE_VARIANTS_COLUMN_NAME = 'range_variants'
+NUMBER_RANGE_FILE_POSITION_COLUMN_NAME = 'position'
+NUMBER_RANGE_FILE_RANGE_TYPE_COLUMN_NAME = 'range_type'
+
+
+# Number range types
+NUMBER_RANGE_MIN_TYPE = 'min'
+NUMBER_RANGE_MAX_TYPE = 'min'
+NUMBER_RANGE_MIN_MAX_TYPE = 'min_max'
+
+# Replace text for number detected in number range
+NUMBER_REPLACE_TEXT = '__dnumber__'
+
+
+# Number range detection return dict keys
+NUMBER_RANGE_MIN_VALUE = 'min_value'
+NUMBER_RANGE_MAX_VALUE = 'max_value'
+NUMBER_RANGE_VALUE_UNIT = 'unit'
+
+
