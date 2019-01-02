@@ -1,0 +1,72 @@
+language,message,unit_type,min_value,max_value,unit,original_text
+en,I want more than 200 banana,NA,200,NA,NA,more than 200
+en,My monthly salary will be more than 2k per month,NA,2000,NA,NA,more than 2k
+en,more than 2.5k people in the stadium,NA,2500,NA,NA,more than 2.5k
+en,more than 200 ,currency,NA,NA,NA,NA
+en,more than 2k,currency,NA,NA,NA,NA
+en,more than 2.5k,currency,NA,NA,NA,NA
+en,more than 200 rupees,currency,200,NA,rupees,more than 200 rupees
+en,more than 2k rupees,currency,2000,NA,rupees,more than 2k rupees
+en,more than 2.5k rupees,currency,2500,NA,rupees,more than 2.5k rupees
+en,200 to 300,NA,200,300,NA,200 to 300
+en,200 – 300,NA,200,300,NA,200 – 300
+en,200-300,NA,200,300,NA,200-300
+en,200 to 300,currency,NA,NA,NA,NA
+en,200 – 300,currency,NA,NA,NA,NA
+en,200-300,currency,NA,NA,NA,NA
+en,200 to 300 ruppes,currency,200,300,rupees,200 to 300 ruppes
+en,200 – 300 rupees,currency,200,300,rupees,200 – 300 rupees
+en,200-300 rupees,currency,200,300,rupees,200-300 rupees
+en,200 rupees to 300,currency,200,300,rupees,200 rupees to 300
+en,200 rupees to 300 rupees,currency,200,300,rupees,200 rupees to 300 rupees
+en,200 rupees – 300,currency,200,300,rupees,200 rupees – 300
+en,200 rupees – 300 rupees,currency,200,300,rupees,200 rupees – 300 rupees
+en,200-300 rupees,currency,200,300,rupees,200-300 rupees
+hi,200 se jyada,NA,200,NA,NA,200 se jyada
+hi,2k se upar,NA,2000,NA,NA,2k se upar
+hi,jada se jada 2.5k,NA,2500,NA,NA,jada se jada 2.5k
+hi,200 se jyada,currency,NA,NA,NA,200 se jyada
+hi,2k se upar,currency,NA,NA,NA,2k se upar
+hi,jada se jada 2.5k,currency,NA,NA,NA,jada se jada 2.5k
+hi,200 rupees se jyada ,currency,200,NA,rupees,200 rupees se jyada 
+hi,Rupees 2k se upar,currency,2000,NA,rupees,Rupees 2k se upar
+hi,jada se jada 2.5k rupees,currency,2500,NA,rupees,jada se jada 2.5k rupees
+hi,200 se 300,NA,200,300,NA,200 se 300
+hi,200 – 300,NA,200,300,NA,200 – 300
+hi,200-300,NA,200,300,NA,200-300
+hi,200 se 300,currency,NA,NA,NA,200 se 300
+hi,200 – 300,currency,NA,NA,NA,200 – 300
+hi,200-300,currency,NA,NA,NA,200-300
+hi,200 se 300 rupees,currency,200,300,rupees,200 se 300 rupees
+hi,200 – 300 rupees,currency,200,300,rupees,200 – 300 rupees
+hi,200-300 rupees,currency,200,300,rupees,200-300 rupees
+hi,200 rupees se 300,currency,200,300,rupees,200 rupees se 300
+hi,200 rupees se 300 rupees,currency,200,300,rupees,200 rupees se 300 rupees
+hi,200 rupees – 300,currency,200,300,rupees,200 rupees – 300
+hi,200 rupees – 300 rupees,currency,200,300,rupees,200 rupees – 300 rupees
+hi,200-300 rupees,currency,200,300,rupees,200-300 rupees
+hi,२०० से ज्यादा,NA,200,NA,NA,२०० से ज्यादा
+hi,२ हजार से ऊपर  ,NA,2000,NA,NA,२ हजार से ऊपर  
+hi,ज्यादा से ज्यादा २.५ हजार,NA,2500,NA,NA,ज्यादा से ज्यादा २.५ हजार
+hi,२०० से ज्यादा,currency,NA,NA,NA,२०० से ज्यादा
+hi,२ हजार से ऊपर  ,currency,NA,NA,NA,२ हजार से ऊपर  
+hi,ज्यादा से ज्यादा २.५ हजार,currency,NA,NA,NA,ज्यादा से ज्यादा २.५ हजार
+hi,२०० रूपीस से ज्यादा,currency,200,NA,rupees,२०० रूपीस से ज्यादा
+hi,रूपीस २ हजार से ऊपर  ,currency,2000,NA,rupees,रूपीस २ हजार से ऊपर  
+hi,ज्यादा से ज्यादा २.५ हजार रुपया,currency,2500,NA,rupees,ज्यादा से ज्यादा २.५ हजार रुपया
+hi,२०० से  ३००  ,NA,200,300,NA,२०० से  ३००  
+hi,२०० – ३००,NA,200,300,NA,२०० – ३००
+hi,२००-३००,NA,200,300,NA,२००-३००
+hi,२०० से  ३००  ,currency,NA,NA,NA,२०० से  ३००  
+hi,२०० – ३००,currency,NA,NA,NA,२०० – ३००
+hi,२००-३००,currency,NA,NA,NA,२००-३००
+hi,२०० से  ३००  रुपया,currency,200,300,rupees,२०० से  ३००  रुपया
+hi,२००-३००  रुपया,currency,200,300,rupees,२००-३००  रुपया
+hi,२०० रुपया से ३०० ,currency,200,300,rupees,२०० रुपया से ३०० 
+hi,२०० रुपया से ३०० रुपया,currency,200,300,rupees,२०० रुपया से ३०० रुपया
+hi,२०० -  ३००  रुपया,currency,200,300,rupees,२०० -  ३००  रुपया
+hi,२०० रुपया -  ३००  ,currency,200,300,rupees,२०० रुपया -  ३००  
+hi,२०० रुपया -  ३०० रुपया  ,currency,200,300,rupees,२०० रुपया -  ३०० रुपया  
+hi,२००-३०० रुपया  ,currency,200,300,rupees,२००-३०० रुपया  
+en,200k-300k men and around 400 women,NA,200000|NA,300000|400,NA,200k-300k|400
+en,200k-300k men and around 300k women,NA,200000|NA,300000|300000,NA,200k-300k|400
