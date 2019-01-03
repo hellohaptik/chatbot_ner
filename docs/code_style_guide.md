@@ -33,7 +33,7 @@ with few exceptions that will be mentioned here. Although Google's styleguide pr
 
 ##### 3.2 Line length
 
-Maximum line length is *120 characters*.
+Maximum line length is *119 characters*.
 
 ##### 3.8 Code documentation
 
@@ -116,12 +116,12 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     flake8 checks for pep8 compatibility
 
     ```shell
-    flake8 --max-line-length=120 <path/to/python file/package/folder>
+    flake8 --max-line-length=119 <path/to/python file/package/folder>
     ```
     Here is a sample run on `datastore` package
 
     ```
-    flake8 --max-line-length=120 datastore/
+    flake8 --max-line-length=119 datastore/
     ```
 
     ```
@@ -131,8 +131,8 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     datastore/exceptions.py:73:1: F811 redefinition of unused 'EngineNotImplementedException' from line 22
     datastore/exceptions.py:84:1: F811 redefinition of unused 'IndexForTransferException' from line 44
     datastore/exceptions.py:94:1: F811 redefinition of unused 'AliasForTransferException' from line 54
-    datastore/datastore.py:93:121: E501 line too long (126 > 120 characters)
-    datastore/datastore.py:94:121: E501 line too long (131 > 120 characters)
+    datastore/datastore.py:93:121: E501 line too long (126 > 119 characters)
+    datastore/datastore.py:94:121: E501 line too long (131 > 119 characters)
     datastore/elastic_search/__init__.py:1:1: F401 'connect' imported but unused
     datastore/elastic_search/__init__.py:2:1: F401 'create' imported but unused
     datastore/elastic_search/__init__.py:3:1: F401 'populate' imported but unused
@@ -152,9 +152,9 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     datastore/elastic_search/populate.py:193:8: F405 'os' may be undefined, or defined from star imports: ..utils
     datastore/elastic_search/populate.py:193:42: F405 'os' may be undefined, or defined from star imports: ..utils
     datastore/elastic_search/populate.py:194:9: F405 'os' may be undefined, or defined from star imports: ..utils
-    datastore/elastic_search/populate.py:263:121: E501 line too long (124 > 120 characters)
-    datastore/elastic_search/populate.py:267:121: E501 line too long (127 > 120 characters)
-    datastore/elastic_search/populate.py:297:121: E501 line too long (136 > 120 characters)
+    datastore/elastic_search/populate.py:263:121: E501 line too long (124 > 119 characters)
+    datastore/elastic_search/populate.py:267:121: E501 line too long (127 > 119 characters)
+    datastore/elastic_search/populate.py:297:121: E501 line too long (136 > 119 characters)
     ```
 
     As you see it caught redefinitions so some exceptions that were missed in Code review, `*` import, too long lines,
@@ -223,8 +223,8 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     ...
     ************* Module chatbot_ner.datastore.datastore
     datastore/datastore.py:341: [W0511(fixme), ] TODO: repopulate code for crf index missing
-    datastore/datastore.py:93: [C0301(line-too-long), ] Line too long (126/120)
-    datastore/datastore.py:94: [C0301(line-too-long), ] Line too long (131/120)
+    datastore/datastore.py:93: [C0301(line-too-long), ] Line too long (126/119)
+    datastore/datastore.py:94: [C0301(line-too-long), ] Line too long (131/119)
     datastore/datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/datastore.py:3: [W0403(relative-import), ] Relative import 'elastic_search', should be 'chatbot_ner.datastore.elastic_search'
     datastore/datastore.py:4: [E0611(no-name-in-module), ] No name 'config' in module 'chatbot_ner'
@@ -301,9 +301,9 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     datastore/elastic_search/populate.py:220: [C0330(bad-continuation), ] Wrong continued indentation (remove 1 space).
                                }
                               |^
-    datastore/elastic_search/populate.py:263: [C0301(line-too-long), ] Line too long (124/120)
-    datastore/elastic_search/populate.py:267: [C0301(line-too-long), ] Line too long (127/120)
-    datastore/elastic_search/populate.py:297: [C0301(line-too-long), ] Line too long (136/120)
+    datastore/elastic_search/populate.py:263: [C0301(line-too-long), ] Line too long (124/119)
+    datastore/elastic_search/populate.py:267: [C0301(line-too-long), ] Line too long (127/119)
+    datastore/elastic_search/populate.py:297: [C0301(line-too-long), ] Line too long (136/119)
     datastore/elastic_search/populate.py:332: [C0330(bad-continuation), ] Wrong continued indentation (remove 1 space).
                           }
                          |^
