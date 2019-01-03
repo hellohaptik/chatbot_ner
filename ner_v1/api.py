@@ -191,10 +191,12 @@ def person_name(request):
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        entity_output = get_person_name(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
-                                        parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                        parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                        parameters_dict[PARAMETER_BOT_MESSAGE])
+        entity_output = get_person_name(message=parameters_dict[PARAMETER_MESSAGE],
+                                        entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+                                        structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                        fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                        bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
+                                        language=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for person_name: %s ' % e)

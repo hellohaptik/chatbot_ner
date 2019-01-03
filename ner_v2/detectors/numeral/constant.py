@@ -15,6 +15,7 @@ NUMBER_TYPE_SCALE = 'scale'
 NUMBER_UNITS_FILE_NAME = 'units.csv'
 NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME = 'unit_variants'
 NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME = 'unit_value'
+NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME = 'unit_type'
 
 # Return type keys of number detection
 NUMBER_DETECTION_RETURN_DICT_VALUE = 'value'

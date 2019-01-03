@@ -13,6 +13,7 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from language_utilities.constant import ENGLISH_LANG
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -425,7 +426,8 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_person_name(message, entity_name, structured_value, fallback_value, bot_message):
+def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
+                    language=ENGLISH_LANG):
     """Use NameDetector to detect names
 
     Args:
@@ -456,7 +458,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
-    name_detection = NameDetector(entity_name=entity_name)
+    name_detection = NameDetector(entity_name=entity_name, language=language)
     if structured_value:
         entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
         if entity_list:
