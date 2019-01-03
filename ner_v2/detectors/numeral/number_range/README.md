@@ -61,9 +61,9 @@ In order to add any new language you have to follow below steps:
 
 1. Create a directory with `ISO 639-1` code of that language inside `ner_v2/detectors/numeral/number_range/`.  
 
-2. Create a directory named `data` inside language_code folder.
+2. Create a directory named `data` inside the language_code folder.
 
-3. Add a CSV files named `number_range_keywords.csv` inside data folder.  
+3. Add a CSV file named `number_range_keywords.csv` inside data folder.  
 
    Below is the folder structure of same after adding all the files for new language `xy`.
 
@@ -84,9 +84,9 @@ In order to add any new language you have to follow below steps:
 
 ####  GuideLines to create data files
 
-Below is the brief about how to create data file `number_range_keywords.csv` All the description of the file is explained using hindi as a reference language. 
+Below is the brief about how to create data file `number_range_keywords.csv` All the description of the file is explained using Hindi as a reference language. 
 
-1. **number_range_keywords.csv**:  This files contains the vocabs for range keywords, their position around number values and their range type.
+1. **number_range_keywords.csv**:  This file contains the vocabs for range keywords, their position around number values and their range type.
 
    |                        range_variants                        | position | range_type |
    | :----------------------------------------------------------: | :------: | :--------: |
@@ -96,13 +96,13 @@ Below is the brief about how to create data file `number_range_keywords.csv` All
    | se niche \| se kam \| se sasta \| se saste k aas paas\|  k aas pas\| k lagbhag \|  से नीचे \| से कम \| से सस्ता \| से सस्ते \|   के आस पास  \| के लगभग |    1     |    max     |
    |                           se\|-\|से                           |    0     |  min_max   |
 
-   Here, 1st column will contain the variants of range keywords seperated by pipes, which are present before or after or in between number values and defines what type of number value is present, either min or max. 
+   Here, the 1st column will contain the variants of range keywords separated by pipes, which are present before or after or in between number values and defines what type of number value is present, either min or max. 
 
-   2rd column corresponds to position of the keyword. If 1 means it will be present after number value, -1 if present before number.  
+   2rd column corresponds to the position of the keyword. If 1 means it will be present after number value, -1 if present before number.  
 
-   3rd column define the range type of number i.e if it contains min value or max value or both.    
+   3rd column defines the range type of number i.e if it contains min value or max value or both.    
 
-   **For example** - *mujhe 2000 se jada log chahiye kal ki rally me* . In this text, range keyword `se jada` which is present in position `1` (after number) defines that number `2000` is minimum value defined in text, no maximum value given in text, hence it will be null.
+   **For example** - *mujhe 2000 se jada log chahiye kal ki rally me* . In this text, range keyword `se jada` which is present in position `1` (after number) defines that number `2000` is the minimum value defined in the text, since no maximum value specified in text, hence it will be null.
 
 
 #### Guidelines to add new detectors for number range apart from builtin ones:
@@ -133,15 +133,15 @@ class NumberRangeDetector(BaseNumberRangeDetector):
 Note that the class name must be `NumberRangeDetector` 
 and should inherit from `ner_v2.detectors.numeral.number_range.standard_number_range_detector.BaseNumberRangeDetector`
 
-Next we define a custom detector. For our purposes we will add a detector to detect number range from text 'between 2k and 3k' and `2000` as minimum value and `3000` as maximum value and unit as `None`.
+Next, we define a custom detector. For our purposes, we will add a detector to detect number range from text of patter 'between *number1* and *number2*. It will detect number1 and number2 as minimum value and maximum value respectively.
 
-1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.number_tagged_processed_text` (This text contained tagged number text i.e number will be replace with `__dnumber__<number>`) . So in your pattern you just have to include pattern with number tag instead of `\d+` for number. (as it handle all number having decimal, ordinal and int)
-2. The two arguments `number_range_list` and `original_list` can both be either None or lists of same length.
+1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.number_tagged_processed_text` (This text contained tagged number text i.e number will be replaced with `__dnumber__<number>`). So in your pattern, you just have to include pattern with number tag instead of `\d+` for the number. (as it handle all number having decimal, ordinal and integer)
+2. The two arguments `number_range_list` and `original_list` can both be either None or lists of the same length.
    `number_range_list` contains parsed min and max value  along with unit and `original_list` contains their corresponding text substrings in the passed text that were detected as numbers range.
-3. Your detector must appened parsed number range dicts with keys `'min_value', 'max_value', 'unit'` to `number_range_list`
+3. Your detector must append parsed number range dicts with keys `'min_value', 'max_value', 'unit'` to `number_range_list`
    and to `original_list` their corresponding substrings from `self.processed_text` that were parsed into numbers.
 4. Take care to not mutate `self.processed_text` in any way as main detect method in base class depends on it to eliminate already detected number from it after each detector is run.
-5. Finally your detector must return a tuple of (number_range_list, original_list). Ensure that `number_range_list` and `original_list` are of equal lengths before returning them.
+5. Finally, your detector must return a tuple of (number_range_list, original_list). Ensure that `number_range_list` and `original_list` are of equal lengths before returning them.
 
 ```python
     def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
@@ -159,7 +159,7 @@ Next we define a custom detector. For our purposes we will add a detector to det
         return number_range_list, original_list
 ```
 
-Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default ordering from 
+Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default order from 
 `detectors.numeral.number_range.standard_number_range_detector.BaseNumberRangeDetector` and inject your own detectors in between.
 Below we show an example where we put our custom detector on top to execute it before some builtin detectors.
 
