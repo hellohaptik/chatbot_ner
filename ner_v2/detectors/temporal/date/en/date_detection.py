@@ -966,12 +966,11 @@ class DateDetector(object):
     def _date_days_later(self, date_list=None, original_list=None):
         """
         Detects "date n days later" and returns the date for n days later
-    
         Matches "digit" followed by "days" and iterations of "later"
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
-                               date entities
+                           date entities
         Returns:
             A tuple of two lists with first list containing the detected date entities and type followed by the 
             second list containing their corresponding substrings in the given text.
@@ -1207,7 +1206,7 @@ class DateDetector(object):
         where each part is in of one of the formats given against them
             day: d, dd
             ordinal indicator: "st", "nd", "rd", "th"
-        
+
         Optional "of" is allowed after ordinal indicator, example "dd th of this current month"
 
         Few valid examples:
@@ -1256,7 +1255,7 @@ class DateDetector(object):
             ordinal indicator: "st", "nd", "rd", "th"
             "next" variants: "next", "nxt", "comming", "coming", "commin", "following", "folowin", "followin",
                              "folowing"
-        
+
         Optional "of" is allowed after ordinal indicator, example "dd th of this next month"
 
         Few valid examples:
