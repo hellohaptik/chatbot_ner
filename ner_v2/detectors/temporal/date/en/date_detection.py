@@ -972,7 +972,7 @@ class DateDetector(object):
             original_list: Optional, list to store corresponding substrings of given text which were detected as
                            date entities
         Returns:
-            A tuple of two lists with first list containing the detected date entities and type followed by the 
+            A tuple of two lists with first list containing the detected date entities and type followed by the
             second list containing their corresponding substrings in the given text.
 
         """
@@ -1754,13 +1754,13 @@ class DateDetector(object):
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_dict_2 = {
                 'dd': int(dd2),
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_list.append(date_dict_1)
             date_list.append(date_dict_2)
 
