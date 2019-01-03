@@ -59,4 +59,4 @@ class DateDetectionTest(TestCase):
                     detected_date_list, detected_original_text = date_detector.detect_entity(row['message'])
                     self.assertEqual(len(detected_date_list), 1)
                     self.assertEqual(expected_output, detected_date_list[0])
-                    self.assertEqual(expected_original_text, detected_original_text[0])
+                    self.assertEqual(expected_original_text.strip(), detected_original_text[0].strip())
