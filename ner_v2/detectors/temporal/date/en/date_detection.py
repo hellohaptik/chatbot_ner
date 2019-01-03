@@ -29,10 +29,10 @@ class DateDetector(object):
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         now_date: datetime object holding timestamp while DateDetector instantiation
-        month_dictionary: dictonary mapping month indexes to month spellings and 
-                            fuzzy variants(spell errors, abbreviations)
-        day_dictionary: dictonary mapping day indexes to day of week spellings and 
-                            fuzzy variants(spell errors, abbreviations)
+        month_dictionary: dictonary mapping month indexes to month spellings and
+                          fuzzy variants(spell errors, abbreviations)
+        day_dictionary: dictonary mapping day indexes to day of week spellings and
+        fuzzy variants(spell errors, abbreviations)
         bot_message: str, set as the outgoing bot text/message
 
         SUPPORTED_FORMAT                                            METHOD_NAME
@@ -63,7 +63,7 @@ class DateDetector(object):
         24."every monday" variants                                  _weeks_identification
         25."after n days" variants                                  _date_days_after
         26."n days later" variants                                  _date_days_later
-        
+
         Not all separator are listed above. See respective methods for detail on structures of these formats
 
     Note:
@@ -786,9 +786,7 @@ class DateDetector(object):
     def _todays_date(self, date_list=None, original_list=None):
         """
         Detects "today" and its variants and returns the date today
-
         Matches "today", "2dy", "2day", "tody", "aaj", "aj", "tonight"
-        
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
@@ -823,7 +821,6 @@ class DateDetector(object):
     def _tomorrows_date(self, date_list=None, original_list=None):
         """
         Detects "tommorow" and its variants and returns the date value for tommorow
-
         Matches "tomorrow", "2morow", "2mrw", "2mrow", "next day", "tommorrow", "tommorow", "tomorow", "tommorow"
         
         Args:
@@ -833,7 +830,6 @@ class DateDetector(object):
         Returns:
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
-
         """
         if date_list is None:
             date_list = []

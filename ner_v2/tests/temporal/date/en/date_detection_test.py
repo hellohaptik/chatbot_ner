@@ -19,9 +19,6 @@ class DateDetectionTest(TestCase):
         Date detection for pattern '2nd jan to 5th'
         """
         message = '2nd jan to 5th'
-        day1 = 2
-        day2 = 5
-        month = 1
         year = self.now_date.year
         if self.now_date.month > 1:
             year += 1
@@ -38,7 +35,7 @@ class DateDetectionTest(TestCase):
                        'from': False,
                        'normal': False,
                        'start_range': False,
-                       'to': False, 'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}}, date_dicts)
+                       'to': False, 'value': {'dd': 5, 'mm': 1, 'type': 'date', 'yy': year}}, date_dicts)
 
         self.assertEqual(original_texts.count(message), 2)
 
@@ -68,4 +65,3 @@ class DateDetectionTest(TestCase):
                        'start_range': False,
                        'to': False, 'value': {'dd': 2, 'mm': month, 'type': 'date', 'yy': year}}, date_dicts)
         self.assertEqual(original_texts.count(message), 2)
-

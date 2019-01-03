@@ -131,4 +131,3 @@ class TimeDetector(BaseDetector):
             bot_message (str): previous message that is sent by the bot
         """
         self.bot_message = bot_message
-

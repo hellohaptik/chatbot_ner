@@ -61,5 +61,3 @@ class NumberRangeDetectorTest(TestCase):
                 detected_zipped = zip(detected_entities_values_list, detected_original_texts_list)
                 for detected_number_range in detected_zipped:
                     self.assertIn(detected_number_range, expected_zipped)
-
-
