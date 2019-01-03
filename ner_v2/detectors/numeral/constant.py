@@ -42,5 +42,3 @@ NUMBER_REPLACE_TEXT = '__dnumber__'
 NUMBER_RANGE_MIN_VALUE = 'min_value'
 NUMBER_RANGE_MAX_VALUE = 'max_value'
 NUMBER_RANGE_VALUE_UNIT = 'unit'
-
-
