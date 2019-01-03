@@ -1,5 +1,5 @@
 message,dd,mm,yy,original_text
-my birthdate is on 18/01/1992, 18,01,1992, 18/01/1992
+"my birthdate is on 18/01/1992", 18,01,1992, "18/01/1992"
 "my birthdate is on 18 January, 1992", 18,01,1992, "18 january, 1992"
 "my birthdate is on 18th January, 1992", 18,01,1992, "18th january, 1992"
 my birthdate is on 18-01-1992, 18,01,1992, 18-01-1992

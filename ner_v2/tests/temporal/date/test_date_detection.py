@@ -51,7 +51,7 @@ class DateDetectionTest(TestCase):
         for lang in list_languages:
             file_basic_patterns = os.path.join(self.TEST_DATA_DIR, lang, 'basic_test_case.csv')
             if os.path.isfile(file_basic_patterns):
-                df_test_data = pd.read_csv(file_basic_patterns, encoding='utf-8', dtype=dtype)
+                df_test_data = pd.read_csv(file_basic_patterns, encoding='utf-8', index_col=False)
                 date_detector = DateDetector(self.entity_name, language=lang)
                 for index, row in df_test_data.iterrows():
                     expected_output = self._make_expected_output(row['dd'], row['mm'], row['yy'])
