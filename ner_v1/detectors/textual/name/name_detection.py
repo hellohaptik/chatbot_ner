@@ -295,11 +295,11 @@ class NameDetector(object):
         """
         if self.language == HINDI_LANG:
             for word in botmessage.strip().split():
-                if word == 'name':
+                if word == u'नाम':
                     return True
         elif self.language == ENGLISH_LANG:
             for word in nltk_tokenizer.tokenize(botmessage.lower()):
-                if word == u'नाम':
+                if word == 'name':
                     return True
         return False
 
