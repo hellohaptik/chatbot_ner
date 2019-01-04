@@ -3,7 +3,7 @@ from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
-    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS
+    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -37,6 +37,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_PAST_DATE_REFERENCED: request.GET.get('date_past_reference', 'False'),
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
+                       PARAMETER_NUMBER_UNIT_TYPE: request.GET.get('unit_type'),
                        }
 
     return parameters_dict
@@ -228,7 +229,8 @@ def number(request):
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
         number_detection = NumberDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
-                                          language=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
+                                          language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
+                                          unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
 
         if parameters_dict[PARAMETER_MIN_DIGITS] and parameters_dict[PARAMETER_MAX_DIGITS]:
             min_digit = int(parameters_dict[PARAMETER_MIN_DIGITS])
