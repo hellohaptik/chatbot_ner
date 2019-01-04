@@ -293,14 +293,14 @@ class NameDetector(object):
         Returns:
             True
         """
-        if self.language == HINDI_LANG:
-            for word in botmessage.strip().split():
-                if word == u'नाम':
-                    return True
-        elif self.language == ENGLISH_LANG:
-            for word in nltk_tokenizer.tokenize(botmessage.lower()):
-                if word == 'name':
-                    return True
+
+        regex_pattern = re.compile(r'[\|\,+\:\?\!\"\(\)!\'\.\%\[\]]+')
+        botmessage = regex_pattern.sub(r'', botmessage)
+
+        botmessage = " " + botmessage.lower().strip() + " "
+        for variant in NAME_VARIATIONS:
+            if " " + variant + " " in botmessage:
+                return True
         return False
 
     def get_hindi_names_from_regex(self, text):
