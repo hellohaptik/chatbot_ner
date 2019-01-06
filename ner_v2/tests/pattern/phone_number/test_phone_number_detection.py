@@ -34,7 +34,7 @@ class PhoneDetectionTest(TestCase):
 
         return test_dict
 
-    def test_phone_number_detector(self):
+    def test_phone_number_detection(self):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
             expected_value = self.test_dict['expected_value'][i]

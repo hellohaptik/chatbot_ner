@@ -55,3 +55,4 @@ DICTIONARY_DATA_VARIANTS = 'variants'
 # Min and Max digit params for Number detection
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
+PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
