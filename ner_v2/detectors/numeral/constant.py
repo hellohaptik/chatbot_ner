@@ -24,9 +24,9 @@ NUMBER_DETECTION_RETURN_DICT_UNIT = 'unit'
 
 # Number range data file name and columns
 NUMBER_RANGE_KEYWORD_FILE_NAME = 'number_range_keywords.csv'
-NUMBER_RANGE_FILE_VARIANTS_COLUMN_NAME = 'range_variants'
-NUMBER_RANGE_FILE_POSITION_COLUMN_NAME = 'position'
-NUMBER_RANGE_FILE_RANGE_TYPE_COLUMN_NAME = 'range_type'
+COLUMN_NUMBER_RANGE_VARIANTS = 'range_variants'
+COLUMN_NUMBER_RANGE_POSITION = 'position'
+COLUMN_NUMBER_RANGE_RANGE_TYPE = 'range_type'
 
 
 # Number range types

@@ -9,7 +9,7 @@ from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 
 NumberRangeVariant = collections.namedtuple('NumberRangeVariant', ['position', 'range_type'])
-NumberTaggedMap = collections.namedtuple('NumberTaggedMap', ['entity_value', 'original_text'])
+ValueTextPair = collections.namedtuple('ValueTextPair', ['entity_value', 'original_text'])
 
 
 class BaseNumberRangeDetector(object):
@@ -29,7 +29,6 @@ class BaseNumberRangeDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.number_tagged_processed_text = ''
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         self.range_variants_map = {}
@@ -75,29 +74,29 @@ class BaseNumberRangeDetector(object):
         number_range_df = pd.read_csv(os.path.join(data_directory_path,
                                                    numeral_constant.NUMBER_RANGE_KEYWORD_FILE_NAME), encoding='utf-8')
         for index, row in number_range_df.iterrows():
-            range_variants = get_list_from_pipe_sep_string(row[numeral_constant.NUMBER_RANGE_FILE_VARIANTS_COLUMN_NAME])
+            range_variants = get_list_from_pipe_sep_string(row[numeral_constant.COLUMN_NUMBER_RANGE_VARIANTS])
             for variant in range_variants:
                 self.range_variants_map[variant] = \
-                    NumberRangeVariant(position=row[numeral_constant.NUMBER_RANGE_FILE_POSITION_COLUMN_NAME],
-                                       range_type=row[numeral_constant.NUMBER_RANGE_FILE_RANGE_TYPE_COLUMN_NAME])
+                    NumberRangeVariant(position=row[numeral_constant.COLUMN_NUMBER_RANGE_POSITION],
+                                       range_type=row[numeral_constant.COLUMN_NUMBER_RANGE_RANGE_TYPE])
 
-        self.min_range_prefix_variants = [variant for variant, value in self.range_variants_map.items()
+        self.min_range_prefix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == -1 and
                                               value.range_type == numeral_constant.NUMBER_RANGE_MIN_TYPE)]
 
-        self.min_range_suffix_variants = [variant for variant, value in self.range_variants_map.items()
+        self.min_range_suffix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == 1 and
                                           value.range_type == numeral_constant.NUMBER_RANGE_MIN_TYPE)]
 
-        self.max_range_prefix_variants = [variant for variant, value in self.range_variants_map.items()
+        self.max_range_prefix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == -1 and
                                               value.range_type == numeral_constant.NUMBER_RANGE_MAX_TYPE)]
 
-        self.max_range_suffix_variants = [variant for variant, value in self.range_variants_map.items()
+        self.max_range_suffix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == 1 and
                                               value.range_type == numeral_constant.NUMBER_RANGE_MAX_TYPE)]
 
-        self.min_max_range_variants = [variant for variant, value in self.range_variants_map.items()
+        self.min_max_range_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                        if (value.position == 0 and
                                            value.range_type == numeral_constant.NUMBER_RANGE_MIN_MAX_TYPE)]
 
@@ -110,10 +109,10 @@ class BaseNumberRangeDetector(object):
             (str): text with number replaced with tag
         Examples:
             >>> text = 'i want to buy 3 apples and more than two bananas'
-            >>> number_detected_map = {'__number__1': ({'value': '3', 'unit': None}, '3'),
-                                       '__number__2': ({'value': '2', 'unit': None}, 'two')}
+            >>> number_detected_map = {'__number__0': ({'value': '2', 'unit': None}, 'two'),
+                                       '__number__1': ({'value': '3', 'unit': None}, '3')}
             >>> self._tag_number_in_text(text)
-            i want to buy __number__1 apples and more than __number__2 bananas
+            i want to buy __number__1 apples and more than __number__0 bananas
         """
         tagged_number_text = processed_text
         sorted_number_detected_map = sorted(self.number_detected_map.items(), key=lambda kv: len(kv[1][1]),
@@ -136,7 +135,7 @@ class BaseNumberRangeDetector(object):
         detected_number_dict = {}
         entity_value_list, original_text_list = self.number_detector.detect_entity(self.processed_text)
         for index, (entity_value, original_text) in enumerate(zip(entity_value_list, original_text_list)):
-            detected_number_dict[numeral_constant.NUMBER_REPLACE_TEXT + str(index)] = NumberTaggedMap(
+            detected_number_dict[numeral_constant.NUMBER_REPLACE_TEXT + str(index)] = ValueTextPair(
                 entity_value=entity_value, original_text=original_text)
         return detected_number_dict
 
@@ -168,13 +167,12 @@ class BaseNumberRangeDetector(object):
 
         """
         self.text = text
-        self.processed_text = text
         self.tagged_text = text
         self.number_detected_map = self._get_number_tag_dict()
+        self.processed_text = self._tag_number_in_text(text)
 
         number_list, original_list = None, None
         for detector in self.detector_preferences:
-            self.number_tagged_processed_text = self._tag_number_in_text(self.processed_text)
             number_list, original_list = detector(number_list, original_list)
             self._update_processed_text(original_list)
         return number_list, original_list
@@ -187,8 +185,6 @@ class BaseNumberRangeDetector(object):
             min_part_match (str or None): tagged min number
             max_part_match (str or None): tagged max number
             full_match (str): text matching regex
-            number_range_list (list): list containing all number range detected
-            original_list (list): list containing original text of values detected
         Returns:
             (tuple): a tuple containing
                 (list): list containing detected numeric text
@@ -242,9 +238,9 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_prefix_variants:
             min_prefix_choices = '|'.join(self.min_range_prefix_variants)
-            min_range_start_pattern = re.compile(ur'((?:{min_prefix_choices})\s+({number}[\d+]))'.format(
+            min_range_start_pattern = re.compile(ur'((?:{min_prefix_choices})\s+({number}\d+))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_prefix_choices=min_prefix_choices), re.UNICODE)
-            number_range_matches = min_range_start_pattern.findall(self.number_tagged_processed_text)
+            number_range_matches = min_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=None,
                                                                      full_match=match[0])
@@ -270,9 +266,9 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_suffix_variants:
             min_suffix_choices = '|'.join(self.min_range_suffix_variants)
-            min_range_end_pattern = re.compile(ur'(({number}[\d+])\s+(?:{min_suffix_choices}))'.format(
+            min_range_end_pattern = re.compile(ur'(({number}\d+)\s+(?:{min_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_suffix_choices=min_suffix_choices), re.UNICODE)
-            number_range_matches = min_range_end_pattern.findall(self.number_tagged_processed_text)
+            number_range_matches = min_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=None,
                                                                      full_match=match[0])
@@ -300,9 +296,9 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_prefix_variants:
             max_prefix_choices = '|'.join(self.max_range_prefix_variants)
-            max_range_start_pattern = re.compile(ur'((?:{max_prefix_choices})\s+({number}[\d+]))'.format(
+            max_range_start_pattern = re.compile(ur'((?:{max_prefix_choices})\s+({number}\d+))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_prefix_choices=max_prefix_choices), re.UNICODE)
-            number_range_matches = max_range_start_pattern.findall(self.number_tagged_processed_text)
+            number_range_matches = max_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=None, max_part_match=match[1],
                                                                      full_match=match[0])
@@ -329,9 +325,9 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_suffix_variants:
             max_suffix_choices = '|'.join(self.max_range_suffix_variants)
-            max_range_end_pattern = re.compile(ur'(({number}[\d+])\s+(?:{max_suffix_choices}))'.format(
+            max_range_end_pattern = re.compile(ur'(({number}\d+)\s+(?:{max_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_suffix_choices=max_suffix_choices), re.UNICODE)
-            number_range_matches = max_range_end_pattern.findall(self.number_tagged_processed_text)
+            number_range_matches = max_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=None, max_part_match=match[1],
                                                                      full_match=match[0])
@@ -359,10 +355,10 @@ class BaseNumberRangeDetector(object):
 
         if self.min_max_range_variants:
             min_max_choices = '|'.join(self.min_max_range_variants)
-            min_max_range_pattern = re.compile(ur'(({number}[\d+])\s*(?:{min_max_choices})\s*'
-                                               ur'({number}[\d+]))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
-                                                                           min_max_choices=min_max_choices), re.UNICODE)
-            number_range_matches = min_max_range_pattern.findall(self.number_tagged_processed_text)
+            min_max_range_pattern = re.compile(ur'(({number}\d+)\s*(?:{min_max_choices})\s*'
+                                               ur'({number}\d+))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
+                                                                         min_max_choices=min_max_choices), re.UNICODE)
+            number_range_matches = min_max_range_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=match[2],
                                                                      full_match=match[0])

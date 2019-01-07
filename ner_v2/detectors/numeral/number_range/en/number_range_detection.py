@@ -21,8 +21,8 @@ class NumberRangeDetector(BaseNumberRangeDetector):
                                      self._detect_min_num_range_with_prefix_variants,
                                      self._detect_min_num_range_with_suffix_variants,
                                      self._detect_max_num_range_with_prefix_variants,
-                                     self._detect_max_num_range_with_suffix_variants,
-                                    ]
+                                     self._detect_max_num_range_with_suffix_variants
+                                     ]
 
     def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
         """Detects number range of text of pattern between number1 to number2

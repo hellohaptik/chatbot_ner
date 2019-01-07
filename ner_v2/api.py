@@ -259,21 +259,21 @@ def number(request):
 def number_range(request):
     """Use NumberDetector to detect numerals
 
-    Args:
-        request: url parameters:
+        Args:
+            request: url parameters:
 
-        request params:
-           message (str): natural text on which detection logic is to be run. Note if structured value is
-                                   detection is run on structured value instead of message
-           entity_name (str): name of the entity. Also acts as elastic-search dictionary name
-                              if entity uses elastic-search lookup
-           structured_value (str): Value obtained from any structured elements. Note if structured value is
-                                   detection is run on structured value instead of message
-                                   (For example, UI elements like form, payload, etc)
-           fallback_value (str): If the detection logic fails to detect any value either from structured_value
-                             or message then we return a fallback_value as an output.
-           bot_message (str): previous message from a bot/agent.
-           unit_type(str): restrict number range to detect for some unit types like 'currency', 'temperature'
+            request params:
+                message (str): natural text on which detection logic is to be run. Note if structured value is
+                                       detection is run on structured value instead of message
+                entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                                  if entity uses elastic-search lookup
+                structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                       detection is run on structured value instead of message
+                                       (For example, UI elements like form, payload, etc)
+                fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                                 or message then we return a fallback_value as an output.
+                bot_message (str): previous message from a bot/agent.
+                unit_type(str): restrict number range to detect for some unit types like 'currency', 'temperature'
 
 
        Returns:
@@ -281,7 +281,6 @@ def number_range(request):
                          entity_value is in itself a dict with its keys varying from entity to entity
 
        Examples:
-
            message = "we expect 200-300 people in room"
            entity_name = 'people_range'
            structured_value = None
@@ -291,22 +290,21 @@ def number_range(request):
            output = number_range(request)
            print output
 
-               >> [{'detection': 'message', 'original_text': '200-300',
-                  'entity_value': {'min_value': , 'unit': None}}]
-
+           >> [{'detection': 'message', 'original_text': '200-300', 'entity_value': {'min_value': '200',
+                'max_value': '300', 'unit': None}}]
        """
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
         number_range_detector = NumberRangeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
-                                                     language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
-                                                     unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
+                                                    language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
+                                                    unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
 
         entity_output = number_range_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+                                                     structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                     fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                     bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
 

@@ -78,8 +78,6 @@ class NumberRangeDetector(BaseDetector):
         super(NumberRangeDetector, self).__init__(language)
         self.entity_name = entity_name
         self.text = ''
-        self.tagged_text = ''
-        self.processed_text = ''
         self.tag = '__' + self.entity_name + '__'
         self.language = language
         self.unit_type = unit_type
@@ -107,6 +105,14 @@ class NumberRangeDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
+    @property
+    def tagged_text(self):
+        return self.language_number_range_detector.tagged_text
+
+    @property
+    def processed_text(self):
+        return self.language_number_range_detector.processed_text
+
     def detect_entity(self, text, **kwargs):
         """Detects numbers in the text string
 
@@ -126,13 +132,8 @@ class NumberRangeDetector(BaseDetector):
             respectively.
 
         """
-        self.text = ' ' + text.lower() + ' '
-        self.processed_text = self.text
-        self.tagged_text = self.text
+        self.text = ' ' + text.lower().strip() + ' '
         number_range_detected, original_text = \
-            self.language_number_range_detector.detect_number_range(self.processed_text)
-
-        self.processed_text = self.language_number_range_detector.processed_text
-        self.tagged_text = self.language_number_range_detector.tagged_text
+            self.language_number_range_detector.detect_number_range(self.text)
 
         return number_range_detected, original_text
