@@ -135,7 +135,7 @@ and should inherit from `ner_v2.detectors.numeral.number_range.standard_number_r
 
 Next, we define a custom detector. For our purposes, we will add a detector to detect number range from text of patter 'between *number1* and *number2*. It will detect number1 and number2 as minimum value and maximum value respectively.
 
-1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.number_tagged_processed_text` (This text contained tagged number text i.e number will be replaced with `__dnumber__<number>`). So in your pattern, you just have to include pattern with number tag instead of `\d+` for the number. (as it handle all number having decimal, ordinal and integer)
+1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.processed_text (This text contained tagged number text i.e number will be replaced with __dnumber__<number>`). So in your pattern, you just have to include pattern with number tag instead of `\d+` for the number. (as it handle all number having decimal, ordinal and integer)
 2. The two arguments `number_range_list` and `original_list` can both be either None or lists of the same length.
    `number_range_list` contains parsed min and max value  along with unit and `original_list` contains their corresponding text substrings in the passed text that were detected as numbers range.
 3. Your detector must append parsed number range dicts with keys `'min_value', 'max_value', 'unit'` to `number_range_list`
@@ -144,19 +144,22 @@ Next, we define a custom detector. For our purposes, we will add a detector to d
 5. Finally, your detector must return a tuple of (number_range_list, original_list). Ensure that `number_range_list` and `original_list` are of equal lengths before returning them.
 
 ```python
+
     def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
         number_range_list = number_range_list or []
         original_list = original_list or []
-        between_min_max_range_regex = re.compile(r'(between\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:and|to)\s*('
-                                                 + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
-        number_range_matches = between_min_max_range_regex.findall(self.number_tagged_processed_text)
+        between_range_pattern = re.compile(ur'(between\s+({number}\d+)(?:\s+and|-)'
+                                           ur'\s+({number}\d+))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
+        number_range_matches = between_range_pattern.findall(self.processed_text)
         for match in number_range_matches:
-            number_range_list, original_list = \
-                self._update_number_range_and_original_list(number_tag_min=match[1], number_tag_max=match[2],
-                                                            matched_text=match[0],
-                                                            number_range_list=number_range_list,
-                                                            original_list=original_list)
+            number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=match[2],
+                                                                 full_match=match[0])
+            if number_range and original_text:
+                number_range_list.append(number_range)
+                original_list.append(original_text)
+
         return number_range_list, original_list
+
 ```
 
 Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default order from 
@@ -170,12 +173,12 @@ Below we show an example where we put our custom detector on top to execute it b
                                                   data_directory_path=NumberRangeDetector.data_directory_path,
                                                   unit_type=unit_type)
 
-        self.detector_preferences = [self._detect_min_num_range_with_start_variant,
-                                     self._detect_min_num_range_with_end_variant,
-                                     self._detect_max_num_range_with_start_variant,
-                                     self._detect_max_num_range_with_end_variant,
-                                     self._detect_min_max_num_range,
-                                     self._custom_num_range_between_num_and_num
+        self.detector_preferences = [self._detect_min_max_num_range,
+                                     self._custom_num_range_between_num_and_num,
+                                     self._detect_min_num_range_with_prefix_variants,
+                                     self._detect_min_num_range_with_suffix_variants,
+                                     self._detect_max_num_range_with_prefix_variants,
+                                     self._detect_max_num_range_with_suffix_variants
                                      ]
 ```
 
@@ -200,12 +203,12 @@ class NumberRangeDetector(BaseNumberRangeDetector):
                                                   data_directory_path=NumberRangeDetector.data_directory_path,
                                                   unit_type=unit_type)
 
-        self.detector_preferences = [self._detect_min_num_range_with_start_variant,
-                                     self._detect_min_num_range_with_end_variant,
-                                     self._detect_max_num_range_with_start_variant,
-                                     self._detect_max_num_range_with_end_variant,
-                                     self._detect_min_max_num_range,
-                                     self._custom_num_range_between_num_and_num
+        self.detector_preferences = [self._detect_min_max_num_range,
+                                     self._custom_num_range_between_num_and_num,
+                                     self._detect_min_num_range_with_prefix_variants,
+                                     self._detect_min_num_range_with_suffix_variants,
+                                     self._detect_max_num_range_with_prefix_variants,
+                                     self._detect_max_num_range_with_suffix_variants
                                      ]
 
     def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
@@ -223,17 +226,17 @@ class NumberRangeDetector(BaseNumberRangeDetector):
         """
         number_range_list = number_range_list or []
         original_list = original_list or []
-        between_min_max_range_regex = re.compile(r'(between\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:and|to)\s*('
-                                                 + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
-        number_range_matches = between_min_max_range_regex.findall(self.number_tagged_processed_text)
+        between_range_pattern = re.compile(ur'(between\s+({number}\d+)(?:\s+and|-)'
+                                           ur'\s+({number}\d+))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
+        number_range_matches = between_range_pattern.findall(self.processed_text)
         for match in number_range_matches:
-            number_range_list, original_list = \
-                self._update_number_range_and_original_list(number_tag_min=match[1], number_tag_max=match[2],
-                                                            matched_text=match[0],
-                                                            number_range_list=number_range_list,
-                                                            original_list=original_list)
-        return number_range_list, original_list
+            number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=match[2],
+                                                                 full_match=match[0])
+            if number_range and original_text:
+                number_range_list.append(number_range)
+                original_list.append(original_text)
 
+        return number_range_list, original_list
 ```
 
 For a working example, please refer `ner_v2/detectors/numerals/number_range/en/number_range_detection.py`

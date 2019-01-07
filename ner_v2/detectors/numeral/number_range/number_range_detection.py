@@ -68,8 +68,9 @@ class NumberRangeDetector(BaseDetector):
             entity_name(str): A string by which the detected numbers would be replaced with on calling detect_entity()
             language (str, optional): language code of number text, defaults to 'en'
             unit_type (str, optional): number unit types like weight, currency, temperature, used to detect number with
-                                       specific unit type only. You can see all unit types supported inside
-                                       number detection language data with filename unit.csv
+                                       specific unit type only. If None, it will detect all number ranges irrespective
+                                       of units. You can see all unit types supported inside number detection
+                                       language data with filename unit.csv.
 
 
         """

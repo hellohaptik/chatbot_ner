@@ -22,8 +22,9 @@ class BaseNumberRangeDetector(object):
             language (str): language code of text
             data_directory_path (str): path of data folder for given language
             unit_type (str, optional): number unit types like weight, currency, temperature, used to detect number with
-                                       specific unit type only. You can see all unit types supported inside
-                                       number detection language data with filename unit.csv
+                                       specific unit type only. If None, it will detect all number ranges irrespective
+                                       of units. You can see all unit types supported inside number detection
+                                       language data with filename unit.csv.
 
         """
         self.text = ''
@@ -205,9 +206,8 @@ class BaseNumberRangeDetector(object):
             entity_value_max = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_VALUE]
             entity_unit = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
 
-        if self.unit_type and \
-                (entity_unit is None or
-                 self.number_detector.language_number_detector.units_map[entity_unit].type != self.unit_type):
+        if self.unit_type and (
+                entity_unit is None or self.number_detector.get_unit_type(entity_unit) != self.unit_type):
             return number_range, original_text
 
         original_text = self._get_original_text_from_tagged_text(full_match)

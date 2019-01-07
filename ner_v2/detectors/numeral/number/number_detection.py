@@ -149,6 +149,11 @@ class NumberDetector(BaseDetector):
 
         return validated_number, validated_number_text
 
+    def get_unit_type(self, detected_unit):
+        unit = self.language_number_detector.units_map.get(detected_unit)
+        unit_type = unit.type if unit else None
+        return unit_type
+
     def set_min_max_digits(self, min_digit, max_digit):
         """
         Update min max digit
