@@ -175,7 +175,7 @@ class BaseNumberRangeDetector(object):
         number_list, original_list = None, None
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
-            self._update_processed_text(original_list)
+            self._update_tagged_text(original_list)
         return number_list, original_list
 
     def _get_number_range(self, min_part_match, max_part_match, full_match):
@@ -194,6 +194,9 @@ class BaseNumberRangeDetector(object):
         number_range = None
         original_text = None
 
+        if full_match not in self.processed_text:
+            return number_range, original_text
+
         entity_value_min, entity_value_max, entity_unit = None, None, None
 
         if min_part_match and min_part_match in self.number_detected_map:
@@ -211,7 +214,8 @@ class BaseNumberRangeDetector(object):
             return number_range, original_text
 
         original_text = self._get_original_text_from_tagged_text(full_match)
-        if entity_value_min or entity_value_max and original_text:
+        if (entity_value_min or entity_value_max) and original_text:
+            self.processed_text = self.processed_text.replace(full_match.strip(), '', 1)
             original_text = original_text.strip()
             number_range = {
                 numeral_constant.NUMBER_RANGE_MIN_VALUE: entity_value_min,
@@ -368,7 +372,7 @@ class BaseNumberRangeDetector(object):
 
         return number_range_list, original_list
 
-    def _update_processed_text(self, original_number_list):
+    def _update_tagged_text(self, original_number_list):
         """
         Replaces detected date with tag generated from entity_name used to initialize the object with
 
@@ -381,7 +385,7 @@ class BaseNumberRangeDetector(object):
         """
         for detected_text in original_number_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
-            self.processed_text = self.processed_text.replace(detected_text, '')
+
 
 
 class NumberRangeDetector(BaseNumberRangeDetector):
