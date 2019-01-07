@@ -129,7 +129,7 @@ class TimeDetector(object):
         time_list, original_list = self._detect_time_with_once_in_x_day(time_list, original_list)
         self._update_processed_text(original_list)
         if form_check:
-            time_list, original_list = self._detect_24_hour_format(time_list, original_list)
+            time_list, original_list = self._detect_24_hour_optional_minutes_format(time_list, original_list)
             self._update_processed_text(original_list)
         time_list, original_list = self._detect_restricted_24_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
@@ -137,7 +137,7 @@ class TimeDetector(object):
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_word_format2(time_list, original_list)
         self._update_processed_text(original_list)
-        time_list, original_list = self._detect_24_hour_without_format(time_list, original_list)
+        time_list, original_list = self._detect_24_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_time_without_format(time_list, original_list)
         self._update_processed_text(original_list)
@@ -224,8 +224,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(
-            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a.m|p.m)[\s-]*?[t][o][\s-]'
-            r'*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a.m|p.m))',
+            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)[\s-]*?[t][o][\s-]'
+            r'*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
             self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -288,8 +288,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(
-            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a.m|p.m)[\s-]*?[t][o][\s-]*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*'
-            r'(am|pm|a.m|p.m))',
+            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?[t][o][\s-]*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*'
+            r'(am|pm|a\.m|p\.m))',
             self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -350,7 +350,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\s((after|aftr)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
-                              r'([0-5][0-9])[\s-]*?(pm|am|a.m|p.m))',
+                              r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -397,7 +397,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\s((before|bfre)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*'
-                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a.m|p.m))',
+                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -442,7 +442,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s((after|aftr)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a.m|p.m))',
+        patterns = re.findall(r'\s((after|aftr)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))',
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -487,7 +487,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s((before|bfore)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a.m|p.m))',
+        patterns = re.findall(r'\s((before|bfore)[\s-]*([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))',
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -545,7 +545,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\D(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
-                              r'([0-5][0-9])[\s-]*?(pm|am|a.m|p.m))',
+                              r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -593,7 +593,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a.m|p.m))', self.processed_text.lower())
+        patterns = re.findall(r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             t1 = pattern[1]
@@ -775,7 +775,7 @@ class TimeDetector(object):
             original_list.append(original)
         return time_list, original_list
 
-    def _detect_24_hour_format(self, time_list=None, original_list=None):
+    def _detect_24_hour_optional_minutes_format(self, time_list=None, original_list=None):
         """
         Detects time in the following format
 
@@ -802,7 +802,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\D((00|[0]?[2-9]|[0]?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])?)[^am|pm|a.m|p.m|\d]',
+        patterns = re.findall(r'\D((00|[0]?[2-9]|[0]?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])?)(?!\s?(?:am|pm|a\.m|p\.m|\d))',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -843,7 +843,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\D((00|1[3-9]?|2[0-3])[:.\s]([0-5][0-9]))[^am|pm|a.m|p.m|\d]',
+        patterns = re.findall(r'\D((00|1[3-9]?|2[0-3])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -880,7 +880,7 @@ class TimeDetector(object):
         Few valid examples:
 
         "02:59 morning", "14:33 early",
-        "evening 14: ", "00.45 noon", "tonight 013 41z "
+        "evening 14:23", "00.45 noon", "tonight 013 41z "
 
         Args:
             time_list (list): Optional, list to store dictionaries of detected time entities
@@ -895,25 +895,25 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\D(([0]?[1-9]|1[0-1])[:.\s]([0-5][0-9]))[^am|pm|a.m|p.m|\d]',
+        patterns = re.findall(r'\D(([0]?[1-9]|1[0-2])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
                               self.processed_text.lower())
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)\s', self.processed_text.lower())
         pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)\s', self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)\s', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
-            t2 = pattern[2]
+            t1 = int(pattern[1])
+            t2 = int(pattern[2])
             time = {
-                'hh': int(t1),
-                'mm': int(t2),
+                'hh': t1,
+                'mm': t2,
             }
-            if len(pattern_am) > 0:
+            if pattern_am:
                 time['nn'] = 'am'
-            elif len(pattern_pm) > 0:
+            elif pattern_pm:
                 time['nn'] = 'pm'
-            elif len(pattern_night) > 0:
-                time['nn'] = 'am' if int(t1) < 5 else 'pm'
+            elif pattern_night:
+                time['nn'] = 'am' if (t1 == 12 or t1 < 5) else 'pm'
             else:
                 return time_list, original_list
             time_list.append(time)
@@ -951,31 +951,31 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'((?:by|before|after|at|on|dot|exactly|exact)[\s-]*([1-9]|1[0-2]?))\D',
+        patterns = re.findall(r'((?:by|before|after|at|on|dot|exactly|exact)[\s-]*([0]?[1-9]|1[0-2]))\D',
                               self.processed_text.lower())
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)', self.processed_text.lower())
         pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)', self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)', self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
+            t1 = int(pattern[1])
             time = {
-                'hh': int(t1),
+                'hh': t1,
                 'mm': 0,
             }
-            if len(pattern_am) > 0:
+            if pattern_am:
                 time['nn'] = 'am'
-            elif len(pattern_pm) > 0:
+            elif pattern_pm:
                 time['nn'] = 'pm'
-            elif len(pattern_night) > 0:
-                time['nn'] = 'am' if int(t1) < 5 else 'pm'
+            elif pattern_night:
+                time['nn'] = 'am' if (t1 == 12 or t1 < 5) else 'pm'
             else:
                 return time_list, original_list
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
 
-    def _detect_24_hour_without_format(self, time_list=None, original_list=None):
+    def _detect_24_hour_format(self, time_list=None, original_list=None):
         """
         Detects time in the following format
 
@@ -998,16 +998,16 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\D((00|[0]?[2-9]|[0]?1[0-9]?|2[0-3])[:.\s]([0-5][0-9]))[^am|pm|a.m|p.m|\d]',
+        patterns = re.findall(r'\D((00|[0]?[2-9]|[0]?1[0-9]?|2[0-3])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
-            t2 = pattern[2]
-            meridiem = self._get_meridiem(int(t1), int(t2))
+            t1 = int(pattern[1])
+            t2 = int(pattern[2])
+            meridiem = self._get_meridiem(t1, t2)
             time = {
-                'hh': int(t1),
-                'mm': int(t2),
+                'hh': t1,
+                'mm': t2,
                 'nn': meridiem
             }
             time_list.append(time)
