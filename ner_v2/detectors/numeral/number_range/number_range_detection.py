@@ -99,7 +99,8 @@ class NumberRangeDetector(BaseDetector):
                 entity_name=self.entity_name,
                 language=language,
                 unit_type=self.unit_type,
-                data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__), lang_code=self.language)
+                data_directory_path=get_lang_data_path(
+                    detector_path=os.path.abspath(__file__), lang_code=self.language)
             )
 
     @property
