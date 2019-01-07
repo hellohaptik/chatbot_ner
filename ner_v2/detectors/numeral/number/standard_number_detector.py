@@ -30,8 +30,6 @@ class BaseNumberDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.date = []
-        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 

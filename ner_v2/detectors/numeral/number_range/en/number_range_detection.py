@@ -16,10 +16,10 @@ class NumberRangeDetector(BaseNumberRangeDetector):
                                                   data_directory_path=NumberRangeDetector.data_directory_path,
                                                   unit_type=unit_type)
 
-        self.detector_preferences = [self._detect_min_num_range_with_start_variant,
-                                     self._detect_min_num_range_with_end_variant,
-                                     self._detect_max_num_range_with_start_variant,
-                                     self._detect_max_num_range_with_end_variant,
+        self.detector_preferences = [self._detect_min_num_range_with_prefix_variants,
+                                     self._detect_min_num_range_with_suffix_variants,
+                                     self._detect_max_num_range_with_prefix_variants,
+                                     self._detect_max_num_range_with_suffix_variants,
                                      self._detect_min_max_num_range,
                                      self._custom_num_range_between_num_and_num
                                      ]
@@ -39,13 +39,13 @@ class NumberRangeDetector(BaseNumberRangeDetector):
         """
         number_range_list = number_range_list or []
         original_list = original_list or []
-        between_min_max_range_regex = re.compile(r'(between\s+(' + NUMBER_REPLACE_TEXT + r'[\d+])\s*(?:and|to)\s*('
-                                                 + NUMBER_REPLACE_TEXT + r'[\d+]))', re.UNICODE)
-        number_range_matches = between_min_max_range_regex.findall(self.number_tagged_processed_text)
+        between_range_pattern = re.compile(ur'(between\s+({number}\d+)(?:\s+and|to|-)'
+                                           ur'\s+({number}\d+))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
+        number_range_matches = between_range_pattern.findall(self.number_tagged_processed_text)
         for match in number_range_matches:
             number_range_list, original_list = \
-                self._update_number_range_and_original_list(number_tag_min=match[1], number_tag_max=match[2],
-                                                            matched_text=match[0],
-                                                            number_range_list=number_range_list,
-                                                            original_list=original_list)
+                self._get_number_range(min_part_match=match[1], max_part_match=match[2],
+                                       full_match=match[0],
+                                       number_range_list=number_range_list,
+                                       original_list=original_list)
         return number_range_list, original_list

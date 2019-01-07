@@ -36,14 +36,14 @@ class NumberRangeDetector(BaseDetector):
             Tagged text: He has invited __number_of_people__ in his marriage
 
     Attributes:
-        text: string to extract entities from
-        entity_name: string by which the detected number would be replaced with on calling detect_entity()
+        text(str): string to extract entities from
+        entity_name(str): string by which the detected number would be replaced with on calling detect_entity()
 
-        tagged_text: string with numbers replaced with tag defined by entity name
-        processed_text: string with numbers detected removed
-        number_ranges: list of number ranges detected
-        original_number_text: list to store substrings of the text detected as numbers
-        tag: entity_name prepended and appended with '__'
+        tagged_text(str): string with numbers replaced with tag defined by entity name
+        processed_text(str): string with numbers detected removed
+        number_ranges(list): list of number ranges detected
+        original_number_text(list): list to store substrings of the text detected as numbers
+        tag(str): entity_name prepended and appended with '__'
 
     """
     @staticmethod
@@ -61,14 +61,17 @@ class NumberRangeDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, unit_type=None):
+    def __init__(self, entity_name='number_range', language=ENGLISH_LANG, unit_type=None):
         """Initializes a NumberDetector object
 
         Args:
-            entity_name: A string by which the detected numbers would be replaced with on calling detect_entity()
+            entity_name(str): A string by which the detected numbers would be replaced with on calling detect_entity()
             language (str, optional): language code of number text, defaults to 'en'
-            unit_type (str): number unit types like weight, currency, temperature, used to detect number with
-                               specific unit type.
+            unit_type (str, optional): number unit types like weight, currency, temperature, used to detect number with
+                                       specific unit type only. You can see all unit types supported inside
+                                       number detection language data with filename unit.csv
+
+
         """
         # assigning values to superclass attributes
         self._supported_languages = self.get_supported_languages()
@@ -77,8 +80,6 @@ class NumberRangeDetector(BaseDetector):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.number_ranges = []
-        self.original_number_text = []
         self.tag = '__' + self.entity_name + '__'
         self.language = language
         self.unit_type = unit_type
@@ -129,5 +130,8 @@ class NumberRangeDetector(BaseDetector):
         self.tagged_text = self.text
         number_range_detected, original_text = \
             self.language_number_range_detector.detect_number_range(self.processed_text)
+
+        self.processed_text = self.language_number_range_detector.processed_text
+        self.tagged_text = self.language_number_range_detector.tagged_text
 
         return number_range_detected, original_text

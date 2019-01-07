@@ -221,8 +221,9 @@ def number(request):
            fallback_value = None
            bot_message = None
            unit_type = None
-           output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                              fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
+           min_digit=1
+           max_digit=6
+           output = number(request)
            print output
 
                >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value':
@@ -258,7 +259,7 @@ def number(request):
 def number_range(request):
     """Use NumberDetector to detect numerals
 
-       Attributes:
+    Args:
         request: url parameters:
 
         request params:
@@ -276,47 +277,33 @@ def number_range(request):
 
 
        Returns:
-           dict or None: dictionary containing entity_value, original_text and detection;
+           HttpResponse: Response containing dictionary having containing entity_value, original_text and detection;
                          entity_value is in itself a dict with its keys varying from entity to entity
 
-       Example:
+       Examples:
 
            message = "we expect 200-300 people in room"
            entity_name = 'people_range'
            structured_value = None
            fallback_value = None
            bot_message = None
-           output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                              fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
+           unit_type=None
+           output = number_range(request)
            print output
 
                >> [{'detection': 'message', 'original_text': '200-300',
                   'entity_value': {'min_value': , 'unit': None}}]
-
-
-           message = "I want to reserve a table for 3 people"
-           entity_name = 'number_of_people'
-           structured_value = None
-           fallback_value = None
-           bot_message = None
-           unit_type = None
-           output = get_number(message=message, entity_name=entity_name, structured_value=structured_value,
-                              fallback_value=fallback_value, bot_message=bot_message, min_digit=1, max_digit=2)
-           print output
-
-               >> [{'detection': 'message', 'original_text': 'for 3 people', 'entity_value':
-                                                                        {'value': '3', 'unit': 'people'}}]
 
        """
     try:
         parameters_dict = get_parameters_dictionary(request)
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
-        number_range_detection = NumberRangeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+        number_range_detector = NumberRangeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                                      language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                                      unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
 
-        entity_output = number_range_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
+        entity_output = number_range_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
                                                       structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                       fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                                       bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
