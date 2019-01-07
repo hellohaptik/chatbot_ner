@@ -17,7 +17,7 @@ class NumberRangeDetector(BaseNumberRangeDetector):
                                                   unit_type=unit_type)
 
         self.detector_preferences = [self._detect_min_max_num_range,
-                                     self._custom_num_range_between_num_and_num
+                                     self._custom_num_range_between_num_and_num,
                                      self._detect_min_num_range_with_prefix_variants,
                                      self._detect_min_num_range_with_suffix_variants,
                                      self._detect_max_num_range_with_prefix_variants,
