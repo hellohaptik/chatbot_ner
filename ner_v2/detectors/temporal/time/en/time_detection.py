@@ -224,7 +224,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(
-            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)[\s-]*?[t][o][\s-]'
+            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)[\s-]*?to[\s-]'
             r'*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
             self.processed_text.lower())
         for pattern in patterns:
@@ -288,7 +288,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(
-            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?[t][o][\s-]*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*'
+            r'\s(([0]?[2-9]|[0]?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?to[\s-]*?([0]?[2-9]|[0]?1[0-2]?)[\s-]*'
             r'(am|pm|a\.m|p\.m))',
             self.processed_text.lower())
         for pattern in patterns:

@@ -45,7 +45,7 @@ class TimeDetectorTest(TestCase):
 
         if not all(other_list_size == len(original_texts)
                    for other_list_size in [len(hhs), len(mms), len(nns), len(ranges), len(time_types)]):
-            raise ValueError('Ill formatted test case row, all output rows must have same number of parts separated by'
+            raise ValueError('Ill-formatted test case row, all output rows must have same number of parts separated by'
                              '{}'.format(TimeDetectorTest.MULTI_SEPARATOR))
 
         expected_times = []
@@ -79,7 +79,7 @@ class TimeDetectorTest(TestCase):
                 expected_times, expected_original_texts = self._make_expected_output(row_dict=row)
                 expected_output = list(zip(expected_times, expected_original_texts))
                 detected_times, original_texts = time_detector.detect_entity(text=row[TimeDetectorTest.TEXT],
-                                                                                 range_enabled=range_enabled)
+                                                                             range_enabled=range_enabled)
 
                 for detected_output_pair in zip(detected_times, original_texts):
                     self.assertIn(detected_output_pair, expected_output)
