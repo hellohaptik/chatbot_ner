@@ -1,8 +1,8 @@
 ## Number Range Detector 
 
-This detector module will help to detect minimum and maximum number values from text containing range values. For example - "200 to 300" (minimum=200 and maximum=300),  "more than 2000" (mininum=2000, maximum=Not define) 
+This detector module detects minimum and maximum number values from text containing range values. For example - "200 to 300" (minimum=200 and maximum=300),  "more than 2000" (mininum=2000, maximum=None) 
 
- We are currently providing number detection supports in 6 languages, which are
+ We are currently providing number detection supports in 2 languages, which are
 
 - English
 - Hindi
@@ -15,7 +15,7 @@ This detector module will help to detect minimum and maximum number values from 
   >> from ner_v2.detector.number.number_range.number_range_detection import NumberRangeDetector
   >> detector = NumberRangeDetector(entity_name='number_range', language='en')  # here language will be ISO 639-1 code
   >> detector.detect_entity(text= 'I annual salary is 200k-500k rupees')
-  >> {'entity_value': [{'min_val': '200000', 'max_value': '500000', 'unit': 'rupees'}], 'original_text':['200k-500k rupees']}
+  >> {'entity_value': [{'min_value': '200000', 'max_value': '500000', 'unit': 'rupees'}], 'original_text':['200k-500k rupees']}
   ```
 
 - **Curl Command**
@@ -34,7 +34,7 @@ This detector module will help to detect minimum and maximum number values from 
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/number_range?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&source_language=en&language_script=en&unit_type='
+  $ curl -i 'http://'$URL':'$PORT'/v2/number_range?message=i%20want%20more%20than%2012%20mangoes&entity_name=number_range&structured_value=&fallback_value=&bot_message=&source_language=en&language_script=en&unit_type='
   
   # Curl output
   $ {
@@ -84,9 +84,9 @@ In order to add any new language you have to follow below steps:
 
 ####  GuideLines to create data files
 
-Below is the brief about how to create data file `number_range_keywords.csv` All the description of the file is explained using Hindi as a reference language. 
+Here, we describe the structure and data that goes into `number_range_keywords.csv` using Hindi as the reference language
 
-1. **number_range_keywords.csv**:  This file contains the vocabs for range keywords, their position around number values and their range type.
+1. **number_range_keywords.csv**:  This file contains the vocabulary used for mentioning ranges in the target language, their position around number values and their range type.
 
    |                        range_variants                        | position | range_type |
    | :----------------------------------------------------------: | :------: | :--------: |
@@ -96,13 +96,23 @@ Below is the brief about how to create data file `number_range_keywords.csv` All
    | se niche \| se kam \| se sasta \| se saste k aas paas\|  k aas pas\| k lagbhag \|  से नीचे \| से कम \| से सस्ता \| से सस्ते \|   के आस पास  \| के लगभग |    1     |    max     |
    |                           se\|-\|से                           |    0     |  min_max   |
 
-   Here, the 1st column will contain the variants of range keywords separated by pipes, which are present before or after or in between number values and defines what type of number value is present, either min or max. 
+   Here, the 1st column contains the variants of range keywords separated by pipes, which are present before or after or in between number values. The variants are grouped together by the part of the range they indicate. For example, `se adhik` (more than)  is used to indicate a minimum part in the range `500 se adhik` (more than 500)
 
-   2rd column corresponds to the position of the keyword. If 1 means it will be present after number value, -1 if present before number.  
+   2nd column indicates the position of the variants in the 1st column around a number in the text.
 
-   3rd column defines the range type of number i.e if it contains min value or max value or both.    
+   - `-1` : means the variant appears as a prefix to the number in the target language (E.g. `kam se kam` 500 (at least 500))
+   - `0` means the variant appears sandwiched between two numbers in the target language (E.g. `300 se 500` (300 to 500))
+   - `1` means the variant appears as a suffix to the number in the target language (E.g. `500 se niche` (less than 500))
 
-   **For example** - *mujhe 2000 se jada log chahiye kal ki rally me* . In this text, range keyword `se jada` which is present in position `1` (after number) defines that number `2000` is the minimum value defined in the text, since no maximum value specified in text, hence it will be null.
+   
+
+   3rd column defines what part of the range the variants in the first column appear in the context of.
+
+   -  `min`: The variants appear only when mentioning a minimum value of the range
+   - `max`: The variants appear only when mentioning a maximum value of the range
+   -  `min_max`: The variants appear when mentioning the entire range (both parts)
+
+   **For example** - `mujhe 2000 se jada log chahiye kal ki rally me`  (I want more than 2000 people in the rally tomorrow). In this text, range keyword `se jada` appears as suffix to the number 2000 (hence position = 1), defines that number `2000` is the minimum value defined in the text, since no maximum value specified in text, hence it will be null.
 
 
 #### Guidelines to add new detectors for number range apart from builtin ones:
@@ -133,14 +143,32 @@ class NumberRangeDetector(BaseNumberRangeDetector):
 Note that the class name must be `NumberRangeDetector` 
 and should inherit from `ner_v2.detectors.numeral.number_range.standard_number_range_detector.BaseNumberRangeDetector`
 
-Next, we define a custom detector. For our purposes, we will add a detector to detect number range from text of patter 'between *number1* and *number2*. It will detect number1 and number2 as minimum value and maximum value respectively.
+Next, we define a custom detector. For our purposes, we will add a detector to detect number range from text of pattern `between <number1> and <number2>`. It will detect number1 and number2 as minimum value and maximum value respectively.
 
 1. The custom detector must accept two arguments `number_range_list` and `original_list` and must operate on `self.processed_text (This text contained tagged number text i.e number will be replaced with __dnumber__<number>`). So in your pattern, you just have to include pattern with number tag instead of `\d+` for the number. (as it handle all number having decimal, ordinal and integer)
+
+   ```
+   Note that self.processed_text is not the text passed into the `detect` or `detect_entity` function. Internally BaseNumberRangeDetector runs NumberDetector on the passed in text to tag it with numbers as this architecture allows us to write simple patterns without worrying about how numbers actually appear (decimal, ordinal, integers, etc) in the text
+   
+   E.g. `more than 3 but less than 2.5` -> `more than __number__1 but less than __number__0`
+   
+   Your custom patterns must operate on the latter, so instead of writing a `\d+` for numbers, you must write `'{number}\d+'.format(ner_v2.detectors.numeral.constant.NUMBER_REPLACE_TEXT)`. Please refer to the code block below to see an example of writing custom pattern
+   ```
+
 2. The two arguments `number_range_list` and `original_list` can both be either None or lists of the same length.
    `number_range_list` contains parsed min and max value  along with unit and `original_list` contains their corresponding text substrings in the passed text that were detected as numbers range.
-3. Your detector must append parsed number range dicts with keys `'min_value', 'max_value', 'unit'` to `number_range_list`
-   and to `original_list` their corresponding substrings from `self.processed_text` that were parsed into numbers.
+
+3. Unlike other detectors, once you detect min part and/or max part of a range you must call
+   `ner_v2.detectors.numeral.number_range.standard_number_range_detection.BaseNumberDetector. _get_number_range` i.e. `self. _get_number_range` which takes three str/unicode arguments and returns a `Tuple[Dict[str, Union[str, unicode]], Union[str, unicode]]` i.e. a pair of parsed dict with keys `'min_value', 'max_value', 'unit'` and substring from the passed in text that was detected as a range. The function takes care of reverse lookup and conversion to convert something like `from __number__0 to  __number__1` to whatever it originally was, say, `from 300 to  500```
+
+   - ```min_part_match` - number part of the `self.processed_text` that was detected as a minimum part of the range. E.g.  `from __number__0 to  __number__1`. In this case `min_part_match='__number__0'`. This can be None if no min part was detected.
+   - `max_part_match` - number part of the `self.processed_text` that was detected as a minimum part of the range. E.g. `from __number__0 to  __number__1`. In this case `max_part_match='__number__1'`. This can be None if no max part was detected.
+   - `full_match` - the entire part of the `self.processed_text` that denotes a range, a substring that contains both `min_part_match` and `max_part_match` as its substrings. E.g. `from __number__0 to  __number__1`. In this case `full_match='from __number__0 to  __number__1'`.
+
+   Once you get the parsed number range dict and original text from this function, you must check if both are not None and if found not None, you must append them to `number_range_list` and `original_list`respectively
+
 4. Take care to not mutate `self.processed_text` in any way as main detect method in base class depends on it to eliminate already detected number from it after each detector is run.
+
 5. Finally, your detector must return a tuple of (number_range_list, original_list). Ensure that `number_range_list` and `original_list` are of equal lengths before returning them.
 
 ```python

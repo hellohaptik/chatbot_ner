@@ -188,6 +188,24 @@ Below we show an example where we put our custom detector on top to execute it b
         ]
 ```
 
+Also to run the custom detector only for few set of entities, you can do it by putting a `if` condition to check if given entity_name belong to list, and modify the detector preference only for them. Below is the example where custom detector will run just for `person_count` and `traveller_number` entity. For other entities it will follow the default pattern defined in BaseNumberDetector.
+
+```python
+	def __init__(self, entity_name='number', unit_type=None):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             data_directory_path=NumberDetector.data_directory_path,
+                                            unit_type=unit_type)
+
+        if entity name in ['person_count', 'traveller_number']:
+            self.detector_preferences = [
+            	self._custom_detect_number_of_people_format,
+            	self._detect_number_from_digit,
+            	self._detect_number_from_numerals
+            ]
+```
+
+
+
 Putting it all together, we have
 
 ```python
@@ -210,11 +228,12 @@ class NumberDetector(BaseNumberDetector):
                                              unit_type=unit_type)
 
 
-        self.detector_preferences = [
-            self._custom_detect_number_of_people_format,
-            self._detect_number_from_digit,
-            self._detect_number_from_numerals
-        ]
+        if entity name in ['person_count', 'traveller_number']:
+            self.detector_preferences = [
+            	self._custom_detect_number_of_people_format,
+            	self._detect_number_from_digit,
+            	self._detect_number_from_numerals
+            ]
 
     def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         number_list = number_list or []

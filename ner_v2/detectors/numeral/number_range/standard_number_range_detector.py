@@ -387,7 +387,6 @@ class BaseNumberRangeDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
 
 
-
 class NumberRangeDetector(BaseNumberRangeDetector):
     def __init__(self, entity_name, language, data_directory_path, unit_type=None):
         super(NumberRangeDetector, self).__init__(entity_name=entity_name,
