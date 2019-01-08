@@ -75,11 +75,11 @@ class TimeDetectorTest(TestCase):
             for index, row in language_tests_df.iterrows():
                 if not self.is_nan(row[TimeDetectorTest.BOT_MESAGE]):
                     time_detector.set_bot_message(bot_message=row[TimeDetectorTest.BOT_MESAGE])
-                    range_enabled = not self.is_nan(row[TimeDetectorTest.RANGE])
-                    expected_times, expected_original_texts = self._make_expected_output(row_dict=row)
-                    expected_output = list(zip(expected_times, expected_original_texts))
-                    detected_times, original_texts = time_detector.detect_entity(text=row[TimeDetectorTest.TEXT],
+                range_enabled = not self.is_nan(row[TimeDetectorTest.RANGE])
+                expected_times, expected_original_texts = self._make_expected_output(row_dict=row)
+                expected_output = list(zip(expected_times, expected_original_texts))
+                detected_times, original_texts = time_detector.detect_entity(text=row[TimeDetectorTest.TEXT],
                                                                                  range_enabled=range_enabled)
 
-                    for detected_output_pair in zip(detected_times, original_texts):
-                        self.assertIn(detected_output_pair, expected_output)
+                for detected_output_pair in zip(detected_times, original_texts):
+                    self.assertIn(detected_output_pair, expected_output)

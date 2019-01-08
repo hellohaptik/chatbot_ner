@@ -641,7 +641,7 @@ class TimeDetector(object):
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[2]
+            t1 = int(pattern[2])
             td = pattern[3]
             hours = ['hour', 'hours', 'hrs', 'hr']
             mins = ['min', 'mins', 'minutes']
@@ -682,7 +682,7 @@ class TimeDetector(object):
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
+            t1 = int(pattern[1])
             td = pattern[2]
             hours = ['hour', 'hours', 'hrs', 'hr']
             mins = ['min', 'mins', 'minutes']
