@@ -169,6 +169,7 @@ class BaseNumberRangeDetector(object):
         """
         self.text = text
         self.tagged_text = text
+        self.processed_text = text
         self.number_detected_map = self._get_number_tag_dict()
         self.processed_text = self._tag_number_in_text(text)
 
