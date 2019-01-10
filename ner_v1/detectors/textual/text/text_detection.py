@@ -1,14 +1,14 @@
-import re
 import collections
+import re
+
 from six import iteritems
 
+import language_utilities.constant as lang_constant
 from chatbot_ner.config import ner_logger
 from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
-# from lib.nlp.regexreplace import RegexReplace
 from ner_v1.detectors.base_detector import BaseDetector
-from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 
 
 class TextDetector(BaseDetector):
@@ -22,7 +22,8 @@ class TextDetector(BaseDetector):
 
     Attributes:
         text (str): string to extract entities from
-        entity_name (str): string by which the detected time entities would be replaced with on calling detect_entity()
+        entity_name (str): string by which the detected time entities would
+                           be replaced with on calling detect_entity()
         text_dict (dict): dictionary to store lemmas, stems, ngrams used during detection process
         _fuzziness (str or int): If this parameter is str, elasticsearch's
                                  auto is used with low and high term distances. Default low and high term distances
@@ -39,7 +40,7 @@ class TextDetector(BaseDetector):
         tag (str): entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name=None, source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, entity_name=None, source_language_script=lang_constant.ENGLISH_LANG, translation_enabled=False):
         """
         Initializes a TextDetector object with given entity_name
 
@@ -51,7 +52,11 @@ class TextDetector(BaseDetector):
                                  particular language, else False
         """
         # assigning values to superclass attributes
-        self._supported_languages = [ENGLISH_LANG, HINDI_LANG]
+        self._supported_languages = [
+            lang_constant.ENGLISH_LANG,
+            lang_constant.HINDI_LANG,
+            lang_constant.GUJARATI_LANG,  # Added temporarily till text detection is ported to v2 api
+        ]
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
 
         self.text = None
@@ -315,8 +320,9 @@ class TextDetector(BaseDetector):
         value_final_list = []
         variants_to_values = collections.OrderedDict()
 
+        text = u' '.join(TOKENIZER.tokenize(self.processed_text))
         _variants_to_values = self.db.get_similar_dictionary(entity_name=self.entity_name,
-                                                             text=u' '.join(TOKENIZER.tokenize(self.processed_text)),
+                                                             text=text,
                                                              fuzziness_threshold=self._fuzziness,
                                                              search_language_script=self._target_language_script)
         for variant, value in iteritems(_variants_to_values):
@@ -344,7 +350,7 @@ class TextDetector(BaseDetector):
         variants_list = exact_matches + fuzzy_variants
 
         for variant in variants_list:
-            original_text = self._get_entity_substring_from_text(variant, self.processed_text)
+            original_text = self._get_entity_substring_from_text(variant)
             if original_text:
                 value_final_list.append(variants_to_values[variant])
                 original_final_list.append(original_text)
@@ -355,32 +361,29 @@ class TextDetector(BaseDetector):
                 self.processed_text = _pattern.sub(self.tag, self.processed_text)
         return value_final_list, original_final_list
 
-    def _get_entity_substring_from_text(self, variant, text):
+    def _get_entity_substring_from_text(self, variant):
         """
-        Checks ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
+        Check ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
+        and return the closest substring in the text that matches the variant
 
         Args:
-            variant: string, ngram of variant to fuzzy detect in the text using Levenshtein distance
-            text: text to detect entities from
+            variant(str or unicode): string, ngram of variant to fuzzy detect in the text using Levenshtein distance
 
         Returns:
-            str or unicode: part of the given text that was detected as entity given the variant, None otherwise
+            str or unicode or None: part of the given text that was detected as entity given the variant,
+                                    None otherwise
 
         Example:
-            text_detection = TextDetector('city')
-            ...
-            text_detection._get_entity_from_text(self, variant, text)
-            text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
-            text_detection.get_entity_from_text('chennai', text)
+            >>> text_detector = TextDetector('city')
+            >>> text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
+            >>> text_detector.detect_entity(text)
+            >>> text_detector._get_entity_substring_from_text(variant='chennai')
+            'chennai'
+            >>> text_detector._get_entity_substring_from_text(variant='delhi')
+            'delehi'
 
-            Output:
-                'chennai'
-
-            text_detection.get_entity_from_text('Delhi', text)
-
-            Output:
-                'delehi'
         """
+        text = self.processed_text
         variant_tokens = TOKENIZER.tokenize(variant)
         text_tokens = TOKENIZER.tokenize(text)
         original_text_tokens = []
