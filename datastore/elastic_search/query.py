@@ -1,10 +1,14 @@
+# std imports
 from six import string_types
 import re
 import collections
-from lib.nlp.const import TOKENIZER
+
+# Local imports
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
+from chatbot_ner.config import ner_logger
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
+from lib.nlp.const import TOKENIZER
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -45,6 +49,145 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
         results_dictionary[result['_source']['value']] = result['_source']['variants']
 
     return results_dictionary
+
+
+def dictionary_supported_language_query(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    """
+    data = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ]
+            }
+        },
+        "aggs": {
+            "unique_values": {
+                "terms": {
+                    "field": "language_script.keyword",
+                    "size": 100000
+                }
+            }
+        },
+        "size": 0
+    }
+    kwargs = dict(
+        kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE,
+        index=index_name, filter_path=['aggregations.unique_values.buckets.key']
+    )
+    search_results = _run_es_search(connection, **kwargs)
+    language_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    return language_list
+
+
+def get_dictionary_records(connection, index_name, doc_type, entity_name, word_list=None, **kwargs):
+    """
+    """
+    data = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ]
+            }
+        },
+        "size": 1000000
+    }
+
+    if word_list:
+        data['query']['bool']['must'].append({
+            "terms": {
+                "value.keyword": word_list
+            }
+        })
+
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+                  scroll='1m')
+    search_results = _run_es_search(connection, **kwargs)
+
+    # Parse hits
+    results_dictionary = {}
+    results = search_results['hits']['hits']
+    for result in results:
+        results_dictionary.setdefault(result['_source']['value'], {})
+        results_dictionary[result['_source']['value']][result['_source']['language_script']] = {
+            '_id': result['_id'],
+            'value': result['_source']['variants']
+        }
+
+    return results_dictionary
+
+
+def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    """
+    data = {
+        "sort": [
+            {
+                "value.keyword": {
+                    "order": "asc"
+                }
+            }
+        ],
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ],
+                "minimum_should_match": 0,
+                "should": []
+            }
+        },
+        "aggs": {
+            "unique_values": {
+                "terms": {
+                    "field": "value.keyword",
+                    "size": 10000000
+                }
+            }
+        },
+        "size": 0
+    }
+
+    word_search_term = kwargs.pop('word_search_term')
+    variant_search_term = kwargs.pop('variant_search_term')
+
+    if word_search_term:
+        data['query']['bool']['minimum_should_match'] = 1
+        data['query']['bool']['should'].append({
+            "wildcard": {
+                "value.keyword": "*{0}*".format(word_search_term)
+            }
+        })
+
+    if variant_search_term:
+        data['query']['bool']['minimum_should_match'] = 1
+        data['query']['bool']['should'].append({
+            "match": {
+                "variants": variant_search_term
+            }
+        })
+
+    kwargs = dict(
+        kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE,
+        index=index_name, filter_path=['aggregations.unique_values.buckets.key']
+    )
+    search_results = _run_es_search(connection, **kwargs)
+    word_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    return word_list
 
 
 def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,

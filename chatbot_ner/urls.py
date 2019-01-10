@@ -40,4 +40,7 @@ urlpatterns = patterns('',
 
     #  Train Crf Model
     url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
+
+    url(r'^dictionary/languages/v1/(?P<dictionary_name>.+)$', 'external_api.api.dictionary_language_view'),
+    url(r'^dictionary/data/v1/(?P<dictionary_name>.+)$', 'external_api.api.dictionary_data_view')
 )

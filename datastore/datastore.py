@@ -404,6 +404,62 @@ class DataStore(object):
                                                        language_script=language_script,
                                                        **kwargs)
 
+    def get_dictionary_supported_languages(self, dictionary_name, **kwargs):
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.dictionary_supported_language_query(
+                connection=self._client_or_connection,
+                index_name=self._store_name,
+                doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                entity_name=dictionary_name,
+                request_timeout=request_timeout,
+                **kwargs
+            )
+
+            return results_dictionary
+
+    def get_dictionary_unique_words(self, dictionary_name, **kwargs):
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.dictionary_unique_words(
+                connection=self._client_or_connection,
+                index_name=self._store_name,
+                doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                entity_name=dictionary_name,
+                request_timeout=request_timeout,
+                **kwargs
+            )
+
+            return results_dictionary
+
+    def get_dictionary_records(self, dictionary_name, word_list=None, **kwargs):
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_dictionary = elastic_search.query.get_dictionary_records(
+                connection=self._client_or_connection,
+                index_name=self._store_name,
+                doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                entity_name=dictionary_name,
+                word_list=word_list,
+                request_timeout=request_timeout,
+                **kwargs
+            )
+
+            return results_dictionary
+
+
     def transfer_entities_elastic_search(self, entity_list):
         """
         This method is used to transfer the entities from one environment to the other for elastic search engine

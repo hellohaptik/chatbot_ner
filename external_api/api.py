@@ -14,7 +14,12 @@ from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, EN
     LIVE_CRF_MODEL_PATH
 
 from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponseNotAllowed
 from models.crf_v2.crf_train import CrfTrain
+
+from external_api.lib import dictionary_utils
+from external_api.response_utils import external_api_response_wrapper
+from external_api.exceptions import APIHandlerException
 
 
 def get_entity_word_variants(request):
@@ -259,3 +264,50 @@ def train_crf_model(request):
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+@csrf_exempt
+@external_api_response_wrapper
+def dictionary_language_view(request, dictionary_name):
+    """
+    """
+    if request.method == 'GET':
+        # Fetch Languages supported by the dictionary
+        return {
+            'supported_languages': dictionary_utils.dictionary_supported_languages(dictionary_name)
+        }
+
+    elif request.method == 'POST':
+        # Update language support in the specified dictionary
+        data = json.loads(request.body.decode(encoding='UTF-8'))
+        dictionary_utils.dictionary_update_languages(dictionary_name, data.get('supported_languages', []))
+        return True
+
+    else:
+        raise APIHandlerException("{0} is not allowed.".format(request.method))
+
+
+@csrf_exempt
+@external_api_response_wrapper
+def dictionary_data_view(request, dictionary_name):
+    """
+    """
+    if request.method == 'GET':
+        params = request.GET.dict()
+        # Fetch Languages supported by the dictionary
+
+        return dictionary_utils.search_dictionary_records(
+            dictionary_name,
+            word_search_term=params.get('word_search_term', None),
+            variant_search_term=params.get('variant_search_term', None),
+            pagination_size=params.get('size', 10),
+            pagination_from=params.get('from', 0),)
+
+    elif request.method == 'POST':
+        # Update language support in the specified dictionary
+        data = json.loads(request.body.decode(encoding='UTF-8'))
+        dictionary_utils.update_dictionary_records(dictionary_name, data)
+        return True
+
+    else:
+        raise APIHandlerException("{0} is not allowed.".format(request.method))
