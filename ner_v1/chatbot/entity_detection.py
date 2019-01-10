@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
@@ -870,6 +872,10 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        timezone (str, optional): str identifier for the timezone to use.
+                                  E.g. 'Asia/Kolkata'
+                                  Please refer pytz docs for this.
+                                  Defaults to 'UTC'
 
 
     Returns:
@@ -1066,6 +1072,6 @@ def parse_fuzziness_parameter(fuzziness):
             fuzziness = int(fuzziness)
         else:
             fuzziness = tuple([int(value.strip()) for value in fuzziness_split])
-    except ValueError as e:
+    except ValueError:
         fuzziness = 1
     return fuzziness

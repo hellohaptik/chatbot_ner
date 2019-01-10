@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 import ast
 import json
 
+import six
 from django.http import HttpResponse
 
 from chatbot_ner.config import ner_logger
@@ -32,7 +35,7 @@ def to_bool(value):
     if isinstance(value, (int, float)):
         return bool(value)
 
-    if isinstance(value, (str, unicode,)):
+    if isinstance(value, (str, six.text_type)):
         return value.lower() == 'true'
 
     return False
