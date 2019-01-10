@@ -93,6 +93,7 @@ def text(request):
             structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
             fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
             bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
+            language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
             fuzziness=parameters_dict[PARAMETER_FUZZINESS],
             min_token_len_fuzziness=parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS],
             live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH],
