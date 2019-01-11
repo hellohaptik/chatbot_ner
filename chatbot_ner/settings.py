@@ -40,7 +40,8 @@ INSTALLED_APPS = (
     'datastore',
     'ner_v1',
     'ner_v2',
-    'models'
+    'models',
+    'django_nose'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -65,6 +66,31 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+
+# Keeping this block here for ease in the future
+# TEST_DB_PATH = os.environ.get('TEST_DB_PATH') or '/dev/shm/chatbot_ner_test.db.sqlite3'
+# if 'test' in sys.argv:
+#    DATABASES['default'] = {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': TEST_DB_PATH,
+#        'CONN_MAX_AGE': 60
+#    }
+
+
+# FOR TEST CASES - COMMON SETTINGS FOR ALL ENVIRONMENTS
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+    
+    def __getitem__(self, item):
+        return None
+
+
+MIGRATION_MODULES = DisableMigrations()
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
