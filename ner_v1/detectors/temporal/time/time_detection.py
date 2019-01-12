@@ -115,6 +115,8 @@ class TimeDetector(BaseDetector):
         """
         time_list = []
         original_list = []
+        time_list, original_list = self._detect_time_with_coln_format(time_list, original_list)
+        self._update_processed_text(original_list)
         time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_range_12_hour_format_without_min(time_list, original_list)
@@ -1467,3 +1469,29 @@ class TimeDetector(BaseDetector):
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
         return time_list_final, original_list_final
+
+    def _detect_time_with_coln_format(self, time_list, original_list):
+        patterns = re.findall(r'\s*((\d+)\:(\d+))\s*', self.processed_text.lower(), re.U)
+        if time_list is None:
+            time_list = []
+        if original_list is None:
+            original_list = []
+
+        for pattern in patterns:
+            t1 = pattern[1]
+            t2 = pattern[2]
+            original = pattern[0]
+
+            time = {
+                'hh': int(t1),
+                'mm': int(t2),
+                'time_type': None
+            }
+
+            original_list.append(original)
+            time_list.append(time)
+
+        return time_list, original_list
+
+
+
