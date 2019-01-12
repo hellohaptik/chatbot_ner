@@ -1,7 +1,6 @@
 from datetime import datetime
 import re
 import pytz
-from chatbot_ner.config import ner_logger
 from ner_v1.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
 from ner_v1.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
