@@ -48,7 +48,7 @@ class BaseRegexTime(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which these regex will work
-        self.detector_preferences = [self._detect_time_with_coln_format, self._self._detect_hour_minute
+        self.detector_preferences = [self._detect_time_with_coln_format, self._detect_hour_minute
                                      ]
 
     def detect_time(self, text):
