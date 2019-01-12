@@ -1,7 +1,7 @@
 from datetime import datetime
 import re
 import pytz
-
+from chatbot_ner.config import ner_logger
 from ner_v1.constant import TWELVE_HOUR, PM_MERIDIEM, AM_MERIDIEM, EVERY_TIME_TYPE
 from ner_v1.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
@@ -116,6 +116,8 @@ class TimeDetector(BaseDetector):
         time_list = []
         original_list = []
         time_list, original_list = self._detect_time_with_coln_format(time_list, original_list)
+        ner_logger.debug("time_list %s" % str(time_list))
+        ner_logger.debug("original_list %s" % str(original_list))
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_range_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
