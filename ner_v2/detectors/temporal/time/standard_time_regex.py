@@ -7,7 +7,6 @@ import pytz
 import re
 import abc
 import datetime
-from chatbot_ner.config import ner_logger
 
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
@@ -241,6 +240,29 @@ class BaseRegexTime(object):
         return time_list, original_list
 
     def _detect_time_with_coln_format(self, time_list, original_list):
+        """
+        This method is used to detect a specific time format of the form <hh>:<mm>
+        1.  कल 5:30 बजे
+        2.  आज १०:१५ बजे अजना
+
+        Args:
+            time_list (list): list of dicts consisting of the detected time entity
+            original_list (list): list consisting of the origin subtext which is detected as time entity
+
+        Returns:
+            time_list (list): list of dicts consisting of the detected time entity
+            original_list (list): list consisting of the origin subtext which is detected as time entity
+
+        Example:
+
+            >>> time_list = []
+            >>> original_list = []
+            >>> procprocessed_text = u'आज 05:40 बजे अजना'
+            >>> _detect_time_with_coln_format(time_list, original_list)
+            >>> ([{'hh': 5, 'mm' : 40, 'time_type': None}], ["05:40"])
+
+
+        """
         patterns = re.findall(r'\s*((\d+)\:(\d+))\s*', self.processed_text.lower(), re.U)
         if time_list is None:
             time_list = []
@@ -253,12 +275,16 @@ class BaseRegexTime(object):
             original = pattern[0]
 
             if len(t1) <= 2 and len(t2) <= 2:
-
+                hh = int(t1)
+                mm = int(t2)
                 time = {
-                    'hh': int(t1),
-                    'mm': int(t2),
+                    'hh': hh,
+                    'mm': mm,
                     'time_type': None
                 }
+
+                nn = self._get_meridiem(hh, mm, original)
+                time.update({'nn': nn})
 
                 original_list.append(original)
                 time_list.append(time)
