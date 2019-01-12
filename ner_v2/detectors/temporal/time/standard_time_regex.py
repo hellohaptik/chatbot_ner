@@ -259,7 +259,7 @@ class BaseRegexTime(object):
             >>> original_list = []
             >>> procprocessed_text = u'आज 05:40 बजे अजना'
             >>> _detect_time_with_coln_format(time_list, original_list)
-            >>> ([{'hh': 5, 'mm' : 40, nn:'pm', 'time_type': None}], ["05:40"])
+            >>> ([{'hh': 5, 'mm': 40, 'nn': 'pm', 'time_type': None}], ["05:40"])
 
 
         """
