@@ -7,6 +7,7 @@ import pytz
 import re
 import abc
 import datetime
+from chatbot_ner.config import ner_logger
 
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 
@@ -47,7 +48,7 @@ class BaseRegexTime(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which these regex will work
-        self.detector_preferences = [self._detect_hour_minute
+        self.detector_preferences = [self._detect_time_with_coln_format, self._self._detect_hour_minute
                                      ]
 
     def detect_time(self, text):
@@ -236,6 +237,32 @@ class BaseRegexTime(object):
 
             time_list.append(time)
             original_list.append(original)
+
+        return time_list, original_list
+
+    def _detect_time_with_coln_format(self, time_list, original_list):
+        patterns = re.findall(r'\s*((\d+)\:(\d+))\s*', self.processed_text.lower(), re.U)
+        if time_list is None:
+            time_list = []
+        if original_list is None:
+            original_list = []
+
+        for pattern in patterns:
+            t1 = pattern[1]
+            t2 = pattern[2]
+            original = pattern[0]
+
+            time = {
+                'hh': int(t1),
+                'mm': int(t2),
+                'time_type': None
+            }
+
+            original_list.append(original)
+            time_list.append(time)
+
+        ner_logger.debug("time_list %s" % str(time_list))
+        ner_logger.debug("original_list %s" % str(original_list))
 
         return time_list, original_list
 
