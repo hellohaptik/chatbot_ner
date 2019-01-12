@@ -252,17 +252,19 @@ class BaseRegexTime(object):
             t2 = pattern[2]
             original = pattern[0]
 
-            time = {
-                'hh': int(t1),
-                'mm': int(t2),
-                'time_type': None
-            }
+            if len(t1) <= 2 and len(t2) <= 2:
 
-            original_list.append(original)
-            time_list.append(time)
+                time = {
+                    'hh': int(t1),
+                    'mm': int(t2),
+                    'time_type': None
+                }
 
-        ner_logger.debug("time_list %s" % str(time_list))
-        ner_logger.debug("original_list %s" % str(original_list))
+                original_list.append(original)
+                time_list.append(time)
+
+            ner_logger.debug("time_list %s" % str(time_list))
+            ner_logger.debug("original_list %s" % str(original_list))
 
         return time_list, original_list
 
