@@ -25,76 +25,113 @@ def dictionary_update_languages(dictionary_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
-    word_list = get_dictionary_words(dictionary_name)
+    word_list = get_dictionary_unique_words(dictionary_name)
     if not word_list:
         raise APIHandlerException('This dictionary does not have any records. Please verify the dictionary name')
 
     records_to_create = []
-    for language_code in languages_added:
+    for language_script in languages_added:
         # create records for all words
         for word in word_list:
             records_to_create.append({
-                "word": word,
-                "language_code": language_code
+                'word': word,
+                'language_script': language_script,
+                'variants': []
             })
 
-    # Bulk create words from above JSON
-    create_records_in_dictionary(dictionary_name, records_to_create)
+    datastore_obj = DataStore()
+    datastore_obj.add_data_elastic_search(dictionary_name, records_to_create)
 
     return True
 
 
-def get_dictionary_unique_words(dictionary_name, word_search_term=None, variant_search_term=None):
+def get_dictionary_unique_words(
+    dictionary_name, empty_variants_only=False, word_search_term=None, variant_search_term=None
+):
     """
     """
     datastore_obj = DataStore()
     return datastore_obj.get_dictionary_unique_words(
         dictionary_name=dictionary_name,
         word_search_term=word_search_term,
-        variant_search_term=variant_search_term
+        variant_search_term=variant_search_term,
+        empty_variants_only=empty_variants_only
     )
 
 
-def get_records_from_word_list(dictionary_name, filtered_word_list):
+def get_records_from_word_list(dictionary_name, filtered_word_list=None):
     datastore_obj = DataStore()
-    return datastore_obj.get_dictionary_records(
+    results = datastore_obj.get_dictionary_records(
         dictionary_name=dictionary_name,
         word_list=filtered_word_list
     )
 
+    merged_records = {}
+    for result in results:
+        merged_records.setdefault(result['_source']['value'], {})
+        merged_records[result['_source']['value']][result['_source']['language_script']] = {
+            '_id': result['_id'],
+            'value': result['_source']['variants'],
+        }
+    return merged_records
+
+
+def delete_records_by_word_list(dictionary_name, word_list):
+    datastore_obj = DataStore()
+    return datastore_obj.delete_dictionary_records_by_word(
+        dictionary_name=dictionary_name,
+        word_list=word_list
+    )
+
 
 def search_dictionary_records(
-        dictionary_name, word_search_term=None, variant_search_term=None,
+        dictionary_name, word_search_term=None, variant_search_term=None, empty_variants_only=False,
         pagination_size=None, pagination_from=None):
     """
     """
-    word_list = get_dictionary_unique_words(
-        dictionary_name=dictionary_name, word_search_term=word_search_term, variant_search_term=variant_search_term)
+    word_list = None
+    if word_search_term or variant_search_term or empty_variants_only:
+        word_list = get_dictionary_unique_words(
+            dictionary_name=dictionary_name,
+            word_search_term=word_search_term,
+            variant_search_term=variant_search_term,
+            empty_variants_only=empty_variants_only,
+        )
 
-    if pagination_size > 0 and pagination_from >= 0:
-        filtered_word_list = word_list[pagination_from:pagination_from + pagination_size]
-    else:
-        filtered_word_list = word_list
+        if pagination_size > 0 and pagination_from >= 0:
+            word_list = word_list[pagination_from:pagination_from + pagination_size]
 
-    records = get_records_from_word_list(dictionary_name, filtered_word_list)
-    return records
+    records_dict = get_records_from_word_list(dictionary_name, word_list)
+    records_list = []
+    for word, variant_data in records_dict.items():
+        records_list.append({
+            "word": word,
+            "variants": variant_data,
+        })
+    return records_list
 
 
 def update_dictionary_records(dictionary_name, data):
     """
     """
-    raise APIHandlerException("Not yet implemented")
+    # Delete some records first
+    records_to_delete = data.get('deleted', [])
+    records_to_create = data.get('edited', [])
 
+    words_to_delete = [record['word'] for record in records_to_delete]
+    words_to_delete.extend([record['word'] for record in records_to_create])
 
-def create_records_in_dictionary(dictionary_name, records):
-    """
-    """
-    # bulk create
-    pass
+    word_variants_to_create = []
+    for record in records_to_create:
+        for language_script, variants in record.get('variants', {}).items():
+            word_variants_to_create.append({
+                'word': record['word'],
+                'language_script': language_script,
+                'variants': variants.get('value', [])
+            })
 
+    # delete words
+    delete_records_by_word_list(dictionary_name, words_to_delete)
 
-def delete_records_from_dictionary(dictionary_name, records):
-    """
-    """
-    # bulk delete records
-    pass
+    datastore_obj = DataStore()
+    datastore_obj.add_data_elastic_search(dictionary_name, word_variants_to_create)

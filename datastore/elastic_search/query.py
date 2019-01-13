@@ -1,14 +1,20 @@
 # std imports
+import copy
 from six import string_types
 import re
 import collections
 
+# 3rd Party Imports
+from elasticsearch import helpers
+
 # Local imports
-from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
+from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR, \
+    ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
 from chatbot_ner.config import ner_logger
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
+from ner_constants import DICTIONARY_DATA_VARIANTS
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -91,40 +97,100 @@ def get_dictionary_records(connection, index_name, doc_type, entity_name, word_l
     data = {
         "query": {
             "bool": {
-                "must": [
-                    {
-                        "match": {
-                            "entity_data": entity_name
-                        }
+                'must': [{
+                    "match": {
+                        "entity_data": entity_name
                     }
-                ]
+                }]
             }
         },
-        "size": 1000000
+        "size": 10000
     }
 
-    if word_list:
-        data['query']['bool']['must'].append({
-            "terms": {
-                "value.keyword": word_list
-            }
-        })
+    query_list = []
+    if word_list is not None:
+        word_list_chunks = [word_list[i:i + 500] for i in xrange(0, len(word_list), 500)]
+        for chunk in word_list_chunks:
+            updated_query = copy.deepcopy(data)
+            updated_query['query']['bool']['must'].append({
+                "terms": {
+                    "value.keyword": chunk
+                }
+            })
+            query_list.append(updated_query)
+    else:
+        query_list.append(data)
 
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
-                  scroll='1m')
-    search_results = _run_es_search(connection, **kwargs)
+    results = []
+    for query in query_list:
+        search_kwargs = dict(kwargs, body=query, doc_type=doc_type,
+                             size=ELASTICSEARCH_SEARCH_SIZE, index=index_name, scroll='1m')
+        search_results = _run_es_search(connection, **search_kwargs)
 
-    # Parse hits
-    results_dictionary = {}
-    results = search_results['hits']['hits']
-    for result in results:
-        results_dictionary.setdefault(result['_source']['value'], {})
-        results_dictionary[result['_source']['value']][result['_source']['language_script']] = {
-            '_id': result['_id'],
-            'value': result['_source']['variants']
+        # Parse hits
+        if search_results:
+            results.extend(search_results['hits']['hits'])
+
+    return results
+
+
+def delete_dictionary_records_by_word(connection, index_name, doc_type, entity_name, word_list=None, **kwargs):
+    """
+    """
+    results = get_dictionary_records(
+        connection=connection,
+        index_name=index_name,
+        doc_type=doc_type,
+        entity_name=entity_name,
+        word_list=word_list,
+        **kwargs
+    )
+
+    delete_bulk_queries = []
+    str_query = []
+    for record in results:
+        delete_dict = {
+            '_index': index_name,
+            '_type': doc_type,
+            '_id': record["_id"],
+            '_op_type': 'delete',
         }
+        str_query.append(delete_dict)
+        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            delete_bulk_queries.append(str_query)
+            str_query = []
 
-    return results_dictionary
+    if str_query:
+        delete_bulk_queries.append(str_query)
+
+    for delete_query in delete_bulk_queries:
+        helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+
+
+def add_data_elastic_search(
+    connection, index_name, doc_type, entity_name, word_variant_records, **kwargs
+):
+    """
+    """
+    str_query = []
+    for record in word_variant_records:
+        query_dict = {
+            '_index': index_name,
+            '_op_type': 'index',
+            '_type': doc_type,
+            'dict_type': DICTIONARY_DATA_VARIANTS,
+            'entity_data': entity_name,
+            'language_script': record.get('language_script'),
+            'value': record.get('word'),
+            'variants': record.get('variants'),
+        }
+        str_query.append(query_dict)
+        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+            str_query = []
+
+    if str_query:
+        helpers.bulk(connection, str_query, stats_only=True, **kwargs)
 
 
 def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwargs):
@@ -164,16 +230,25 @@ def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwa
 
     word_search_term = kwargs.pop('word_search_term')
     variant_search_term = kwargs.pop('variant_search_term')
+    empty_variants_only = kwargs.pop('empty_variants_only', False)
 
     if word_search_term:
         data['query']['bool']['minimum_should_match'] = 1
         data['query']['bool']['should'].append({
             "wildcard": {
-                "value.keyword": "*{0}*".format(word_search_term)
+                "value": "*{0}*".format(word_search_term.lower())
             }
         })
 
-    if variant_search_term:
+    if empty_variants_only:
+        data['query']['bool']['must_not'] = [
+            {
+                "exists": {
+                    "field": "variants"
+                }
+            }
+        ]
+    elif variant_search_term:
         data['query']['bool']['minimum_should_match'] = 1
         data['query']['bool']['should'].append({
             "match": {
@@ -186,7 +261,9 @@ def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwa
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
     search_results = _run_es_search(connection, **kwargs)
-    word_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    word_list = []
+    if search_results:
+        word_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
     return word_list
 
 

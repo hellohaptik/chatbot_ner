@@ -279,8 +279,14 @@ def dictionary_language_view(request, dictionary_name):
 
     elif request.method == 'POST':
         # Update language support in the specified dictionary
+        ner_logger.debug('******************')
+        ner_logger.debug(request.body)
         data = json.loads(request.body.decode(encoding='UTF-8'))
+        ner_logger.debug('******************')
+        ner_logger.debug(request.body)
         dictionary_utils.dictionary_update_languages(dictionary_name, data.get('supported_languages', []))
+        ner_logger.debug('******************')
+        ner_logger.debug(request.body)
         return True
 
     else:
@@ -296,12 +302,27 @@ def dictionary_data_view(request, dictionary_name):
         params = request.GET.dict()
         # Fetch Languages supported by the dictionary
 
+        try:
+            pagination_size = int(params.get('size', 10))
+        except ValueError:
+            raise APIHandlerException('size should be sent as a number')
+
+        try:
+            pagination_from = int(params.get('from', 0))
+        except ValueError:
+            raise APIHandlerException('from should be sent as a number')
+
+        ner_logger.debug(dictionary_name)
+        ner_logger.debug(params)
+
         return dictionary_utils.search_dictionary_records(
-            dictionary_name,
+            dictionary_name=dictionary_name,
             word_search_term=params.get('word_search_term', None),
             variant_search_term=params.get('variant_search_term', None),
-            pagination_size=params.get('size', 10),
-            pagination_from=params.get('from', 0),)
+            empty_variants_only=params.get('empty_variants_only', False),
+            pagination_size=pagination_size,
+            pagination_from=pagination_from
+        )
 
     elif request.method == 'POST':
         # Update language support in the specified dictionary

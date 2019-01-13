@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 # Local imports
 from external_api.exceptions import APIHandlerException
+from chatbot_ner.config import ner_logger
 
 
 class APIResponse(object):
@@ -33,6 +34,8 @@ def external_api_response_wrapper(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         response = APIResponse()
+        ner_logger.debug('*******************************')
+        ner_logger.debug(request.GET.dict())
 
         try:
             response.result = view_func(request, *args, **kwargs)
@@ -43,9 +46,15 @@ def external_api_response_wrapper(view_func):
             response.error = e.error_msg
 
         except Exception as e:
-            response.status_code = 500
+            response.status_code = 400
             response.error = str(e)
             raise e
+        ner_logger.debug('###############################')
+
+        ner_logger.debug(response.success)
+        ner_logger.debug(response.result)
+        ner_logger.debug(response.error)
+        ner_logger.debug('*******************************')
 
         return response.toHttpResponse()
 
