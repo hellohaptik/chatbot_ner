@@ -90,6 +90,7 @@ def search_dictionary_records(
     """
     """
     word_list = None
+    total_records = None
     if word_search_term or variant_search_term or empty_variants_only:
         word_list = get_dictionary_unique_words(
             dictionary_name=dictionary_name,
@@ -97,7 +98,7 @@ def search_dictionary_records(
             variant_search_term=variant_search_term,
             empty_variants_only=empty_variants_only,
         )
-
+        total_records = len(word_list)
         if pagination_size > 0 and pagination_from >= 0:
             word_list = word_list[pagination_from:pagination_from + pagination_size]
 
@@ -108,7 +109,14 @@ def search_dictionary_records(
             "word": word,
             "variants": variant_data,
         })
-    return records_list
+
+    if total_records is None:
+        total_records = len(records_list)
+
+    return {
+        'records': records_list,
+        'total': total_records
+    }
 
 
 def update_dictionary_records(dictionary_name, data):
