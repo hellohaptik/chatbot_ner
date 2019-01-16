@@ -5,20 +5,17 @@ import importlib
 import os
 import re
 
-import pytz
-
 import models.crf.constant as model_constant
 import ner_v2.detectors.temporal.constant as temporal_constant
-from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
 from language_utilities.utils import translate_text
 from models.crf.models import Models
-from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED, \
-    FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE
+from ner_constants import (FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED,
+                           FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE)
 from ner_v2.detectors.base_detector import BaseDetector
-from ner_v2.detectors.temporal.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST, \
-    TYPE_NEXT_DAY, TYPE_REPEAT_DAY
-from ner_v2.detectors.utils import get_lang_data_path
+from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST,
+                                                TYPE_NEXT_DAY, TYPE_REPEAT_DAY)
+from ner_v2.detectors.utils import get_lang_data_path, get_timezone
 
 
 class DateAdvancedDetector(BaseDetector):
@@ -77,6 +74,7 @@ class DateAdvancedDetector(BaseDetector):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
+        self.timezone = get_timezone(timezone)
         self.date_detector_object = DateDetector(entity_name=entity_name,
                                                  language=language,
                                                  timezone=timezone,
@@ -762,12 +760,7 @@ class DateDetector(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        try:
-            self.timezone = pytz.timezone(timezone)
-        except Exception as e:
-            ner_logger.debug('Timezone error: %s ' % e)
-            self.timezone = pytz.timezone('UTC')
-            ner_logger.debug('Default timezone passed as "UTC"')
+        self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.language = language
@@ -777,7 +770,7 @@ class DateDetector(object):
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
             self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
                                                                             past_date_referenced=past_date_referenced,
-                                                                            timezone=self.timezone)
+                                                                            timezone=timezone)
         except ImportError:
             standard_date_regex = importlib.import_module(
                 'ner_v2.detectors.temporal.date.standard_date_regex'
@@ -786,7 +779,7 @@ class DateDetector(object):
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
-                timezone=self.timezone,
+                timezone=timezone,
                 past_date_referenced=past_date_referenced
             )
 

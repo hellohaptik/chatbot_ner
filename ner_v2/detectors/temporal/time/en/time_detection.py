@@ -1,8 +1,8 @@
-from datetime import datetime
+import datetime
 import re
-import pytz
 
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
+from ner_v2.detectors.utils import get_timezone
 
 
 class TimeDetector(object):
@@ -70,11 +70,6 @@ class TimeDetector(object):
                             default is UTC
             range_enabled (bool): whether time range needs to be detected
             form_check (bool): Optional, boolean set to False, used when passed text is a form type message
-            language (str): ISO 639 code for language of entities to be detected by the instance of this
-                                          class
-            translation_enabled (bool): True if messages needs to be translated in case detector does not support a
-                                        particular language, else False
-
         """
         # assigning values to superclass attributes
         self.entity_name = entity_name
@@ -88,7 +83,8 @@ class TimeDetector(object):
         self.form_check = form_check
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
-        self.timezone = timezone or 'UTC'
+        self.timezone = get_timezone(timezone)
+        self.now_date = datetime.datetime.now(tz=self.timezone)
         self.range_enabled = range_enabled
 
     def _detect_time(self):
@@ -1149,7 +1145,7 @@ class TimeDetector(object):
         Returns
             meridiem type (str): returns the meridiem type whether its am and pm
         """
-        current_datetime = datetime.now(pytz.timezone(self.timezone))
+        current_datetime = self.now_date
         current_hour = current_datetime.hour
         current_min = current_datetime.minute
         if hours == 0 or hours >= TWELVE_HOUR:

@@ -2,13 +2,13 @@ import copy
 import datetime
 import re
 
-import pytz
-
-from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, TYPE_TOMORROW, TYPE_YESTERDAY, \
-    TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_N_DAYS_AFTER, TYPE_NEXT_DAY, TYPE_THIS_DAY, TYPE_POSSIBLE_DAY, WEEKDAYS, \
-    REPEAT_WEEKDAYS, WEEKENDS, REPEAT_WEEKENDS, TYPE_REPEAT_DAY, MONTH_DICT, DAY_DICT, ORDINALS_MAP
+from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY, TYPE_TOMORROW, TYPE_YESTERDAY,
+                                                TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_N_DAYS_AFTER, TYPE_NEXT_DAY,
+                                                TYPE_THIS_DAY, TYPE_POSSIBLE_DAY, WEEKDAYS,
+                                                REPEAT_WEEKDAYS, WEEKENDS, REPEAT_WEEKENDS, TYPE_REPEAT_DAY,
+                                                MONTH_DICT, DAY_DICT, ORDINALS_MAP)
 from ner_v2.detectors.temporal.utils import get_weekdays_for_month
+from ner_v2.detectors.utils import get_timezone
 
 
 class DateDetector(object):
@@ -90,12 +90,7 @@ class DateDetector(object):
         self.day_dictionary = {}
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        try:
-            self.timezone = pytz.timezone(timezone)
-        except Exception as e:
-            ner_logger.debug('Timezone error: %s ' % e)
-            self.timezone = pytz.timezone('UTC')
-            ner_logger.debug('Default timezone passed as "UTC"')
+        self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
@@ -877,7 +872,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday))\b')
+        regex_pattern = re.compile(
+            r'\b((yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1598,7 +1594,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         ordinal_choices = "|".join(ORDINALS_MAP.keys())
-        regex_pattern = re.compile(r'((' + ordinal_choices + ')\s+week\s+(of\s+)?([a-zA-z]+)(?:\s+month)?)\s+')
+        regex_pattern = re.compile(r'((' + ordinal_choices + r')\s+week\s+(of\s+)?([a-zA-z]+)(?:\s+month)?)\s+')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1763,13 +1759,13 @@ class DateDetector(object):
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_dict_2 = {
                 'dd': int(dd2),
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_list.append(date_dict_1)
             date_list.append(date_dict_2)
 

@@ -1,14 +1,13 @@
 # coding=utf-8
-from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, AM_MERIDIEM, PM_MERIDIEM, \
-    TWELVE_HOUR
-import pytz
-import re
-import abc
 import datetime
+import re
 
+from ner_v2.detectors.temporal.constant import (DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE,
+                                                TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE,
+                                                MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, AM_MERIDIEM, PM_MERIDIEM,
+                                                TWELVE_HOUR)
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
+from ner_v2.detectors.utils import get_timezone
 
 
 class BaseRegexTime(object):
@@ -26,12 +25,7 @@ class BaseRegexTime(object):
         self.processed_text = ''
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        try:
-            self.timezone = pytz.timezone(timezone)
-        except Exception as e:
-            ner_logger.debug('Timezone error: %s ' % e)
-            self.timezone = pytz.timezone('UTC')
-            ner_logger.debug('Default timezone passed as "UTC"')
+        self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
@@ -47,8 +41,10 @@ class BaseRegexTime(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which these regex will work
-        self.detector_preferences = [self._detect_time_with_coln_format, self._detect_hour_minute
-                                     ]
+        self.detector_preferences = [
+            self._detect_time_with_colon_format,
+            self._detect_hour_minute,
+        ]
 
     def detect_time(self, text):
         """
@@ -239,7 +235,7 @@ class BaseRegexTime(object):
 
         return time_list, original_list
 
-    def _detect_time_with_coln_format(self, time_list, original_list):
+    def _detect_time_with_colon_format(self, time_list, original_list):
         """
         This method is used to detect a specific time format of the form <hh>:<mm>
         1.  कल 5:30 बजे
@@ -263,20 +259,20 @@ class BaseRegexTime(object):
 
 
         """
-        patterns = re.findall(r'\s*((\d+)\:(\d+))\s*', self.processed_text.lower(), re.U)
+        patterns = re.findall(r'\s*((\d\d)\:(\d\d))\s*', self.processed_text.lower(), re.U)
         if time_list is None:
             time_list = []
         if original_list is None:
             original_list = []
 
         for pattern in patterns:
-            t1 = pattern[1]
-            t2 = pattern[2]
+            t1 = int(pattern[1])
+            t2 = int(pattern[2])
             original = pattern[0]
 
-            if len(t1) <= 2 and len(t2) <= 2:
-                hh = int(t1)
-                mm = int(t2)
+            if 0 <= t1 <= 23 and 0 <= t2 <= 59:
+                hh = t1
+                mm = t2
                 time = {
                     'hh': hh,
                     'mm': mm,
@@ -288,9 +284,6 @@ class BaseRegexTime(object):
 
                 original_list.append(original)
                 time_list.append(time)
-
-            ner_logger.debug("time_list %s" % str(time_list))
-            ner_logger.debug("original_list %s" % str(original_list))
 
         return time_list, original_list
 

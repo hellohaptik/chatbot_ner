@@ -6,12 +6,13 @@ import re
 import pytz
 from dateutil.relativedelta import relativedelta
 
-from chatbot_ner.config import ner_logger
+from ner_v2.detectors.temporal.constant import (DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE,
+                                                RELATIVE_DATE, DATE_LITERAL_TYPE, MONTH_LITERAL_TYPE, WEEKDAY_TYPE,
+                                                MONTH_TYPE, ADD_DIFF_DATETIME_TYPE, MONTH_DATE_REF_TYPE,
+                                                NUMERALS_CONSTANT_FILE)
 from ner_v2.detectors.temporal.constant import TYPE_EXACT
-from ner_v2.detectors.temporal.constant import DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE, \
-    RELATIVE_DATE, DATE_LITERAL_TYPE, MONTH_LITERAL_TYPE, WEEKDAY_TYPE, \
-    MONTH_TYPE, ADD_DIFF_DATETIME_TYPE, MONTH_DATE_REF_TYPE, NUMERALS_CONSTANT_FILE
 from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple_dict
+from ner_v2.detectors.utils import get_timezone
 
 
 class BaseRegexDate(object):
@@ -32,13 +33,7 @@ class BaseRegexDate(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        try:
-            self.timezone = pytz.timezone(timezone)
-        except Exception as e:
-            ner_logger.debug('Timezone error: %s ' % e)
-            self.timezone = pytz.timezone('UTC')
-            ner_logger.debug('Default timezone passed as "UTC"')
-
+        self.timezone = get_timezone(pytz.timezone(timezone))
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 

@@ -2,8 +2,8 @@
 import importlib
 import os
 
-from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.utils import get_lang_data_path
 
 
@@ -47,7 +47,7 @@ class TimeDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name, timezone='UTC', range_enabled=False, form_check=False,
+    def __init__(self, entity_name='time', timezone='UTC', range_enabled=False, form_check=False,
                  language=ENGLISH_LANG):
         """Initializes a TimeDetector object with given entity_name and timezone
 
@@ -75,7 +75,6 @@ class TimeDetector(BaseDetector):
         self.form_check = form_check
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
-        self.timezone = timezone or 'UTC'
         self.range_enabled = range_enabled
         self.language = language
 
@@ -83,7 +82,7 @@ class TimeDetector(BaseDetector):
             time_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.time.{0}.time_detection'.format(self.language))
             self.language_time_detector = time_detector_module.TimeDetector(entity_name=self.entity_name,
-                                                                            timezone=self.timezone,
+                                                                            timezone=timezone,
                                                                             range_enabled=range_enabled,
                                                                             form_check=form_check)
 
@@ -95,7 +94,7 @@ class TimeDetector(BaseDetector):
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
-                timezone=self.timezone,
+                timezone=timezone,
                 range_enabled=range_enabled,
                 form_check=form_check
             )
@@ -131,4 +130,3 @@ class TimeDetector(BaseDetector):
             bot_message (str): previous message that is sent by the bot
         """
         self.bot_message = bot_message
-
