@@ -14,30 +14,11 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-# Vars being used are defined in config.example and used in settings.py
+# Vars being used are defined in config.example & .env.example and used in settings.py
 # ENV vars defined in Dockerfile can be overwritten here before docker-compose up
-      - "NAME=chatbot_ner"
-      - "DJANGODIR=/app"
-      - "NUM_WORKERS=1"
-      - "MAX_REQUESTS=1000"
-      - "DJANGO_SETTINGS_MODULE=chatbot_ner.settings"
-      - "DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py"
-      - "DJANGO_LOG_LEVEL=debug"
-      - "DJANGO_DEBUG=False"
-      - "PORT=8081"
-      - "TIMEOUT=600"
-      - "ENGINE=elasticsearch"
-# ES_HOST is host for ES that comes up with compose
-      - "ES_HOST=elasticsearch"
-      - "ES_PORT=9200"
-      - "ES_INDEX_NAME=entity_data"
-      - "ES_DOC_TYPE=data_dictionary"
-      - "ES_BULK_MSG_SIZE=1000"
-      - "ES_SEARCH_SIZE=10"
-      - "CITY_MODEL_TYPE=crf"
-      - "CITY_MODEL_PATH="
-      - "GOOGLE_TRANSLATE_API_KEY="
-
+# just add to .env
+    env_file:
+      - .env
     restart: always
     volumes:
       - ..:/app/
