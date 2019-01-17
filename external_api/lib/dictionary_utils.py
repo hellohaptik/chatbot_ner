@@ -1,5 +1,6 @@
 from external_api.exceptions import APIHandlerException
 from datastore.datastore import DataStore
+from chatbot_ner.config import ner_logger
 
 
 def dictionary_supported_languages(dictionary_name):
@@ -125,9 +126,13 @@ def update_dictionary_records(dictionary_name, data):
     # Delete some records first
     records_to_delete = data.get('deleted', [])
     records_to_create = data.get('edited', [])
+    replace_data = data.get('replace')
 
-    words_to_delete = [record['word'] for record in records_to_delete]
-    words_to_delete.extend([record['word'] for record in records_to_create])
+    if replace_data:
+        words_to_delete = get_dictionary_unique_words(dictionary_name)
+    else:
+        words_to_delete = [record['word'] for record in records_to_delete]
+        words_to_delete.extend([record['word'] for record in records_to_create])
 
     word_variants_to_create = []
     for record in records_to_create:
@@ -137,6 +142,9 @@ def update_dictionary_records(dictionary_name, data):
                 'language_script': language_script,
                 'variants': variants.get('value', [])
             })
+
+    ner_logger.debug(words_to_delete)
+    ner_logger.debug(word_variants_to_create)
 
     # delete words
     delete_records_by_word_list(dictionary_name, words_to_delete)
