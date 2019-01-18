@@ -1,19 +1,22 @@
 from __future__ import absolute_import
 
-from django.test import TestCase
+import os
 import pandas as pd
+from django.test import TestCase
+
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 
 class PhoneDetectionTest(TestCase):
     def setUp(self):
         self.phone_number_detection = PhoneDetector(entity_name='phone_number')
-        self.data = pd.read_csv('ner_v2/tests/pattern/phone_number/data/phone_detection_test_cases.csv')
+        self.csv_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                     'data',
+                                     'phone_detection_test_cases.csv')
+        self.data = pd.read_csv(self.csv_path, encoding='utf-8')
         self.test_dict = self.preprocess_test_cases()
 
     def preprocess_test_cases(self):
-        self.data['original_entities'] = self.data['original_entities'].apply(lambda x: x.decode('utf-8'))
-
         test_dict = {
             'language': [],
             'message': [],
@@ -38,7 +41,6 @@ class PhoneDetectionTest(TestCase):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
             expected_value = self.test_dict['expected_value'][i]
-            detected_texts, original_texts = self.phone_number_detection.\
-                detect_entity(text=message.decode('utf-8'))
+            detected_texts, original_texts = self.phone_number_detection.detect_entity(text=message)
             zipped = zip(detected_texts, original_texts)
             self.assertEqual(expected_value, zipped)
