@@ -6,7 +6,7 @@ External API Documentation
 ### Get languages supported by an entity ###
 
 
-**URL:** entities/languages/v1/<entity_name>
+**URL:** entity/languages/v1/<entity_name>
 
 **Method:** GET
 
@@ -31,7 +31,7 @@ None
 ***
 ### Add language support for an entity ###
 
-**URL:** entities/languages/v1/<entity_name>
+**URL:** entity/languages/v1/<entity_name>
 
 **Method:** POST
 
@@ -57,7 +57,7 @@ None
 ***
 ### Get data associated with the specific entity ###
 
-**URL:** entities/data/v1/<entity_name>
+**URL:** entity/data/v1/<entity_name>
 
 **Method:** GET
 
@@ -119,7 +119,7 @@ None
 ***
 ### Add/Edit/Remove data associated with a specific entity ###
 
-**URL:** entities/data/v1/<entity_name>
+**URL:** entity/data/v1/<entity_name>
 
 **Method:** POST
 
