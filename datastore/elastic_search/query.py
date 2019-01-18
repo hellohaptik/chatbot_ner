@@ -10,7 +10,6 @@ from elasticsearch import helpers
 # Local imports
 from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR, \
     ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
-from chatbot_ner.config import ner_logger
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
@@ -57,8 +56,16 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
     return results_dictionary
 
 
-def dictionary_supported_language_query(connection, index_name, doc_type, entity_name, **kwargs):
+def get_entity_supported_languages(connection, index_name, doc_type, entity_name, **kwargs):
     """
+    Fetch languages supported by a specific entity
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the language codes are to be fetched
+    Returns:
+        (list): List of language codes supported by this entity
     """
     data = {
         "query": {
@@ -93,6 +100,14 @@ def dictionary_supported_language_query(connection, index_name, doc_type, entity
 
 def get_dictionary_records(connection, index_name, doc_type, entity_name, values=None, **kwargs):
     """
+    Fetches entity data from ES for the specific entity
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be fetched
+    Returns:
+        (list): List of language codes supported by this entity
     """
     data = {
         "query": {
@@ -134,15 +149,23 @@ def get_dictionary_records(connection, index_name, doc_type, entity_name, values
     return results
 
 
-def delete_dictionary_records_by_word(connection, index_name, doc_type, entity_name, word_list=None, **kwargs):
+def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):
     """
+    Fetches entity data from ES for the specific entity
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be deleted. If None => All records are cleared
+    Returns:
+        None
     """
     results = get_dictionary_records(
         connection=connection,
         index_name=index_name,
         doc_type=doc_type,
         entity_name=entity_name,
-        word_list=word_list,
+        values=values,
         **kwargs
     )
 
@@ -167,13 +190,23 @@ def delete_dictionary_records_by_word(connection, index_name, doc_type, entity_n
         helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
 
 
-def add_data_elastic_search(
-    connection, index_name, doc_type, entity_name, word_variant_records, **kwargs
+def add_entity_data(
+    connection, index_name, doc_type, entity_name, value_variant_records, **kwargs
 ):
     """
+    Save entity data in ES for the records
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be created
+        value_variant_records (list): List of records to be created in ES
+    Returns:
+        None
     """
     str_query = []
-    for record in word_variant_records:
+    for record in value_variant_records:
         query_dict = {
             '_index': index_name,
             '_op_type': 'index',
@@ -193,8 +226,23 @@ def add_data_elastic_search(
         helpers.bulk(connection, str_query, stats_only=True, **kwargs)
 
 
-def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwargs):
+def get_entity_unique_values(
+        connection, index_name, doc_type, entity_name,
+        value_search_term=None, variant_search_term=None, empty_variants_only=False,
+        **kwargs):
     """
+    Search for values in entity with filters
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be fetched
+        value_search_term (str): Filter values with the specific search term
+        variant_search_term (str): Filter variants with the specific search term
+        empty_variants_only (bool): Search for values with empty variants only
+    Returns:
+        values (list): List of values which match the filters and search criteria
     """
     data = {
         "sort": [
@@ -228,15 +276,11 @@ def dictionary_unique_words(connection, index_name, doc_type, entity_name, **kwa
         "size": 0
     }
 
-    word_search_term = kwargs.pop('word_search_term')
-    variant_search_term = kwargs.pop('variant_search_term')
-    empty_variants_only = kwargs.pop('empty_variants_only', False)
-
-    if word_search_term:
+    if value_search_term:
         data['query']['bool']['minimum_should_match'] = 1
         data['query']['bool']['should'].append({
             "wildcard": {
-                "value": "*{0}*".format(word_search_term.lower())
+                "value": "*{0}*".format(value_search_term.lower())
             }
         })
 

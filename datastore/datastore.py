@@ -418,7 +418,7 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.dictionary_supported_language_query(
+            results_dictionary = elastic_search.query.get_entity_supported_languages(
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
@@ -443,7 +443,7 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.dictionary_unique_words(
+            results_dictionary = elastic_search.query.get_entity_unique_values(
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
@@ -454,11 +454,13 @@ class DataStore(object):
 
             return results_dictionary
 
-    def delete_entity_data_by_values(self, entity_name, word_list=None, **kwargs):
+    def delete_entity_data_by_values(self, entity_name, values=None, **kwargs):
         """
         Delete entity data which match the values
         Args:
             entity_name (str): Name of the entity for which the unique values are to be fetched
+            values (list, optional): List of words for which records are to be deleted.
+                If none, then all records are cleared
         Returns:
             None
         """
@@ -469,12 +471,12 @@ class DataStore(object):
             self._check_doc_type_for_elasticsearch()
             update_index = elastic_search.connect.get_current_live_index(self._store_name)
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            elastic_search.query.delete_dictionary_records_by_word(
+            elastic_search.query.delete_entity_data_by_values(
                 connection=self._client_or_connection,
                 index_name=update_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
                 entity_name=entity_name,
-                word_list=word_list,
+                values=values,
                 request_timeout=request_timeout,
                 **kwargs
             )
@@ -494,12 +496,12 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             update_index = elastic_search.connect.get_current_live_index(self._store_name)
-            elastic_search.query.add_data_elastic_search(
+            elastic_search.query.add_entity_data(
                 connection=self._client_or_connection,
                 index_name=update_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
                 entity_name=entity_name,
-                word_variant_records=value_variant_records,
+                value_variant_records=value_variant_records,
                 **kwargs
             )
 
