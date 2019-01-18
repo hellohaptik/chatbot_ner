@@ -305,10 +305,10 @@ def get_entity_unique_values(
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
     search_results = _run_es_search(connection, **kwargs)
-    word_list = []
+    values = []
     if search_results:
-        word_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
-    return word_list
+        values = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    return values
 
 
 def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,

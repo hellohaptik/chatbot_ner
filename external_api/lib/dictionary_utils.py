@@ -81,7 +81,7 @@ def get_entity_unique_values(
     datastore_obj = DataStore()
     return datastore_obj.get_entity_unique_values(
         entity_name=entity_name,
-        word_search_term=value_search_term,
+        value_search_term=value_search_term,
         variant_search_term=variant_search_term,
         empty_variants_only=empty_variants_only
     )
@@ -125,7 +125,7 @@ def delete_records_by_values(entity_name, values):
     datastore_obj = DataStore()
     datastore_obj.delete_entity_data_by_values(
         entity_name=entity_name,
-        word_list=values
+        values=values
     )
 
 

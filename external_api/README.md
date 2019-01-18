@@ -66,8 +66,8 @@ None
 - value_search_term (str): Search term to filter entity values
 - variant_search_term (str): Search term to filter entiy variants
 - empty_variants_only (bool): Filter only values with empty variants
-- pagination_from (int): Filter results offset for pagination
-- pagination_size (int): Filter results size for pagination
+- from (int): Filter results offset for pagination
+- size (int): Filter results size for pagination
 
 **Response:**
 ```json
