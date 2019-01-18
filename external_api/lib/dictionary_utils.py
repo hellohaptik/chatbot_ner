@@ -26,7 +26,7 @@ def entity_update_languages(entity_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
-    word_list = get_entity_unique_values(entity_name)
+    word_list = get_entity_unique_values(entity_name=entity_name)
     if not word_list:
         raise APIHandlerException('This entity does not have any records. Please verify the entity name')
 
@@ -47,24 +47,41 @@ def entity_update_languages(entity_name, new_language_list):
 
 
 def get_entity_unique_values(
-    dictionary_name, empty_variants_only=False, word_search_term=None, variant_search_term=None
+    entity_name, empty_variants_only=False, value_search_term=None, variant_search_term=None
 ):
     """
+    Get a list of unique values belonging to this entity
+    Args:
+        entity_name (str): Name of the entity for which unique values are to be fetched
+        empty_variants_only (bool): Flag to search for values with empty variants only
+        value_search_term (str): Search term to filter values from this entity data
+        variant_search_term (str): Search term to filter out variants from the entity data
+    Returns:
+        values_list (list): List of strings which are unique values in the entity
     """
     datastore_obj = DataStore()
     return datastore_obj.get_entity_unique_values(
-        dictionary_name=dictionary_name,
-        word_search_term=word_search_term,
+        dictionary_name=entity_name,
+        word_search_term=value_search_term,
         variant_search_term=variant_search_term,
         empty_variants_only=empty_variants_only
     )
 
 
-def get_records_from_word_list(dictionary_name, filtered_word_list=None):
+def get_records_from_values(entity_name, values=None):
+    """
+    Fetch entity data based for the specified values in that entity
+    Args:
+        entity_name (str): Name of the entity for which records are to be fetched
+        values (list): List of str values for which the data is to be fetched
+    Returns:
+        records (dict): dictionary with (key, value) as the value and language_code mapped
+            variants and id
+    """
     datastore_obj = DataStore()
     results = datastore_obj.get_dictionary_records(
-        dictionary_name=dictionary_name,
-        word_list=filtered_word_list
+        dictionary_name=entity_name,
+        word_list=values
     )
 
     merged_records = {}
@@ -78,6 +95,15 @@ def get_records_from_word_list(dictionary_name, filtered_word_list=None):
 
 
 def delete_records_by_word_list(dictionary_name, word_list):
+    """
+    Delete entity data based for the specified values in that entity
+    Args:
+        entity_name (str): Name of the entity for which records are to be fetched
+        values (list): List of str values for which the data is to be fetched
+    Returns:
+        records (dict): dictionary with (key, value) as the value and language_code mapped
+            variants and id
+    """
     datastore_obj = DataStore()
     return datastore_obj.delete_dictionary_records_by_word(
         dictionary_name=dictionary_name,
@@ -85,25 +111,42 @@ def delete_records_by_word_list(dictionary_name, word_list):
     )
 
 
-def search_entity_records(
-        entity_name, word_search_term=None, variant_search_term=None, empty_variants_only=False,
-        pagination_size=None, pagination_from=None):
+def search_entity_values(
+        entity_name,
+        value_search_term=None,
+        variant_search_term=None,
+        empty_variants_only=False,
+        pagination_size=None,
+        pagination_from=None
+):
     """
+    Searches for values within the specific entity. If pagination details not specified, all
+    data will be returned.
+
+    Args:
+        entity_name (str): Name of the entity for which records are to be fetched
+        value_search_term (str, optional): Search term to filter values from this entity data
+        variant_search_term (str, optional): Search term to filter out variants from the entity data
+        empty_variants_only (bool, optional): Flag to search for values with empty variants only
+        pagination_size (int, optional): No. of records to fetch data when paginating
+        pagination_from (int, optional): Offset to skip initial data (useful for pagination queries)
+    Returns:
+        (dict): total records (for pagination) and a list of individual records which match by the search filters
     """
-    word_list = None
+    values = None
     total_records = None
-    if word_search_term or variant_search_term or empty_variants_only:
-        word_list = get_entity_unique_values(
+    if value_search_term or variant_search_term or empty_variants_only:
+        values = get_entity_unique_values(
             dictionary_name=entity_name,
-            word_search_term=word_search_term,
+            value_search_term=value_search_term,
             variant_search_term=variant_search_term,
             empty_variants_only=empty_variants_only,
         )
-        total_records = len(word_list)
+        total_records = len(values)
         if pagination_size > 0 and pagination_from >= 0:
-            word_list = word_list[pagination_from:pagination_from + pagination_size]
+            values = values[pagination_from:pagination_from + pagination_size]
 
-    records_dict = get_records_from_word_list(entity_name, word_list)
+    records_dict = get_records_from_values(entity_name, values)
     records_list = []
     for word, variant_data in records_dict.items():
         records_list.append({
@@ -122,6 +165,15 @@ def search_entity_records(
 
 def update_entity_records(entity_name, data):
     """
+    Update dictionary data with the edited and deleted records
+
+    Args:
+        entity_name (str): Name of the entity for which records are to be fetched
+        data (dict): Dictionary of edited, deleted data. If replace flag is true, then all
+            existing data is deleted before adding the records
+
+    Returns:
+        None
     """
     # Delete some records first
     records_to_delete = data.get('deleted', [])

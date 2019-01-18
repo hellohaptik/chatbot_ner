@@ -307,9 +307,9 @@ def entity_data_view(request, entity_name):
         except ValueError:
             raise APIHandlerException('from should be sent as a number')
 
-        return dictionary_utils.search_entity_records(
+        return dictionary_utils.search_entity_values(
             entity_name=entity_name,
-            word_search_term=params.get('word_search_term', None),
+            value_search_term=params.get('value_search_term', None),
             variant_search_term=params.get('variant_search_term', None),
             empty_variants_only=params.get('empty_variants_only', False),
             pagination_size=pagination_size,
