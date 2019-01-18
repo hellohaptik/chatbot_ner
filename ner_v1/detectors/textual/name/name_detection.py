@@ -7,7 +7,7 @@ from ner_v1.constant import EMOJI_RANGES
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from ner_v1.detectors.textual.name.hindi_const import  \
     HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS, NAME_VARIATIONS
-
+from lib.nlp.const import nltk_tokenizer
 
 class NameDetector(object):
     """
@@ -207,6 +207,8 @@ class NameDetector(object):
             return [], []
 
         text = self.remove_emojis(text=self.text)
+        regex = re.compile(ur'[^\u0900-\u097F\s]+', re.U)
+        text = regex.sub(string=text, repl='')
 
         regex_detection_result = self.get_hindi_names_from_regex(text=text)
         replaced_text = self.replace_detected_text(regex_detection_result, text=text)
@@ -234,7 +236,12 @@ class NameDetector(object):
                     ['my', 'name', 'is', 'yash', 'doshi']
 
         """
-        replaced_text = text.lower().strip().split()
+        replaced_text = []
+        if self.language == ENGLISH_LANG:
+            replaced_text = nltk_tokenizer.tokenize(text.lower())
+        elif self.language == HINDI_LANG:
+            replaced_text = text.lower().strip().split()
+
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text)):
                 replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
@@ -277,8 +284,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    @staticmethod
-    def context_check_botmessage(botmessage):
+    def context_check_botmessage(self, botmessage):
         """
         Checks if previous botmessage conatins name as a keyword or not
         Args:
@@ -287,8 +293,13 @@ class NameDetector(object):
         Returns:
             True
         """
-        for word in botmessage.lower().strip().split():
-            if word in NAME_VARIATIONS:
+
+        regex_pattern = re.compile(r'[\|\,+\:\?\!\"\(\)!\'\.\%\[\]]+')
+        botmessage = regex_pattern.sub(r'', botmessage)
+
+        botmessage = " " + botmessage.lower().strip() + " "
+        for variant in NAME_VARIATIONS:
+            if " " + variant + " " in botmessage:
                 return True
         return False
 
@@ -341,8 +352,6 @@ class NameDetector(object):
         """
 
         text = self.replace_stopwords_hindi(text)
-        regex = re.compile(ur'[^\u0900-\u097F\s]+', re.U)
-        text = regex.sub(string=text, repl='')
         original_text_list = text.strip().split()
         if len(original_text_list) > 4:
             original_text_list = []
@@ -365,8 +374,10 @@ class NameDetector(object):
             >>[u'प्रतिक श्रीदत्त जयराओ']
 
         """
-        regex_list = [ur"(?:नाम|मैं|हम|मै)\s*([\u0900-\u097F\s]+)",
-                      ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s*([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
+        regex_list = [ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s+(?:लोग)\s+([\u0900-\u097F\s]+)"
+                      ur"\s+(?:नाम\sसे)\s+(?:कहते|बुलाते|बुलाओ)",
+                      ur"(?:नाम|मैं|हम|मै)\s+([\u0900-\u097F\s]+)",
+                      ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s+([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
                       ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं|मै)(?:कहते|बुलाते|बुलाओ)?"
                       ]
 

@@ -13,13 +13,31 @@ ENGINE=elasticsearch
 # ES prefixed values correspond to settings for elasticsearch.
 # ES_URL is the complete url with auth name and password required to connect. If provided, this will override ES_HOST,
 # ES_PORT, ES_AUTH_NAME, ES_AUTH_PASSWORD
-ES_URL=
-ES_HOST=127.0.0.1
-ES_PORT=9200
-ES_INDEX_NAME=chatbot_ner_index
-ES_DOC_TYPE=data_dictionary
+# ES_HOST by default is host for ES that comes up with compose
+
 ES_AUTH_NAME=
 ES_AUTH_PASSWORD=
+ES_HOST=elasticsearch
+ES_URL=
+ES_PORT=9200
+ES_INDEX_NAME=entity_data
+ES_DOC_TYPE=data_dictionary
+
+NAME=chatbot_ner
+DJANGODIR=/app
+NUM_WORKERS=1
+MAX_REQUESTS=1000
+DJANGO_SETTINGS_MODULE=chatbot_ner.settings
+DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py
+DJANGO_LOG_LEVEL=debug
+DJANGO_DEBUG=False
+PORT=8081
+TIMEOUT=600
+
+CITY_MODEL_TYPE=crf
+CITY_MODEL_PATH=
+GOOGLE_TRANSLATE_API_KEY=
+
 
 # ES_BULK_MSG_SIZE is an integer value
 ES_BULK_MSG_SIZE=1000
@@ -28,7 +46,6 @@ ES_BULK_MSG_SIZE=1000
 ES_SEARCH_SIZE=10000
 
 # Provide the following values if you need AWS authentication
-
 ES_AWS_SECRET_ACCESS_KEY=
 ES_AWS_ACCESS_KEY_ID=
 ES_AWS_REGION=

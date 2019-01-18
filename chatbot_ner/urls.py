@@ -1,8 +1,11 @@
-from django.conf.urls import patterns, include, url
+from __future__ import absolute_import
+
+from django.conf.urls import url
 from django.contrib import admin
+
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^v1/text/$', 'ner_v1.api.text'),
     url(r'^v1/location/$', 'ner_v1.api.location'),
     url(r'^v1/phone_number/$', 'ner_v1.api.phone_number'),
@@ -43,4 +46,4 @@ urlpatterns = patterns('',
 
     url(r'^entity/languages/v1/(?P<entity_name>.+)$', 'external_api.api.entity_language_view'),
     url(r'^entity/data/v1/(?P<entity_name>.+)$', 'external_api.api.entity_data_view')
-)
+]
