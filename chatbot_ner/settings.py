@@ -61,6 +61,8 @@ WSGI_APPLICATION = 'chatbot_ner.wsgi.application'
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 # FOR TEST CASES - COMMON SETTINGS FOR ALL ENVIRONMENTS
+
+
 class DisableMigrations(object):
 
     def __contains__(self, item):
