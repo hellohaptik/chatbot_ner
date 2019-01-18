@@ -404,7 +404,7 @@ class DataStore(object):
                                                        language_script=language_script,
                                                        **kwargs)
 
-    def get_dictionary_supported_languages(self, dictionary_name, **kwargs):
+    def get_dictionary_supported_languages(self, entity_name, **kwargs):
         if self._client_or_connection is None:
             self._connect()
 
@@ -415,14 +415,14 @@ class DataStore(object):
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                entity_name=dictionary_name,
+                entity_name=entity_name,
                 request_timeout=request_timeout,
                 **kwargs
             )
 
             return results_dictionary
 
-    def get_entity_unique_values(self, dictionary_name, **kwargs):
+    def get_entity_unique_values(self, entity_name, **kwargs):
         if self._client_or_connection is None:
             self._connect()
 
@@ -433,14 +433,14 @@ class DataStore(object):
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                entity_name=dictionary_name,
+                entity_name=entity_name,
                 request_timeout=request_timeout,
                 **kwargs
             )
 
             return results_dictionary
 
-    def delete_dictionary_records_by_word(self, dictionary_name, word_list=None, **kwargs):
+    def delete_dictionary_records_by_word(self, entity_name, word_list=None, **kwargs):
         if self._client_or_connection is None:
             self._connect()
 
@@ -452,7 +452,7 @@ class DataStore(object):
                 connection=self._client_or_connection,
                 index_name=update_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                entity_name=dictionary_name,
+                entity_name=entity_name,
                 word_list=word_list,
                 request_timeout=request_timeout,
                 **kwargs

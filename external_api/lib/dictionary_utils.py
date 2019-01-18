@@ -1,17 +1,29 @@
 from external_api.exceptions import APIHandlerException
 from datastore.datastore import DataStore
-from chatbot_ner.config import ner_logger
 
 
 def entity_supported_languages(entity_name):
     """
+    Fetch list of supported languages for the specific entity
+
+    Args:
+        entity_name (str): Name of the entity for which unique values are to be fetched
+    Returns:
+        (list): List of language_codes
     """
     datastore_obj = DataStore()
-    return datastore_obj.get_dictionary_supported_languages(entity_name)
+    return datastore_obj.get_dictionary_supported_languages(entity_name=entity_name)
 
 
 def entity_update_languages(entity_name, new_language_list):
     """
+    Args:
+        entity_name (str): Name of the entity for which unique values are to be fetched
+        new_language_list (list): List of language codes for the new entity
+    Returns:
+        bool: Success flag if the update
+    Raises:
+        APIHandlerException (Exception): for any validation errors
     """
     old_language_list = entity_supported_languages(entity_name)
     languages_added = set(new_language_list) - set(old_language_list)
@@ -26,16 +38,16 @@ def entity_update_languages(entity_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
-    word_list = get_entity_unique_values(entity_name=entity_name)
-    if not word_list:
+    values = get_entity_unique_values(entity_name=entity_name)
+    if not values:
         raise APIHandlerException('This entity does not have any records. Please verify the entity name')
 
     records_to_create = []
     for language_script in languages_added:
         # create records for all words
-        for word in word_list:
+        for value in values:
             records_to_create.append({
-                'word': word,
+                'word': value,
                 'language_script': language_script,
                 'variants': []
             })
@@ -61,7 +73,7 @@ def get_entity_unique_values(
     """
     datastore_obj = DataStore()
     return datastore_obj.get_entity_unique_values(
-        dictionary_name=entity_name,
+        entity_name=entity_name,
         word_search_term=value_search_term,
         variant_search_term=variant_search_term,
         empty_variants_only=empty_variants_only
@@ -94,7 +106,7 @@ def get_records_from_values(entity_name, values=None):
     return merged_records
 
 
-def delete_records_by_word_list(dictionary_name, word_list):
+def delete_records_by_values(entity_name, values):
     """
     Delete entity data based for the specified values in that entity
     Args:
@@ -106,8 +118,8 @@ def delete_records_by_word_list(dictionary_name, word_list):
     """
     datastore_obj = DataStore()
     return datastore_obj.delete_dictionary_records_by_word(
-        dictionary_name=dictionary_name,
-        word_list=word_list
+        entity_name=entity_name,
+        word_list=values
     )
 
 
@@ -137,7 +149,7 @@ def search_entity_values(
     total_records = None
     if value_search_term or variant_search_term or empty_variants_only:
         values = get_entity_unique_values(
-            dictionary_name=entity_name,
+            entity_name=entity_name,
             value_search_term=value_search_term,
             variant_search_term=variant_search_term,
             empty_variants_only=empty_variants_only,
@@ -148,9 +160,9 @@ def search_entity_values(
 
     records_dict = get_records_from_values(entity_name, values)
     records_list = []
-    for word, variant_data in records_dict.items():
+    for value, variant_data in records_dict.items():
         records_list.append({
-            "word": word,
+            "word": value,
             "variants": variant_data,
         })
 
@@ -181,25 +193,22 @@ def update_entity_records(entity_name, data):
     replace_data = data.get('replace')
 
     if replace_data:
-        words_to_delete = get_entity_unique_values(entity_name)
+        values_to_delete = get_entity_unique_values(entity_name)
     else:
-        words_to_delete = [record['word'] for record in records_to_delete]
-        words_to_delete.extend([record['word'] for record in records_to_create])
+        values_to_delete = [record['word'] for record in records_to_delete]
+        values_to_delete.extend([record['word'] for record in records_to_create])
 
-    word_variants_to_create = []
+    value_variants_to_create = []
     for record in records_to_create:
         for language_script, variants in record.get('variants', {}).items():
-            word_variants_to_create.append({
+            value_variants_to_create.append({
                 'word': record['word'],
                 'language_script': language_script,
                 'variants': variants.get('value', [])
             })
 
-    ner_logger.debug(words_to_delete)
-    ner_logger.debug(word_variants_to_create)
-
     # delete words
-    delete_records_by_word_list(entity_name, words_to_delete)
+    delete_records_by_values(entity_name=entity_name, values=values_to_delete)
 
     datastore_obj = DataStore()
-    datastore_obj.add_data_elastic_search(entity_name, word_variants_to_create)
+    datastore_obj.add_data_elastic_search(entity_name, value_variants_to_create)
