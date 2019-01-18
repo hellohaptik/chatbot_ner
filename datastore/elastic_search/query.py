@@ -98,7 +98,7 @@ def get_entity_supported_languages(connection, index_name, doc_type, entity_name
     return language_list
 
 
-def get_dictionary_records(connection, index_name, doc_type, entity_name, values=None, **kwargs):
+def get_entity_data(connection, index_name, doc_type, entity_name, values=None, **kwargs):
     """
     Fetches entity data from ES for the specific entity
     Args:

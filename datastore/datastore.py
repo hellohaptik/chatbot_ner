@@ -459,7 +459,7 @@ class DataStore(object):
         Delete entity data which match the values
         Args:
             entity_name (str): Name of the entity for which the unique values are to be fetched
-            values (list, optional): List of words for which records are to be deleted.
+            values (list, optional): List of values for which records are to be deleted.
                 If none, then all records are cleared
         Returns:
             None
@@ -511,7 +511,7 @@ class DataStore(object):
 
         Args:
             entity_name (str): Name of the entity for which the entity data is to be fetched
-            values (list): List of words for which the entity data is to be fetched
+            values (list): List of values for which the entity data is to be fetched
         Returns:
             (list): List of records with entity data matching the filters
         """
@@ -521,7 +521,7 @@ class DataStore(object):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.get_dictionary_records(
+            results_dictionary = elastic_search.query.get_entity_data(
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
