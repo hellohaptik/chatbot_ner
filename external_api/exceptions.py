@@ -1,8 +1,4 @@
-class BaseException(Exception):
-    pass
-
-
-class APIHandlerException(BaseException):
+class APIHandlerException(Exception):
     """
     This is used to send error messages in response for API call
     on validation errors or handled errors

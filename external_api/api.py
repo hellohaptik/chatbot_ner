@@ -279,7 +279,7 @@ def entity_language_view(request, entity_name):
 
     elif request.method == 'POST':
         # Update language support in the specified entity
-        data = json.loads(request.body.decode(encoding='UTF-8'))
+        data = json.loads(request.body.decode(encoding='utf-8'))
         dictionary_utils.entity_update_languages(entity_name, data.get('supported_languages', []))
         return True
 
@@ -318,7 +318,7 @@ def entity_data_view(request, entity_name):
 
     elif request.method == 'POST':
         # Update language support in the specified entity
-        data = json.loads(request.body.decode(encoding='UTF-8'))
+        data = json.loads(request.body.decode(encoding='utf-8'))
         dictionary_utils.update_entity_records(entity_name, data)
         return True
 

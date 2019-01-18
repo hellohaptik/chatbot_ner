@@ -1,3 +1,10 @@
+"""
+Note:
+'word' and 'value' mean the same in this context and hasn't been cleaned because of dependency
+on other haptik repository.
+TODO: Move to consistent terminology and use 'value' everywhere
+"""
+
 from external_api.exceptions import APIHandlerException
 from datastore.datastore import DataStore
 

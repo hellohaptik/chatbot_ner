@@ -34,9 +34,6 @@ def external_api_response_wrapper(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         response = APIResponse()
-        ner_logger.debug('*******************************')
-        ner_logger.debug(request.GET.dict())
-
         try:
             response.result = view_func(request, *args, **kwargs)
             response.success = True
@@ -49,8 +46,12 @@ def external_api_response_wrapper(view_func):
             response.status_code = 400
             response.error = str(e)
             raise e
-        ner_logger.debug('###############################')
 
+        ner_logger.debug('*******************************')
+        ner_logger.debug(request.path)
+        ner_logger.debug(request.GET.dict())
+        ner_logger.debug(request.META)
+        ner_logger.debug(request.body)
         ner_logger.debug(response.success)
         ner_logger.debug(response.result)
         ner_logger.debug(response.error)
