@@ -160,7 +160,7 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
     Returns:
         None
     """
-    results = get_dictionary_records(
+    results = get_entity_data(
         connection=connection,
         index_name=index_name,
         doc_type=doc_type,
