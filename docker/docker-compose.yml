@@ -14,7 +14,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     environment:
-# Vars being used are defined in config.example & .env.example and used in settings.py
+# Vars being used are defined in config.example and used in settings.py
 # ENV vars defined in Dockerfile can be overwritten here before docker-compose up
 # just add to .env
     env_file:
