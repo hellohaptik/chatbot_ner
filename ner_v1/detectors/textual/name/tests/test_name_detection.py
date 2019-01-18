@@ -21,9 +21,13 @@ class NameDetectionTest(TestCase):
             'message': [],
             'expected_value': [],
         }
-        zipped = zip(self.data['language'], self.data['message'], self.data['first_name'],
-                     self.data['middle_name'], self.data['last_name'], self.data['original_entities'])
-        for language, message, first_name, middle_name, last_name, original_entity in zipped:
+        for (language, message, first_name, middle_name, last_name, original_entity) in zip(
+                self.data['language'],
+                self.data['message'],
+                self.data['first_name'],
+                self.data['middle_name'],
+                self.data['last_name'],
+                self.data['original_entities']):
             fn = []
             mn = []
             ln = []
