@@ -14,7 +14,6 @@ from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, EN
     LIVE_CRF_MODEL_PATH
 
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponseNotAllowed
 from models.crf_v2.crf_train import CrfTrain
 
 from external_api.lib import dictionary_utils
@@ -268,25 +267,20 @@ def train_crf_model(request):
 
 @csrf_exempt
 @external_api_response_wrapper
-def dictionary_language_view(request, dictionary_name):
+def entity_language_view(request, entity_name):
     """
+    API call to View and Edit the list of languages supported by an entity.
     """
     if request.method == 'GET':
-        # Fetch Languages supported by the dictionary
+        # Fetch Languages supported by the entity
         return {
-            'supported_languages': dictionary_utils.dictionary_supported_languages(dictionary_name)
+            'supported_languages': dictionary_utils.entity_supported_languages(entity_name)
         }
 
     elif request.method == 'POST':
-        # Update language support in the specified dictionary
-        ner_logger.debug('******************')
-        ner_logger.debug(request.body)
+        # Update language support in the specified entity
         data = json.loads(request.body.decode(encoding='UTF-8'))
-        ner_logger.debug('******************')
-        ner_logger.debug(request.body)
-        dictionary_utils.dictionary_update_languages(dictionary_name, data.get('supported_languages', []))
-        ner_logger.debug('******************')
-        ner_logger.debug(request.body)
+        dictionary_utils.entity_update_languages(entity_name, data.get('supported_languages', []))
         return True
 
     else:
@@ -295,12 +289,13 @@ def dictionary_language_view(request, dictionary_name):
 
 @csrf_exempt
 @external_api_response_wrapper
-def dictionary_data_view(request, dictionary_name):
+def entity_data_view(request, entity_name):
     """
+    API call to fetch and edit entity data
     """
     if request.method == 'GET':
         params = request.GET.dict()
-        # Fetch Languages supported by the dictionary
+        # Fetch Languages supported by the entity
 
         try:
             pagination_size = int(params.get('size', 10))
@@ -312,11 +307,8 @@ def dictionary_data_view(request, dictionary_name):
         except ValueError:
             raise APIHandlerException('from should be sent as a number')
 
-        ner_logger.debug(dictionary_name)
-        ner_logger.debug(params)
-
-        return dictionary_utils.search_dictionary_records(
-            dictionary_name=dictionary_name,
+        return dictionary_utils.search_entity_records(
+            entity_name=entity_name,
             word_search_term=params.get('word_search_term', None),
             variant_search_term=params.get('variant_search_term', None),
             empty_variants_only=params.get('empty_variants_only', False),
@@ -325,9 +317,9 @@ def dictionary_data_view(request, dictionary_name):
         )
 
     elif request.method == 'POST':
-        # Update language support in the specified dictionary
+        # Update language support in the specified entity
         data = json.loads(request.body.decode(encoding='UTF-8'))
-        dictionary_utils.update_dictionary_records(dictionary_name, data)
+        dictionary_utils.update_entity_records(entity_name, data)
         return True
 
     else:

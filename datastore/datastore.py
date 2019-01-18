@@ -422,7 +422,7 @@ class DataStore(object):
 
             return results_dictionary
 
-    def get_dictionary_unique_words(self, dictionary_name, **kwargs):
+    def get_entity_unique_values(self, dictionary_name, **kwargs):
         if self._client_or_connection is None:
             self._connect()
 

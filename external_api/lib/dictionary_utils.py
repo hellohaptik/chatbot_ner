@@ -3,17 +3,17 @@ from datastore.datastore import DataStore
 from chatbot_ner.config import ner_logger
 
 
-def dictionary_supported_languages(dictionary_name):
+def entity_supported_languages(entity_name):
     """
     """
     datastore_obj = DataStore()
-    return datastore_obj.get_dictionary_supported_languages(dictionary_name)
+    return datastore_obj.get_dictionary_supported_languages(entity_name)
 
 
-def dictionary_update_languages(dictionary_name, new_language_list):
+def entity_update_languages(entity_name, new_language_list):
     """
     """
-    old_language_list = dictionary_supported_languages(dictionary_name)
+    old_language_list = entity_supported_languages(entity_name)
     languages_added = set(new_language_list) - set(old_language_list)
     languages_removed = set(old_language_list) - set(new_language_list)
 
@@ -26,9 +26,9 @@ def dictionary_update_languages(dictionary_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
-    word_list = get_dictionary_unique_words(dictionary_name)
+    word_list = get_entity_unique_values(entity_name)
     if not word_list:
-        raise APIHandlerException('This dictionary does not have any records. Please verify the dictionary name')
+        raise APIHandlerException('This entity does not have any records. Please verify the entity name')
 
     records_to_create = []
     for language_script in languages_added:
@@ -41,18 +41,18 @@ def dictionary_update_languages(dictionary_name, new_language_list):
             })
 
     datastore_obj = DataStore()
-    datastore_obj.add_data_elastic_search(dictionary_name, records_to_create)
+    datastore_obj.add_data_elastic_search(entity_name, records_to_create)
 
     return True
 
 
-def get_dictionary_unique_words(
+def get_entity_unique_values(
     dictionary_name, empty_variants_only=False, word_search_term=None, variant_search_term=None
 ):
     """
     """
     datastore_obj = DataStore()
-    return datastore_obj.get_dictionary_unique_words(
+    return datastore_obj.get_entity_unique_values(
         dictionary_name=dictionary_name,
         word_search_term=word_search_term,
         variant_search_term=variant_search_term,
@@ -85,16 +85,16 @@ def delete_records_by_word_list(dictionary_name, word_list):
     )
 
 
-def search_dictionary_records(
-        dictionary_name, word_search_term=None, variant_search_term=None, empty_variants_only=False,
+def search_entity_records(
+        entity_name, word_search_term=None, variant_search_term=None, empty_variants_only=False,
         pagination_size=None, pagination_from=None):
     """
     """
     word_list = None
     total_records = None
     if word_search_term or variant_search_term or empty_variants_only:
-        word_list = get_dictionary_unique_words(
-            dictionary_name=dictionary_name,
+        word_list = get_entity_unique_values(
+            dictionary_name=entity_name,
             word_search_term=word_search_term,
             variant_search_term=variant_search_term,
             empty_variants_only=empty_variants_only,
@@ -103,7 +103,7 @@ def search_dictionary_records(
         if pagination_size > 0 and pagination_from >= 0:
             word_list = word_list[pagination_from:pagination_from + pagination_size]
 
-    records_dict = get_records_from_word_list(dictionary_name, word_list)
+    records_dict = get_records_from_word_list(entity_name, word_list)
     records_list = []
     for word, variant_data in records_dict.items():
         records_list.append({
@@ -120,7 +120,7 @@ def search_dictionary_records(
     }
 
 
-def update_dictionary_records(dictionary_name, data):
+def update_entity_records(entity_name, data):
     """
     """
     # Delete some records first
@@ -129,7 +129,7 @@ def update_dictionary_records(dictionary_name, data):
     replace_data = data.get('replace')
 
     if replace_data:
-        words_to_delete = get_dictionary_unique_words(dictionary_name)
+        words_to_delete = get_entity_unique_values(entity_name)
     else:
         words_to_delete = [record['word'] for record in records_to_delete]
         words_to_delete.extend([record['word'] for record in records_to_create])
@@ -147,7 +147,7 @@ def update_dictionary_records(dictionary_name, data):
     ner_logger.debug(word_variants_to_create)
 
     # delete words
-    delete_records_by_word_list(dictionary_name, words_to_delete)
+    delete_records_by_word_list(entity_name, words_to_delete)
 
     datastore_obj = DataStore()
-    datastore_obj.add_data_elastic_search(dictionary_name, word_variants_to_create)
+    datastore_obj.add_data_elastic_search(entity_name, word_variants_to_create)
