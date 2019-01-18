@@ -125,7 +125,53 @@ None
 
 **Request Body:**
 ```json
+{
+    "edited": [
+        {
+            "variants": {
+                "en": {
+                    "_id": "AWhfjhmwLvkU3x32pO67",
+                    "value": [
+                        "India"
+                    ]
+                },
+                "hi": {
+                    "_id": "AWhfjhmwLvkU3x32pO68",
+                    "value": [
+                        "इंडिया"
+                    ]
+                }
+            },
+            "word": "India"
+        }
+    ],
+    "deleted": [
+        {
+            "variants": {
+                "en": {
+                    "_id": "AWhfjhmwLvkU3x32pO67",
+                    "value": [
+                        "Delhi"
+                    ]
+                },
+                "hi": {
+                    "_id": "AWhfjhmwLvkU3x32pO68",
+                    "value": [
+                        "दिल्ली"
+                    ]
+                }
+            },
+            "word": "Delhi"
+        }
+    ],
+    "replace": true
+}
 ```
 **Response:**
 ```json
+{
+    "result": true,
+    "success": true,
+    "error": ""
+}
 ```
