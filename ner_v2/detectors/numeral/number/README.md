@@ -1,8 +1,10 @@
 ## Number Detector 
 
-This is the V2 version of Number detector module that will detect number and number word from text in multiple languages. This detector module adds an additional feature of detecting units along with number in text. Example -  for a given text "5 kg", this module will return `5`  as detected value and `kg` as detected unit. 
+This is the V2 version of Number detector module that will detect number and number word from text in multiple languages. This detector module adds an additional feature of detecting units along with number in text. Example -  for a given text "5 kg", this module will return `5`  as detected value and `kg` as detected unit. The module has the capability to detect only certain type of numbers like currency or temperature type numbers by specifying the unit type.
 
- We are currently providing number detection supports in 6 languages, which are
+To check all unit type supported by english number detector please go through [unit.csv](https://github.com/hellohaptik/chatbot_ner/blob/develop/ner_v2/detectors/numeral/number/en/data/units.csv)
+
+ We are currently providing number detection supports for 6 different languages, which are
 
 - English
 - Hindi
@@ -35,11 +37,12 @@ This is the V2 version of Number detector module that will detect number and num
   # max_number_digits=6
   # source_language='hi'
   # language_script='hi'
+  # unit_type=None
   
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi'
+  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi&unit_type='
   
   # Curl output
   $ {
