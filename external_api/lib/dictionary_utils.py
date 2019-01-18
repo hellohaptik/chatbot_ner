@@ -19,7 +19,7 @@ def entity_supported_languages(entity_name):
         (list): List of language_codes
     """
     datastore_obj = DataStore()
-    return datastore_obj.get_dictionary_supported_languages(entity_name=entity_name)
+    return datastore_obj.get_entity_supported_languages(entity_name=entity_name)
 
 
 def entity_update_languages(entity_name, new_language_list):
@@ -60,7 +60,7 @@ def entity_update_languages(entity_name, new_language_list):
             })
 
     datastore_obj = DataStore()
-    datastore_obj.add_data_elastic_search(entity_name, records_to_create)
+    datastore_obj.add_entity_data(entity_name, records_to_create)
 
     return True
 
@@ -98,9 +98,9 @@ def get_records_from_values(entity_name, values=None):
             variants and id
     """
     datastore_obj = DataStore()
-    results = datastore_obj.get_dictionary_records(
-        dictionary_name=entity_name,
-        word_list=values
+    results = datastore_obj.get_entity_data(
+        entity_name=entity_name,
+        values=values
     )
 
     merged_records = {}
@@ -120,11 +120,10 @@ def delete_records_by_values(entity_name, values):
         entity_name (str): Name of the entity for which records are to be fetched
         values (list): List of str values for which the data is to be fetched
     Returns:
-        records (dict): dictionary with (key, value) as the value and language_code mapped
-            variants and id
+        None
     """
     datastore_obj = DataStore()
-    return datastore_obj.delete_dictionary_records_by_word(
+    datastore_obj.delete_entity_data_by_values(
         entity_name=entity_name,
         word_list=values
     )
@@ -218,4 +217,4 @@ def update_entity_records(entity_name, data):
     delete_records_by_values(entity_name=entity_name, values=values_to_delete)
 
     datastore_obj = DataStore()
-    datastore_obj.add_data_elastic_search(entity_name, value_variants_to_create)
+    datastore_obj.add_entity_data(entity_name, value_variants_to_create)

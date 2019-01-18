@@ -91,7 +91,7 @@ def dictionary_supported_language_query(connection, index_name, doc_type, entity
     return language_list
 
 
-def get_dictionary_records(connection, index_name, doc_type, entity_name, word_list=None, **kwargs):
+def get_dictionary_records(connection, index_name, doc_type, entity_name, values=None, **kwargs):
     """
     """
     data = {
@@ -108,9 +108,9 @@ def get_dictionary_records(connection, index_name, doc_type, entity_name, word_l
     }
 
     query_list = []
-    if word_list is not None:
-        word_list_chunks = [word_list[i:i + 500] for i in xrange(0, len(word_list), 500)]
-        for chunk in word_list_chunks:
+    if values is not None:
+        values_chunks = [values[i:i + 500] for i in xrange(0, len(values), 500)]
+        for chunk in values_chunks:
             updated_query = copy.deepcopy(data)
             updated_query['query']['bool']['must'].append({
                 "terms": {

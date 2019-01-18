@@ -404,7 +404,14 @@ class DataStore(object):
                                                        language_script=language_script,
                                                        **kwargs)
 
-    def get_dictionary_supported_languages(self, entity_name, **kwargs):
+    def get_entity_supported_languages(self, entity_name, **kwargs):
+        """
+        Fetch supported language list for the entity
+        Args:
+            entity_name (str): Name of the entity for which the languages are to be fetched
+        Returns:
+            (list): List of str language codes
+        """
         if self._client_or_connection is None:
             self._connect()
 
@@ -423,6 +430,13 @@ class DataStore(object):
             return results_dictionary
 
     def get_entity_unique_values(self, entity_name, **kwargs):
+        """
+        Get list of unique values in this entity
+        Args:
+            entity_name (str): Name of the entity for which the unique values are to be fetched
+        Returns:
+            (list): list of values in this entity
+        """
         if self._client_or_connection is None:
             self._connect()
 
@@ -440,7 +454,14 @@ class DataStore(object):
 
             return results_dictionary
 
-    def delete_dictionary_records_by_word(self, entity_name, word_list=None, **kwargs):
+    def delete_entity_data_by_values(self, entity_name, word_list=None, **kwargs):
+        """
+        Delete entity data which match the values
+        Args:
+            entity_name (str): Name of the entity for which the unique values are to be fetched
+        Returns:
+            None
+        """
         if self._client_or_connection is None:
             self._connect()
 
@@ -448,7 +469,7 @@ class DataStore(object):
             self._check_doc_type_for_elasticsearch()
             update_index = elastic_search.connect.get_current_live_index(self._store_name)
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.delete_dictionary_records_by_word(
+            elastic_search.query.delete_dictionary_records_by_word(
                 connection=self._client_or_connection,
                 index_name=update_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
@@ -458,27 +479,40 @@ class DataStore(object):
                 **kwargs
             )
 
-            return results_dictionary
-
-    def add_data_elastic_search(self, dictionary_name, word_variant_records, **kwargs):
+    def add_entity_data(self, entity_name, value_variant_records, **kwargs):
+        """
+        Add the specified records under this entity
+        Args:
+            entity_name (str): Name of the entity for which the unique values are to be fetched
+            value_variant_records (list): List of dicts with the value, variants and language script
+        Returns:
+            None
+        """
         if self._client_or_connection is None:
             self._connect()
 
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             update_index = elastic_search.connect.get_current_live_index(self._store_name)
-            results_dictionary = elastic_search.query.add_data_elastic_search(
+            elastic_search.query.add_data_elastic_search(
                 connection=self._client_or_connection,
                 index_name=update_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                entity_name=dictionary_name,
-                word_variant_records=word_variant_records,
+                entity_name=entity_name,
+                word_variant_records=value_variant_records,
                 **kwargs
             )
 
-            return results_dictionary
+    def get_entity_data(self, entity_name, values=None, **kwargs):
+        """
+        Fetch entity data for all languages for this entity filtered by the values provided
 
-    def get_dictionary_records(self, dictionary_name, word_list=None, **kwargs):
+        Args:
+            entity_name (str): Name of the entity for which the entity data is to be fetched
+            values (list): List of words for which the entity data is to be fetched
+        Returns:
+            (list): List of records with entity data matching the filters
+        """
         if self._client_or_connection is None:
             self._connect()
 
@@ -489,8 +523,8 @@ class DataStore(object):
                 connection=self._client_or_connection,
                 index_name=self._store_name,
                 doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                entity_name=dictionary_name,
-                word_list=word_list,
+                entity_name=entity_name,
+                values=values,
                 request_timeout=request_timeout,
                 **kwargs
             )
