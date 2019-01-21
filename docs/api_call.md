@@ -1124,11 +1124,11 @@ The Time with range detector module has the capability to detect range of time w
 
 The Date detector module has the capability to detect various form of dates from text in multiple languages. It can detect date from following patterns:
 
- 	1. *Day month year format*  - 12 feb 2018, 2nd Jan 2019,  12/11/2019, 12-jan-2019
-		2. *Day month* - 12 feb, 12/12
-		3. Weekday reference - Comming monday, next sunday
-		4. Reference day month - 2nd of next month, 2nd sunday of coming month
-		5. Current day reference -  tomorrow, yesterday, day after tomorrow
+1. *Day month year format*  - 12 feb 2018, 2nd Jan 2019,  12/11/2019, 12-jan-2019
+2. *Day month* - 12 feb, 12/12
+3. Weekday reference - Comming monday, next sunday
+4. Reference day month - 2nd of next month, 2nd sunday of coming month
+5. Current day reference -  tomorrow, yesterday, day after tomorrow
 
  Currently time detection support has been provided in different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
 
