@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+
+from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
 from ner_v1.detectors.numeral.budget.budget_detection import BudgetDetector
@@ -13,6 +16,7 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -86,20 +90,33 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, fallback_value, bot_message):
-    """Use TextDetector (elasticsearch) to detect textual entities
+def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG, **kwargs):
+    """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
-        message (str): natural text on which detection logic is to be run. Note if structured value is
-                                detection is run on structured value instead of message
+        message (str or unicode or None): natural language text on which detection logic is to be run.
+                                          Note if structured value is passed detection is run on
+                                          structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
-        structured_value (str): Value obtained from any structured elements. Note if structured value is
-                                detection is run on structured value instead of message
-                                (For example, UI elements like form, payload, etc)
-        fallback_value (str): If the detection logic fails to detect any value either from structured_value
-                          or message then we return a fallback_value as an output.
-        bot_message (str): previous message from a bot/agent.
+        structured_value (str or unicode or None): Value obtained from any structured elements.
+                                                   Note if structured value is detection is run on
+                                                   structured value instead of message
+                                                   (For example, UI elements like form, payload, etc)
+        fallback_value (str or unicode or None): If the detection logic fails to detect any value
+                                                 either from structured_value or message then
+                                                 we return a fallback_value as an output.
+        bot_message (str or unicode or None): previous message from a bot/agent.
+        language (str): ISO 639-1 code of language of message
+        **kwargs: extra configuration arguments for TextDetector
+            fuzziness (str or int or None): fuziness to apply while detecting text entities
+            min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
+            live_crf_model_path (str) : path to the CRF model to use to detect entites. Defaults to None
+            read_model_from_s3 (bool): If True read CRF model from S3. Defaults to False
+            read_embeddings_from_remote_url (bool): if True read word embeddings from configured remote url. Defaults
+                                                    to False
+
+
 
 
     Returns:
@@ -108,61 +125,100 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     Example:
 
-        message = 'i want to order chinese from  mainland china and pizza from domminos'
-        entity_name = 'restaurant'
-        structured_value = None
-        fallback_value = None
-        bot_message = None
-        output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
+        >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
+        >>> entity_name = 'restaurant'
+        >>> structured_value = None
+        >>> fallback_value = None
+        >>> bot_message = None
+        >>> output = get_text(message=message,
+        >>>                   entity_name=entity_name,
+        >>>                   structured_value=structured_value,
+        >>>                   fallback_value=fallback_value,
+        >>>                   bot_message=bot_message)
+        >>> print(output)
 
-            >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
-            {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
-            'entity_value': {'value': u"Domino's Pizza"}}]
-
-
-
-        message = 'i wanted to watch movie'
-        entity_name = 'movie'
-        structured_value = 'inferno'
-        fallback_value = None
-        bot_message = None
-        output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
-
-            >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
-            {'value': u'Inferno'}}]
+        [
+            {
+                'detection': 'message',
+                'original_text': 'mainland china',
+                'entity_value': {'value': u'Mainland China'}
+            },
+            {
+                'detection': 'message',
+                'original_text': 'domminos',
+                'entity_value': {'value': u"Domino's Pizza"}
+            }
+        ]
 
 
-        message = 'i wanted to watch inferno'
-        entity_name = 'movie'
-        structured_value = 'delhi'
-        fallback_value = None
-        bot_message = None
-        output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
-                          fallback_value=fallback_value, bot_message=bot_message)
-        print output
 
-            >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
+        >>> message = u'i wanted to watch movie'
+        >>> entity_name = 'movie'
+        >>> structured_value = u'inferno'
+        >>> fallback_value = None
+        >>> bot_message = None
+        >>> output = get_text(message=message,
+        >>>                   entity_name=entity_name,
+        >>>                   structured_value=structured_value,
+        >>>                   fallback_value=fallback_value,
+        >>>                   bot_message=bot_message)
+        >>> print(output)
+
+        [
+            {
+                'detection': 'structure_value_verified',
+                'original_text': 'inferno',
+                'entity_value': {'value': u'Inferno'}
+            }
+        ]
+
+        >>> message = u'i wanted to watch inferno'
+        >>> entity_name = 'movie'
+        >>> structured_value = u'delhi'
+        >>> fallback_value = None
+        >>> bot_message = None
+        >>> output = get_text(message=message,
+        >>>                   entity_name=entity_name,
+        >>>                   structured_value=structured_value,
+        >>>                   fallback_value=fallback_value,
+        >>>                   bot_message=bot_message)
+        >>> print(output)
+
+        [
+            {
+                'detection': 'message',
+                'original_text': 'inferno',
+                'entity_value': {'value': u'Inferno'}
+            }
+        ]
 
     """
-    text_detection = TextDetector(entity_name=entity_name)
-    if structured_value:
-        text_entity_list, original_text_list = text_detection.detect_entity(structured_value)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        text_entity_list, original_text_list = text_detection.detect_entity(message)
-        if text_entity_list:
-            return output_entity_dict_list(text_entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            return output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
+    fuzziness = kwargs.get('fuzziness', None)
+    min_token_len_fuzziness = kwargs.get('min_token_len_fuzziness', None)
+    live_crf_model_path = kwargs.get('live_crf_model_path', None)
+    read_model_from_s3 = kwargs.get('read_model_from_s3', False)
+    read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
 
-    return None
+    text_model_detector = TextModelDetector(entity_name=entity_name,
+                                            language=language,
+                                            live_crf_model_path=live_crf_model_path,
+                                            read_model_from_s3=read_model_from_s3,
+                                            read_embeddings_from_remote_url=read_embeddings_from_remote_url)
+
+    if fuzziness:
+        fuzziness = parse_fuzziness_parameter(fuzziness)
+        text_model_detector.set_fuzziness_threshold(fuzziness)
+
+    if min_token_len_fuzziness:
+        min_token_len_fuzziness = int(min_token_len_fuzziness)
+        text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+
+    entity_output = text_model_detector.detect(message=message,
+                                               structured_value=structured_value,
+                                               fallback_value=fallback_value,
+                                               bot_message=bot_message)
+
+    return entity_output
 
 
 def get_location(message, entity_name, structured_value, fallback_value, bot_message):
@@ -328,7 +384,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-        language (str): language of text
+        language (str): ISO 639-1 code of language of message
 
 
     Returns:
@@ -425,7 +481,8 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_person_name(message, entity_name, structured_value, fallback_value, bot_message):
+def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
+                    language=ENGLISH_LANG):
     """Use NameDetector to detect names
 
     Args:
@@ -439,6 +496,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        language (str): ISO 639-1 code of language of message
 
 
     Returns:
@@ -456,7 +514,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
-    name_detection = NameDetector(entity_name=entity_name)
+    name_detection = NameDetector(entity_name=entity_name, language=language)
     if structured_value:
         entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
         if entity_list:
@@ -814,6 +872,10 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        timezone (str, optional): str identifier for the timezone to use.
+                                  E.g. 'Asia/Kolkata'
+                                  Please refer pytz docs for this.
+                                  Defaults to 'UTC'
 
 
     Returns:
@@ -977,3 +1039,39 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
         )
 
     return entity_list
+
+
+def parse_fuzziness_parameter(fuzziness):
+    """
+    This function takes input as the fuzziness value.
+    If the fuzziness is int it is returned as it is.
+    If the input is a ',' separated str value, the function returns a tuple with all values
+    present in the str after casting them to int.
+
+    Args:
+        fuzziness (str or int): The fuzzines value that needs to be parsed.
+
+    Returns:
+        fuzziness (tuple or int): It returns a tuple with of all the values cast to int present in the str.
+                                  If the fuzziness is a single element then int is returned
+
+    Examples:
+        >>> fuzziness = 2
+        >>> parse_fuzziness_parameter(fuzziness)
+        2
+
+        >>> fuzziness = '3,4'
+        >>> parse_fuzziness_parameter(fuzziness)
+        (3, 4)
+    """
+    try:
+        if isinstance(fuzziness, int):
+            return fuzziness
+        fuzziness_split = fuzziness.split(',')
+        if len(fuzziness_split) == 1:
+            fuzziness = int(fuzziness)
+        else:
+            fuzziness = tuple([int(value.strip()) for value in fuzziness_split])
+    except ValueError:
+        fuzziness = 1
+    return fuzziness
