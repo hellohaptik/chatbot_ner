@@ -71,6 +71,8 @@ def get_tuple_dict(csv_file):
     Returns:
         (dict): dict containing key as csv index key and all other rows values as tuple
     """
+    # TODO: Add values for keys as a namedtuple so the code in date and time becomes easier to understand without
+    # TODO: having to look at the csv files
     data_df = pd.read_csv(csv_file, encoding='utf-8')
     data_df = data_df.set_index(CONSTANT_FILE_KEY)
     records = data_df.to_records()
