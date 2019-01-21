@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 # std imports
 import copy
 from six import string_types
@@ -94,7 +96,9 @@ def get_entity_supported_languages(connection, index_name, doc_type, entity_name
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
     search_results = _run_es_search(connection, **kwargs)
-    language_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    language_list = []
+    if search_results:
+        language_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
     return language_list
 
 
@@ -124,7 +128,7 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
 
     query_list = []
     if values is not None:
-        values_chunks = [values[i:i + 500] for i in xrange(0, len(values), 500)]
+        values_chunks = [values[i:i + 500] for i in range(0, len(values), 500)]
         for chunk in values_chunks:
             updated_query = copy.deepcopy(data)
             updated_query['query']['bool']['must'].append({

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 """
 Note:
 'word' and 'value' mean the same in this context and hasn't been cleaned because of dependency
