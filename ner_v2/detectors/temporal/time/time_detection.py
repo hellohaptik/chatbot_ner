@@ -2,8 +2,8 @@
 import importlib
 import os
 
-from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.utils import get_lang_data_path
 
 
@@ -119,4 +119,3 @@ class TimeDetector(BaseDetector):
             bot_message (str): previous message that is sent by the bot
         """
         self.language_time_detector.set_bot_message(bot_message)
-

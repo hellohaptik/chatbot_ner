@@ -1,0 +1,6 @@
+range_variants,position,range_type
+ke upar| k upar|  ke uper| k uper| se upar| se uper| se jada | se jyada | se adhik | के ऊपर | से ऊपर |  से ज्यादा |से जादा | से अधिक,1,min
+kam se kam| कम से कम,-1,min
+jada se jada | jyada se jyada | lagbhag | ज्यादा से ज्यादा | जादा से जादा | लगभग,-1,max
+se niche | se kam | se sasta | se saste |ke aaspas| ke aspas | k aaspas| k aspas | ke aas paas|  ke aas pas| k aas paas|  k aas pas|ke lagbhag| k lagbhag |  से नीचे | से कम | से सस्ता | से सस्ते | के आसपास |   के आस पास  | के लगभग,1,max
+se|-|से,0,min_max
