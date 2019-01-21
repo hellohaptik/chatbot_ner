@@ -1,0 +1,5 @@
+range_variants,position,range_type
+above | abv | abov |  more than | mor than | more den | mor den | greater than | greater ,-1,min
+max | upto | up to | around | below | less than | less | less den,-1,max
+max,1,max
+To | - ,0,min_max
