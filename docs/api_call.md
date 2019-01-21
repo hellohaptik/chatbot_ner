@@ -1130,7 +1130,7 @@ The Date detector module has the capability to detect various form of dates from
 4. Reference day month - 2nd of next month, 2nd sunday of coming month
 5. Current day reference -  tomorrow, yesterday, day after tomorrow
 
- Currently time detection support has been provided in different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
+ Currently date detection support has been provided in different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
 
 > To add support for new languages or to add custom patterns in particular language please go through the Date Detector readme [here](https://github.com/hellohaptik/chatbot_ner/blob/develop/ner_v2/detectors/temporal/date/README.md)
 
