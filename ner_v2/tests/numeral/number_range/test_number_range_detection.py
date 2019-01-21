@@ -59,6 +59,5 @@ class NumberRangeDetectorTest(TestCase):
                 detected_entities_values_list, detected_original_texts_list = \
                     number_range_detector.detect_entity(message)
 
-                detected_zipped = zip(detected_entities_values_list, detected_original_texts_list)
-                for detected_number_range in detected_zipped:
+                for detected_number_range in zip(detected_entities_values_list, detected_original_texts_list):
                     self.assertIn(detected_number_range, expected_zipped)
