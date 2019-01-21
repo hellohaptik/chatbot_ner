@@ -1,7 +1,10 @@
+import os
+from collections import defaultdict
+
 from elasticsearch import helpers
 from ner_constants import DICTIONARY_DATA_VARIANTS
-from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE
-from ..utils import *
+from datastore.elastic_search import constants
+from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
 from language_utilities.constant import ENGLISH_LANG
 
 log_prefix = 'datastore.elastic_search.populate'
@@ -73,9 +76,9 @@ def recreate_all_dictionary_data(connection, index_name, doc_type, logger, entit
 
 def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger, **kwargs):
     """
-    Reads the csv file at csv_file_path and create a dictionary mapping entity value to a list of their variants.
-    the entity values are first column of the csv file and their corresponding variants are stored in the second column
-    delimited by '|'
+    Reads the csv file at csv_file_path and create a dictionary mapping
+    entity value to a list of their variants. The entity values are first column of the
+    csv file and their corresponding variants are stored in the second column delimited by '|'
 
     Args:
         csv_file_path: absolute file path of the csv file populate entity data from
@@ -111,8 +114,10 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
     return dictionary_value
 
 
-def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, dictionary_value, language_script, logger,
-                            **kwargs):
+def add_data_elastic_search(
+        connection, index_name, doc_type, dictionary_key,
+        dictionary_value, language_script, logger, **kwargs
+):
     """
     Adds all entity values and their variants to the index. Entity value and its list of variants are keys and values
     of dictionary_value parameter generated from the csv file of this entity
@@ -153,7 +158,7 @@ def add_data_elastic_search(connection, index_name, doc_type, dictionary_key, di
                       '_op_type': 'index'
                       }
         str_query.append(query_dict)
-        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
             str_query = []
@@ -188,7 +193,8 @@ def create_dictionary_data_from_file(connection, index_name, doc_type, csv_file_
     if dictionary_value:
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                 dictionary_key=dictionary_key,
-                                dictionary_value=remove_duplicate_data(dictionary_value), language_script=ENGLISH_LANG,
+                                dictionary_value=remove_duplicate_data(dictionary_value),
+                                language_script=ENGLISH_LANG,
                                 logger=logger, **kwargs)
     if os.path.exists(csv_file_path) and os.path.splitext(csv_file_path)[1] == '.csv':
         os.path.basename(csv_file_path)
@@ -203,7 +209,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                 }
             }
         },
-        "size": ELASTICSEARCH_SEARCH_SIZE
+        "size": constants.ELASTICSEARCH_SEARCH_SIZE
     }
     results = connection.search(index=index_name, doc_type=doc_type, scroll='2m', body=data)
     sid = results['_scroll_id']
@@ -219,7 +225,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
                            '_op_type': 'delete',
                            }
             str_query.append(delete_dict)
-            if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
                 delete_bulk_queries.append(str_query)
                 str_query = []
         results = connection.scroll(scroll_id=sid, scroll='2m')
@@ -260,12 +266,15 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
         logger.debug('%s: +++ Started: add_data_elastic_search() +++' % log_prefix)
         add_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
                                 dictionary_key=entity_name,
-                                dictionary_value=dictionary_value, language_script=language_script, logger=logger, **kwargs)
+                                dictionary_value=dictionary_value,
+                                language_script=language_script,
+                                logger=logger, **kwargs)
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
-def update_entity_crf_data_populate(connection, index_name, doc_type, entity_list, entity_name, sentence_list, language_script,
-                                    logger, **kwargs):
+def update_entity_crf_data_populate(
+    connection, index_name, doc_type, entity_list, entity_name, sentence_list, language_script, logger, **kwargs
+):
     """
     This method is used to populate the elastic search traininf data.
     Args:
@@ -294,8 +303,10 @@ def update_entity_crf_data_populate(connection, index_name, doc_type, entity_lis
     logger.debug('%s: +++ Completed: add_training_data_elastic_search() +++' % log_prefix)
 
 
-def add_training_data_elastic_search(connection, index_name, doc_type, entity_name, entity_list, sentence_list, language_script, logger,
-                                     **kwargs):
+def add_training_data_elastic_search(
+    connection, index_name, doc_type, entity_name, entity_list,
+    sentence_list, language_script, logger, **kwargs
+):
     """
     Adds all sentences and the corresponding entities to the specified index.
     If the same named entity is found a delete followed by an update is triggered
@@ -331,7 +342,7 @@ def add_training_data_elastic_search(connection, index_name, doc_type, entity_na
                       '_op_type': 'index'
                       }
         str_query.append(query_dict)
-        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
             str_query = []

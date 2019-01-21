@@ -8,8 +8,8 @@ import collections
 from elasticsearch import helpers
 
 # Local imports
-from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR, \
-    ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE
+from chatbot_ner.config import ner_logger
+from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
@@ -44,7 +44,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
@@ -83,14 +83,14 @@ def get_entity_supported_languages(connection, index_name, doc_type, entity_name
             "unique_values": {
                 "terms": {
                     "field": "language_script.keyword",
-                    "size": 100000
+                    "size": constants.ELASTICSEARCH_SEARCH_SIZE
                 }
             }
         },
         "size": 0
     }
     kwargs = dict(
-        kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE,
+        kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
     search_results = _run_es_search(connection, **kwargs)
@@ -119,7 +119,7 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
                 }]
             }
         },
-        "size": 10000
+        "size": constants.ELASTICSEARCH_SEARCH_SIZE
     }
 
     query_list = []
@@ -139,7 +139,7 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
     results = []
     for query in query_list:
         search_kwargs = dict(kwargs, body=query, doc_type=doc_type,
-                             size=ELASTICSEARCH_SEARCH_SIZE, index=index_name, scroll='1m')
+                             size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name, scroll='1m')
         search_results = _run_es_search(connection, **search_kwargs)
 
         # Parse hits
@@ -179,7 +179,7 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
             '_op_type': 'delete',
         }
         str_query.append(delete_dict)
-        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             delete_bulk_queries.append(str_query)
             str_query = []
 
@@ -187,7 +187,8 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
         delete_bulk_queries.append(str_query)
 
     for delete_query in delete_bulk_queries:
-        helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        ner_logger.debug('delete_entity_data_by_values: entity_name: {0} result {1}'.format(entity_name, str(result)))
 
 
 def add_entity_data(
@@ -218,7 +219,7 @@ def add_entity_data(
             'variants': record.get('variants'),
         }
         str_query.append(query_dict)
-        if len(str_query) > ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             str_query = []
 
@@ -269,7 +270,7 @@ def get_entity_unique_values(
             "unique_values": {
                 "terms": {
                     "field": "value.keyword",
-                    "size": 10000000
+                    "size": constants.ELASTICSEARCH_SEARCH_SIZE
                 }
             }
         },
@@ -301,7 +302,7 @@ def get_entity_unique_values(
         })
 
     kwargs = dict(
-        kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE,
+        kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
     search_results = _run_es_search(connection, **kwargs)
@@ -357,7 +358,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
     """
     data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
                                           language_script=search_language_script)
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     results = _run_es_search(connection, **kwargs)
     results = _parse_es_search_results(results)
     return results
@@ -411,7 +412,8 @@ def _get_dynamic_fuzziness_threshold(fuzzy_setting):
                      otherwise the input is returned as it is
     """
     if isinstance(fuzzy_setting, string_types):
-        if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
+        if constants.ELASTICSEARCH_VERSION_MAJOR > 6 or \
+                (constants.ELASTICSEARCH_VERSION_MAJOR == 6 and constants.ELASTICSEARCH_VERSION_MINOR >= 2):
             return fuzzy_setting
         return 'auto'
 
@@ -601,7 +603,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
