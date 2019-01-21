@@ -70,7 +70,7 @@ class TimeDetectorTest(TestCase):
         df = pd.read_csv(self.csv_path, encoding='utf-8', dtype=six.text_type, keep_default_na=False)
 
         for language, language_tests_df in df.groupby(by=[TimeDetectorTest.LANGUAGE]):
-            print('Running tests for language {}'.format(language))
+            print('Running tests for language {}'.format(language))  # noqa: E1601
             time_detector = TimeDetector(language=language)
             for index, row in language_tests_df.iterrows():
                 if not self.is_nan(row[TimeDetectorTest.BOT_MESAGE]):
