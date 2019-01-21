@@ -1,8 +1,11 @@
-from django.conf.urls import patterns, include, url
+from __future__ import absolute_import
+
+from django.conf.urls import url
 from django.contrib import admin
+
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^v1/text/$', 'ner_v1.api.text'),
     url(r'^v1/location/$', 'ner_v1.api.location'),
     url(r'^v1/phone_number/$', 'ner_v1.api.phone_number'),
@@ -40,4 +43,4 @@ urlpatterns = patterns('',
 
     #  Train Crf Model
     url(r'^entities/train_crf_model', 'external_api.api.train_crf_model'),
-)
+]

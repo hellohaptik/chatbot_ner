@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+
 import abc
+
+import six
+
 from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import TRANSLATED_TEXT
+from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-from language_utilities.utils import translate_text
-from language_utilities.constant import TRANSLATED_TEXT
 
 
 class BaseDetector(object):
@@ -193,7 +198,7 @@ class BaseDetector(object):
 
         entity_list = []
         for i, entity_value in enumerate(entity_value_list):
-            if type(entity_value) in [str, unicode]:
+            if type(entity_value) in [str, six.text_type]:
                 entity_value = {
                     ENTITY_VALUE_DICT_KEY: entity_value
                 }
