@@ -84,7 +84,8 @@ class BaseNumberDetector(object):
         """
         # create number_words dict having number variants and their corresponding scale and increment value
         # create language_scale_map dict having scale variants and their corresponding value
-        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME), encoding='utf-8')
+        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME),
+                                 encoding='utf-8')
         for index, row in numeral_df.iterrows():
             name_variants = get_list_from_pipe_sep_string(row[NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME])
             value = row[NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME]
