@@ -1,11 +1,10 @@
 # coding=utf-8
 from chatbot_ner.config import ner_logger
-from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE, \
-    TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, AM_MERIDIEM, PM_MERIDIEM, \
-    TWELVE_HOUR
+from ner_v2.detectors.temporal.constant import DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, \
+    NUMERALS_CONSTANT_FILE, TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE, MINUTE_TIME_TYPE, \
+    DAYTIME_MERIDIAN, AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR
 import pytz
 import re
-import abc
 import datetime
 
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
