@@ -43,9 +43,9 @@ def external_api_response_wrapper(view_func):
             response.error = e.error_msg
 
         except Exception as e:
-            response.status_code = 400
-            response.error = str(e)
-            raise e
+            response.success = False
+            response.error = 'Unknown error: {0}'.format(str(e))
+            response.status_code = 500
 
         ner_logger.debug('*******************************')
         ner_logger.debug(request.path)
