@@ -1,8 +1,26 @@
 ## API Documentation
 
-[TOC]
+### List of Entity Types
+ [1. Text Entity](#1-text-entity)
+ [2. Phone number](#2-phone-number)
+ [3. Email](#3-email)
+ [4. City Name](#4-city-name)
+ [5. PNR Number](#5-pnr-number)
+ [6. Number Entity](#6-number-entity)
+ [7. Time Entity](#7-time-entity)
+ [8. Time with range](#8-time-with-range)
+ [9. Date Entity](#9-date-entity)
+ [10. Budget](#10-budget)
+ [11. Apparel's Shopping Size](#11-apparels-shopping-size)
+ [12. Passenger Count](#12-passenger-count)
+ [13. Location Entity](#13-location-entity)
+ [14. Person Name](#14-person-name)
+ [15. Regex Entity](#15-regex-entity)
 
-## List of Entity Types
+### Tag multiple entities
+[Data Tagging](#data-tagging)
+
+
 
 Following are the list of different entity types along with its API call:
 
@@ -652,7 +670,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "30",
           "entity_value": {
               "value": "30",
-              "unit": None
+              "unit": null
           },
             "language": "en"
         },
@@ -661,7 +679,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "40",
           "entity_value": {
               "value": "40",
-              "unit": None
+              "unit": null
           },
             "language": "en"
         }
@@ -716,7 +734,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "३०",
           "entity_value": {
               "value": "30",
-              "unit": None
+              "unit": null
           },
             "language": "hi"
         },
@@ -725,7 +743,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "दो हजार",
           "entity_value": {
               "value": "2000",
-              "unit": None
+              "unit": null
           },
             "language": "hi"
         }
@@ -780,7 +798,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "30",
           "entity_value": {
               "value": "30",
-              "unit": None
+              "unit": null
           },
             "language": "hi"
         },
@@ -789,7 +807,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "2 hajaar",
           "entity_value": {
               "value": "2000",
-              "unit": None
+              "unit": null
           },
             "language": "hi"
         },
@@ -798,7 +816,7 @@ Currently number detection support has been provided for 6 different languages -
           "original_text": "teen sau",
           "entity_value": {
               "value": "300",
-              "unit": None
+              "unit": null
           },
             "language": "hi"
         }
@@ -1098,7 +1116,7 @@ The Time with range detector module has the capability to detect range of time w
     > ```
 
 
-  
+
 
 ### 9. Date Entity
 
@@ -1107,10 +1125,10 @@ The Time with range detector module has the capability to detect range of time w
 The Date detector module has the capability to detect various form of dates from text in multiple languages. It can detect date from following patterns:
 
  	1. *Day month year format*  - 12 feb 2018, 2nd Jan 2019,  12/11/2019, 12-jan-2019
- 	2. *Day month* - 12 feb, 12/12
- 	3. Weekday reference - Comming monday, next sunday
- 	4. Reference day month - 2nd of next month, 2nd sunday of coming month
- 	5. Current day reference -  tomorrow, yesterday, day after tomorrow
+		2. *Day month* - 12 feb, 12/12
+		3. Weekday reference - Comming monday, next sunday
+		4. Reference day month - 2nd of next month, 2nd sunday of coming month
+		5. Current day reference -  tomorrow, yesterday, day after tomorrow
 
  Currently time detection support has been provided in different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
 
@@ -1146,7 +1164,6 @@ The Date detector module has the capability to detect various form of dates from
                                  fallback_value=fallback_value)
     >>> print(output)
     ```
-    
 
   - *CURL:*
 
