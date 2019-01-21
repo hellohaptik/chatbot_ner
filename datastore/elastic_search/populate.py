@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from elasticsearch import helpers
 from ner_constants import DICTIONARY_DATA_VARIANTS
-from datastore.elastic_search import constants
+from datastore import constants
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
 from language_utilities.constant import ENGLISH_LANG
 
