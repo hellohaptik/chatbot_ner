@@ -5,6 +5,7 @@ import pandas as pd
 import os
 
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
+from chatbot_ner.config import ner_logger
 
 
 def get_value_list(val):
@@ -44,7 +45,7 @@ class NumberRangeDetectorTest(TestCase):
         df = pd.read_csv(self.csv_path, encoding='utf-8', keep_default_na=False)
 
         for language, language_tests_df in df.groupby(by=['language']):
-            print('Running tests for language {}'.format(language))
+            ner_logger.debug('Running tests for language {}'.format(language))
             for index, row in language_tests_df.iterrows():
                 message = row['message']
                 unit_type = None if row['unit_type'] == 'NA' else row['unit_type']
@@ -58,6 +59,5 @@ class NumberRangeDetectorTest(TestCase):
                 detected_entities_values_list, detected_original_texts_list = \
                     number_range_detector.detect_entity(message)
 
-                detected_zipped = zip(detected_entities_values_list, detected_original_texts_list)
-                for detected_number_range in detected_zipped:
+                for detected_number_range in zip(detected_entities_values_list, detected_original_texts_list):
                     self.assertIn(detected_number_range, expected_zipped)

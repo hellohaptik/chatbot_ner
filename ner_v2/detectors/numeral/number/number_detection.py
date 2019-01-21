@@ -101,7 +101,8 @@ class NumberDetector(BaseDetector):
             self.language_number_detector = standard_number_regex.NumberDetector(
                 entity_name=self.entity_name,
                 unit_type=self.unit_type,
-                data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__), lang_code=self.language)
+                data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
+                                                       lang_code=self.language)
             )
 
     @property
