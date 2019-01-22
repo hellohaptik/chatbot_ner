@@ -6,16 +6,11 @@ from six import string_types
 import re
 import collections
 
-# 3rd Party Imports
-from elasticsearch import helpers
-
 # Local imports
-from chatbot_ner.config import ner_logger
 from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
-from ner_constants import DICTIONARY_DATA_VARIANTS
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -110,6 +105,8 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name (str): name of the entity for which the data is to be fetched
+        values (str, optional): List of values for which data is to be fetched. If None, all
+                                records are fetched
     Returns:
         (list): List of language codes supported by this entity
     """
@@ -153,88 +150,8 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
     return results
 
 
-def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):
-    """
-    Fetches entity data from ES for the specific entity
-    Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name (str): name of the entity for which the data is to be deleted. If None => All records are cleared
-    Returns:
-        None
-    """
-    results = get_entity_data(
-        connection=connection,
-        index_name=index_name,
-        doc_type=doc_type,
-        entity_name=entity_name,
-        values=values,
-        **kwargs
-    )
-
-    delete_bulk_queries = []
-    str_query = []
-    for record in results:
-        delete_dict = {
-            '_index': index_name,
-            '_type': doc_type,
-            '_id': record["_id"],
-            '_op_type': 'delete',
-        }
-        str_query.append(delete_dict)
-        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-            delete_bulk_queries.append(str_query)
-            str_query = []
-
-    if str_query:
-        delete_bulk_queries.append(str_query)
-
-    for delete_query in delete_bulk_queries:
-        result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
-        ner_logger.debug('delete_entity_data_by_values: entity_name: {0} result {1}'.format(entity_name, str(result)))
-
-
-def add_entity_data(
-    connection, index_name, doc_type, entity_name, value_variant_records, **kwargs
-):
-    """
-    Save entity data in ES for the records
-
-    Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name (str): name of the entity for which the data is to be created
-        value_variant_records (list): List of records to be created in ES
-    Returns:
-        None
-    """
-    str_query = []
-    for record in value_variant_records:
-        query_dict = {
-            '_index': index_name,
-            '_op_type': 'index',
-            '_type': doc_type,
-            'dict_type': DICTIONARY_DATA_VARIANTS,
-            'entity_data': entity_name,
-            'language_script': record.get('language_script'),
-            'value': record.get('word'),
-            'variants': record.get('variants'),
-        }
-        str_query.append(query_dict)
-        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-            helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-            str_query = []
-
-    if str_query:
-        helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-
-
-def get_entity_unique_values(
-        connection, index_name, doc_type, entity_name,
-        value_search_term=None, variant_search_term=None, empty_variants_only=False,
-        **kwargs):
+def get_entity_unique_values(connection, index_name, doc_type, entity_name, value_search_term=None,
+                             variant_search_term=None, empty_variants_only=False, **kwargs):
     """
     Search for values in entity with filters
 
@@ -247,8 +164,12 @@ def get_entity_unique_values(
         variant_search_term (str): Filter variants with the specific search term
         empty_variants_only (bool): Search for values with empty variants only
     Returns:
-        values (list): List of values which match the filters and search criteria
+        list: List of values which match the filters and search criteria
     """
+    # aggs count set at 50000 because the biggest dictionary (excluding person_name)
+    # currently has around 16000 records. So 50000 is a safe limit for now.
+    # Also, aggs size doesn't belong in the const file because the number depends
+    # on use case, data and the operation (unique/average/sum/min/max/count etc.)
     data = {
         "sort": [
             {
@@ -274,7 +195,7 @@ def get_entity_unique_values(
             "unique_values": {
                 "terms": {
                     "field": "value.keyword",
-                    "size": constants.ELASTICSEARCH_SEARCH_SIZE
+                    "size": 50000
                 }
             }
         },
@@ -285,7 +206,7 @@ def get_entity_unique_values(
         data['query']['bool']['minimum_should_match'] = 1
         data['query']['bool']['should'].append({
             "wildcard": {
-                "value": "*{0}*".format(value_search_term.lower())
+                "value": u"*{0}*".format(value_search_term.lower())
             }
         })
 

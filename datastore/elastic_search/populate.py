@@ -1,13 +1,19 @@
 from __future__ import absolute_import
 
+# std imports
 import os
 from collections import defaultdict
 
+# 3rd party imports
 from elasticsearch import helpers
-from ner_constants import DICTIONARY_DATA_VARIANTS
+
+# Local imports
+from chatbot_ner.config import ner_logger
 from datastore import constants
+from datastore.elastic_search.query import get_entity_data
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
 from language_utilities.constant import ENGLISH_LANG
+from ner_constants import DICTIONARY_DATA_VARIANTS
 
 log_prefix = 'datastore.elastic_search.populate'
 
@@ -351,3 +357,82 @@ def add_training_data_elastic_search(
     if str_query:
         result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
         logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
+
+
+def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):
+    """
+    Fetches entity data from ES for the specific entity
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be deleted.
+        values (str, optional): List of values for which data is to be fetched.
+            If None, all records are deleted
+    Returns:
+        None
+    """
+    results = get_entity_data(
+        connection=connection,
+        index_name=index_name,
+        doc_type=doc_type,
+        entity_name=entity_name,
+        values=values,
+        **kwargs
+    )
+
+    delete_bulk_queries = []
+    str_query = []
+    for record in results:
+        delete_dict = {
+            '_index': index_name,
+            '_type': doc_type,
+            '_id': record["_id"],
+            '_op_type': 'delete',
+        }
+        str_query.append(delete_dict)
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            delete_bulk_queries.append(str_query)
+            str_query = []
+
+    if str_query:
+        delete_bulk_queries.append(str_query)
+
+    for delete_query in delete_bulk_queries:
+        result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        ner_logger.debug('delete_entity_data_by_values: entity_name: {0} result {1}'.format(entity_name, str(result)))
+
+
+def add_entity_data(connection, index_name, doc_type, entity_name, value_variant_records, **kwargs):
+    """
+    Save entity data in ES for the records
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+        doc_type: The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be created
+        value_variant_records (list): List of dicts to be created in ES.
+            Sample Dict: {'value': 'value', 'language_script': 'en', variants': ['variant 1', 'variant 2']}
+    Returns:
+        None
+    """
+    str_query = []
+    for record in value_variant_records:
+        query_dict = {
+            '_index': index_name,
+            '_op_type': 'index',
+            '_type': doc_type,
+            'dict_type': DICTIONARY_DATA_VARIANTS,
+            'entity_data': entity_name,
+            'language_script': record.get('language_script'),
+            'value': record.get('value'),
+            'variants': record.get('variants'),
+        }
+        str_query.append(query_dict)
+        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            helpers.bulk(connection, str_query, stats_only=True, **kwargs)
+            str_query = []
+
+    if str_query:
+        helpers.bulk(connection, str_query, stats_only=True, **kwargs)

@@ -18,7 +18,7 @@ def entity_supported_languages(entity_name):
     Args:
         entity_name (str): Name of the entity for which unique values are to be fetched
     Returns:
-        (list): List of language_codes
+        list: List of language_codes
     """
     datastore_obj = DataStore()
     return datastore_obj.get_entity_supported_languages(entity_name=entity_name)
@@ -55,11 +55,12 @@ def entity_update_languages(entity_name, new_language_list):
     for language_script in languages_added:
         # create records for all words
         for value in values:
-            records_to_create.append({
-                'word': value,
-                'language_script': language_script,
-                'variants': []
-            })
+            if value and language_script:
+                records_to_create.append({
+                    'value': value,
+                    'language_script': language_script,
+                    'variants': []
+                })
 
     datastore_obj = DataStore()
     datastore_obj.add_entity_data(entity_name, records_to_create)
@@ -74,11 +75,11 @@ def get_entity_unique_values(
     Get a list of unique values belonging to this entity
     Args:
         entity_name (str): Name of the entity for which unique values are to be fetched
-        empty_variants_only (bool): Flag to search for values with empty variants only
-        value_search_term (str): Search term to filter values from this entity data
-        variant_search_term (str): Search term to filter out variants from the entity data
+        empty_variants_only (bool, optional): Flag to search for values with empty variants only
+        value_search_term (str, optional): Search term to filter values from this entity data
+        variant_search_term (str, optional): Search term to filter out variants from the entity data
     Returns:
-        values_list (list): List of strings which are unique values in the entity
+        list: List of strings which are unique values in the entity
     """
     datastore_obj = DataStore()
     return datastore_obj.get_entity_unique_values(
@@ -94,10 +95,20 @@ def get_records_from_values(entity_name, values=None):
     Fetch entity data based for the specified values in that entity
     Args:
         entity_name (str): Name of the entity for which records are to be fetched
-        values (list): List of str values for which the data is to be fetched
+        values (list, optional): List of str values for which the data is to be fetched
     Returns:
-        records (dict): dictionary with (key, value) as the value and language_code mapped
-            variants and id
+        dict: dictionary mapping the entity_value to a dictionary
+            Sample: {
+                'entity_value': {
+                    'en': {
+                        '_id': 'Random ES ID',
+                        'value': ['Variant 1', 'Variant 2']
+                    },
+                    'hi': {
+                        '_id': 'Random ES ID',
+                        'value': ['Variant 1', 'Variant 2']
+                    }
+                }
     """
     datastore_obj = DataStore()
     results = datastore_obj.get_entity_data(
@@ -145,13 +156,18 @@ def search_entity_values(
 
     Args:
         entity_name (str): Name of the entity for which records are to be fetched
-        value_search_term (str, optional): Search term to filter values from this entity data
+        value_search_term (str, optional): Search term to filter values from this entity data.
+            If not provided, results are not filtered by values
         variant_search_term (str, optional): Search term to filter out variants from the entity data
+            If not provided, results are not filtered by variants
         empty_variants_only (bool, optional): Flag to search for values with empty variants only
+            If not provided, all variants are included
         pagination_size (int, optional): No. of records to fetch data when paginating
+            If it is None, the results will not be paginated
         pagination_from (int, optional): Offset to skip initial data (useful for pagination queries)
+            If it is None, the results will not be paginated
     Returns:
-        (dict): total records (for pagination) and a list of individual records which match by the search filters
+        dict: total records (for pagination) and a list of individual records which match by the search filters
     """
     values = None
     total_records = None
@@ -209,11 +225,12 @@ def update_entity_records(entity_name, data):
     value_variants_to_create = []
     for record in records_to_create:
         for language_script, variants in record.get('variants', {}).items():
-            value_variants_to_create.append({
-                'word': record['word'],
-                'language_script': language_script,
-                'variants': variants.get('value', [])
-            })
+            if record['word'] and language_script:
+                value_variants_to_create.append({
+                    'value': record['word'],
+                    'language_script': language_script,
+                    'variants': variants.get('value', [])
+                })
 
     # delete words
     delete_records_by_values(entity_name=entity_name, values=values_to_delete)
