@@ -21,9 +21,9 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
     Args:
         connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name: name of the entity to perform a 'term' query on
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity to perform a 'term' query on
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
@@ -57,9 +57,9 @@ def get_entity_supported_languages(connection, index_name, doc_type, entity_name
     """
     Fetch languages supported by a specific entity
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
         entity_name (str): name of the entity for which the language codes are to be fetched
     Returns:
         (list): List of language codes supported by this entity
@@ -101,9 +101,9 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
     """
     Fetches entity data from ES for the specific entity
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
         entity_name (str): name of the entity for which the data is to be fetched
         values (str, optional): List of values for which data is to be fetched. If None, all
                                 records are fetched
@@ -156,9 +156,9 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     Search for values in entity with filters
 
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
         entity_name (str): name of the entity for which the data is to be fetched
         value_search_term (str): Filter values with the specific search term
         variant_search_term (str): Filter variants with the specific search term
@@ -166,8 +166,9 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     Returns:
         list: List of values which match the filters and search criteria
     """
-    # aggs count set at 50000 because the biggest dictionary (excluding person_name)
-    # currently has around 16000 records. So 50000 is a safe limit for now.
+    # aggs count is set at 50000 because it is a safe limit for now.
+    # If the dictionary sizes increases beyond this, then the count will have to be
+    # increased accordingly.
     # Also, aggs size doesn't belong in the const file because the number depends
     # on use case, data and the operation (unique/average/sum/min/max/count etc.)
     data = {

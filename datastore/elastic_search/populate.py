@@ -320,8 +320,8 @@ def add_training_data_elastic_search(
     If the same named entity is found a delete followed by an update is triggered
     Args:
         connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type:  The type of the documents being indexed
+        index_name (str): The name of the index
+        doc_type (str):  The type of the documents being indexed
         entity_name (str): Name of the entity for which the training data has to be populated
         entity_list (list): List consisting of the entities corresponding to the sentence_list
         sentence_list (list): List of sentences for training
@@ -363,9 +363,9 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
     """
     Fetches entity data from ES for the specific entity
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
         entity_name (str): name of the entity for which the data is to be deleted.
         values (str, optional): List of values for which data is to be fetched.
             If None, all records are deleted
@@ -391,7 +391,7 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
             '_op_type': 'delete',
         }
         str_query.append(delete_dict)
-        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) == constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             delete_bulk_queries.append(str_query)
             str_query = []
 
@@ -408,9 +408,9 @@ def add_entity_data(connection, index_name, doc_type, entity_name, value_variant
     Save entity data in ES for the records
 
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
         entity_name (str): name of the entity for which the data is to be created
         value_variant_records (list): List of dicts to be created in ES.
             Sample Dict: {'value': 'value', 'language_script': 'en', variants': ['variant 1', 'variant 2']}
@@ -430,7 +430,7 @@ def add_entity_data(connection, index_name, doc_type, entity_name, value_variant
             'variants': record.get('variants'),
         }
         str_query.append(query_dict)
-        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+        if len(str_query) == constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             str_query = []
 
