@@ -487,6 +487,7 @@ class DataStore(object):
         Args:
             entity_name (str): Name of the entity for which the unique values are to be fetched
             value_variant_records (list): List of dicts with the value, variants and language script
+                Sample Dict: {'value': 'value', 'language_script': 'en', variants': ['variant 1', 'variant 2']}
         Returns:
             None
         """

@@ -26,6 +26,10 @@ def entity_supported_languages(entity_name):
 
 def entity_update_languages(entity_name, new_language_list):
     """
+    Updates the language support list of the entity by creating dummy records. Currently does not
+    support removal of a language.
+    It creates empty variant records for all the unique values present in this entity.
+
     Args:
         entity_name (str): Name of the entity for which unique values are to be fetched
         new_language_list (list): List of language codes for the new entity

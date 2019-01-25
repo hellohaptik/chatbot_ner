@@ -361,7 +361,8 @@ def add_training_data_elastic_search(
 
 def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):
     """
-    Fetches entity data from ES for the specific entity
+    Deletes entity data from ES for the specific entity depending on the values.
+
     Args:
         connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
         index_name (str): The name of the index
