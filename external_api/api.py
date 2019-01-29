@@ -16,6 +16,10 @@ from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, EN
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
 
+from external_api.lib import dictionary_utils
+from external_api.response_utils import external_api_response_wrapper
+from external_api.exceptions import APIHandlerException
+
 
 def get_entity_word_variants(request):
     """
@@ -259,3 +263,64 @@ def train_crf_model(request):
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
+@csrf_exempt
+@external_api_response_wrapper
+def entity_language_view(request, entity_name):
+    """
+    API call to View and Edit the list of languages supported by an entity.
+    """
+    if request.method == 'GET':
+        # Fetch Languages supported by the entity
+        return {
+            'supported_languages': dictionary_utils.entity_supported_languages(entity_name)
+        }
+
+    elif request.method == 'POST':
+        # Update language support in the specified entity
+        data = json.loads(request.body.decode(encoding='utf-8'))
+        dictionary_utils.entity_update_languages(entity_name, data.get('supported_languages', []))
+        return True
+
+    else:
+        raise APIHandlerException("{0} is not allowed.".format(request.method))
+
+
+@csrf_exempt
+@external_api_response_wrapper
+def entity_data_view(request, entity_name):
+    """
+    API call to fetch and edit entity data
+    """
+    if request.method == 'GET':
+        params = request.GET.dict()
+        # Fetch Languages supported by the entity
+
+        try:
+            pagination_size = int(params.get('size', 10))
+        except ValueError:
+            raise APIHandlerException('size should be sent as a number')
+
+        try:
+            pagination_from = int(params.get('from', 0))
+        except ValueError:
+            raise APIHandlerException('from should be sent as a number')
+
+        return dictionary_utils.search_entity_values(
+            entity_name=entity_name,
+            value_search_term=params.get('value_search_term', None),
+            variant_search_term=params.get('variant_search_term', None),
+            empty_variants_only=params.get('empty_variants_only', False),
+            pagination_size=pagination_size,
+            pagination_from=pagination_from
+        )
+
+    elif request.method == 'POST':
+        # Update language support in the specified entity
+        data = json.loads(request.body.decode(encoding='utf-8'))
+        dictionary_utils.update_entity_records(entity_name, data)
+        return True
+
+    else:
+        raise APIHandlerException("{0} is not allowed.".format(request.method))

@@ -1,10 +1,16 @@
+from __future__ import absolute_import
+
+# std imports
+import copy
 from six import string_types
 import re
 import collections
-from lib.nlp.const import TOKENIZER
-from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR
+
+# Local imports
+from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
+from lib.nlp.const import TOKENIZER
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -15,9 +21,9 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
 
     Args:
         connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name: name of the entity to perform a 'term' query on
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity to perform a 'term' query on
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
@@ -35,7 +41,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
@@ -45,6 +51,191 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
         results_dictionary[result['_source']['value']] = result['_source']['variants']
 
     return results_dictionary
+
+
+def get_entity_supported_languages(connection, index_name, doc_type, entity_name, **kwargs):
+    """
+    Fetch languages supported by a specific entity
+    Args:
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the language codes are to be fetched
+    Returns:
+        (list): List of language codes supported by this entity
+    """
+    data = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ]
+            }
+        },
+        "aggs": {
+            "unique_values": {
+                "terms": {
+                    "field": "language_script.keyword",
+                    "size": constants.ELASTICSEARCH_SEARCH_SIZE
+                }
+            }
+        },
+        "size": 0
+    }
+    kwargs = dict(
+        kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
+        index=index_name, filter_path=['aggregations.unique_values.buckets.key']
+    )
+    search_results = _run_es_search(connection, **kwargs)
+    language_list = []
+    if search_results:
+        language_list = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    return language_list
+
+
+def get_entity_data(connection, index_name, doc_type, entity_name, values=None, **kwargs):
+    """
+    Fetches entity data from ES for the specific entity
+    Args:
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be fetched
+        values (str, optional): List of values for which data is to be fetched. If None, all
+                                records are fetched
+    Returns:
+        (list): List of language codes supported by this entity
+    """
+    data = {
+        "query": {
+            "bool": {
+                'must': [{
+                    "match": {
+                        "entity_data": entity_name
+                    }
+                }]
+            }
+        },
+        "size": constants.ELASTICSEARCH_SEARCH_SIZE
+    }
+
+    query_list = []
+    if values is not None:
+        values_chunks = [values[i:i + 500] for i in range(0, len(values), 500)]
+        for chunk in values_chunks:
+            updated_query = copy.deepcopy(data)
+            updated_query['query']['bool']['must'].append({
+                "terms": {
+                    "value.keyword": chunk
+                }
+            })
+            query_list.append(updated_query)
+    else:
+        query_list.append(data)
+
+    results = []
+    for query in query_list:
+        search_kwargs = dict(kwargs, body=query, doc_type=doc_type,
+                             size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name, scroll='1m')
+        search_results = _run_es_search(connection, **search_kwargs)
+
+        # Parse hits
+        if search_results:
+            results.extend(search_results['hits']['hits'])
+
+    return results
+
+
+def get_entity_unique_values(connection, index_name, doc_type, entity_name, value_search_term=None,
+                             variant_search_term=None, empty_variants_only=False, **kwargs):
+    """
+    Search for values in entity with filters
+
+    Args:
+        connection (elasticsearch.client.Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity for which the data is to be fetched
+        value_search_term (str): Filter values with the specific search term
+        variant_search_term (str): Filter variants with the specific search term
+        empty_variants_only (bool): Search for values with empty variants only
+    Returns:
+        list: List of values which match the filters and search criteria
+    """
+    # aggs count is set at 50000 because it is a safe limit for now.
+    # If the dictionary sizes increases beyond this, then the count will have to be
+    # increased accordingly.
+    # Also, aggs size doesn't belong in the const file because the number depends
+    # on use case, data and the operation (unique/average/sum/min/max/count etc.)
+    data = {
+        "sort": [
+            {
+                "value.keyword": {
+                    "order": "asc"
+                }
+            }
+        ],
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ],
+                "minimum_should_match": 0,
+                "should": []
+            }
+        },
+        "aggs": {
+            "unique_values": {
+                "terms": {
+                    "field": "value.keyword",
+                    "size": 50000
+                }
+            }
+        },
+        "size": 0
+    }
+
+    if value_search_term:
+        data['query']['bool']['minimum_should_match'] = 1
+        data['query']['bool']['should'].append({
+            "wildcard": {
+                "value": u"*{0}*".format(value_search_term.lower())
+            }
+        })
+
+    if empty_variants_only:
+        data['query']['bool']['must_not'] = [
+            {
+                "exists": {
+                    "field": "variants"
+                }
+            }
+        ]
+    elif variant_search_term:
+        data['query']['bool']['minimum_should_match'] = 1
+        data['query']['bool']['should'].append({
+            "match": {
+                "variants": variant_search_term
+            }
+        })
+
+    kwargs = dict(
+        kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
+        index=index_name, filter_path=['aggregations.unique_values.buckets.key']
+    )
+    search_results = _run_es_search(connection, **kwargs)
+    values = []
+    if search_results:
+        values = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+    return values
 
 
 def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
@@ -93,7 +284,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
     """
     data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
                                           language_script=search_language_script)
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     results = _run_es_search(connection, **kwargs)
     results = _parse_es_search_results(results)
     return results
@@ -147,7 +338,8 @@ def _get_dynamic_fuzziness_threshold(fuzzy_setting):
                      otherwise the input is returned as it is
     """
     if isinstance(fuzzy_setting, string_types):
-        if ELASTICSEARCH_VERSION_MAJOR > 6 or (ELASTICSEARCH_VERSION_MAJOR == 6 and ELASTICSEARCH_VERSION_MINOR >= 2):
+        if constants.ELASTICSEARCH_VERSION_MAJOR > 6 or \
+                (constants.ELASTICSEARCH_VERSION_MAJOR == 6 and constants.ELASTICSEARCH_VERSION_MINOR >= 2):
             return fuzzy_setting
         return 'auto'
 
@@ -337,7 +529,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
