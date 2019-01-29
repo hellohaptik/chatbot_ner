@@ -29,10 +29,10 @@ class DateDetector(object):
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         now_date: datetime object holding timestamp while DateDetector instantiation
-        month_dictionary: dictonary mapping month indexes to month spellings and 
-                            fuzzy variants(spell errors, abbreviations)
-        day_dictionary: dictonary mapping day indexes to day of week spellings and 
-                            fuzzy variants(spell errors, abbreviations)
+        month_dictionary: dictonary mapping month indexes to month spellings and
+                          fuzzy variants(spell errors, abbreviations)
+        day_dictionary: dictonary mapping day indexes to day of week spellings and
+        fuzzy variants(spell errors, abbreviations)
         bot_message: str, set as the outgoing bot text/message
 
         SUPPORTED_FORMAT                                            METHOD_NAME
@@ -63,7 +63,7 @@ class DateDetector(object):
         24."every monday" variants                                  _weeks_identification
         25."after n days" variants                                  _date_days_after
         26."n days later" variants                                  _date_days_later
-        
+
         Not all separator are listed above. See respective methods for detail on structures of these formats
 
     Note:
@@ -786,9 +786,7 @@ class DateDetector(object):
     def _todays_date(self, date_list=None, original_list=None):
         """
         Detects "today" and its variants and returns the date today
-
         Matches "today", "2dy", "2day", "tody", "aaj", "aj", "tonight"
-        
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
@@ -823,9 +821,7 @@ class DateDetector(object):
     def _tomorrows_date(self, date_list=None, original_list=None):
         """
         Detects "tommorow" and its variants and returns the date value for tommorow
-
         Matches "tomorrow", "2morow", "2mrw", "2mrow", "next day", "tommorrow", "tommorow", "tomorow", "tommorow"
-        
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
@@ -833,7 +829,6 @@ class DateDetector(object):
         Returns:
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
-
         """
         if date_list is None:
             date_list = []
@@ -898,8 +893,7 @@ class DateDetector(object):
     def _day_after_tomorrow(self, date_list=None, original_list=None):
         """
         Detects "day after tomorrow" and its variants and returns the date on day after tomorrow
-
-        Matches "day" or "dy" followed by "after" or "aftr" followed by one of 
+        Matches "day" or "dy" followed by "after" or "aftr" followed by one of
         "tomorrow", "2morow", "2mrw", "2mrow", "kal", "2mrrw"
 
         Args:
@@ -936,14 +930,13 @@ class DateDetector(object):
     def _date_days_after(self, date_list=None, original_list=None):
         """
         Detects "date after n number of days" and returns the date after n days
-    
         Matches "after" followed by the number of days provided
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
                                date entities
         Returns:
-            A tuple of two lists with first list containing the detected date entities and type followed by the 
+            A tuple of two lists with first list containing the detected date entities and type followed by the
             second list containing their corresponding substrings in the given text.
 
         """
@@ -973,14 +966,13 @@ class DateDetector(object):
     def _date_days_later(self, date_list=None, original_list=None):
         """
         Detects "date n days later" and returns the date for n days later
-    
         Matches "digit" followed by "days" and iterations of "later"
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as
-                               date entities
+                           date entities
         Returns:
-            A tuple of two lists with first list containing the detected date entities and type followed by the 
+            A tuple of two lists with first list containing the detected date entities and type followed by the
             second list containing their corresponding substrings in the given text.
 
         """
@@ -1011,7 +1003,7 @@ class DateDetector(object):
         """
         Detects "day before yesterday" and its variants and returns the date on day after tomorrow
 
-        Matches "day" or "dy" followed by "before" or "befre" followed by one of 
+        Matches "day" or "dy" followed by "before" or "befre" followed by one of
         "yesterday", "sterday", "yesterdy", "yestrdy", "yestrday"
 
         Args:
@@ -1214,11 +1206,11 @@ class DateDetector(object):
         where each part is in of one of the formats given against them
             day: d, dd
             ordinal indicator: "st", "nd", "rd", "th"
-        
+
         Optional "of" is allowed after ordinal indicator, example "dd th of this current month"
 
         Few valid examples:
-            "3rd this month", "2 of this month", "05 of this current month" 
+            "3rd this month", "2 of this month", "05 of this current month"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -1227,7 +1219,6 @@ class DateDetector(object):
         Returns:
             A tuple of two lists with first list containing the detected date entities and second list containing their
             corresponding substrings in the given text.
-
         """
         if original_list is None:
             original_list = []
@@ -1264,11 +1255,11 @@ class DateDetector(object):
             ordinal indicator: "st", "nd", "rd", "th"
             "next" variants: "next", "nxt", "comming", "coming", "commin", "following", "folowin", "followin",
                              "folowing"
-        
+
         Optional "of" is allowed after ordinal indicator, example "dd th of this next month"
 
         Few valid examples:
-            "3rd of next month", "2 of next month", "05 of next month" 
+            "3rd of next month", "2 of next month", "05 of next month"
 
         Args:
             date_list: Optional, list to store dictionaries of detected dates
@@ -1763,13 +1754,13 @@ class DateDetector(object):
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_dict_2 = {
                 'dd': int(dd2),
                 'mm': int(mm),
                 'yy': int(yy),
                 'type': TYPE_EXACT
-                }
+            }
             date_list.append(date_dict_1)
             date_list.append(date_dict_2)
 
@@ -1839,10 +1830,9 @@ class DateDetector(object):
     def _weeks_identification(self, date_list=None, original_list=None):
         """
         Checks for repeating days and will replace the type to TYPE_REPEAT_DAY
-        
         Few valid examples:
-            "every monday", "every friday", "every thursday" 
-            
+            "every monday", "every friday", "every thursday"
+
         Args:
             date_list: Optional, list to store dictionaries of detected dates
             original_list: Optional, list to store corresponding substrings of given text which were detected as

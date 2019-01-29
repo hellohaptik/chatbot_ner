@@ -50,11 +50,13 @@ Following are the steps to create the Docker image and run NER with Docker.
 
 ```shell
 cd chatbot_ner 
+cp config.example .env    (This will have all the basic environment variables to get started, You can update values accordingly)
+cp .env docker/.env
 cd docker
 docker-compose up --build -d
 ```
 
-The above will also mount local repo root directory inside the containers /app directory
+The above will also mount local repo root directory inside the containers /app directory.
 Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
    > **NOTE**: make sure that nothing is running on port 8081 on your server or your local environment.
      If anything is running on port 8081, you can stop it by running the following command
@@ -213,4 +215,3 @@ $ sudo docker rm -f ner
 $ sudo docker rmi -f mlhaptik/chatbot_ner
 $ sudo apt-get remove docker
 ```
-

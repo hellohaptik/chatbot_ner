@@ -8,31 +8,35 @@ from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUM
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
     NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, \
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
-    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE
+    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE, NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME
 from ner_v2.detectors.numeral.utils import get_number_from_number_word, get_list_from_pipe_sep_string
 
 NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
+NumberUnit = collections.namedtuple('NumberUnit', ['value', 'type'])
 
 
 class BaseNumberDetector(object):
-    def __init__(self, entity_name, data_directory_path):
+    def __init__(self, entity_name, data_directory_path, unit_type=None):
         """
         Standard Number detection class, read data from language data path and help to detect number and numbers words
         for given languages.
         Args:
+            entity_name (str): entity_name: string by which the detected number would be replaced
             data_directory_path (str): path of data folder for given language
+            unit_type (str): number unit types like weight, currency, temperature, used to detect number with
+                               specific unit type.
+
         """
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.date = []
-        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 
         self.numbers_word_map = {}
         self.scale_map = {}
         self.units_map = {}
+        self.unit_type = unit_type
 
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
@@ -80,7 +84,8 @@ class BaseNumberDetector(object):
         """
         # create number_words dict having number variants and their corresponding scale and increment value
         # create language_scale_map dict having scale variants and their corresponding value
-        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME), encoding='utf-8')
+        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME),
+                                 encoding='utf-8')
         for index, row in numeral_df.iterrows():
             name_variants = get_list_from_pipe_sep_string(row[NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME])
             value = row[NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME]
@@ -104,11 +109,14 @@ class BaseNumberDetector(object):
         unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE_NAME)
         if os.path.exists(unit_file_path):
             units_df = pd.read_csv(unit_file_path, encoding='utf-8')
+            if self.unit_type:
+                units_df = units_df[units_df[NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME] == self.unit_type]
             for index, row in units_df.iterrows():
                 unit_variants = get_list_from_pipe_sep_string(row[NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME])
                 unit_value = row[NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME]
+                unit_type = row[NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME]
                 for unit in unit_variants:
-                    self.units_map[unit] = unit_value
+                    self.units_map[unit] = NumberUnit(value=unit_value, type=unit_type)
 
     def _get_unit_from_text(self, detected_original, processed_text):
         """
@@ -146,10 +154,10 @@ class BaseNumberDetector(object):
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
             if unit_suffix:
-                unit = self.units_map[unit_suffix.strip()]
+                unit = self.units_map[unit_suffix.strip()].value
                 original_text = original_text_suffix.strip()
             elif unit_prefix:
-                unit = self.units_map[unit_prefix.strip()]
+                unit = self.units_map[unit_prefix.strip()].value
                 original_text = original_text_prefix.strip()
         return unit, original_text
 
@@ -297,5 +305,7 @@ class BaseNumberDetector(object):
 
 
 class NumberDetector(BaseNumberDetector):
-    def __init__(self, entity_name, data_directory_path):
-        super(NumberDetector, self).__init__(entity_name=entity_name, data_directory_path=data_directory_path)
+    def __init__(self, entity_name, data_directory_path, unit_type=None):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             data_directory_path=data_directory_path,
+                                             unit_type=unit_type)

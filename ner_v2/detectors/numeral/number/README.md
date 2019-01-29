@@ -16,7 +16,7 @@ This is the V2 version of Number detector module that will detect number and num
 - **Python Shell**
 
   ```python
-  >> from ner_v2.detector.number.number.date_detection import NumberDetector
+  >> from ner_v2.detector.number.number.number_detection import NumberDetector
   >> detector = NumberDetector(entity_name='number', language='en')  # here language will be ISO 639-1 code
   >> detector.detect_entity(text= 'I want 4000 rs')
   >> {'entity_value': [{'value': '4000', 'unit': 'rupees'}], 'original_text':['4000 rs']}
@@ -39,7 +39,7 @@ This is the V2 version of Number detector module that will detect number and num
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/date?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi'
+  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi'
   
   # Curl output
   $ {
@@ -109,12 +109,12 @@ Below is the brief about how to create data files `numerals_constant.csv`, `unit
 
 2. **units.csv**:  This files contains the vocabs of units for number and their correspoding all variants possible .
 
-   | unit_value |                        unit_variants                         |
-   | :--------: | :----------------------------------------------------------: |
-   |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
-   |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
+   | unit_type | unit_value |                        unit_variants                         |
+   | --------- | :--------: | :----------------------------------------------------------: |
+   | currency  |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
+   | currency  |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
 
-   Here, 1st column will contain the value of unit which will be return by detector module, while 2nd column contain all the possible variants of units in language and english script.
+   Here, the 1st column contains the type of unit (E.g. dollars, euros are "currency", centimetre, metre, kilometre are "distance"), 2nd column contains the value of unit which will be returned by number detector and 3rd column contains all the possible variants of that unit value (delimited by pipe `|`) for the language you are adding. (It is recommended to add Romanised versions of the variants you are adding)
 
 #### Guidelines to add new detectors for number apart from builtin ones:
 
@@ -134,8 +134,12 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name):
-        super(NumberDetector, self).__init__(entity_name=entity_name,                                      data_directory_path=NumberDetector.data_directory_path)
+    def __init__(self, entity_name='number', unit_type=None):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                            
+                                        data_directory_path=NumberDetector.data_directory_path,
+                                             unit_type=unit_type)
+
 ```
 
 Note that the class name must be `NumberDetector` 
@@ -172,9 +176,10 @@ Once having defined a custom detector, we now add it to `self.detector_preferenc
 Below we show an example where we put our custom detector on top to execute it before some builtin detectors.
 
 ```python
-	def __init__(self, entity_name):
+	def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             data_directory_path=NumberDetector.data_directory_path)
+                                             data_directory_path=NumberDetector.data_directory_path,
+                                            unit_type=unit_type)
 
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
@@ -182,6 +187,24 @@ Below we show an example where we put our custom detector on top to execute it b
             self._detect_number_from_numerals
         ]
 ```
+
+Also to run the custom detector only for few set of entities, you can do it by putting a `if` condition to check if given entity_name belong to list, and modify the detector preference only for them. Below is the example where custom detector will run just for `person_count` and `traveller_number` entity. For other entities it will follow the default pattern defined in BaseNumberDetector.
+
+```python
+	def __init__(self, entity_name='number', unit_type=None):
+        super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             data_directory_path=NumberDetector.data_directory_path,
+                                            unit_type=unit_type)
+
+        if entity name in ['person_count', 'traveller_number']:
+            self.detector_preferences = [
+            	self._custom_detect_number_of_people_format,
+            	self._detect_number_from_digit,
+            	self._detect_number_from_numerals
+            ]
+```
+
+
 
 Putting it all together, we have
 
@@ -198,15 +221,19 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             data_directory_path=NumberDetector.data_directory_path)
+                                             
+                                             data_directory_path=NumberDetector.data_directory_path,
+                                             unit_type=unit_type)
 
-        self.detector_preferences = [
-            self._custom_detect_number_of_people_format,
-            self._detect_number_from_digit,
-            self._detect_number_from_numerals
-        ]
+
+        if entity name in ['person_count', 'traveller_number']:
+            self.detector_preferences = [
+            	self._custom_detect_number_of_people_format,
+            	self._detect_number_from_digit,
+            	self._detect_number_from_numerals
+            ]
 
     def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         number_list = number_list or []

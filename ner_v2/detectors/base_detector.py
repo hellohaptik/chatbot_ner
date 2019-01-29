@@ -1,10 +1,15 @@
+from __future__ import absolute_import
+
 import abc
+
+import six
+
 from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import TRANSLATED_TEXT
+from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-from language_utilities.utils import translate_text
-from language_utilities.constant import TRANSLATED_TEXT
 
 
 class BaseDetector(object):
@@ -163,16 +168,16 @@ class BaseDetector(object):
 
         Args:
             entity_value_list (list): list of entity values which are identified from given detection logic
-            original_text_list (list): list original values or actual values from message/structured_value 
+            original_text_list (list): list original values or actual values from message/structured_value
                                        which are identified
-            detection_method (str, optional): how the entity was detected 
+            detection_method (str, optional): how the entity was detected
                                               i.e. whether from message, structured_value
                                                    or fallback, verified from model or not.
                                               defaults to None
-            detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
-                                                   if provided, this argument will be used over detection method
+            detection_method_list(list, optional): list containing how each entity was detected in the entity_value
+                                                   list. if provided, this argument will be used over detection method
                                                    defaults to None
-            detection_language(str): ISO 639 code for language in which entity is detected                                        
+            detection_language(str): ISO 639 code for language in which entity is detected
 
         Returns:
               list of dict: list containing dictionaries, each containing entity_value, original_text and detection;
@@ -194,7 +199,7 @@ class BaseDetector(object):
 
         entity_list = []
         for i, entity_value in enumerate(entity_value_list):
-            if type(entity_value) in [str, unicode]:
+            if type(entity_value) in [str, six.text_type]:
                 entity_value = {
                     ENTITY_VALUE_DICT_KEY: entity_value
                 }
