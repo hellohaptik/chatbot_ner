@@ -175,7 +175,7 @@ def search_entity_values(
     """
     values = None
     total_records = None
-    if value_search_term or variant_search_term or empty_variants_only:
+    if value_search_term or variant_search_term or empty_variants_only or pagination_size or pagination_from:
         values = get_entity_unique_values(
             entity_name=entity_name,
             value_search_term=value_search_term,
