@@ -3,6 +3,8 @@ TODO
 - [ ] Change Crf -> CRF
 
 
+
+
 ## CONDITIONAL RANDOM FIELDS
 
 
@@ -163,7 +165,7 @@ The module is used to take input as the sentence_list and entity_list and conver
     This module is used to load the word embeddings from the local disk and then each token is assigned a its coressponsding word embedding
     
     ```python
-    from models.crf_v2.crf_preprocess_data import CrfPreprocessData
+    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
     docs['word_embeddings'] = 
     CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
     vocab=vocab, word_vectors=word_vectors) 
@@ -189,19 +191,24 @@ The module is used to take input as the sentence_list and entity_list and conver
 
 		1. **lower**     
 		
-        The token is casted to the lower case.
+        	The token is casted to the lower case.
+		
 		2. **isupper**  
 		
-        Flag to check if the first letter of the token is capitalized
+	        Flag to check if the first letter of the token is capitalized
+		
 		3. **istitle**
 		
-        Flag to check if the complete token is in upper case
+        	Flag to check if the complete token is in upper case
+		
 		4. **isdigit**   
 		
-        Flag to check if the token is a digit
-		5. **pos_tag**  
+        	Flag to check if the token is a digit
 		
-        Part of speech tag for the given token
+		5. **pos_tag**  
+	
+        	Part of speech tag for the given token
+		
 		6. **word_embeddings** 
 
 		Word Vectors associated with each token
@@ -266,14 +273,14 @@ The mdoule can be used to detect entities utilizing the previously trained CRF m
 
 	This module is responsible to tag the entities from text and return the detected subtexts.
     
-```python
-from models.crf_v2.crf_detect_entity import CrfDetection
-crf_detection = CrfDetection(entity_name='crf_chat')
-detected_text = crf_detection.detect_entity(text='People call me Aman Shah and my friend Krupal Modi')
-print(detected_text)
->>> ['Aman Shah', 'Krupal Modi']
+	```python
+    from models.crf_v2.crf_detect_entity import CrfDetection
+    crf_detection = CrfDetection(entity_name='crf_chat')
+	detected_text = crf_detection.detect_entity(text='People call me Aman Shah and my friend Krupal Modi')
+    print(detected_text)
+    >>> ['Aman Shah', 'Krupal Modi']
 
-```
+	```
 ### E. CRF-TEXT ENTITY DETECTION (Combined Module)
 
 This module is used to run the previously trained CRF model alongside the tradional text entity detection (detection accomplished from datastore). This module takes input as the entity name and returns a combined result using both CRF Detection and Text Entity Detection.
@@ -394,6 +401,7 @@ print(live_crf_model_path)
 **Note** _Save the **live_crf_model_path**_
 
 **2. Detection**
+This code can be used to detect the entities from the given text
 ```python
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 text_model_detector = TextModelDetector(entity_name='crf_chat', live_crf_model_path=live_crf_model_path)
