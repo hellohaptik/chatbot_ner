@@ -265,14 +265,14 @@ The mdoule can be used to detect entities utilizing the previously trained CRF m
 
 	This module is responsible to tag the entities from text and return the detected subtexts.
     
-	```python
-    from models.crf_v2.crf_detect_entity import CrfDetection
-    crf_detection = CrfDetection(entity_name='crf_chat')
-	detected_text = crf_detection.detect_entity(text='People call me Aman Shah and my friend Krupal Modi')
-    print(detected_text)
-    >>> ['Aman Shah', 'Krupal Modi']
+```python
+from models.crf_v2.crf_detect_entity import CrfDetection
+crf_detection = CrfDetection(entity_name='crf_chat')
+detected_text = crf_detection.detect_entity(text='People call me Aman Shah and my friend Krupal Modi')
+print(detected_text)
+>>> ['Aman Shah', 'Krupal Modi']
 
-	```
+```
 ### E. CRF-TEXT ENTITY DETECTION (Combined Module)
 
 This module is used to run the previously trained CRF model alongside the tradional text entity detection (detection accomplished from datastore). This module takes input as the entity name and returns a combined result using both CRF Detection and Text Entity Detection.
