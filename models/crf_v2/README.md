@@ -15,40 +15,9 @@ CRFs are a type of discriminative undirected probabilistic graphical model. They
 
 We have implemented a CRF model for Named Entity Recognition. In addition to commonly used primitive features we have incorporated glove embeddings in order to add semantic knowledge to the Entity Recognition algorithm.
 
-### B. PRIMARY FEATURES
+Since the CRF model is used to detect named-entities we thus have assigned CRF Entities are assigned **text** type
 
-
-**1. Window Size**
-	
-We consider a window of two tokens in the forward and the backward direction for each token at a given time step.
-
-**Examples**
-
-1. My name |_is Pratik **Jayarao** and this_| is my friend Hardik Patel.
-2. I want to |**travel from **Mumbai** to Delhi**|
-
-
-**2. Token features**
-	
-Each token present in the window is converted to the following features as an input
-
-1. **lower**     
-The token is casted to the lower case.
-2. **isupper**  
-Flag to check if the first letter of the token is capitalized
-3. **istitle**
-Flag to check if the complete token is in upper case
-4. **isdigit**   
-Flag to check if the token is a digit
-5. **pos_tag**  
-Part of speech tag for the given token
-6. **word_embeddings** 
-	
-    Word vector corresponding to the token
-
-
-
-### C. SETUP
+### B. SETUP
 
 **1. Word Embeddings**
 
@@ -99,9 +68,9 @@ EMBEDDINGS_PATH_VECTORS=/app/glove_vectors
 ### C. TRAINING
 
 
-**1. Training Data Format**
+**1. Input Training Data**
 
-Generate training data for CRF model in the CSV format. The csv files should consists of the sentences and their corresponding entities on which the model has to be trained.
+Generate training data for CRF model in the CSV format. The csv files should consists of the sentences and their corresponding entities on which the model has to be trained. This CSV is just for convenience. Direct sentence_list and entity_list can be provided as input.
 
 -	**sentence_list**
 	
@@ -124,41 +93,205 @@ Generate training data for CRF model in the CSV format. The csv files should con
 | Chirag Jain is my name and I live in India | ["Chirag Jain"]                |
 | Myself Aman Srivastava and I Engineer    | ["Aman Srivastava"]            |
 | People call me Yash Doshi and my friend Sagar Dedhia | ["Yash Doshi", "Sagar Dedhia"] |
-| Hi, how are you doing?                   | []                             |
+| Hi, how are you doing?                   | []                             
 
-
-**2. Train Crf Model**
-
-The following code can be used to train the CRF model from the aforementioned csv.
-
+**Note** Convert CSV file into sentence_list and entity_list utilizing the following code
 ```python
 from models.crf_v2.crf_train import CrfTrain
 import ast
 import pandas as pd
 
-entity_name = 'crf_chat' #  The name of entity which will be reflected in the model and is the primary identifier of the entity.
 csv_path = '/app/crf_chat.csv'  #  The path where the csv file is stored.
 
 data = pd.read_csv(csv_path, encoding='utf-8') #  Load the csv file into a pandas DataFrame
 sentence_list = list(data['sentence_list']) 
 entity_list = list(data['entity_list'].apply(lambda x: ast.literal_eval(x)))
 
-crf_model = CrfTrain(entity_name=entity_name) #  Initialize the Crf Model
-model_path = crf_model.train_crf_model_from_list(sentence_list=sentence_list, entity_list=entity_list)
-
-print(model_path)
-
->>>'/app/models_crf/crf_chat' 
 ```
 
-**Note** _Store this **model_path**_
+**2. Preprocess Data**
 
+The module is used to take input as the sentence_list and entity_list and converts it to features for training the Crf Model.
 
-### D. ENTITY DETECTION 
+-	**Tokenization and Label Generation**
+	
+    This module is used to tokenize and generate labels according to the IOB standards of Named Entity Recognition (NER)
+    	
+       ```python
+       from models.crf_v2.crf_preprocess_data import CrfPreprocessData
+      sentence_list =['book a flight from Mumbai to Delhi', 'Book a flight to Pune']
+       entity_list = [['Mumbai', 'Delhi'], ['Pune']]
+	   docs = CrfPreprocessData.pre_process_text(sentence_list, entity_list)
+       print(docs)
 
-The following code can be used to detect entities utilizing the previously trained CRF model.
+       >>> {'labels': [['O', 'O', 'O', 'O', 'B', 'O', 'B'], ['O', 'O', 'O',
+       >>> 'O', 'B']],
+       >>> 'sentence_list': [['book', 'a', 'flight', 'from', 
+       >>> 'Mumbai','to', 'Delhi'], ['Book', 'a', 'flight', 'to', 'Pune']]}
+	```
 
-**Detect Entity**
+-	**Parts Of Speech Tagging**
+
+	This module is used to tag the parts of speech for the tokenized sentences
+	```python
+    from models.crf_v2.crf_preprocess_data import CrfPreprocessData
+    docs = CrfPreprocessData.pos_tag(docs)
+    print(docs)
+
+    >>> {'labels': [['O', 'O', 'O', 'O', 'B', 'O', 'B'], 
+    >>> ['O', 'O', 'O', 'O', 'B']],
+    >>> 'pos_tags': [['NN', 'DT', 'NN', 'IN', 'NNP', 'TO', 'VB'], 
+    >>> ['VB', 'DT', 'NN', 'TO', 'VB']],
+    >>> 'sentence_list': [['book', 'a', 'flight', 'from', 
+    >>> 'Mumbai', 'to', 'Delhi'],['Book', 'a', 'flight', 'to', 'Pune']}
+	```
+
+- 	**Load Word Embeddings**
+	
+	This module is used to load the word embeddings into the memory
+        
+    ```python
+    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
+    word_embeddings = LoadWordEmbeddings()
+    vocab = word_embeddings.vocab
+    word_vectors = word_embeddings.word_vectors
+    ```
+
+-	**Assign Word Embeddings**
+	
+    This module is used to load the word embeddings from the local disk and then each token is assigned a its coressponsding word embedding
+    
+    ```python
+    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
+    docs['word_embeddings'] = 
+    CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
+    vocab=vocab, word_vectors=word_vectors) 
+    for each in docs[SENTENCE_LIST]]
+	```
+    
+-	**Generate Feature From Data**
+    
+    This module is to generate feature for each token which acts as the input features for the CRF Model
+    
+    -	**Window Size**
+	
+		We consider a window of two tokens in the forward and the backward direction for each token at a given time step.
+
+		**Example**
+
+		1. My name |_is Pratik **Jayarao** and this_| is my friend Hardik Patel.
+		2. I want to |**travel from **Mumbai** to Delhi**|
+
+	-	**Token features**
+	
+		Each token present in the window is converted to the following features as an input
+
+		1. **lower**     
+		
+        The token is casted to the lower case.
+		2. **isupper**  
+		
+        Flag to check if the first letter of the token is capitalized
+		3. **istitle**
+		
+        Flag to check if the complete token is in upper case
+		4. **isdigit**   
+		
+        Flag to check if the token is a digit
+		5. **pos_tag**  
+		
+        Part of speech tag for the given token
+		6. **word_embeddings** 
+
+		Word Vectors associated with each token
+
+    ```python
+    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
+    features = CrfPreprocessData.extract_crf_features(docs)
+    labels = docs['labels']
+    ```
+3. **Train Crf Model**
+
+	This module takes input as the features and the and labels obtained from the preprocessing module and trains a CRF model on it. The module saves this model locally and this path is then returned.
+    
+	**Model Cofigurations**
+	-	C1 - L1 Regularization constant 
+	-	C2 - L2 Regularization constant
+	-	Max Iterations - Max number of iterations to be executed
+    
+	```python
+	from models.crf_v2.crf_train import CrfTrain
+	
+	crf_train = CrfTrain(entity_name='crf_chat')
+	model_path = crf_train.train_crf_model(x=features, y=labels, c1=0, c2=0,
+    max_iterations=1000)
+
+	print(model_path)
+
+	>>>'/app/models_crf/crf_chat' 
+	```
+
+4. **Training Example**
+    
+	```python
+    from models.crf_v2.crf_train import CrfTrain
+    import ast
+    import pandas as pd
+
+    entity_name = 'crf_chat' #  The name of entity which will be reflected in the model and is the primary identifier of the entity.
+    csv_path = '/app/crf_chat.csv'  #  The path where the csv file is stored.
+
+    data = pd.read_csv(csv_path, encoding='utf-8') #  Load the csv file into a pandas DataFrame
+    sentence_list = list(data['sentence_list']) 
+    entity_list = list(data['entity_list'].apply(lambda x: ast.literal_eval(x)))
+
+    crf_model = CrfTrain(entity_name=entity_name) #  Initialize the Crf Model
+    model_path = crf_model.train_crf_model_from_list(sentence_list=sentence_list, entity_list=entity_list)
+
+    print(model_path)
+
+    >>>'/app/models_crf/crf_chat' 
+	```
+
+### D. CRF ENTITY DETECTION (Standalone)
+
+The mdoule can be used to detect entities utilizing the previously trained CRF model. This module takes input as the entity name and the text from which the entity has to be extracted.
+
+1. **Load Model**
+
+	The crf model corresponding to the entity is loaded from the local disk into the memory and the tagger is initialized. This module is a Singelton class and hence the model if once loaded remaines in the memory.
+    
+2. **Extract Entity**
+
+	This module is responsible to tag the entities from text and return the detected subtexts.
+    
+	```python
+    from models.crf_v2.crf_detect_entity import CrfDetection
+    crf_detection = CrfDetection(entity_name='crf_chat')
+	detected_text = crf_detection.detect_entity(text='People call me Aman Shah and my friend Krupal Modi')
+    print(detected_text)
+    >>> ['Aman Shah', 'Krupal Modi']
+
+	```
+### E. CRF-TEXT ENTITY DETECTION (Combined Module)
+
+This module is used to run the previously trained CRF model alongside the tradional text entity detection (detection accomplished from datastore). This module takes input as the entity name and returns a combined result using both CRF Detection and Text Entity Detection.
+
+1. **CRF Standalone Detection**
+
+	The CRF Standalone Detection is triggered. The result i.e the list of entities detected from the CRF is returned.
+    
+2. **Text Entity Detection**
+
+	This module is used to detect entities leveraging the Text entity fucntionality. This module returns the entity_value and the original_text.
+
+3. **Verification Source**
+	
+	This module is responsible to assign the source (CRF / Datastore) from which the entity is detected.
+    
+4. **Ensemble Results**
+
+	This module is responsible to combine the results detected from the Datastore and the CRF Model. The Datastore value is given higher priority. If the same entity is detected by the CRF model and the Datastore then the entity value is resolved to the entity value returned by the Datastore Module
 
 ```python
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
@@ -167,6 +300,7 @@ output = text_model_detector.detect(message='my name is harsh')
 print(output)
 >>> [{'detection': 'message',
   	'entity_value': {'crf_model_verified': True,
+    'datastore_verified': False,
    	'value': 'harsh'},
   	'language': 'en',
   	'original_text': 'harsh'}]
@@ -178,9 +312,7 @@ print(output)
 
 
 **1. Training**
-
-First we convert the CSV file into the appropriate json which will be consumed by the Chatbot Ner docker. Post which we train the model
-    
+  
 ```python
 
 import pandas as pd
@@ -188,7 +320,7 @@ import json
 import requests
 import ast
 
-def convert_data_to_json(csv_path, entity_name, language_script):
+def convert_data_to_json(csv_path, entity_name):
     """
     This method is used to convert the CSV file into the appropriate json which will be
     consumed by the Chatbot Ner docker. 
@@ -211,7 +343,6 @@ def convert_data_to_json(csv_path, entity_name, language_script):
 
     external_api_data = json.dumps({
         'entity_name': entity_name,
-        'language_script': language_script,
         'sentence_list': sentence_list,
         'entity_list': entity_list,
     })
@@ -270,32 +401,9 @@ output = text_model_detector.detect(message='my name is harsh')
 print(output)
 >>> [{'detection': 'message',
   	'entity_value': {'crf_model_verified': True,
+    'datastore_verified': False,
    	'value': 'harsh'},
   	'language': 'en',
   	'original_text': 'harsh'}]
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
