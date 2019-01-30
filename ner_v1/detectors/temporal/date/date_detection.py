@@ -1941,6 +1941,7 @@ class DateDetector(object):
 
             while now < end:
                 date_list.append(copy.deepcopy(date_dict))
+                original_list.append(original)
                 now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
@@ -1948,7 +1949,6 @@ class DateDetector(object):
                     'yy': now.year,
                     'type': TYPE_EVERYDAY
                 }
-                original_list.append(original)
         return date_list, original_list
 
     def _date_identification_everyday_except_weekends(self, date_list=None, original_list=None, n_days=30):
@@ -1982,7 +1982,7 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
 
         if not patterns:
-            weekday_regex_pattern = re.compile(r'\b(weekdays|weekday|week day|week days| all weekdays)\b')
+            weekday_regex_pattern = re.compile(r'\b((weekdays|weekday|week day|week days| all weekdays))\b')
             patterns = weekday_regex_pattern.findall(self.processed_text.lower())
         constant_type = WEEKDAYS
         if self._is_everyday_present(self.text):
@@ -1991,7 +1991,7 @@ class DateDetector(object):
         count = 0
         weekend = []
         date_day = self.now_date
-        while count < 15:
+        while count < n_days + 2:
             if today > 6:
                 today = 0
             if today == 5 or today == 6:
@@ -2017,6 +2017,7 @@ class DateDetector(object):
             while now < end:
                 if current_date not in weekend_digit:
                     date_list.append(copy.deepcopy(date_dict))
+                    original_list.append(original)
                 now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
@@ -2025,7 +2026,6 @@ class DateDetector(object):
                     'type': constant_type
                 }
                 current_date = now.day
-                original_list.append(original)
         return date_list, original_list
 
     def _date_identification_everyday_except_weekdays(self, date_list=None, original_list=None, n_days=30):
@@ -2070,7 +2070,7 @@ class DateDetector(object):
         count = 0
         weekend = []
         date_day = self.now_date
-        while count < 50:
+        while count < n_days + 2:
             if today > 6:
                 today = 0
             if today == 5 or today == 6:
@@ -2096,6 +2096,7 @@ class DateDetector(object):
             while now < end:
                 if current_date in weekend_digit:
                     date_list.append(copy.deepcopy(date_dict))
+                    original_list.append(original)
                 now += datetime.timedelta(days=1)
                 date_dict = {
                     'dd': now.day,
@@ -2104,7 +2105,7 @@ class DateDetector(object):
                     'type': constant_type
                 }
                 current_date = now.isocalendar()
-                original_list.append(original)
+
         return date_list, original_list
 
     def _day_month_format_for_arrival_departure(self, date_list=None, original_list=None):
