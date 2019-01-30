@@ -165,7 +165,7 @@ The module is used to take input as the sentence_list and entity_list and conver
     This module is used to load the word embeddings from the local disk and then each token is assigned a its coressponsding word embedding
     
     ```python
-    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
+    from models.crf_v2.crf_preprocess_data import CrfPreprocessData
     docs['word_embeddings'] = 
     CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
     vocab=vocab, word_vectors=word_vectors) 
@@ -214,7 +214,7 @@ The module is used to take input as the sentence_list and entity_list and conver
 		Word Vectors associated with each token
 
     ```python
-    from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
+    from models.crf_v2.crf_preprocess_data import CrfPreprocessData
     features = CrfPreprocessData.extract_crf_features(docs)
     labels = docs['labels']
     ```
@@ -314,7 +314,7 @@ print(output)
 
 ```
 
-### E. PYTHON API DOCUMENTATION
+### F. PYTHON API DOCUMENTATION
 
 
 
