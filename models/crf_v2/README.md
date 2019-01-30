@@ -249,9 +249,9 @@ CHATBOT_NER_URL = CHATBOT_NER_SCHEMA + CHATBOT_NER_HOST + ':' + CHATBOT_NER_PORT
 HTTP_TIMEOUT = 100
 CSV_PATH = "/home/ubuntu/crf_chat.csv"
 ENTITY_NAME = 'crf_chat'
-LANGUAGE_SCRIPT = 'en'
 
-external_api_data= convert_data_to_json(csv_path=CSV_PATH, entity_name=ENTITY_NAME, language_script=LANGUAGE_SCRIPT) 
+
+external_api_data= convert_data_to_json(csv_path=CSV_PATH, entity_name=ENTITY_NAME) 
 
 live_crf_model_path = train_crf_model(external_api_data=external_api_data, chatbot_ner_url=CHATBOT_NER_URL, http_timeout=HTTP_TIMEOUT)
 
