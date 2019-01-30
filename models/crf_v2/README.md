@@ -66,7 +66,7 @@ MODELS_PATH=/app/models_crf
 EMBEDDINGS_PATH_VOCAB=/app/glove_vocab
 EMBEDDINGS_PATH_VECTORS=/app/glove_vectors
 ```
-    
+Add the above specified dir/files to .gitignore    
 
 ### C. TRAINING
 
