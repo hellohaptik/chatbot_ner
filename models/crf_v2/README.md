@@ -1,5 +1,6 @@
 
-
+TODO
+- [ ] Change Crf -> CRF
 
 
 ## CONDITIONAL RANDOM FIELDS
