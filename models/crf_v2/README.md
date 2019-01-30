@@ -393,7 +393,6 @@ print(live_crf_model_path)
 **Note** _Save the **live_crf_model_path**_
 
 **2. Detection**
-This code can be used to detect the entities from the given text
 ```python
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 text_model_detector = TextModelDetector(entity_name='crf_chat', live_crf_model_path=live_crf_model_path)
