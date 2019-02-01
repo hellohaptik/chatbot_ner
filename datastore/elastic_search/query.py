@@ -196,7 +196,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
             "unique_values": {
                 "terms": {
                     "field": "value.keyword",
-                    "size": 100000
+                    "size": 300000
                 }
             }
         },
