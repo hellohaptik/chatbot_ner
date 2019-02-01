@@ -166,7 +166,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     Returns:
         list: List of values which match the filters and search criteria
     """
-    # aggs count is set at 50000 because it is a safe limit for now.
+    # aggs count is set at 100000 because it is a safe limit for now.
     # If the dictionary sizes increases beyond this, then the count will have to be
     # increased accordingly.
     # Also, aggs size doesn't belong in the const file because the number depends
@@ -196,7 +196,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
             "unique_values": {
                 "terms": {
                     "field": "value.keyword",
-                    "size": 50000
+                    "size": 100000
                 }
             }
         },
