@@ -70,36 +70,6 @@ class NonESEngineTransferException(Exception):
     def __str__(self):
         return repr(self.value)
 
-class EngineNotImplementedException(Exception):
-    def __init__(self, message=None):
-        self.value = "Chatbot NER datastore currently supports only the following engines: ['elasticsearch'] . " \
-                     "Please make sure the ENGINE environment variable is correctly set"
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
-
-
-class IndexForTransferException(Exception):
-    def __init__(self, message=None):
-        self.value = "ES index has not been configured for transfer. Please configure before transfer."
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
-
-
-class AliasForTransferException(Exception):
-    def __init__(self, message=None):
-        self.value = "ES alias has not been configured for transfer. Please configure before transfer."
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
-
 
 class IndexNotFoundException(Exception):
     """
