@@ -1,11 +1,11 @@
-key,time_type,meridian
+key,time_type,meridiem
 ஆயினும்|Ayinum,relative_time,NA
 உடனே|Utane|Ippo|udanay|udnay|Udnay,relative_time,NA
 சனிக்கிழமை|அழைக்கிறார்|மூலம்|Canikkilamai|Mulam|Alaikkirat,hour,NA
 மணி|மணிநேரம்|Havar|Maṇi|Manineram,hour,NA
 நிமிடங்கள்|Nimitankal|Nimidum|Oru Nimidam|Our Nimidaum,minutes,NA
 இரண்டாவது|Irantavatu|Irnodi,second,NA
-காலையில்|Kalaiyil|Kalai,daytime_meridian,am
-மதியம்|Matiyam|Malai,daytime_meridian,pm
-மலை|Malai|Sangyalum,daytime_meridian,pm
-இரவு|Iravu|rathri,daytime_meridian,pm
+காலையில்|Kalaiyil|Kalai,daytime_meridiem,am
+மதியம்|Matiyam|Malai,daytime_meridiem,pm
+மலை|Malai|Sangyalum,daytime_meridiem,pm
+இரவு|Iravu|rathri,daytime_meridiem,pm
