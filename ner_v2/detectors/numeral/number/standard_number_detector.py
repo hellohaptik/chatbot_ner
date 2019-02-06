@@ -1,14 +1,18 @@
 # coding=utf-8
-import pandas as pd
 import collections
 import os
 import re
 
-from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
-    NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
-    NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, \
-    NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
-    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE, NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME
+import pandas as pd
+
+from ner_v2.detectors.numeral.constant import (NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME,
+                                               NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME,
+                                               NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT,
+                                               NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE,
+                                               NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME,
+                                               NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME,
+                                               NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE,
+                                               NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME)
 from ner_v2.detectors.numeral.utils import get_number_from_number_word, get_list_from_pipe_sep_string
 
 NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
@@ -30,6 +34,8 @@ class BaseNumberDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
+        self.date = []
+        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 
@@ -41,12 +47,12 @@ class BaseNumberDetector(object):
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
 
-        sorted_len_units_keys = sorted(self.units_map.keys(), key=len, reverse=True)
-        self.unit_choices = "|".join([re.escape(x) for x in sorted_len_units_keys])
+        sorted_len_units_keys = sorted(list(self.units_map.keys()), key=lambda key: len(key), reverse=True)
+        self.unit_choices = u"|".join([re.escape(x) for x in sorted_len_units_keys])
 
-        sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
+        sorted_len_scale_map = sorted(list(self.scale_map.keys()), key=lambda key: len(key), reverse=True)
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
-        self.scale_map_choices = "|".join([re.escape(x) for x in sorted_len_scale_map])
+        self.scale_map_choices = u"|".join([re.escape(x) for x in sorted_len_scale_map])
 
         # Variable to define default order in which detector will work
         self.detector_preferences = [self._detect_number_from_digit,
@@ -65,8 +71,8 @@ class BaseNumberDetector(object):
 
         """
         self.text = text
-        self.processed_text = text
-        self.tagged_text = text
+        self.processed_text = ' ' + text.lower().strip() + ' '
+        self.tagged_text = self.processed_text
 
         number_list, original_list = None, None
         for detector in self.detector_preferences:
@@ -149,8 +155,11 @@ class BaseNumberDetector(object):
 
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
-        unit_matches = re.search(r'((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')|(' +
-                                 detected_original + r'\s*(' + self.unit_choices + r'))', processed_text, re.UNICODE)
+        unit_matches = re.search(r'\s'
+                                 r'((' + self.unit_choices + r')[\.\,]?\s*' + detected_original + r')\s'
+                                 r'|'
+                                 r'\s(' + detected_original + r'\s*(' + self.unit_choices + r')[\.\,]?)'
+                                 r'\s', processed_text, re.UNICODE)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
             if unit_suffix:
@@ -260,8 +269,13 @@ class BaseNumberDetector(object):
         original_list = original_list or []
         processed_text = self.processed_text
 
-        regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))[\s\-\:]' +
-                                            r'|([\d,]+\.?[\d]*)', re.UNICODE)
+        regex_numeric_patterns = re.compile(r'[\s\-\:]'
+                                            r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))'
+                                            r'[\s\-\:]'
+                                            r'|'
+                                            r'(?:\s|(?<=\d[\-\:]))'
+                                            r'([\d,]+\.?[\d]*)'
+                                            r'[\s\-\:]', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             number, scale, original_text = None, None, None
