@@ -269,13 +269,13 @@ class BaseNumberDetector(object):
         original_list = original_list or []
         processed_text = self.processed_text
 
-        regex_numeric_patterns = re.compile(r'[\s\-\:]'
+        regex_numeric_patterns = re.compile(r'[\s\-\:\.\,]'
                                             r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))'
-                                            r'[\s\-\:]'
+                                            r'[\s\-\:\.\,]'
                                             r'|'
-                                            r'(?:\s|(?<=\d[\-\:]))'
+                                            r'(?:\s|(?<=\d[\-\:\.\,]))'
                                             r'([\d,]+\.?[\d]*)'
-                                            r'[\s\-\:]', re.UNICODE)
+                                            r'[\s\-\:\.\,]', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             number, scale, original_text = None, None, None
