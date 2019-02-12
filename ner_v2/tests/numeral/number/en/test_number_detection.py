@@ -227,7 +227,7 @@ class NumberDetectionTest(TestCase):
         number_detector_object = NumberDetector(entity_name=self.entity_name, language='en')
         number_dicts, original_texts = number_detector_object.detect_entity(message)
 
-        zipped = zip(number_dicts, original_texts)
+        zipped = list(zip(number_dicts, original_texts))
         self.assertEqual(len(zipped), 1)
         self.assertIn(({'value': '2300', 'unit': None}, u'2.3k'), zipped)
 
