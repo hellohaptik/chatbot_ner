@@ -221,7 +221,7 @@ class NumberDetectionTest(TestCase):
 
     def test_en_number_detection_for_decimal_number_with_scale_and_unit(self):
         """
-        Number detection for english language for decimal number with scale like '1.2 thousand rupees', 'Rupees 2.2k'
+        Number detection for english language for decimal number with scale like '1.2 thousand', '2.2k' excluding unit
         """
         message = 'I bought a car toy for 2.3k rupees'
         number_detector_object = NumberDetector(entity_name=self.entity_name, language='en')
@@ -242,3 +242,14 @@ class NumberDetectionTest(TestCase):
         zipped = zip(number_dicts, original_texts)
         self.assertEqual(len(zipped), 1)
         self.assertIn(({'value': '2300', 'unit': 'rupees'}, u'2.3k rupees'), zipped)
+
+    def test_en_number_detection_for_decimal_number_with_scale_and_unit_and_different_unit_type_given(self):
+        """
+        Number detection for english language for decimal number with scale like '1.2 thousand rupees', 'Rupees 2.2k'
+        """
+        message = 'I buys 2.3k kg mango'
+        number_detector_object = NumberDetector(entity_name=self.entity_name, language='en', unit_type='currency')
+        number_dicts, original_texts = number_detector_object.detect_entity(message)
+
+        zipped = list(zip(number_dicts, original_texts))
+        self.assertEqual(len(zipped), 0)
