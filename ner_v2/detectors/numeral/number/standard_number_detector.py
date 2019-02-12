@@ -207,7 +207,9 @@ class BaseNumberDetector(object):
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
             for number, original_text in zip(numbers, original_texts):
-                unit, original_text = self._get_unit_from_text(original_text, numeral_text)
+                unit = None
+                if self.unit_type:
+                    unit, original_text = self._get_unit_from_text(original_text, numeral_text)
                 numeral_text = numeral_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
@@ -278,7 +280,9 @@ class BaseNumberDetector(object):
             if number:
                 number = float(number) * scale
                 number = int(number) if number.is_integer() else number
-                unit, original_text = self._get_unit_from_text(original_text, processed_text)
+                unit = None
+                if self.unit_type:
+                    unit, original_text = self._get_unit_from_text(original_text, processed_text)
                 processed_text = processed_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
