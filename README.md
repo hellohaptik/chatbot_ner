@@ -17,12 +17,10 @@ are working on building a pip package for the same.
 
 ### **Supported Entities**
 
-| Entity type   | Code reference       | Description                              | example                           |
+| Entity type   | Code reference       | Description                              | example                           | Supported languages - **ISO 639-1** code |
 | :------------ | -------------------- | :--------------------------------------- | --------------------------------- |
-| Time          |
-[TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) |
-Detects time in various formats from given text. | after 15 minutes, कल सुबह ५ बजे |
- Date | [DateDetector] | detects date | next monday, agle somvar|
+| Time          | [TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) | Detects time from given text. | tomorrow morning at 5, कल सुबह ५ बजे, kal subah 5 baje | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Date          | [DateAdvancedDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/date) | Detects date from given text | next monday, agle somvar, अगले सोमवार | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
 
 ### **API structure**
 Detail documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
