@@ -5,17 +5,27 @@
 Chatbot NER is an open source framework custom built to supports entity recognition in text messages. After doing
 thorough research on existing [NER](https://en.wikipedia.org/wiki/Named-entity_recognition) systems, team at Haptik felt
 the strong need of building a framework which is tailored for Conversational AI and also supports Indian languages.
-Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil**. Currently this framework uses
-heuristics along with few NLP techniques to extract necessary entities from languages with sparse data. API structure
-of Chatbot ner is designed keeping in mind usability for chatbot developers. Team at Haptik is continuously working
-towards scaling this framework for **all Indian languages and their respective local dialects**.
+Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil** and their ode mixed form.
+Currently this framework uses heuristics along with few NLP techniques to extract necessary entities from languages
+with sparse data. API structure of Chatbot ner is designed keeping in mind usability for chatbot developers. Team at
+Haptik is continuously working towards scaling this framework for **all Indian languages and their respective local
+dialects**.
 
 ### **Installation**
 Detail documentation on how to setup Chatbot NER on your system using docker is available [here](docs/install.md). We
 are working on building a pip package for the same.
 
+### **Supported Entities**
+
+| Entity type   | Code reference       | Description                              | example                           |
+| :------------ | -------------------- | :--------------------------------------- | --------------------------------- |
+| Time          |
+[TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) |
+Detects time in various formats from given text. | after 15 minutes, कल सुबह ५ बजे |
+ Date | [DateDetector] | detects date | next monday, agle somvar|
+
 ### **API structure**
-Detecil documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
+Detail documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
 built for ease of accessing it from conversational AI applications. However it can be used for other applications also.
 
 ### **Framework Overview**
