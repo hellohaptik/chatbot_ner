@@ -3,15 +3,25 @@
 ![chatbotner logo](docs/images/chatbotner_logo.png)
 
 Chatbot NER is an open source framework custom built to supports entity recognition in text messages. After doing
-thorough research on existing NER systems, team at Haptik felt the strong need of building a framework which is
-tailored for Conversational AI and also supports Indian languages. Currently Chatbot-ner supports **English, Hindi,
-Gujarati, Marathi, Bengali and Tamil**. Currently this framework uses heuristics along with few NLP techniques to
-extract necessary entities from languages with sparse data. API structure of Chatbot ner is designed keeping in mind
-usability for chatbot developers. Team at Haptik is working towards scaling this framework
-for **all Indian languages and their respective local dialects**.
+thorough research on existing [NER](https://en.wikipedia.org/wiki/Named-entity_recognition) systems, team at Haptik felt
+the strong need of building a framework which is tailored for Conversational AI and also supports Indian languages.
+Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil**. Currently this framework uses
+heuristics along with few NLP techniques to extract necessary entities from languages with sparse data. API structure
+of Chatbot ner is designed keeping in mind usability for chatbot developers. Team at Haptik is continuously working
+towards scaling this framework for **all Indian languages and their respective local dialects**.
+
+### **Installation**
+Detail documentation on how to setup Chatbot NER on your system using docker is available [here](docs/install.md). We
+are working on building a pip package for the same.
+
+### **API structure**
+Detecil documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
+built for ease of accessing it from conversational AI applications. However it can be used for other applications also.
+
+### **Framework Overview**
 
 
-To build a good chatbot, one of the modules that play a crucial role is [Named Entity Recognition](https://en.wikipedia.org/wiki/Named-entity_recognition) (NER). In this repository, we have open-sourced our NER which uses heuristic approach along with several NLP techniques to extract necessary entities from chat interfaces.
+
 
 To know more about our NER repository please go through the following documentations:
 
