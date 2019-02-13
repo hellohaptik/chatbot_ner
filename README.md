@@ -41,4 +41,22 @@ built for ease of accessing it from conversational AI applications. However, it 
 
 ### **Framework Overview**
 
-### **Contribution guidelines**
+In any conversational AI application, there are several entities to be identified and logic for detection on one entity
+might be different from other. We have organised this repository as shown below
+
+![entity hierarchy](docs/images/entity_hierarchy.png)
+
+We have classified entities into four main types i.e. *numeral*, *pattern*, *temporal* and *textual*.
+
+- **numeral**(https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral): This type will contain all the entities that deal with the numeral or numbers. For example, number detection, budget detection, size detection, etc.
+
+- **pattern**(https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/pattern): This will contain all the detection logics where identification can be done using patterns or regular expressions. For example, email, phone_number, pnr, etc.
+
+- **temporal**(https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal): It will contain detection logics for detecting time and date.
+
+- **textual**(https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/textual): It identifies entities by looking at the dictionary. This detection mainly contains detection of text (like cuisine, dish, restaurants, etc.), the name of cities, the location of a user, etc.
+
+**Numeral, temporal and pattern** have been moved to ner_v2 for language portability with more flexible detection logic.
+In ner_v1, currently only **text** entity has language support. We will be moving it to ner_v2 without any major API changes.
+
+
