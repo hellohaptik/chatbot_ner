@@ -8,7 +8,7 @@ the strong need of building a framework which is tailored for Conversational AI 
 Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil** and their code mixed form.
 Currently this framework uses heuristics along with few NLP techniques to extract necessary entities from languages
 with sparse data. API structure of Chatbot ner is designed keeping in mind usability for Conversational AI
-developers. Team at Haptik is continuously working towards scaling this framework for **all Indian languages and their
+applications. Team at Haptik is continuously working towards scaling this framework for **all Indian languages and their
 respective local dialects**.
 
 ### **Installation**
@@ -37,21 +37,8 @@ recommend you to **use only primary detectors** mentioned in the table above.
 
 ### **API structure**
 Detail documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
-built for ease of accessing it from conversational AI applications. However it can be used for other applications also.
+built for ease of accessing it from conversational AI applications. However, it can be used for other applications also.
 
 ### **Framework Overview**
 
 ### **Contribution guidelines**
-
-
-
-
-To know more about our NER repository please go through the following documentations:
-
-1. [Installation and setup](docs/install.md): *Detailed document on how to install and setup the chatbot NER on your system*
-
-2. [CSV file structure and adding/removing entities to DataStore](docs/adding_entities.md): *Document on how to create your own entity and store it to DataStore*
-
-3. [Approach used](docs/approach.md): *Document on the architecture along with different detection logics (entity types) and built-in entities*
-
-4. [API calls](docs/api_call.md): *A brief document on the api calls for different detection logics along with its necessary output*
