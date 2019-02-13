@@ -5,7 +5,7 @@
 Chatbot NER is an open source framework custom built to supports entity recognition in text messages. After doing
 thorough research on existing [NER](https://en.wikipedia.org/wiki/Named-entity_recognition) systems, team at Haptik felt
 the strong need of building a framework which is tailored for Conversational AI and also supports Indian languages.
-Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil** and their ode mixed form.
+Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil** and their code mixed form.
 Currently this framework uses heuristics along with few NLP techniques to extract necessary entities from languages
 with sparse data. API structure of Chatbot ner is designed keeping in mind usability for chatbot developers. Team at
 Haptik is continuously working towards scaling this framework for **all Indian languages and their respective local
