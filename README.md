@@ -7,9 +7,9 @@ thorough research on existing [NER](https://en.wikipedia.org/wiki/Named-entity_r
 the strong need of building a framework which is tailored for Conversational AI and also supports Indian languages.
 Currently Chatbot-ner supports **English, Hindi, Gujarati, Marathi, Bengali and Tamil** and their code mixed form.
 Currently this framework uses heuristics along with few NLP techniques to extract necessary entities from languages
-with sparse data. API structure of Chatbot ner is designed keeping in mind usability for chatbot developers. Team at
-Haptik is continuously working towards scaling this framework for **all Indian languages and their respective local
-dialects**.
+with sparse data. API structure of Chatbot ner is designed keeping in mind usability for Conversational AI
+developers. Team at Haptik is continuously working towards scaling this framework for **all Indian languages and their
+respective local dialects**.
 
 ### **Installation**
 Detail documentation on how to setup Chatbot NER on your system using docker is available [here](docs/install.md). We
