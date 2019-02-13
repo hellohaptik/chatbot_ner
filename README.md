@@ -19,8 +19,21 @@ are working on building a pip package for the same.
 
 | Entity type   | Code reference       | Description                              | example                           | Supported languages - **ISO 639-1** code |
 | :------------ | -------------------- | :--------------------------------------- | --------------------------------- | ---------------------------------------- |
-| Time          | [TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) | Detects time from given text. | tomorrow morning at 5, कल सुबह ५ बजे, kal subah 5 baje | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
-| Date          | [DateAdvancedDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/date) | Detects date from given text | next monday, agle somvar, अगले सोमवार | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Time          | [TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) | Detect time from given text. | tomorrow morning at 5, कल सुबह ५ बजे, kal subah 5 baje | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Date          | [DateAdvancedDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/date) | Detect date from given text | next monday, agle somvar, अगले सोमवार | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Number        | [TimeDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number]) | Detect number and respective units in given text | 50 rs per person, ५ किलो चावल, मुझे एक लीटर ऑइल चाहिए | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Phone number  | [PhoneDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/pattern/phone_number) | Detect phone number in given text | 9833530536, +91 9833530536, ९८३३४३०५३५ | 'en', 'hi', 'gu', 'bn', 'mr', 'ta' |
+| Email         | [EmailDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/pattern/email) | Detect email in text | hello@haptik.co | 'en' |
+| Text          | [TextDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/textual/text) | Detects custom entities in text string using full text search in Datastore or based on contextual model dictionary|  Search supported for 'en', 'hi', 'gu', 'bn', 'mr', 'ta', Contextual model supported for 'en' only|
+| PNR           | [PNRDetector](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/pattern/pnr) | Detects PNR (serial) codes in given text. | My flight PNR is 4SGX3E | 'en' |
+
+There are other custom detectors such as [city] (https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/textual/city),
+[person name](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/textual/name),
+[shopping size](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v1/detectors/numeral/size) which are
+derived from above mentioned primary detectors but they are supported currently in English only and limited
+to Indian users only. We are currently  in process of restructuring them to scale them across languages and geography
+and their current versions might be deprecated in future. So **for applications already in production**, we would
+recommend you to **use only primary detectors** mentioned in the table above.
 
 ### **API structure**
 Detail documentation of APIs for all entity types is available [here](docs/api_call.md). Current API structure is
