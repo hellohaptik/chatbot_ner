@@ -87,7 +87,7 @@ class DateAdvancedDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
-    def detect_entity(self, text, run_model=False):
+    def detect_entity(self, text, run_model=False, **kwargs):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.

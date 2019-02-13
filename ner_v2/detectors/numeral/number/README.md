@@ -17,9 +17,11 @@ This is the V2 version of Number detector module that will detect number and num
 
   ```python
   >> from ner_v2.detector.number.number.number_detection import NumberDetector
-  >> detector = NumberDetector(entity_name='number', language='en')  # here language will be ISO 639-1 code
+  >> detector = NumberDetector(entity_name='number', language='en', unit_type='currency')  # here language will be ISO 639-1 code
   >> detector.detect_entity(text= 'I want 4000 rs')
   >> {'entity_value': [{'value': '4000', 'unit': 'rupees'}], 'original_text':['4000 rs']}
+  
+  # Notes -> if unit type is not given it will only detect 4000, not unit.
   ```
 
 - **Curl Command**
@@ -35,11 +37,12 @@ This is the V2 version of Number detector module that will detect number and num
   # max_number_digits=6
   # source_language='hi'
   # language_script='hi'
+  # unit_type=None 
   
   $ URL='localhost'
   $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi'
+  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi&unit_type='
   
   # Curl output
   $ {
