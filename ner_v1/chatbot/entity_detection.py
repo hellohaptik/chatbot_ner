@@ -516,22 +516,22 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
     """
     # TODO refactor NameDetector to make this easy to read and use
     name_detection = NameDetector(entity_name=entity_name, language=language)
-    text, detection_method, fallback_value, fallback_method = (structured_value,
-                                                               FROM_STRUCTURE_VALUE_VERIFIED,
-                                                               structured_value,
-                                                               FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+    text, detection_method, fallback_text, fallback_method = (structured_value,
+                                                              FROM_STRUCTURE_VALUE_VERIFIED,
+                                                              structured_value,
+                                                              FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     if not structured_value:
-        text, detection_method, fallback_value, fallback_method = (message,
-                                                                   FROM_MESSAGE,
-                                                                   fallback_value,
-                                                                   FROM_FALLBACK_VALUE)
+        text, detection_method, fallback_text, fallback_method = (message,
+                                                                  FROM_MESSAGE,
+                                                                  fallback_value,
+                                                                  FROM_FALLBACK_VALUE)
     entity_list, original_text_list = [], []
 
     if text:
         entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message)
 
-    if not entity_list and fallback_value:
-        entity_list, original_text_list = NameDetector.get_format_name(fallback_value.split())
+    if not entity_list and fallback_text:
+        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
         detection_method = fallback_method
 
     if entity_list and original_text_list:
