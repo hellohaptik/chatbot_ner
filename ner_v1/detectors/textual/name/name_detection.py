@@ -1,13 +1,17 @@
 # coding=utf-8
 import re
-from lib.nlp.pos import *
-from ner_v1.constant import FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import EMOJI_RANGES
+
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
-from ner_v1.detectors.textual.name.hindi_const import  \
-    HINDI_BADWORDS, HINDI_QUESTIONWORDS, HINDI_STOPWORDS, NAME_VARIATIONS
 from lib.nlp.const import nltk_tokenizer
+from lib.nlp.pos import POS
+from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
+from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
+                                                       HINDI_STOPWORDS, NAME_VARIATIONS)
+from ner_v1.detectors.textual.text.text_detection import TextDetector
+
+
+# TODO: Refactor this module for readability and useability. Remove any hacks
+# TODO: Make this module python 3 compatible
 
 class NameDetector(object):
     """
@@ -17,7 +21,8 @@ class NameDetector(object):
 
     Attributes:
         text: string to extract entities from
-        entity_name: string by which the detected person_name entities would be replaced with on calling detect_entity()
+        entity_name: string by which the detected person_name entities would be replaced with
+                     on calling detect_entity()
         tagged_text: string with city entities replaced with tag defined by entity_name
         processed_text: string with detected time entities removed
         text_detection_object: the object which is used to call the TextDetector
@@ -56,7 +61,10 @@ class NameDetector(object):
                  ['yash', 'doshi']
 
         Returns:
-        ({first_name: "yash", middle_name: None, last_name: "modi"}, "yash modi")
+            (
+                [{first_name: "yash", middle_name: None, last_name: "modi"}],
+                ["yash modi"]
+            )
         """
 
         original_text = " ".join(name_list)
@@ -219,7 +227,6 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-
     def replace_detected_text(self, text_detection_result, text):
         """
         Replaces the detected name from text_detection_result by _<name>_
@@ -289,12 +296,14 @@ class NameDetector(object):
         Checks if previous botmessage conatins name as a keyword or not
         Args:
             botmessage: it consists of the previous botmessage
-            Example: what is your name ?
+
+        Example: what is your name ?
+
         Returns:
             True
         """
 
-        regex_pattern = re.compile(r'[\|\,+\:\?\!\"\(\)!\'\.\%\[\]]+')
+        regex_pattern = re.compile(r'[\|\,+\:\?\!\"\(\)\'\.\%\[\]]+')
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
@@ -357,7 +366,6 @@ class NameDetector(object):
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
-
 
     def get_hindi_text_from_regex(self, text):
         """
