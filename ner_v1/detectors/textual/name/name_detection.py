@@ -3,7 +3,7 @@ import re
 
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
-from lib.nlp.pos import *
+from lib.nlp.pos import POS
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
                                                        HINDI_STOPWORDS, NAME_VARIATIONS)
@@ -21,7 +21,8 @@ class NameDetector(object):
 
     Attributes:
         text: string to extract entities from
-        entity_name: string by which the detected person_name entities would be replaced with on calling detect_entity()
+        entity_name: string by which the detected person_name entities would be replaced with
+                     on calling detect_entity()
         tagged_text: string with city entities replaced with tag defined by entity_name
         processed_text: string with detected time entities removed
         text_detection_object: the object which is used to call the TextDetector
