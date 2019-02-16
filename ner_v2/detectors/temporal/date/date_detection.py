@@ -820,6 +820,8 @@ class DateDetector(object):
         for date, original_text in zip(self.date, self.original_date_text):
             try:
                 datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
+                if "dinfo" in date:
+                    date.pop("dinfo")
                 validated_date_list.append(date)
                 validated_original_list.append(original_text)
             except ValueError:

@@ -25,10 +25,12 @@ def nth_weekday(weekday, n, ref_date):
 def next_weekday(current_date, weekday, n):
     """
     Method to return python datetime object to find next weekday from current date
+
     Args:
         current_date (datetime): python datetime object
-        weekday (int): int count of weekday like 0 for monday, 1 for tuesday
-        n (int): 0 for coming weekday, 1 for next weekday, 2 for next to next weekday
+        weekday (int): Number for day of the week Monday is 0 and Sunday is 7
+        n (int): 0 for day in immediate target day in the future,  for next to immediate target day (target + 7)
+                 and so on
 
     Returns:
         (datetime): next weekday datetime from current date
@@ -65,11 +67,14 @@ def get_hour_min_diff(time1, time2):
 def get_tuple_dict(csv_file):
     """
     Method to convert language constant csv into tuple dict
+
+    This method assumes csv has variants to be in used in the patterns in the first column
+
     Args:
         csv_file (str): csv file path
 
     Returns:
-        (dict): dict containing key as csv index key and all other rows values as tuple
+        dict: dict containing key as csv index key and all other rows values as tuple
     """
     # TODO: Add values for keys as a namedtuple so the code in date and time becomes easier to understand without
     # TODO: having to look at the csv files

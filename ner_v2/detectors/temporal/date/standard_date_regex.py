@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-
 from __future__ import unicode_literals  # All strings in this file are by default unicode literals
 
+import collections
 import datetime
 import os
 import re
@@ -12,8 +13,9 @@ import ner_v2.detectors.temporal.constant as temporal_constants
 import ner_v2.detectors.temporal.utils as temporal_utils
 import ner_v2.detectors.utils as detector_utils
 
-# TODO: For now all date types return TYPE_EXACT. Either drop the type or return proper types
 
+# TODO: Some detectors don't return proper date types
+# NOTE: This detector ignores year mentions
 
 class BaseRegexDate(object):
     def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
@@ -61,7 +63,6 @@ class BaseRegexDate(object):
             self._detect_after_days,
             self._detect_weekday_ref_month_1,
             self._detect_weekday_ref_month_2,
-            self._detect_weekday_diff,
             self._detect_weekday
         ]
 
@@ -72,6 +73,7 @@ class BaseRegexDate(object):
 
         date_list, original_list = None, None
         for detector in self.detector_preferences:
+            # FIXME: this just overwrites the results from successive detectors, is this correct ?
             date_list, original_list = detector(date_list=None, original_list=None)
             self._update_processed_text(original_list)
         return date_list, original_list
@@ -89,7 +91,8 @@ class BaseRegexDate(object):
 
     def _generate_date_patterns(self, data_directory_path):
         """
-        Initialise standard regex from data file
+        Intialize
+
         Args:
             data_directory_path (str): path of data folder for given language
         Returns:
@@ -104,56 +107,80 @@ class BaseRegexDate(object):
         self._datetime_constants_dict = temporal_utils.get_tuple_dict(datetime_constants_path)
         self._numerals_constants_dict = temporal_utils.get_tuple_dict(numeral_constans_path)
 
-        relative_date_choices = [x for x in self._date_constants_dict
-                                 if self._date_constants_dict[x][1] == temporal_constants.RELATIVE_DATE]
+        date_part_choices = collections.defaultdict(list)
 
-        date_literal_choices = [x for x in self._date_constants_dict
-                                if self._date_constants_dict[x][1] == temporal_constants.DATE_LITERAL_TYPE]
+        # TODO: Make this more pythonic and readable by using namedtuple or some other datatype instead of 1 and 2
+        # TODO: indices
+        for variant in self._date_constants_dict:
+            date_part_choices[self._date_constants_dict[variant][1]].append(variant)
 
-        month_ref_date_choices = [x for x in self._date_constants_dict
-                                  if self._date_constants_dict[x][1] == temporal_constants.MONTH_DATE_REF_TYPE]
+        # Relative date mentions. In en -> today, tomorrow, yesterday, day after tomorrow
+        relative_date_choices = date_part_choices[temporal_constants.RELATIVE_DATE]
 
-        month_literal_choices = [x for x in self._date_constants_dict
-                                 if self._date_constants_dict[x][1] == temporal_constants.MONTH_LITERAL_TYPE]
+        # literals that mean "day". In en -> 2 "days", hi -> 3 "din"
+        day_literal_choices = date_part_choices[temporal_constants.DATE_LITERAL_TYPE]
 
-        weekday_choices = [x for x in self._date_constants_dict
-                           if self._date_constants_dict[x][1] == temporal_constants.WEEKDAY_TYPE]
+        # Literals that mean "date". Used when referring to some date wrt to month.
+        # In hi -> agle mahine ki 3 "tareekh", etc
+        month_ref_date_choices = date_part_choices[temporal_constants.MONTH_DATE_REF_TYPE]
 
-        month_choices = [x for x in self._date_constants_dict
-                         if self._date_constants_dict[x][1] == temporal_constants.MONTH_TYPE]
+        # Literals that mean "month". In hi -> mahina, mahine, etc
+        month_literal_choices = date_part_choices[temporal_constants.MONTH_LITERAL_TYPE]
 
+        # Days of the week. In en -> Monday, Tuesday, Wednesday, ...
+        weekday_choices = date_part_choices[temporal_constants.WEEKDAY_TYPE]
+
+        # Months of the year. In en -> January, February, ...
+        month_choices = date_part_choices[temporal_constants.MONTH_TYPE]
+
+        # prefixes and suffixes that indicate the sign of relative delta. Also contains time prepositions
+        # like previous, next, this, ago, last, etc
+        # In en -> 2 days "later", 2 days "ago"
+        # In hi -> 2 din "baad", 3 din "pehle"
+        # FIXME: We are not using the prefix/suffix information provided in the data, resulting in detection of
+        # FIXME: weird constructs like '2 din pichla', '2 din agla', 'pehle ravivar', 'baad mangalvaar'
         datetime_diff_choices = [x for x in self._datetime_constants_dict
                                  if self._datetime_constants_dict[x][2] == temporal_constants.ADD_DIFF_DATETIME_TYPE]
 
+        # word and digit representations of numbers in the target language
+        # In en -> 1, 2, 3, 4, 5, ...(upto thirty one), one, two, three, ... (upto thirty one)
         numeral_variants = [x for x in self._numerals_constants_dict]
 
         format_args = {
             "relative_date_choices": "({})".format(self._decode_sort_escape_join(relative_date_choices)),
-            "date_literal_choices": "({})".format(self._decode_sort_escape_join(date_literal_choices)),
+            "day_literal_choices": "({})".format(self._decode_sort_escape_join(day_literal_choices)),
             "month_ref_date_choices": "({})".format(self._decode_sort_escape_join(month_ref_date_choices)),
             "month_literal_choices": "({})".format(self._decode_sort_escape_join(month_literal_choices)),
             "weekday_choices": "({})".format(self._decode_sort_escape_join(weekday_choices)),
             "month_choices": "({})".format(self._decode_sort_escape_join(month_choices)),
             "datetime_diff_choices": "({})".format(self._decode_sort_escape_join(datetime_diff_choices)),
-            "numeral_variants": "({})".format(self._decode_sort_escape_join(numeral_variants)),
+            "numeral_variants": r"(\d+|{})".format(self._decode_sort_escape_join(numeral_variants)),
         }
 
         _patterns = {
             "regex_relative_date": r"({relative_date_choices})",
-            "regex_day_diff": r"({datetime_diff_choices}\s*{date_literal_choices})",
-            "regex_date_month": r"((\d+|{numeral_variants})\s*(st|nd|th|rd)\s*{month_choices})",
-            "regex_date_ref_month_1": r"((\d+|{numeral_variants})\s*{month_ref_date_choices}\s*"
+
+            "regex_date_month": r"({numeral_variants}\s*(st|nd|th|rd)?\s*{month_choices})",
+
+            "regex_date_ref_month_1": r"({numeral_variants}\s*{month_ref_date_choices}\s*"
                                       r"{datetime_diff_choices}\s*{month_literal_choices})",
+
             "regex_date_ref_month_2": r"({datetime_diff_choices}\s*{month_literal_choices}\s*"
-                                      r"[a-z]*\s*(\d+|{numeral_variants})\s+{month_ref_date_choices})",
-            "regex_date_ref_month_3": r"((\d+|{numeral_variants})\s*{month_ref_date_choices})",
-            "regex_after_days_ref": r"((\d+|{numeral_variants})\s*{date_literal_choices}\s+{datetime_diff_choices})",
-            "regex_weekday_month_1": r"((\d+|{numeral_variants})\s*{weekday_choices}\s*"
+                                      r"[a-z]*\s*{numeral_variants}\s+{month_ref_date_choices})",
+
+            "regex_date_ref_month_3": r"({numeral_variants}\s*{month_ref_date_choices})",
+
+            "regex_date_diff": r"({datetime_diff_choices}\s*{day_literal_choices})",
+
+            "regex_after_days_ref": r"({numeral_variants}\s*{day_literal_choices}\s+{datetime_diff_choices})",
+
+            "regex_weekday_month_1": r"({numeral_variants}\s*{weekday_choices}\s*"
                                      r"{datetime_diff_choices}\s+{month_literal_choices})",
+
             "regex_weekday_month_2": r"({datetime_diff_choices}\s+{month_literal_choices}\s*[a-z]*\s*"
-                                     r"(\d+|{numeral_variants})\s+{weekday_choices})",
-            "regex_weekday_diff": r"({datetime_diff_choices}\s+{weekday_choices})",
-            "regex_weekday": r"({weekday_choices})",
+                                     r"{numeral_variants}\s+{weekday_choices})",
+
+            "regex_weekday": r"((?:{datetime_diff_choices}\s+)?{weekday_choices})",
         }
 
         for pattern_key in _patterns:
@@ -161,32 +188,60 @@ class BaseRegexDate(object):
 
     def _get_int_from_numeral(self, numeral):
         """
-        Convert string to float for given numeral text
+        Cast a numeral str to int. It does so by directing casting it if the strinng contains only digits.
+        Otherwise it looks up in the numerals data read from language data folder (numbers_constant.csv)
+
         Args:
-            numeral (str): numeral text
+            numeral (str): numeral text to cast to int
 
         Returns:
-            (int): return float corresponding to given numeral
+            int: integer value for given numeral
+
+        Raises:
+            ValueError: if the given string contains decimal points in addition to digits
+            KeyError: if the numeral string is not present in the data read from numbers_constant.csv
         """
         if numeral.replace('.', '').isdigit():
+            # FIXME: This fails for any floating point string
             return int(numeral)
         else:
+            # FIXME: possible lossy conversion for dedh, dhai, etc that have floats in numbers_constant.csv
             return int(self._numerals_constants_dict[numeral][0])
 
     def _detect_relative_date(self, date_list=None, original_list=None):
         """
-        Parser to detect relative date  like 'kal'(hindi), 'parso'(hindi)
+        Detect dates in relative mentions
+            en -> today, tomorrow, yesterday, day after tomorrow, ...
+            hi -> aaj, kal, parson, ...
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
+            tuple containing
+                list: list of date values detected so far
+                list: list of same length as date_list, which has corresponding substrings from
+                      the text that were detected as dates.
         """
+
+        def get_type(delta):
+            relative_types = [temporal_constants.TYPE_DAY_BEFORE,
+                              temporal_constants.TYPE_YESTERDAY,
+                              temporal_constants.TYPE_TODAY,
+                              temporal_constants.TYPE_TOMORROW,
+                              temporal_constants.TYPE_DAY_AFTER]
+            if 0 <= delta + 2 < len(delta):
+                return relative_types[delta + 2]
+
+            return temporal_constants.TYPE_EXACT
+
         date_list = date_list or []
         original_list = original_list or []
 
-        date_rel_match = self._patterns["regex_relative_date"].findall(self.processed_text)
-        for date_match in date_rel_match:
+        relative_date_matches = self._patterns["regex_relative_date"].findall(self.processed_text)
+        for date_match in relative_date_matches:
             original = date_match[0]
             if not self.is_past_referenced:
                 req_date = self.now_date + datetime.timedelta(days=self._date_constants_dict[date_match[1]][0])
@@ -197,7 +252,12 @@ class BaseRegexDate(object):
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
+                "type": get_type(self._date_constants_dict[date_match[1]][0]),
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                },
             }
             date_list.append(date)
             original_list.append(original)
@@ -205,21 +265,29 @@ class BaseRegexDate(object):
 
     def _detect_date_month(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing specific date and month like '2 july'(hindi), 'pehli august'(hindi)
+        Detect dates in <number><optional ordinal><month word> format
+            en -> 2nd July, 3rd Feb
+            hi -> 2 janvary, 3 september
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
+            tuple containing
+                list: list of date values detected so far
+                list: list of same length as date_list, which has corresponding substrings from
+                      the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
         date_month_matches = self._patterns["regex_date_month"].findall(self.processed_text)
         for date_month_match in date_month_matches:
-            original = date_month_match[0]
-            dd = int(self._get_int_from_numeral(date_month_match[1]))
-            mm = int(self._date_constants_dict[date_month_match[3]][0])
+            original, number_variant, _, month_variant = date_month_match
+            dd = int(self._get_int_from_numeral(number_variant))
+            mm = int(self._date_constants_dict[month_variant][0])
             yy = self.now_date.year
 
             current_date = self.now_date.date()
@@ -235,7 +303,12 @@ class BaseRegexDate(object):
                 "dd": dd,
                 "mm": mm,
                 "yy": yy,
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "inferred",
+                },
             }
             date_list.append(date)
             original_list.append(original)
@@ -243,25 +316,32 @@ class BaseRegexDate(object):
 
     def _detect_date_ref_month_1(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing reference date and month like '2 tarikh is mahine ki'(hindi)
+        Detect dates in <number><date literals><next/previous/this/relative delta prepositions><month literals> format
+            en -> 2nd of this month
+            hi -> 2 tarikh iss mahine ki, 2 tarikh pichle mahine ki
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            tuple containing
+                list: list of date values detected so far
+                list: list of same length as date_list, which has corresponding substrings from
+                      the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
-        date_ref_month_match = self._patterns["regex_date_ref_month_1"].findall(self.processed_text)
+        date_ref_month_matches = self._patterns["regex_date_ref_month_1"].findall(self.processed_text)
 
-        for date_match in date_ref_month_match:
-            original = date_match[0]
-            dd = self._get_int_from_numeral(date_match[1])
-            if date_match[3] and date_match[4]:
-                req_date = self.now_date + relativedelta.relativedelta(
-                    months=self._datetime_constants_dict[date_match[3]][1])
+        for date_match in date_ref_month_matches:
+            original, day_variant, _, month_delta, month_literal = date_match
+            dd = self._get_int_from_numeral(day_variant)
+            if month_delta and month_literal:
+                months_delta_value = self._datetime_constants_dict[month_delta][1]
+                req_date = self.now_date + relativedelta.relativedelta(months=months_delta_value)
                 mm = req_date.month
                 yy = req_date.year
             else:
@@ -272,7 +352,12 @@ class BaseRegexDate(object):
                 "dd": int(dd),
                 "mm": int(mm),
                 "yy": int(yy),
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                },
             }
             date_list.append(date)
             original_list.append(original)
@@ -280,24 +365,31 @@ class BaseRegexDate(object):
 
     def _detect_date_ref_month_2(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing reference date and month like 'agle mahine ki 2 tarikh ko'(hindi)
+        Detect dates in <next/previous/this/relative delta prepositions><month literals><number><date literals> format
+            hi -> alge mahine ki 2 tareekh, pichle mahine ki 30 tareekh
+            en -> next month's 2nd day
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            tuple containing
+                list: list of date values detected so far
+                list: list of same length as date_list, which has corresponding substrings from
+                      the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
         date_ref_month_match = self._patterns["regex_date_ref_month_2"].findall(self.processed_text)
         for date_match in date_ref_month_match:
-            original = date_match[0]
-            dd = self._get_int_from_numeral(date_match[3])
-            if date_match[1] and date_match[2]:
-                req_date = self.now_date + relativedelta.relativedelta(
-                    months=self._datetime_constants_dict[date_match[1]][1])
+            original, month_delta, month_literal, day_variant, _ = date_match
+            dd = self._get_int_from_numeral(day_variant)
+            if month_delta and month_literal:
+                months_delta_value = self._datetime_constants_dict[month_delta][1]
+                req_date = self.now_date + relativedelta.relativedelta(months=months_delta_value)
                 mm = req_date.month
                 yy = req_date.year
             else:
@@ -308,7 +400,12 @@ class BaseRegexDate(object):
                 "dd": int(dd),
                 "mm": int(mm),
                 "yy": int(yy),
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                },
             }
             date_list.append(date)
             original_list.append(original)
@@ -316,26 +413,33 @@ class BaseRegexDate(object):
 
     def _detect_date_ref_month_3(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing reference date and month like '2 tarikh ko'(hindi)
+        Detect dates in <number><date literals> format
+            en -> 2nd day
+            hi -> 2 tarikh , 30 tareekh
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            tuple containing
+                list: list of date values detected so far
+                list: list of same length as date_list, which has corresponding substrings from
+                      the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
         date_ref_month_match = self._patterns["regex_date_ref_month_3"].findall(self.processed_text)
         for date_match in date_ref_month_match:
-            original = date_match[0]
-            dd = self._get_int_from_numeral(date_match[1])
+            original, day_variant, date_literal = date_match
+            dd = self._get_int_from_numeral(day_variant)
             if ((self.now_date.day > dd and self.is_past_referenced) or
                     (self.now_date.day <= dd and not self.is_past_referenced)):
                 mm = self.now_date.month
                 yy = self.now_date.year
-            elif self.now_date.day <= dd and self.is_past_referenced:
+            elif self.now_date.day < dd and self.is_past_referenced:
                 req_date = self.now_date - relativedelta.relativedelta(months=1)
                 mm = req_date.month
                 yy = req_date.year
@@ -347,7 +451,12 @@ class BaseRegexDate(object):
                 "dd": int(dd),
                 "mm": int(mm),
                 "yy": int(yy),
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_POSSIBLE_DAY,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "inferred",
+                    "yy": "inferred",
+                },
             }
             date_list.append(date)
             original_list.append(original)
@@ -355,26 +464,37 @@ class BaseRegexDate(object):
 
     def _detect_date_diff(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing reference with current date like 'pichhle din'(hindi)
+        Detect date using format <previous/next/this><day literals>
+            hi -> agle din, pichle din
+            en -> previous day, next day, this day
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            list: list of date values detected so far
+            list: list of same length as date_list, which has corresponding substrings from
+                  the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
-        diff_day_match = self._patterns["regex_day_diff"].findall(self.processed_text)
+        diff_day_match = self._patterns["regex_date_diff"].findall(self.processed_text)
         for date_match in diff_day_match:
-            original = date_match[0]
-            req_date = self.now_date + datetime.timedelta(days=self._datetime_constants_dict[date_match[1]][1])
+            original, day_delta, _ = date_match
+            req_date = self.now_date + datetime.timedelta(days=self._datetime_constants_dict[day_delta][1])
             date = {
                 'dd': req_date.day,
                 'mm': req_date.month,
                 'yy': req_date.year,
-                'type': temporal_constants.TYPE_EXACT
+                'type': temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                }
             }
             date_list.append(date)
             original_list.append(original)
@@ -382,28 +502,39 @@ class BaseRegexDate(object):
 
     def _detect_after_days(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing reference with current date like '2 din hua'(hindi), '2 din baad'(hindi)
+        Detect date using format <number><day literals><ago/later/relative delta prepositions>
+            hi -> 2 din bad, 30 din pehle
+            en -> two days later, one day ago
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            list: list of date values detected so far
+            list: list of same length as date_list, which has corresponding substrings from
+                  the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
         after_days_match = self._patterns["regex_after_days_ref"].findall(self.processed_text)
         for date_match in after_days_match:
-            original = date_match[0]
-            day_diff = self._get_int_from_numeral(date_match[1])
+            original, number_variant, _, day_delta = date_match
+            day_diff = self._get_int_from_numeral(number_variant)
             req_date = self.now_date + relativedelta.relativedelta(
-                days=day_diff * self._datetime_constants_dict[date_match[3]][1])
+                days=day_diff * self._datetime_constants_dict[day_delta][1])
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                }
             }
             date_list.append(date)
             original_list.append(original)
@@ -411,29 +542,41 @@ class BaseRegexDate(object):
 
     def _detect_weekday_ref_month_1(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing referenced week and month 'agle month ka pehla monday'(hindi)
+        Detect date using format <number><day of week><next/previous/this/relative delta prepositions>?<month literals>
+            hi -> doosra somwaar agle mahine ka, teesra somwar pichle mahine ka 
+            en -> 2nd Monday of next month
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
+            list: list of date values detected so far
+            list: list of same length as date_list, which has corresponding substrings from
+                  the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
-        weekday_month_match = self._patterns["regex_weekday_month_1"].findall(self.processed_text)
-        for date_match in weekday_month_match:
-            original = date_match[0]
-            n_weekday = self._get_int_from_numeral(date_match[1])
-            weekday = self._date_constants_dict[date_match[2]][0]
+        weekday_month_matches = self._patterns["regex_weekday_month_1"].findall(self.processed_text)
+        for date_match in weekday_month_matches:
+            original, number_variant, day_of_week, months_delta, _ = date_match
+            n_weekday = self._get_int_from_numeral(number_variant)
+            weekday = self._date_constants_dict[day_of_week][0]
             ref_date = self.now_date + relativedelta.relativedelta(
-                months=self._datetime_constants_dict[date_match[3]][1])
+                months=self._datetime_constants_dict[months_delta][1])
             req_date = temporal_utils.nth_weekday(n_weekday, weekday, ref_date)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                }
             }
             date_list.append(date)
             original_list.append(original)
@@ -441,58 +584,41 @@ class BaseRegexDate(object):
 
     def _detect_weekday_ref_month_2(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing referenced week and month like'pehla monday agle month ka'(hindi)
+        Detect date using format <next/previous/this/relative delta prepositions><month literals><number><day of week>
+            hi -> agle mahine ka doosra somwaar, pichle mahine ka teesra somwar
+            en -> next month's 2nd Monday
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
+            list: list of date values detected so far
+            list: list of same length as date_list, which has corresponding substrings from
+                  the text that were detected as dates.
         """
         date_list = date_list or []
         original_list = original_list or []
 
-        weekday_month_match = self._patterns["regex_weekday_month_2"].findall(self.processed_text)
-        for date_match in weekday_month_match:
-            original = date_match[0]
-            n_weekday = self._get_int_from_numeral(date_match[3])
-            weekday = self._date_constants_dict[date_match[4]][0]
+        weekday_month_matches = self._patterns["regex_weekday_month_2"].findall(self.processed_text)
+        for date_match in weekday_month_matches:
+            original, months_delta, _, number_variant, day_of_week = date_match
+            n_weekday = self._get_int_from_numeral(number_variant)
+            weekday = self._date_constants_dict[day_of_week][0]
             ref_date = self.now_date + relativedelta.relativedelta(
-                months=self._datetime_constants_dict[date_match[1]][1])
+                months=self._datetime_constants_dict[months_delta][1])
             req_date = temporal_utils.nth_weekday(weekday, n_weekday, ref_date)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
-            }
-            date_list.append(date)
-            original_list.append(original)
-        return date_list, original_list
-
-    def _detect_weekday_diff(self, date_list=None, original_list=None):
-        """
-        Parser to detect date containing referenced weekday from present day like 'aane wala tuesday'(hindi),
-            'agla somvar'(hindi)
-        Args:
-
-        Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-        """
-        date_list = date_list or []
-        original_list = original_list or []
-
-        weekday_ref_match = self._patterns["regex_weekday_diff"].findall(self.processed_text)
-        for date_match in weekday_ref_match:
-            original = date_match[0]
-            n = self._datetime_constants_dict[date_match[1]][1]
-            weekday = self._date_constants_dict[date_match[2]][0]
-            req_date = temporal_utils.next_weekday(current_date=self.now_date, n=n, weekday=weekday)
-            date = {
-                "dd": req_date.day,
-                "mm": req_date.month,
-                "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
+                "type": temporal_constants.TYPE_EXACT,
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                }
             }
             date_list.append(date)
             original_list.append(original)
@@ -500,28 +626,48 @@ class BaseRegexDate(object):
 
     def _detect_weekday(self, date_list=None, original_list=None):
         """
-        Parser to detect date containing referenced weekday without referencing any particular day like
-        'mangalvar'(hindi), 'ravivar'(hindi)
+        Detect date using format <next/previous/this/relative delta prepositions>?<day of week>
+            en -> previous monday, next tuesday, etc
+            hi -> pichla somwar, agla ravivar, etc
+
         Args:
+            date_list (list, optional): list of date values detected so far
+            original_list (list, optional): list of same length as date_list, which has corresponding substrings from
+                                            the text that were detected as dates.
 
         Returns:
-            date_list (list): list of dict containing day, month, year from detected text
-            original_list (list): list of original text corresponding to values detected
-
+            list: list of date values detected so far
+            list: list of same length as date_list, which has corresponding substrings from
+                  the text that were detected as dates.
         """
+
+        def get_type(delta):
+            relative_types = [temporal_constants.TYPE_THIS_DAY, temporal_constants.TYPE_NEXT_DAY]
+            if 0 <= delta < len(relative_types):
+                return relative_types[delta]
+            return temporal_constants.TYPE_EXACT
+
         date_list = date_list or []
         original_list = original_list or []
 
-        weekday_ref_match = self._patterns["regex_weekday"].findall(self.processed_text)
-        for date_match in weekday_ref_match:
-            original = date_match[0]
-            weekday = self._date_constants_dict[date_match[1]][0]
-            req_date = temporal_utils.next_weekday(current_date=self.now_date, n=0, weekday=weekday)
+        weekday_ref_matches = self._patterns["regex_weekday"].findall(self.processed_text)
+        for date_match in weekday_ref_matches:
+            original, delta_variant, day_of_week = date_match
+            n = 0
+            if delta_variant:
+                n = self._datetime_constants_dict[delta_variant][1]
+            weekday = self._date_constants_dict[day_of_week][0]
+            req_date = temporal_utils.next_weekday(current_date=self.now_date, n=n, weekday=weekday)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": temporal_constants.TYPE_EXACT
+                "type": get_type(delta=n),
+                "dinfo": {
+                    "dd": "detected",
+                    "mm": "detected",
+                    "yy": "detected",
+                },
             }
             date_list.append(date)
             original_list.append(original)

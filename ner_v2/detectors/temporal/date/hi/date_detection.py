@@ -25,7 +25,6 @@ class DateDetector(BaseRegexDate):
             self._detect_after_days,
             self._detect_weekday_ref_month_1,
             self._detect_weekday_ref_month_2,
-            self._detect_weekday_diff,
             self._detect_weekday,
             self.custom_christmas_date_detector,
         ]
