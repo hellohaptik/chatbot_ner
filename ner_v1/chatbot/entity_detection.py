@@ -514,22 +514,28 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             [{'detection': 'message', 'original_text': 'yash doshi',
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
+    # TODO refactor NameDetector to make this easy to read and use
     name_detection = NameDetector(entity_name=entity_name, language=language)
-    if structured_value:
-        entity_list, original_text_list = name_detection.detect_entity(text=structured_value)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
-        else:
-            return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
-    else:
-        entity_list, original_text_list = name_detection.detect_entity(text=message, bot_message=bot_message)
-        if entity_list:
-            return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
-        elif fallback_value:
-            fallback_entity_value, fallback_original_value = NameDetector.get_format_name(fallback_value.split())
-            return output_entity_dict_list(entity_value_list=[fallback_entity_value[0]],
-                                           original_text_list=[fallback_original_value[0]],
-                                           detection_method=FROM_FALLBACK_VALUE)
+    text, detection_method, fallback_text, fallback_method = (structured_value,
+                                                              FROM_STRUCTURE_VALUE_VERIFIED,
+                                                              structured_value,
+                                                              FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+    if not structured_value:
+        text, detection_method, fallback_text, fallback_method = (message,
+                                                                  FROM_MESSAGE,
+                                                                  fallback_value,
+                                                                  FROM_FALLBACK_VALUE)
+    entity_list, original_text_list = [], []
+
+    if text:
+        entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message)
+
+    if not entity_list and fallback_text:
+        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
+        detection_method = fallback_method
+
+    if entity_list and original_text_list:
+        return output_entity_dict_list(entity_list, original_text_list, detection_method)
 
     return None
 

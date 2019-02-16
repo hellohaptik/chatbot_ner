@@ -1,5 +1,4 @@
 import calendar
-import re
 from datetime import datetime, timedelta
 import pandas as pd
 from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF, CONSTANT_FILE_KEY

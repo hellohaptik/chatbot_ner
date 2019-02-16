@@ -1,6 +1,6 @@
 ## Time Detector 
 
-This is the V2 version of time detector module that will detect time in multiple languages from raw text containing time entity. Currently we provide supports for 6 languages, which are
+This is the V2 version of time detector module that can detect and parse times in multiple languages from natural language text. Currently we provide supports for 6 languages, which are
 
 - English
 - Hindi
@@ -31,12 +31,12 @@ This is the V2 version of time detector module that will detect time in multiple
   timezone = 'UTC'  
   source_language = 'hi'
   language_script = 'en'
-  
+
   $ URL='localhost'
   $ PORT=8081
-  
+
   $ curl -i 'http://'$URL':'$PORT'/v2/time?message=shaam%20sava%204%20baje&entity_name=date&structured_value=&fallback_value=&bot_message=&source_language=hi&language_script=hi'
-  
+
   # Curl output
   $ {
       "data": [
@@ -69,17 +69,17 @@ In order to add any new language you have to follow below steps:
    Below is the folder structure of same after adding all the files for new language `xy`.
 
    ```python
-   |__ner_v2
-         |___detectors
-             |___temporal
-                 |___time
-                     |___xy    # <- New language Added 
-                     |	  |___data
-                     |   |   |___time_constant.csv
-                     |   |   |___datetime_diff_constant.csv
-                     |   |   |___numbers_constant.csv
-                     |
-                     |__time_detection.py 
+   |__ner_v2/
+     |__detectors/
+       |__temporal/
+         |__time/
+           |__xy/    # <- New language Added
+             |__init__.py
+             |__data/
+               |__time_constant.csv
+               |__datetime_diff_constant.csv
+               |__numbers_constant.csv
+    
    ```
 
 
@@ -87,65 +87,86 @@ In order to add any new language you have to follow below steps:
 
 #### GuideLines to create data files
 
-Below is the brief about how to create three data files `time_constant.csv`, `datetime_diff_constant.csv`, `numbers_constant.csv`.  All the description of each file is explained using hindi as a reference language. 
+First, Create three data files `time_constant.csv`, `datetime_diff_constant.csv`, `numbers_constant.csv`.
+Here, we explain the structure of each file using Hindi (hi) as a reference language.
+You can examine these files at [ner_v2/detectors/temporal/time/hi/data/](hi/data)
 
-1. **numbers_constant.csv**:  This files contains the vocabs for numerals in local langauge like in hindi एक,  दो  corresponds to number 1 and 2 respectively.
 
-   |        key         | **numeric_respresentation** |
-   | :----------------: | :-------------------------: |
-   |     १\|एक \|ek     |              1              |
-   |    २\|दो \| do     |              2              |
+1. **numbers_constant.csv**:  This files contains the vocabulary for numerals in desired langauge.
+   For example, in hindi एक and दो  corresponds to number 1 and 2 respectively.
+   For time, you would want to enter from 0 to 23 and any special cases.
+   For example in Hindi time people use special words ढेड़ and ढाई for 1:30 and 2:30 respectively.
+
+   |         key         | **numeric_respresentation** |
+   | :-----------------: | :-------------------------: |
+   |     १\|एक \|ek      |              1              |
+   |     २\|दो \| do     |              2              |
    | २१ \|इक्कीस\| ikkis |             21              |
 
-   Here, 1st column will contain the numerical value in the local language script plus in english script, Second column corresponds to their actual numerical representation.
+   **1st column will contain the variations speakers use while writing that number in the target language script**.It is recommended to add Romanised (transliterated) variations as well.
 
-   For reference see `number_constant` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/time/hi/data/numbers_constant
+   **2nd column corresponds to their actual numerical representation**. It must strictly contain an int or float.
 
-    
+   For reference see [numbers_constant.csv](hi/data/numbers_constant.csv) file for Hindi
 
-2. **time_constant.csv**: This file contains the words that occurs only in reference to time entity like  बजे,  घंटे,  मिनट,  सुबह  etc.
 
-   |                       key                       |    time_type    | meridian |
-   | :---------------------------------------------: | :-------------: | :------: |
-   |                    अभी\|abhi                    |  relative_time  |    NA    |
-   |                   तुरंत\|turant                   |  relative_time  |    NA    |
-   |   बजे\|बजकर\|बज\|baje\|bajkr\|bajkar\|bje\|baj   |      hour       |    NA    |
-   |      घंटा\|घंटे\|घंटों\|ghanta\|ghante\|ghanton      |      hour       |    NA    |
-   | मिनट\|मिनटों\|minton\|minutes\|mins\|minute\|min |     minute      |    NA    |
-   |                सुबह\|subah\|subeh                | daytime_merdian |    am    |
-   |                    रात\|raat                    | daytime_merdian |    pm    |
+2. **time_constant.csv**: This file contains the words that occurs only when referencing time like
+   `बजे`, `घंटे` (hours),  `मिनट` (minutes), `सुबह` (morning) etc.
 
-   Here, 1st column will contain word which is used to detect time entity, 3rd column define meridian based on time_key, will be NA where time_key occur for both instances (am and pm). 2nd column define the time type, below is the description of each time type.
+   |                   key                    |    time_type     | meridiem |
+   | :--------------------------------------: | :--------------: | :------: |
+   |                अभी\|abhi                 |  relative_time   |    NA    |
+   |              तुरंत\|turant               |  relative_time   |    NA    |
+   | बजे\|बजकर\|बज\|baje\|bajkr\|bajkar\|bje\|baj |       hour       |    NA    |
+   | घंटा\|घंटे\|घंटों\|ghanta\|ghante\|ghanton |       hour       |    NA    |
+   | मिनट\|मिनटों\|minton\|minutes\|mins\|minute\|min |      minute      |    NA    |
+   |            सुबह\|subah\|subeh            | daytime_meridiem |    am    |
+   |                रात\|raat                 | daytime_meridiem |    pm    |
 
-   1. ***relative_time***:  time which is derived with reference to current time.
+   **1st column will contain word variations which are used in conjunction with numbers to specify a time.**As you can see in the above table contains words like `घंटे` (hour), `मिनट` (minute), `सुबह` (morning), `रात` (night)
 
-   2. ***hour***:  Words which represent hours in time entity.
+   **2nd column defines how a mention of a variant from the first column modifies the mentioned time.**Below is a description of all possible values for the column
 
-   3. ***minute***: Words which represent minutes in time in entity.
+   - `relative_time`:  phrases that indicate mentioned time is relative to current time.
+   - `hour`:  phrases are used to indicate hours (E.g. 5 "hours" 30 minutes 50 seconds, 5 "bajkar" 3 minute)
+   - `minute`: phrases are used to indicate minutes (E.g. 5 hours 30 "minutes", 5 bajkar 3 "minute")
+   - `second`:  phrases are used to indicate seconds (E.g. 5 hours 30 minutes 50 "seconds")
+   - `daytime_meridiem`: phrases that can decide the meridiem of 12 hour format time (E.g. morning -> am, noon -> pm, night -> pm)
 
-   4. ***second***:  Words which represent seconds in time in entity.
+   **3rd column defines explicitly what meridiem to use when a variant from 1st column is present in the message.**Values can either be `am` (when something like "morning" is mentioned), `pm` (when something like "night" is mentioned),
+   or `NA` when both or none are applicable and it is upto the detector to infer 
 
-   5. ***daytime_merdian***: Words which represent day time reference or meridian in support of time entity. For ex. 'subah me 2 baje' -> here it define what meridian to consider for 2 baje i.e am
+   For reference see [time_constant.csv](hi/data/time_constant.csv) file for Hindi
 
-      
+3. **datetime_diff_constant.csv**: This file contains the vocabulary which is used while referencing for both date and time.
+   This vocabulary is used to mention dates and time in past or future w.r.t current time or to add a delta (of hours/minutes) in mentioned time.
+   Some examples are **पिछले** दिन (previous day), **पिछले** घंटे (previous hour)
 
-   For reference see `date_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/time/hi/data/time_constant.csv
-
-   
-
-3. **datetime_diff_constant.csv**:  This file contains the vocabs which come in reference for both date and time entity. These vocabs help to reference to some datetime in past and future w.r.t current time or create diff in mentioned time. Examples are  **पिछले** दिन,  **पिछले** घंटे
-
-   |           key           | present_in_start | adding_magnitude |   datetime_type   |
-   | :---------------------: | :--------------: | :--------------: | :---------------: |
-   |       बाद \| baad       |      False       |        1         | add_diff_datetime |
-   |    इस \|  इसी \| isi    |       True       |        0         | add_diff_datetime |
+   |           key            | present_in_start | adding_magnitude |   datetime_type   |
+   | :----------------------: | :--------------: | :--------------: | :---------------: |
+   |       बाद \| baad        |      False       |        1         | add_diff_datetime |
+   |    इस \|  इसी \| isi     |       True       |        0         | add_diff_datetime |
    | पिछले \| पिछला\| pichhla |       True       |        -1        | add_diff_datetime |
-   |  सावा \| sava \| sawa   |       True       |       0.25       |   ref_datetime    |
+   |   सावा \| sava \| sawa   |       True       |       0.25       |   ref_datetime    |
    |      पौने \| paune       |       True       |      -0.25       |   ref_datetime    |
 
-   Here, 1st column contains the word which can in reference for date time, 2nd column define the positioning of this word in entity whether it comes in start or in end. For example, in sentence *2 din baad* ,  "baad" came after "2 din"(date entity), hence its present_in_start will be false.  3rd column define the magnitude it is adding to referenced date or time, (1 if its adding positively, -1 if adding negatively). 4th column define the datetime type. Below are their detailed description.
+   Here, **1st column contains phrases which can be used to mention a relative delta for hour in time**
+        - "after" one hour
+        - "this" hour
+        - "last" hour
+        - three hours "later"
+        - "quarter to" 5
+        - ek ghante "baad" # one hour later
+        - "sava" teen # 15 minutes past 3
+        - "paune" paanch # "quarter to" 5
 
-   1. ***add_diff_datetime***:  Words which are referencing to datetime difference from current time like word baad in 2  दिन *बाद*  referring to a day, which comes 2 day later from current date.
-   2. **ref_datetime**: Words which referenced to create difference in time reference next to it. Example- सावा 4 , here whole sentence is referring to time 4:15.
+   **2nd column mentions if the entries in the first column appear as a prefix to the time mention**. The value must be a boolean (either True or False). For example, in the sentence `3 ghante baad `(3 hours later) ,  "baad" (later) is written as a suffix to "3 ghante" (3 hours), hence its `present_in_start` will be False.
 
-   For reference see `datetime_diff_constant.csv` file for hindi - https://github.com/hellohaptik/chatbot_ner/blob/language_datetime_code_review/ner_v2/detectors/temporal/date/hi/time/datetime_diff_constant.csv
+   **3rd column contains the relative number of hours to add to referenced time**, (1 for adding an hour, -1 for subtracting an hour). Here you can also add things like "quarter to N" with adding_magnitude -0.25 which indicates to the parse to remove 0.25 hour = 15 minutes before N i.e. return the time 15 minutes before N.
+
+    **4th column defines the delta type.** Below are supported values
+
+   1. `add_diff_datetime`:  If phrases in the first column appear as suffix to the time mention and modifies the time by adding the defined number of hours in the third column
+   2. `ref_datetime`: If phrases in the first column appear as prefix to the time mention and modifies the time by adding the defined number of hours in the third column
+
+   For reference see [datetime_diff_constant.csv](hi/data/datetime_diff_constant.csv) file for Hindi

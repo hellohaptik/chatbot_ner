@@ -30,8 +30,6 @@ class BaseNumberDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.date = []
-        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 
@@ -86,7 +84,8 @@ class BaseNumberDetector(object):
         """
         # create number_words dict having number variants and their corresponding scale and increment value
         # create language_scale_map dict having scale variants and their corresponding value
-        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME), encoding='utf-8')
+        numeral_df = pd.read_csv(os.path.join(data_directory_path, NUMBER_NUMERAL_CONSTANT_FILE_NAME),
+                                 encoding='utf-8')
         for index, row in numeral_df.iterrows():
             name_variants = get_list_from_pipe_sep_string(row[NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME])
             value = row[NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME]
@@ -208,7 +207,9 @@ class BaseNumberDetector(object):
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
             for number, original_text in zip(numbers, original_texts):
-                unit, original_text = self._get_unit_from_text(original_text, numeral_text)
+                unit = None
+                if self.unit_type:
+                    unit, original_text = self._get_unit_from_text(original_text, numeral_text)
                 numeral_text = numeral_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
@@ -279,7 +280,9 @@ class BaseNumberDetector(object):
             if number:
                 number = float(number) * scale
                 number = int(number) if number.is_integer() else number
-                unit, original_text = self._get_unit_from_text(original_text, processed_text)
+                unit = None
+                if self.unit_type:
+                    unit, original_text = self._get_unit_from_text(original_text, processed_text)
                 processed_text = processed_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),

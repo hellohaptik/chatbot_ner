@@ -1,18 +1,20 @@
 # coding=utf-8
+from __future__ import absolute_import
+
 import datetime
+import os
 import re
 
 from ner_v2.detectors.temporal.constant import (DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE,
                                                 TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE,
-                                                MINUTE_TIME_TYPE, DAYTIME_MERIDIAN, AM_MERIDIEM, PM_MERIDIEM,
+                                                MINUTE_TIME_TYPE, DAYTIME_MERIDIEM, AM_MERIDIEM, PM_MERIDIEM,
                                                 TWELVE_HOUR)
 from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
 from ner_v2.detectors.utils import get_timezone
 
 
 class BaseRegexTime(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False,
-                 form_check=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -46,13 +48,30 @@ class BaseRegexTime(object):
             self._detect_hour_minute,
         ]
 
-    def detect_time(self, text):
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message (str): previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
+
+    def detect_time(self, text, range_enabled=False, form_check=False, **kwargs):
         """
         Detects exact time for complete time information - hour, minute, time_type available in text
 
+         Args:
+            text (Union[str, unicode]): text to detect times from
+            range_enabled (bool, optional): whether to detect time ranges. Defaults to False
+            form_check (bool, optional): boolean set to False, used when passed text is a form type message
+
         Returns:
-            A tuple of two lists with first list containing the detected time entities and second list containing their
-            corresponding substrings in the given text.
+            Tuple[List[Dict[str, str]], List[Union[str, unicode]]]: tuple containing two lists,
+                first containing dictionaries, each containing containing hour, minutes
+                and meridiem/notation - either 'am', 'pm', 'hrs', 'df'
+                ('df' denotes relative difference to current time)
+                for each detected time, and second list containing corresponding original substrings in text
         """
 
         self.text = text
@@ -68,7 +87,7 @@ class BaseRegexTime(object):
         return time_list, original_list
 
     @staticmethod
-    def _sort_choices_on_word_counts(choices_list):
+    def _sort_choices_by_word_counts(choices_list):
         choices_list.sort(key=lambda s: len(s.split()), reverse=True)
         return choices_list
 
@@ -80,42 +99,64 @@ class BaseRegexTime(object):
         Returns:
             None
         """
-        self.time_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + TIME_CONSTANT_FILE)
-        self.datetime_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + DATETIME_CONSTANT_FILE)
-        self.numerals_constant_dict = get_tuple_dict(data_directory_path.rstrip('/') + '/' + NUMERALS_CONSTANT_FILE)
+        self.time_constant_dict = get_tuple_dict(
+            csv_file=os.path.join(data_directory_path.rstrip(os.sep), TIME_CONSTANT_FILE)
+        )
+        self.datetime_constant_dict = get_tuple_dict(
+            csv_file=os.path.join(data_directory_path.rstrip(os.sep), DATETIME_CONSTANT_FILE)
+        )
+        self.numerals_constant_dict = get_tuple_dict(
+            csv_file=os.path.join(data_directory_path.rstrip(os.sep), NUMERALS_CONSTANT_FILE)
+        )
 
-        # datetime_add_diff OR choices for regex
-        datetime_diff_choices = "(" + "|".join(self._sort_choices_on_word_counts(
-            [x for x in self.datetime_constant_dict
-             if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE])) + "|)"
+        # datetime_add_diff choices for regex
+        datetime_diff_choices = [x for x in self.datetime_constant_dict
+                                 if self.datetime_constant_dict[x][2] == ADD_DIFF_DATETIME_TYPE]
+        datetime_diff_choices = self._sort_choices_by_word_counts(datetime_diff_choices)
+        datetime_diff_choices = u'({}|)'.format(u'|'.join(datetime_diff_choices))
 
-        # datetime_ref OR choices in regex
-        datetime_add_ref_choices = "(" + "|".join(self._sort_choices_on_word_counts(
-            [x for x in self.datetime_constant_dict if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE])) + "|)"
+        # datetime_ref choices in regex
+        datetime_add_ref_choices = [x for x in self.datetime_constant_dict
+                                    if self.datetime_constant_dict[x][2] == REF_DATETIME_TYPE]
+        datetime_add_ref_choices = self._sort_choices_by_word_counts(datetime_add_ref_choices)
+        datetime_add_ref_choices = u'({}|)'.format(u'|'.join(datetime_add_ref_choices))
 
-        # hour OR choices for regex
-        hour_variants = "(" + "|".join(self._sort_choices_on_word_counts(
-            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == HOUR_TIME_TYPE])) + "|)"
+        # hour choices for regex
+        hour_variants = [x.lower() for x in self.time_constant_dict
+                         if self.time_constant_dict[x][0] == HOUR_TIME_TYPE]
+        hour_variants = self._sort_choices_by_word_counts(hour_variants)
+        hour_variants = u'({}|)'.format(u'|'.join(hour_variants))
 
         # minute OR choices for regex
-        minute_variants = "(" + "|".join(self._sort_choices_on_word_counts(
-            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == MINUTE_TIME_TYPE])) + "|)"
+        minute_variants = [x.lower() for x in self.time_constant_dict
+                           if self.time_constant_dict[x][0] == MINUTE_TIME_TYPE]
+        minute_variants = self._sort_choices_by_word_counts(minute_variants)
+        minute_variants = u'({}|)'.format(u'|'.join(minute_variants))
 
-        # meridian OR choices for regex
-        daytime_meridian = "(" + "|".join(self._sort_choices_on_word_counts(
-            [x.lower() for x in self.time_constant_dict if x.strip() != "" and
-             self.time_constant_dict[x][0] == DAYTIME_MERIDIAN])) + "|)"
+        # meridiem OR choices for regex
+        daytime_meridiem = [x.lower() for x in self.time_constant_dict
+                            if self.time_constant_dict[x][0] == DAYTIME_MERIDIEM]
+        daytime_meridiem = self._sort_choices_by_word_counts(daytime_meridiem)
+        daytime_meridiem = u'({}|)'.format(u'|'.join(daytime_meridiem))
 
         # numeral OR choices for regex
-        numeral_variants = "|".join(self._sort_choices_on_word_counts(
-            [x.lower() for x in self.numerals_constant_dict if x.strip() != ""]))
+        numeral_variants = [x.lower() for x in self.numerals_constant_dict]
+        numeral_variants = self._sort_choices_by_word_counts(numeral_variants)
+        numeral_variants = u'|'.join(numeral_variants)
 
-        self.regex_time = re.compile(r'(' + daytime_meridian + r'\s*[a-z]*?\s*' + datetime_add_ref_choices +
-                                     r'\s*(\d+|' + numeral_variants + r')\s*' + hour_variants + r'\s*(\d*|' +
-                                     numeral_variants + r')\s*' + minute_variants + r'\s+'
-                                     + datetime_diff_choices + r'\s*' + daytime_meridian + r')', flags=re.UNICODE)
+        self.regex_time = re.compile(r'(' +
+                                     daytime_meridiem +
+                                     r'\s*[a-z]*?\s*' +
+                                     datetime_add_ref_choices +
+                                     r'\s*(\d+|' + numeral_variants + r')\s*' +
+                                     hour_variants +
+                                     r'\s*(\d*|' + numeral_variants + r')\s*' +
+                                     minute_variants +
+                                     r'\s+' +
+                                     datetime_diff_choices +
+                                     r'\s*' +
+                                     daytime_meridiem +
+                                     r')', flags=re.UNICODE)
 
     def _get_float_from_numeral(self, numeral):
         """
@@ -147,7 +188,7 @@ class BaseRegexTime(object):
             original_text (str): original substring having hour and minute
 
         Returns
-            meridian type (str): returns the meridiem type whether its am and pm
+            str: returns the meridiem type whether its am and pm
         """
         current_hour = self.now_date.hour
         current_min = self.now_date.minute
@@ -155,7 +196,7 @@ class BaseRegexTime(object):
             return 'hrs'
 
         for key, values in self.time_constant_dict.items():
-            if values[0] == DAYTIME_MERIDIAN and key in original_text:
+            if values[0] == DAYTIME_MERIDIEM and key in original_text:
                 return values[1]
 
         if current_hour >= TWELVE_HOUR:
@@ -190,8 +231,8 @@ class BaseRegexTime(object):
         time_list = time_list or []
         original_list = original_list or []
 
-        regex_hour_match = self.regex_time.findall(self.processed_text)
-        for time_match in regex_hour_match:
+        time_matches = self.regex_time.findall(self.processed_text)
+        for time_match in time_matches:
             hh = 0
             mm = 0
             nn = None
@@ -211,9 +252,8 @@ class BaseRegexTime(object):
                 mm = self._get_float_from_numeral(time_match[5])
 
             if time_match[7]:
-                ref_date = self.now_date + int(self.datetime_constant_dict[time_match[7]][1]) * \
-                           datetime.timedelta(hours=hh, minutes=mm)
-
+                _dt = datetime.timedelta(hours=hh, minutes=mm)
+                ref_date = (self.now_date + int(self.datetime_constant_dict[time_match[7]][1]) * _dt)
                 hh, mm, nn = get_hour_min_diff(self.now_date, ref_date)
 
             if int(hh) != hh:
@@ -253,8 +293,8 @@ class BaseRegexTime(object):
 
             >>> time_list = []
             >>> original_list = []
-            >>> procprocessed_text = u'आज 05:40 बजे अजना'
-            >>> _detect_time_with_coln_format(time_list, original_list)
+            >>> preprocessed_text = u'आज 05:40 बजे अजना'
+            >>> _detect_time_with_colon_format(time_list, original_list)
             >>> ([{'hh': 5, 'mm': 40, 'nn': 'pm', 'time_type': None}], ["05:40"])
 
 
@@ -304,9 +344,7 @@ class BaseRegexTime(object):
 
 
 class TimeDetector(BaseRegexTime):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', range_enabled=False, form_check=False):
+    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
         super(TimeDetector, self).__init__(entity_name=entity_name,
                                            data_directory_path=data_directory_path,
-                                           timezone=timezone,
-                                           range_enabled=range_enabled,
-                                           form_check=form_check)
+                                           timezone=timezone)
