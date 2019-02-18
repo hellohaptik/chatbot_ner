@@ -5,7 +5,7 @@ args:
     yy: 2019
 tests:
   en:
-    - message: 17/12/19
+    - message: "17/12/19"
       bot_message: null
       outputs:
         - dd: 17
@@ -14,7 +14,8 @@ tests:
           property: null
           range: null
           repeat: null
-    - message: from 20th Dec to 30th Jan
+          original_text: "17/12/19"
+    - message: "from 20th Dec to 30th Jan"
       bot_message: null
       outputs:
         - dd: 20
@@ -23,13 +24,15 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "from 20th Dec"
         - dd: 30
           mm: 1
           yy: 2020
           property: null
           range: end
           repeat: null
-    - message: from this Monday to next Tuesday
+          original_text: "to 30th Jan"
+    - message: "from this Monday to next Tuesday"
       bot_message: null
       outputs:
         - dd: 18
@@ -38,13 +41,15 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "from this Monday"
         - dd: 19
           mm: 2
           yy: 2019
           property: null
           range: end
           repeat: null
-    - message: wake me up today and tomorrow at 8 am
+          original_text: "to next Tuesday"
+    - message: "wake me up today and tomorrow at 8 am"
       bot_message: null
       outputs:
         - dd: 15
@@ -53,13 +58,15 @@ tests:
           property: null
           range: null
           repeat: null
+          original_text: "today"
         - dd: 16
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
-    - message: I missed my yesterdays appointment, so please reschedule to day after tomorrow
+          original_text: "tomorrow"
+    - message: "I missed my yesterday's appointment, so please reschedule to day after tomorrow"
       bot_message: null
       outputs:
         - dd: 14
@@ -68,13 +75,15 @@ tests:
           property: null
           range: null
           repeat: null
+          original_text: "yesterday's"
         - dd: 17
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
-    - message: Wake me up on 23rd September 2022
+          original_text: "day after tomorrow"
+    - message: "Wake me up on 23rd September, 2022"
       bot_message: null
       outputs:
         - dd: 23
@@ -83,7 +92,8 @@ tests:
           property: null
           range: null
           repeat: null
-    - message: Wake me up on 23 September 2022
+          original_text: "23rd September, 2022"
+    - message: "Wake me up on 23 September 2022"
       bot_message: null
       outputs:
         - dd: 23
@@ -92,7 +102,8 @@ tests:
           property: null
           range: null
           repeat: null
-    - message: Wake me up on 23 Sept 2022
+          original_text: "23 September 2022"
+    - message: "Wake me up on 23 Sept 2022"
       bot_message: null
       outputs:
         - dd: 23
@@ -101,7 +112,8 @@ tests:
           property: null
           range: null
           repeat: null
-    - message: Wake me up on 23rd September
+          original_text: "23 Sept 2022"
+    - message: "Wake me up on 23rd September"
       bot_message: null
       outputs:
         - dd: 23
@@ -110,7 +122,8 @@ tests:
           property: null
           range: null
           repeat: null
-    - message: Wake me up everyday at 8 am
+          original_text: "23rd September"
+    - message: "Wake me up everyday at 8 am"
       bot_message: null
       outputs:
         - dd: 15
@@ -119,9 +132,9 @@ tests:
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 1
-    - message: Wake me up every monday at 8 am
+            - interval: 1
+          original_text: "everyday"
+    - message: "Wake me up every monday at 8 am"
       bot_message: null
       outputs:
         - dd: 18
@@ -130,9 +143,9 @@ tests:
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
-    - message: Wake me up every weekend at 8 am
+            - interval: 7
+          original_text: "every monday"
+    - message: "Wake me up every weekend at 8 am"
       bot_message: null
       outputs:
         - dd: 16
@@ -141,17 +154,17 @@ tests:
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
+            - interval: 7
+          original_text: "every weekend"
         - dd: 17
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
-    - message: Wake me up every weekday at 8 am
+            - interval: 7
+          original_text: "every weekend"
+    - message: "Wake me up every weekday at 8 am"
       bot_message: null
       outputs:
         - dd: 15
@@ -160,41 +173,41 @@ tests:
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
+            - interval: 7
+          original_text: "every weekday"
         - dd: 18
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
+            - interval: 7
+          original_text: "every weekday"
         - dd: 19
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
+            - interval: 7
+          original_text: "every weekday"
         - dd: 20
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
+            - interval: 7
+          original_text: "every weekday"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat:
-            - unit: 15
-              interval: 7
-    - message: Wake me up on weekend at 8 am
+            - interval: 7
+          original_text: "every weekday"
+    - message: "Wake me up on weekend at 8 am"
       bot_message: null
       outputs:
         - dd: 16
@@ -203,13 +216,15 @@ tests:
           property: null
           range: null
           repeat: null
+          original_text: "weekend"
         - dd: 17
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
-    - message: Wake me up on weekdays at 8 am
+          original_text: "weekend"
+    - message: "Wake me up on weekdays at 8 am"
       bot_message: null
       outputs:
         - dd: 15
@@ -218,31 +233,36 @@ tests:
           property: null
           range: null
           repeat: null
+          original_text: "weekdays"
         - dd: 18
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
+          original_text: "weekdays"
         - dd: 19
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
+          original_text: "weekdays"
         - dd: 20
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
+          original_text: "weekdays"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
           range: null
           repeat: null
-    - message: remind me this Monday onwards till Thursday
+          original_text: "weekdays"
+    - message: "remind me this Monday onwards till Thursday"
       bot_message: null
       outputs:
         - dd: 18
@@ -251,13 +271,15 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "this Monday onwards"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
           range: end
           repeat: null
-    - message: remind me from Monday till Thursday
+          original_text: "till Thursday"
+    - message: "remind me from Monday till Thursday"
       bot_message: null
       outputs:
         - dd: 18
@@ -266,13 +288,15 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "from Monday"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
           range: end
           repeat: null
-    - message: remind me starting Monday
+          original_text: "till Thursday"
+    - message: "remind me starting Monday"
       bot_message: null
       outputs:
         - dd: 18
@@ -281,7 +305,8 @@ tests:
           property: null
           range: start
           repeat: null
-    - message: remind me till Thursday
+          original_text: "starting Monday"
+    - message: "remind me till Thursday"
       bot_message: null
       outputs:
         - dd: 21
@@ -290,22 +315,8 @@ tests:
           property: null
           range: end
           repeat: null
-    - message: remind me from 18th feb to 21st feb
-      bot_message: null
-      outputs:
-        - dd: 18
-          mm: 2
-          yy: 2019
-          property: null
-          range: start
-          repeat: null
-        - dd: 21
-          mm: 2
-          yy: 2019
-          property: null
-          range: end
-          repeat: null
-    - message: remind me from 18th to 21st feb
+          original_text: "till Thursday"
+    - message: "remind me from 18th feb to 21st feb"
       bot_message: null
       outputs:
         - dd: 18
@@ -314,13 +325,32 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "from 18th feb"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
           range: end
           repeat: null
-    - message: remind me from 18th to 21st feb 2020
+          original_text: "to 21st feb"
+    - message: "remind me from 18th to 21st feb"
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+          original_text: "from 18th"
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+          original_text: "to 21st feb"
+    - message: "remind me from 18th to 21st feb 2020"
       bot_message: null
       outputs:
         - dd: 18
@@ -329,9 +359,11 @@ tests:
           property: null
           range: start
           repeat: null
+          original_text: "from 18th"
         - dd: 21
           mm: 2
           yy: 2020
           property: null
           range: end
           repeat: null
+          original_text: "to 21st feb 2020"
