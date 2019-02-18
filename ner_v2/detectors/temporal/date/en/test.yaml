@@ -120,7 +120,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 1
+              interval: 1
     - message: Wake me up every monday at 8 am
       bot_message: null
       outputs:
@@ -131,7 +131,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
     - message: Wake me up every weekend at 8 am
       bot_message: null
       outputs:
@@ -142,7 +142,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
         - dd: 17
           mm: 2
           yy: 2019
@@ -150,7 +150,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
     - message: Wake me up every weekday at 8 am
       bot_message: null
       outputs:
@@ -161,7 +161,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
         - dd: 18
           mm: 2
           yy: 2019
@@ -169,7 +169,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
         - dd: 19
           mm: 2
           yy: 2019
@@ -177,7 +177,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
         - dd: 20
           mm: 2
           yy: 2019
@@ -185,7 +185,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
         - dd: 21
           mm: 2
           yy: 2019
@@ -193,7 +193,7 @@ tests:
           range: null
           repeat:
             - unit: 15
-            - interval: 7
+              interval: 7
     - message: Wake me up on weekend at 8 am
       bot_message: null
       outputs:
