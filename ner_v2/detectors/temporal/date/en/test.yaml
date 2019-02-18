@@ -1,0 +1,337 @@
+args:
+  today:
+    dd: 15
+    mm: 2
+    yy: 2019
+tests:
+  en:
+    - message: 17/12/19
+      bot_message: null
+      outputs:
+        - dd: 17
+          mm: 12
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: from 20th Dec to 30th Jan
+      bot_message: null
+      outputs:
+        - dd: 20
+          mm: 12
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 30
+          mm: 1
+          yy: 2020
+          property: null
+          range: end
+          repeat: null
+    - message: from this Monday to next Tuesday
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 19
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: wake me up today and tomorrow at 8 am
+      bot_message: null
+      outputs:
+        - dd: 15
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 16
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: I missed my yesterdays appointment, so please reschedule to day after tomorrow
+      bot_message: null
+      outputs:
+        - dd: 14
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 17
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up on 23rd September 2022
+      bot_message: null
+      outputs:
+        - dd: 23
+          mm: 9
+          yy: 2022
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up on 23 September 2022
+      bot_message: null
+      outputs:
+        - dd: 23
+          mm: 9
+          yy: 2022
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up on 23 Sept 2022
+      bot_message: null
+      outputs:
+        - dd: 23
+          mm: 9
+          yy: 2022
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up on 23rd September
+      bot_message: null
+      outputs:
+        - dd: 23
+          mm: 9
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up everyday at 8 am
+      bot_message: null
+      outputs:
+        - dd: 15
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 1
+    - message: Wake me up every monday at 8 am
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+    - message: Wake me up every weekend at 8 am
+      bot_message: null
+      outputs:
+        - dd: 16
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+        - dd: 17
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+    - message: Wake me up every weekday at 8 am
+      bot_message: null
+      outputs:
+        - dd: 15
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+        - dd: 19
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+        - dd: 20
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat:
+            - unit: 15
+            - interval: 7
+    - message: Wake me up on weekend at 8 am
+      bot_message: null
+      outputs:
+        - dd: 16
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 17
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: Wake me up on weekdays at 8 am
+      bot_message: null
+      outputs:
+        - dd: 15
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 19
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 20
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: null
+          repeat: null
+    - message: remind me this Monday onwards till Thursday
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: remind me from Monday till Thursday
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: remind me starting Monday
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+    - message: remind me till Thursday
+      bot_message: null
+      outputs:
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: remind me from 18th feb to 21st feb
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: remind me from 18th to 21st feb
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2019
+          property: null
+          range: start
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2019
+          property: null
+          range: end
+          repeat: null
+    - message: remind me from 18th to 21st feb 2020
+      bot_message: null
+      outputs:
+        - dd: 18
+          mm: 2
+          yy: 2020
+          property: null
+          range: start
+          repeat: null
+        - dd: 21
+          mm: 2
+          yy: 2020
+          property: null
+          range: end
+          repeat: null
