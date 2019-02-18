@@ -140,7 +140,7 @@ Currently time detection support has been provided in different languages - `Eng
 
 - ***Example 1: Detect time[English] from text having 24 hrs, 12 hrs and time difference time format***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     >>> message = "John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. But the bus was scheduled for 12:30 pm"
@@ -197,7 +197,7 @@ Currently time detection support has been provided in different languages - `Eng
 
 - ***Example 2: Detect time[Hindi] from text containing 24 hrs, 12 hrs and time difference text format***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     >>> message = "राजू का बस १३:५० को बस स्टॉप से निकला और १५ मिनट में यहाँ पहुंच जाएगा और गोवा को शाम में बारह बजकर ३० मिनट पैर पहुंचेगा"
@@ -279,7 +279,7 @@ The Date detector module has the capability to detect various form of dates from
 
   Use the **timezone** parameter to pass your current timezone to date detection
 
-  - *Python:*
+  - *Django Shell:*
 
     ```python
     >>> message = "set me reminder on 23rd december"
@@ -333,7 +333,7 @@ The Date detector module has the capability to detect various form of dates from
 
   Use the **timezone** parameter to pass your current timezone to date detection
 
-  - *Python:*
+  - *Django Shell:*
 
     ```python
     >>> message = "मुझे कल सुबह ५ बजे उठा देना"
@@ -387,7 +387,7 @@ The Date detector module has the capability to detect various form of dates from
 
   Use the **timezone** parameter to pass your current timezone to date detection
 
-  - *Python:*
+  - *Django Shell:*
 
     ```python
     >>> message = "आने वाले सोमवार को मेरा मैथ्स का एग्जाम है"
@@ -453,7 +453,7 @@ Currently number detection support has been provided for 6 different languages -
 
 - ***Example 1: Detecting number[English] without unit in message***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     # For a sample query with following parameters
@@ -509,7 +509,7 @@ Currently number detection support has been provided for 6 different languages -
 
 - ***Example 2: Detecting number[Hindi] without unit in message***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     # For a sample query with following parameters
@@ -568,7 +568,7 @@ Currently number detection support has been provided for 6 different languages -
 
 - ***Example 3: Detecting number[Hindi in latin script] without unit in message***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     # For a sample query with following parameters
@@ -635,7 +635,7 @@ Currently number detection support has been provided for 6 different languages -
 
 - ***Example 4: Detecting number[English] with unit in message***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     # For a sample query with following parameters
@@ -702,7 +702,7 @@ Currently number detection support has been provided for 6 different languages -
 
   - **Example 1: *Detecting phone number from message***
 
-    - *Python:* 
+    - *Django Shell:* 
 
       ```python
       >>> message = u'send a message on 91 9820334455'
@@ -749,7 +749,7 @@ Currently number detection support has been provided for 6 different languages -
 
   - **Example 2:  *Detecting phone number from fallback value***
 
-    - *Python:* 
+    - *Django Shell:* 
 
       ```python
       >>> message = 'Please call me'
@@ -806,7 +806,7 @@ Currently number detection support has been provided for 6 different languages -
 
   - **Example 1:  *Detecting emails from message***
 
-    - *Python:*
+    - *Django Shell:*
 
       ```python
       >>> message = 'my email id is amans.rlx@gmail.com'
@@ -848,7 +848,7 @@ Currently number detection support has been provided for 6 different languages -
 
   - ***Example 2:  Detecting email from fallback value***
 
-    - *Python:*
+    - *Django Shell:*
 
       ```python
       >>> message = 'send this me to my email'
@@ -902,7 +902,7 @@ The Text Detector has the capability to detect custom text entity within the giv
 
 - **Example 1: *Detecting text entity from message***
 
-  - *Python:* 
+  - *Django Shell:* 
 
     ```python
     >>> message='i want to order chinese from  mainland china and pizza from domminos'
@@ -957,7 +957,7 @@ The Text Detector has the capability to detect custom text entity within the giv
 
 - **Example 2: *Detecting text entity from structured value***
 
-  - *Python:* 
+  - *Django Shell:* 
 
     ```python
     >>> message = 'i wanted to watch movie'
@@ -1012,7 +1012,7 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
 
 - ***Example 1: Detecting 10 digit Train PNR number from text***
 
-  - *Python*
+  - *Django Shell*
 
     ```python
     >>> entity_name = 'train_pnr'
@@ -1068,7 +1068,7 @@ This functionality helps to detect  entities that abide by the specified regex.
 
 - ***Example 1: Detecting 4-6 digit number using regex***
 
-  - *Python:*
+  - *Django Shell:*
 
     ```python
     >>> message = '123456 is my otp'
