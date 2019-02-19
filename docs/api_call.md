@@ -33,7 +33,7 @@ Following are the list of parameters accepted by APIs used for detection:
 
    For other entities like `date` or `time` `entity_name`, detection logic works solely on their entity_types.
 
-3. **structured_value** (optional): It is a value which is obtained from the structured text. For example, UI elements like form, payload, etc. See below reference of detecting test name from form key `Test name`
+3. **structured_value** (optional): It is a value which is obtained from the structured text. For example, UI elements like form, payload, etc. See below image for reference used for detecting test name from form key `Test name`
 
    ![form](images/form.png)
 
