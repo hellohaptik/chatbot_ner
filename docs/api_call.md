@@ -135,8 +135,8 @@ After following above steps, you can test the APIs either using django shell or 
 
 To get into django shell you need to execute the below commands.
 
-1. `docker exec -it <container> bash`   #  To get inside container 
-2. `python manage.py shell`
+1. To get inside container,  first run`docker exec -it <container_name> bash` 
+2. Then, inside main project directory run `python manage.py shell`
 
 Below are the APIs example for each of the entity types mentioned above.
 
