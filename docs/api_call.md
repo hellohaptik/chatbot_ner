@@ -13,7 +13,7 @@ Following are the different entity types we currently support.
 | [Email](#5-email)               | Detects email addresses in given text.                       | amans.rlx@gmail.com                                          |
 | [Text](#6-text)                 | Detect custom entities in text string using full text search in Datastore or based on contextual model | **pizza**, **मुंबई**                                           |
 | [PNR-Number](#7-pnr-number)     | Detect PNR (serial) codes in given text.                     | My flight PNR is **4SGX3E**                                  |
-| [Regex](#8-regex)               | Detect entities using custom regex patterns                  | My flight PNR is **4SGX3E**                                  |
+| [Regex](#8-regex)               | Detect entities using custom regex patterns                  | My flight PNR is **4SGX3E**<br />Please apply **CASH20** coupon code |
 
 
 
@@ -23,7 +23,7 @@ Following are the list of parameters accepted by APIs used for detection:
 
 1. **message**: Message on which detection logic needs to run. It is an unstructured text from which entity needs to be extracted. For example, *"I want to order pizza"*.
 
-2. **entity_name**: Name of the entity. This parameter is important when the detection logic relies on dictionary. It is used to run particular detection logic by looking at its dictionary.
+2. **entity_name**: Name of the entity. This parameter primarily defines the key of the output dictionary. 
 
    For example, in Text detection logic  the entity name is based on dictionary name of entities we need to detect.
 
@@ -31,11 +31,13 @@ Following are the list of parameters accepted by APIs used for detection:
      - *cuisine* entity_name will be *"cuisine"*
      - *dish* entity_name will be *"dish"*
 
-   In some detection like `date` or `time detection` `entity_name` does not have any siginificance as detection logic of these entities won't change based on their name.
+   In other detection like `date` or `tim` `entity_name` does not have any siginificance as detection logic works solely based on their entity_types only.
 
 3. **structured_value**: It is a value which is obtained from the structured text. For example, UI elements like form, payload, etc.
 
-4. **fallback_value**: It is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* as an output. This value is derived from third party api or from users profile.
+   <image>
+
+4. **fallback_value**: It is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* passed in request as an output. 
 
    For example, if user says *"Nearby ATMs"*. In this example user has not provided any information about his location in the chat but, we can pass a *fallback_value* that will contain its location that can be obtained from its profile or third party apis (like geopy, etc).
 
@@ -67,16 +69,16 @@ The output of entities detected will be stored in a list of dictionary containin
 Consider the following example for detailed explanation:
 
 ```
-"I want to order from mcd"
+"I want to order two litre pepsi."
 ```
 
-- entity_value: This will store the value of entity (i.e entity value) that is detected. The output will be in dictionary format. For example, `{"value": "McDonalds"}`.
+- entity_value: This will store the value of entity (i.e entity value) that is detected. The output will be in dictionary format. For example, `{"value": "2", "unit": "quantity"}`.
 - detection: This will store how the entity is detected i.e. whether from *message*, *structured value* or *fallback value*.
-- original_text: This will store the actual value that is detected. For example, mcd.
+- original_text: This will store the actual value that is detected. For example, `two`.
 
-```python
+```json
 Example 1:
-input:  message = 'i want to order chinese from  mainland china and pizza from domminos'
+input:  message = 'I want to order 2 burgers from mainland china at 3 pm '
         entity_name = 'restaurant'
         structured_value = None
         structured_value_verification = 0
@@ -87,29 +89,32 @@ output:
 [
   {
     "detection": "message",
-    "original_text": "mainland china",
-    "entity_value": { "value": "Mainland China" }
+    "original_text": "2",
+    "entity_value": { "value": "2", "unit": null},
+    "language": "en"
   },
   {
     "detection": "message",
-    "original_text": "domminos",
-    "entity_value": { "value": "Domino's Pizza"}
+    "original_text": "3 pm",
+    "entity_value": { "mm": 0, "hh": 3, "nn": "pm"},
+    "language": "en"
   }
 ]
 
 Example 2:
-input:  message = 'i wanted to watch movie'
-        entity_name = 'movie'
-        structured_value = 'inferno'
+// referenced date is 19th feb
+input:  message = 'I have my maths exam next Saturday.'
+        entity_name = 'date'
+        structured_value = None
         structured_value_verification = 0
         fallback_value = None
         bot_message = None
 
 output:[
 {
-    "detection": "structure_value_verified",
+    "detection": "message",
     "original_text": "inferno",
-    "entity_value": {"value": "Inferno"}
+    "entity_value": {"value": {"mm": 03, "yy": 2019, "dd": 02, "type": "date"}
   }, 
 ]
 ```
@@ -521,8 +526,7 @@ Currently number detection support has been provided for 6 different languages -
     >>> min_number_digits=1  # minimum number of digit 
     >>> max_number_digits=6  # maximum number of digit
     >>> source_language='hi' # here language will be ISO 639-1 code
-    >>> unit_type=None       # this restrict the number detector to detect particular 
-                 # number type only.
+    >>> unit_type="weight"  # this restrict the number detector to detect only weight type number entity 
     
     >>> from ner_v2.detector.number.number.number_detection import NumberDetector
     >>> detector = NumberDetector(entity_name=entity_name, language=source_language, 
@@ -551,16 +555,10 @@ Currently number detection support has been provided for 6 different languages -
     ```json
     {"data": [
         {
-            "detection": "message",
-            "original_text": "३०", 
-            "entity_value": { "value": "30", "unit": null},
-            "language": "en"
-        },
-        {
           "detection": "message",
-          "original_text": "दो हजार",
-          "entity_value": { "value": "2000", "unit": null},
-          "language": "en"
+          "original_text": "३० किलो"
+          "entity_value": { "value": "३०", "unit": "kg"},
+          "language": "hi"
         }]
     }
     
@@ -696,7 +694,7 @@ Currently number detection support has been provided for 6 different languages -
 
   The Phone Number Detector has the capability to detect phone numbers from within the given text. The detector has the ability to handle multilanguage text. Additionally, this detector is scaled to handle domestic as well as international phone numbers.  
 
-  *This module has been updated to v2 version of chatbot_ner.*
+  *This module has been updated to v2 version of chatbot_ner and is language agnostic.*
 
   **API Examples:**
 
@@ -747,7 +745,54 @@ Currently number detection support has been provided for 6 different languages -
       
       ```
 
-  - **Example 2:  *Detecting phone number from fallback value***
+  - **Example 2: *Detecting phone number (hindi) from message***
+
+    - *Django Shell:* 
+
+      ```python
+      >>> message = u'मेरा मोबाइल नंबर है ९८९१९८९८७१'
+      >>> entity_name = 'phone_number'
+      >>> structured_value = None
+      >>> fallback_value = None
+      >>> bot_message = None
+      >>> source_langauge='hi'       # here language will be ISO 639-1 code
+      
+      >>> from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
+      >>> detector = PhoneDetector(language=source_langauge,
+                                   entity_name=entity_name) 
+      >>> output = detector.detect(message=message, entity_name=entity_name,
+                                   structured_value=structured_value,
+                                   fallback_value=fallback_value,
+                                   bot_message=bot_message,language=source_language)
+      >>> print(output)
+      
+      ```
+
+    - *CURL command:*
+
+      ```shell
+      URL='localhost'
+      PORT=8081
+      
+      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=मेरा मोबाइल नंबर है ९८९१९८९८७१entity_name=phone_number&structured_value=&fallback_value=None&bot_message=&source_language=en'
+      
+      ```
+
+      > **Output **:
+
+      ```json
+      {"data": [
+          {
+              "detection": "message",
+              "original_text": "९८९१९८९८७१'",
+              "entity_value": { "value": "981117971"},
+              "language": "hi"
+          }]
+      }
+      
+      ```
+
+  - Example 2:  *Detecting phone number from fallback value***
 
     - *Django Shell:* 
 
@@ -905,8 +950,8 @@ The Text Detector has the capability to detect custom text entity within the giv
   - *Django Shell:* 
 
     ```python
-    >>> message='i want to order chinese from  mainland china and pizza from domminos'
-    >>> entity_name='restaurant'
+    >>> message='i want to order chinese from mainland china and pizza from dominos'
+    >>> entity_name='restaurant' # here detection NER will search for values in dictionary 'restaurant'  
     >>> structured_value=None
     >>> fallback_value=None
     >>> bot_message=None
@@ -960,12 +1005,12 @@ The Text Detector has the capability to detect custom text entity within the giv
   - *Django Shell:* 
 
     ```python
-    >>> message = 'i wanted to watch movie'
-    >>> entity_name = 'movie'
-    >>> structured_value = 'inferno'
+    >>> message = 'मेरे लिए कैब बुक कर दीजिये'
+    >>> entity_name = 'city'
+    >>> structured_value = 'मुंबई'
     >>> fallback_value = None
     >>> bot_message = None
-    >>> source_langauge='en'
+    >>> source_langauge='hi'
     
     >>> from ner_v1.chatbot.entity_detection import get_text
     >>> output = get_text(message=message, entity_name=entity_name,
@@ -982,7 +1027,7 @@ The Text Detector has the capability to detect custom text entity within the giv
     URL='localhost'
     PORT=8081
     
-    curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20wanted%20to%20watch%20movie&entity_name=movie&structured_value=inferno&fallback_value=None&bot_message=&source_language=en'
+    curl -i 'http://'$URL':'$PORT'/v1/text/?message=मेरे लिए कैब बुक कर दीजिये&entity_name=movie&structured_value=मुंबई&fallback_value=None&bot_message=&source_language=en'
     
     ```
 
@@ -992,9 +1037,9 @@ The Text Detector has the capability to detect custom text entity within the giv
     {"data": [
         {
             "detection": "structure_value_verified",
-            "original_text": "inferno",
-            "entity_value": {"value": "Inferno"},
-            "language":"en"
+            "original_text": "mumbai",
+            "entity_value": {"value": "Mumbai"},
+            "language":"hi"
         }]
     }
     
@@ -1015,6 +1060,7 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
   - *Django Shell*
 
     ```python
+    >>  message = 'check my pnr status for 2141215305'
     >>> entity_name = 'train_pnr'
     >>> structured_value = None
     >>> fallback_value = None
@@ -1071,12 +1117,12 @@ This functionality helps to detect  entities that abide by the specified regex.
   - *Django Shell:*
 
     ```python
-    >>> message = '123456 is my otp'
-    >>> entity_name = 'regex_test_otp'
+    >>> message = 'please apply AMAZON30 coupon code to my cart'
+    >>> entity_name = 'regex_coupon_code'
     >>> structured_value = None
     >>> fallback_value = None
-    >>> bot_message = 'enter the otp'
-    >>> regex = '\\d{4,6}'
+    >>> bot_message = 'Enter the coupon code'
+    >>> regex = '[A-Z]+\d{2,6}'
     
     >>> from ner_v1.chatbot.entity_detection import get_regex
     >>> output = get_regex(message=message,entity_name=entity_name,
@@ -1092,7 +1138,7 @@ This functionality helps to detect  entities that abide by the specified regex.
     URL='localhost'
     PORT=8081
     
-    curl -i 'http://'$URL':'$PORT'/v1/regex/?message=123456%20is%20my%otp&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20&regex=\d{4,6}'
+    curl -i 'http://'$URL':'$PORT'/v1/regex/?message=please%20apply%20AMAZON30%20coupon%20code%20to my%20cart&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20&regex=\d{4,6}'
     ```
 
     > **Output:**
@@ -1101,8 +1147,8 @@ This functionality helps to detect  entities that abide by the specified regex.
     {"data": [
         {
             "detection": "message",
-            "original_text": "123456",
-            "entity_value": "123456"
+            "original_text": "AMAZON30",
+            "entity_value": "AMAZON30"
         }]
     }
     ```
