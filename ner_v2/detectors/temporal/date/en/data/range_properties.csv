@@ -1,0 +1,3 @@
+property,prefixes,suffixes,bot_message_contexts,prefix_within_n_words,suffix_within_n_words,prefix_suffix_both_required
+start,from,,start|starting from,1,0,false
+end,to|till,,end|ending,1,0,false

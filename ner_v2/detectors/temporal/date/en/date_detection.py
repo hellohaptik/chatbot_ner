@@ -27,15 +27,6 @@ class DateDetector(object):
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         now_date: datetime object holding timestamp while DateDetector instantiation
-<<<<<<< HEAD
-        day_dictionary: dictonary mapping day indexes to day of week spellings and 
-                            fuzzy variants(spell errors, abbreviations)
-=======
-        month_dictionary: dictonary mapping month indexes to month spellings and
-                          fuzzy variants(spell errors, abbreviations)
-        day_dictionary: dictonary mapping day indexes to day of week spellings and
-        fuzzy variants(spell errors, abbreviations)
->>>>>>> 4a25547d8ae00c57dd3fa841bd10c45681b09ee5
         bot_message: str, set as the outgoing bot text/message
 
         SUPPORTED_FORMAT                                            METHOD_NAME
