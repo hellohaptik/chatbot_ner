@@ -19,9 +19,11 @@ To check all unit type supported by english number detector please go through [u
 
   ```python
   >> from ner_v2.detector.number.number.number_detection import NumberDetector
-  >> detector = NumberDetector(entity_name='number', language='en')  # here language will be ISO 639-1 code
+  >> detector = NumberDetector(entity_name='number', language='en', unit_type='currency')  # here language will be ISO 639-1 code
   >> detector.detect_entity(text= 'I want 4000 rs')
   >> {'entity_value': [{'value': '4000', 'unit': 'rupees'}], 'original_text':['4000 rs']}
+  
+  # Notes -> if unit type is not given it will only detect 4000, not unit.
   ```
 
 - **Curl Command**
@@ -36,31 +38,34 @@ To check all unit type supported by english number detector please go through [u
   # min_number_digits=1
   # max_number_digits=6
   # source_language='hi'
-  # language_script='hi'
-  # unit_type=None
+  # unit_type=None 
   
   $ URL='localhost'
-  $ PORT=8081
+    $ PORT=8081
   
-  $ curl -i 'http://'$URL':'$PORT'/v2/number?message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi&unit_type='
-  
-  # Curl output
-  $ {
-      "data": [
-          {
-              "detection": "message",
-              "original_text": "do hajaar chaar sau",
-              "entity_value": {
-                  "unit": null,
-                  "value": "2400"
-              },
-              "language": "hi"
-          }
-      ]
-  }
+  $ curl -i 'http://'$URL':'$PORT'/v2/number/message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi&unit_type='
   ```
 
   
+
+- **Output**
+
+  ```json
+   {
+        "data": [
+            {
+                "detection": "message",
+                "original_text": "do hajaar chaar sau",
+                "entity_value": {
+                    "unit": null,
+                    "value": "2400"
+                },
+                "language": "hi"
+            }
+        ]
+    }
+  ```
+
 
 ### Steps to add new language for Number detection
 
@@ -86,7 +91,6 @@ In order to add any new language you have to follow below steps:
                      |
                      |__number_detection.py 
    ```
-
 
 
 
@@ -127,22 +131,18 @@ To start with copy the code below
 ```python
 import re
 import os
-
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 from ner_v2.detectors.numeral.constant import NUMBER_DETECT_UNIT, NUMBER_DETECT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
 
-
 class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
-
     def __init__(self, entity_name='number', unit_type=None):
-        super(NumberDetector, self).__init__(entity_name=entity_name,
-                                            
-                                        data_directory_path=NumberDetector.data_directory_path,
-                                             unit_type=unit_type)
-
+    super(NumberDetector, self).__init__(entity_name=entity_name,
+                                        
+                                    data_directory_path=NumberDetector.data_directory_path,
+                                         unit_type=unit_type)
 ```
 
 Note that the class name must be `NumberDetector` 
@@ -159,7 +159,7 @@ Next we define a custom detector. For our purposes we will add a detector to det
 5. Finally your detector must return a tuple of (number_list, original_list). Ensure that `number_list` and `original_list` are of equal lengths before returning them.
 
 ```python
-    def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
+def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         number_list = number_list or []
         original_list = original_list or []
         patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
@@ -170,16 +170,14 @@ Next we define a custom detector. For our purposes we will add a detector to det
                 NUMBER_DETECT_UNIT: 'people'
             })
             original_list.append(pattern[0])
-
-        return number_list, original_list
+    return number_list, original_list
 ```
-
 Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default ordering from 
 `detectors.numeral.number.standard_number_detector.BaseNumberDetector` and inject your own detectors in between.
 Below we show an example where we put our custom detector on top to execute it before some builtin detectors.
 
-```python
-	def __init__(self, entity_name='number', unit_type=None):
+  ```python
+def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path,
                                             unit_type=unit_type)
@@ -189,7 +187,7 @@ Below we show an example where we put our custom detector on top to execute it b
             self._detect_number_from_digit,
             self._detect_number_from_numerals
         ]
-```
+  ```
 
 Also to run the custom detector only for few set of entities, you can do it by putting a `if` condition to check if given entity_name belong to list, and modify the detector preference only for them. Below is the example where custom detector will run just for `person_count` and `traveller_number` entity. For other entities it will follow the default pattern defined in BaseNumberDetector.
 
@@ -206,8 +204,6 @@ Also to run the custom detector only for few set of entities, you can do it by p
             	self._detect_number_from_numerals
             ]
 ```
-
-
 
 Putting it all together, we have
 

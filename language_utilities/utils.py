@@ -48,6 +48,6 @@ def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG
             translate_response = request.json()
             response[TRANSLATED_TEXT] = translate_response["data"]["translations"][0]["translatedText"]
             response['status'] = True
-    except Exception, e:
+    except Exception as e:
         ner_logger.exception('Exception while translation: %s ' % e)
     return response

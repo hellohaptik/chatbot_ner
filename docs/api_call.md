@@ -10,14 +10,14 @@ Following are the different entity types we currently support.
 | [Date](#2-date)                 | Detects date in various formats from given text.             | 28-12-2096, 09th Nov 2014, Tomorrow, next monday, agle somvar, अगले सोमवार |
 | [Number](#3-number)             | Detects number from the text.                                | 50 rs per person, ५ किलो चावल, मुझे एक लीटर ऑइल चाहिए          |
 | [Phone number](#4-phone-number) | Detects phone numbers in given text.                         | +919222222222                                                |
-| [Email](#5-email)               | Detects email addresses in given text.                       | amans.rlx@gmail.com                                          |
+| [Email](#5-email)               | Detects email addresses in given text.                       | abc.123@gmail.com                                            |
 | [Text](#6-text)                 | Detect custom entities in text string using full text search in Datastore or based on contextual model | **pizza**, **मुंबई**                                           |
 | [PNR-Number](#7-pnr-number)     | Detect PNR (serial) codes in given text.                     | My flight PNR is **4SGX3E**                                  |
 | [Regex](#8-regex)               | Detect entities using custom regex patterns                  | My flight PNR is **4SGX3E**<br />Please apply **CASH20** coupon code |
 
 
 
-### APIs Parameters
+### API Parameters
 
 Following are the list of parameters accepted by APIs used for detection:
 
@@ -31,19 +31,19 @@ Following are the list of parameters accepted by APIs used for detection:
      - *cuisine* entity_name will be *"cuisine"*
      - *dish* entity_name will be *"dish"*
 
-   In other detection like `date` or `tim` `entity_name` does not have any siginificance as detection logic works solely based on their entity_types only.
+   For other entities like `date` or `time` `entity_name`, detection logic works solely on their entity_types.
 
-3. **structured_value**: It is a value which is obtained from the structured text. For example, UI elements like form, payload, etc.
+3. **structured_value** (optional): It is a value which is obtained from the structured text. For example, UI elements like form, payload, etc. See below reference of detecting test name from form key `Test name`
 
-   <image>
+   ![form](images/form.png)
 
-4. **fallback_value**: It is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* passed in request as an output. 
+4. **fallback_value** (optional): It is a fallback value. If the detection logic fails to detect any value either from *structured_value* or *message* then we return a *fallback_value* passed in request as an output. 
 
    For example, if user says *"Nearby ATMs"*. In this example user has not provided any information about his location in the chat but, we can pass a *fallback_value* that will contain its location that can be obtained from its profile or third party apis (like geopy, etc).
 
 5. **source_language**: It is the language in which user message is passed. We have to pass ISO 639-1 code of the language here.
 
-6. **bot_message**: previous message from a bot/agent. This is an important parameter, many times the entity value relies on the message from the bot/agent i.e. what is bot saying? or asking?
+6. **bot_message** (optional): previous message from a bot/agent. This is an important parameter, many times the entity value relies on the message from the bot/agent i.e. what is bot saying? or asking?
 
    For example, bot might ask for departure date to book a flight and user might reply with a date. Now, it is difficult to disambiguate whether its departure date or arrival date unless, we know what bot is asking for?
 
@@ -73,17 +73,21 @@ Consider the following example for detailed explanation:
 ```
 
 - entity_value: This will store the value of entity (i.e entity value) that is detected. The output will be in dictionary format. For example, `{"value": "2", "unit": "quantity"}`.
-- detection: This will store how the entity is detected i.e. whether from *message*, *structured value* or *fallback value*.
-- original_text: This will store the actual value that is detected. For example, `two`.
+- detection: This indicates how the entity was detected. Possibles values are
+  -  *message* : If entity get detected from message key.
+  - *structured value*: If entity get detected from structured value.
+  - *fallback value*: If entity get detected from fallback value.
+- original_text: This store the part of the text that gets detected as an entity. For example, `two`.
 
 ```json
 Example 1:
-input:  message = 'I want to order 2 burgers from mainland china at 3 pm '
-        entity_name = 'restaurant'
-        structured_value = None
-        structured_value_verification = 0
-        fallback_value = None
-        bot_message = None
+input:  
+message = u'I want to order 2 burgers from mainland china at 3 pm '
+entity_name = 'restaurant'
+structured_value = None
+structured_value_verification = 0
+fallback_value = None
+bot_message = None
 
 output:
 [
@@ -102,19 +106,21 @@ output:
 ]
 
 Example 2:
-// referenced date is 19th feb
-input:  message = 'I have my maths exam next Saturday.'
-        entity_name = 'date'
-        structured_value = None
-        structured_value_verification = 0
-        fallback_value = None
-        bot_message = None
+// If today is 19th feb
+input:  
+message = u'I have my maths exam next Saturday.'
+entity_name = 'date'
+structured_value = None
+structured_value_verification = 0
+fallback_value = None
+bot_message = None
 
 output:[
 {
     "detection": "message",
     "original_text": "inferno",
-    "entity_value": {"value": {"mm": 03, "yy": 2019, "dd": 02, "type": "date"}
+    "entity_value": {"value": {"mm":03, "yy": 2019, "dd": 02, "type": "date"}},
+    "language": "en"
   }, 
 ]
 ```
@@ -125,13 +131,16 @@ output:[
 
 Please, have a look at [installation steps](https://github.com/hellohaptik/chatbot_ner/blob/master/docs/install.md) guide to install Chatbot NER on your system.
 
-After following above steps, you can test the APIs either using django shell or by making curl get request. To get into django shell, you need to run `python manage.py shell` command in main project directory. 
+After following above steps, you can test the APIs either using django shell or by making curl get request. 
 
-Below are APIs example for each of the entity types mentioned above.
+To get into django shell you need to execute the below commands.
+
+1. `docker exec -it <container> bash`   #  To get inside container 
+2. `python manage.py shell`
+
+Below are the APIs example for each of the entity types mentioned above.
 
 ### 1. Time
-
-> entity_type: time
 
 The Time detector module has the capability to detect time from text in multiple languages. It can detect time in 12/24 hr format and also detect text with time difference specified. for example - wake me up `after 10 mins`. 
 
@@ -143,26 +152,26 @@ Currently time detection support has been provided in different languages - `Eng
 
 **API Example**:
 
-- ***Example 1: Detect time[English] from text having 24 hrs, 12 hrs and time difference time format***
+- ***Example 1: Detect time from English text which contains time mentions in 24 hours format, 12 hours format and relative time format***
 
   - *Django Shell*
 
     ```python
-    >>> message = "John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. But the bus was scheduled for 12:30 pm"
-    >>> entity_name = 'time'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> timezone = 'UTC' 
-    >>> source_language='en'
+    message = u"John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. But the bus was scheduled for 12:30 pm"
+    entity_name = 'time'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
+    timezone = 'UTC' 
+    source_language='en'
     
-    >>> from ner_v2.detectors.temporal.time.time_detection import TimeDetector
-    >>> detector = TimeDetector(entity_name=entity_name, language=source_language, 
-                                timezone=timezone)  
-    >>> output = detector.detect(message=message, entity_name=entity_name,
-                                 structured_value=structured_value,
-                                 fallback_value=fallback_value)
-    >>> print(output)
+    from ner_v2.detectors.temporal.time.time_detection import TimeDetector
+    detector = TimeDetector(entity_name=entity_name, language=source_language,
+                            timezone=timezone)  
+    output = detector.detect(message=message, entity_name=entity_name,
+                             structured_value=structured_value,
+                             fallback_value=fallback_value)
+    print(output)
     ```
 
   - *CURL command*
@@ -205,21 +214,21 @@ Currently time detection support has been provided in different languages - `Eng
   - *Django Shell*
 
     ```python
-    >>> message = "राजू का बस १३:५० को बस स्टॉप से निकला और १५ मिनट में यहाँ पहुंच जाएगा और गोवा को शाम में बारह बजकर ३० मिनट पैर पहुंचेगा"
-    >>> entity_name = 'time'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> timezone = 'UTC' 
-    >>> source_language='hi'
+    message = u"राजू का बस १३:५० को बस स्टॉप से निकला और १५ मिनट में यहाँ पहुंच जाएगा और गोवा को शाम में बारह बजकर ३० मिनट पैर पहुंचेगा"
+    entity_name = 'time'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
+    timezone = 'UTC' 
+    source_language='hi'
     
-    >>> from ner_v2.detectors.temporal.time.time_detection import TimeDetector
-    >>> detector = TimeDetector(entity_name=entity_name, language=source_language, 
-                                timezone=timezone)  
-    >>> output = detector.detect(message=message, entity_name=entity_name,
+    from ner_v2.detectors.temporal.time.time_detection import TimeDetector
+    detector = TimeDetector(entity_name=entity_name, language=source_language,
+                            timezone=timezone)  
+    output = detector.detect(message=message, entity_name=entity_name,
                                  structured_value=structured_value,
                                  fallback_value=fallback_value)
-    >>> print(output)
+    print(output)
     ```
 
   - *CURL command*
@@ -262,15 +271,13 @@ Currently time detection support has been provided in different languages - `Eng
 
 ### 2. Date
 
-> entity_type: date
-
 The Date detector module has the capability to detect various form of dates from text in multiple languages. It can detect date from following patterns:
 
-1. *Day month year format*  - 12 feb 2018, 2nd Jan 2019,  12/11/2019, 12-jan-2019
-2. *Day month* - 12 feb, 12/12
-3. Weekday reference - Comming monday, next sunday
-4. Reference day month - 2nd of next month, 2nd sunday of coming month
-5. Current day reference -  tomorrow, yesterday, day after tomorrow
+1. **Day month year format**  - 12 feb 2018, 2nd Jan 2019,  12/11/2019, 12-jan-2019
+2. **Day month** - 12 feb, 12/12
+3. **Weekday reference** - Comming monday, next sunday
+4. **Reference day month** - 2nd of next month, 2nd sunday of coming month
+5. **Current day reference** -  tomorrow, yesterday, day after tomorrow
 
  Currently date detection support has been provided in different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
 
@@ -287,24 +294,23 @@ The Date detector module has the capability to detect various form of dates from
   - *Django Shell:*
 
     ```python
-    >>> message = "set me reminder on 23rd december"
-    >>> entity_name = 'date'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> timezone='UTC'
-    >>> source_language='en'
-    >>> past_date_referenced=False # flag to check if the date reference lies in past                     or future. For Example - In hindi "Kal" ``                  corresonds to both tomorrow and yesterday. So                   this flag will determines actual referenced date. 
+    message = u"set me reminder on 23rd december"
+    entity_name = 'date'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
+    timezone='UTC'
+    source_language='en'
+    past_date_referenced=False # flag to check if the date reference lies in past                     or future. For Example - In hindi "Kal"corresonds to both tomorrow and yesterday. So                   this flag will determines actual referenced date. 
     
-    >>> from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
-    >>> detector = DateAdvanceDetector(entity_name=entity_name,
-                                       language=source_language, 
-                                       timezone=timezone,
-                                       past_date_referenced=past_date_referenced)  
-    >>> output = detector.detect(message=message, entity_name=entity_name,
-                                 structured_value=structured_value,
-                                 fallback_value=fallback_value)
-    >>> print(output)
+    from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
+    detector = DateAdvanceDetector(entity_name=entity_name, language=source_language,
+                                   timezone=timezone,
+                                   past_date_referenced=past_date_referenced)  
+    output = detector.detect(message=message, entity_name=entity_name,
+                             structured_value=structured_value,
+                             fallback_value=fallback_value)
+    print(output)
     
     ```
 
@@ -341,23 +347,23 @@ The Date detector module has the capability to detect various form of dates from
   - *Django Shell:*
 
     ```python
-    >>> message = "मुझे कल सुबह ५ बजे उठा देना"
-    >>> entity_name = 'date'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> timezone='UTC'
-    >>> source_language='hi'
-    >>> past_date_referenced=False 
-    >>> from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
-    >>> detector = DateAdvanceDetector(entity_name=entity_name,
-                                       language=source_language, 
-                                       timezone=timezone,
-                                       past_date_referenced=past_date_referenced)  
-    >>> output = detector.detect(message=message, entity_name=entity_name,
-                                 structured_value=structured_value,
-                                 fallback_value=fallback_value)
-    >>> print(output)
+    message = u"मुझे कल सुबह ५ बजे उठा देना"
+    entity_name = 'date'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
+    timezone='UTC'
+    source_language='hi'
+    past_date_referenced=False 
+    
+    from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
+    detector = DateAdvanceDetector(entity_name=entity_name,language=source_language,
+                                   timezone=timezone, 
+                                   past_date_referenced=past_date_referenced)  
+    output = detector.detect(message=message, entity_name=entity_name,
+                             structured_value=structured_value,
+                             fallback_value=fallback_value)
+    print(output)
     
     ```
 
@@ -395,23 +401,23 @@ The Date detector module has the capability to detect various form of dates from
   - *Django Shell:*
 
     ```python
-    >>> message = "आने वाले सोमवार को मेरा मैथ्स का एग्जाम है"
-    >>> entity_name = 'date'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> timezone='UTC'
-    >>> source_language='hi'
-    >>> past_date_referenced=False 
-    >>> from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
-    >>> detector = DateAdvanceDetector(entity_name=entity_name,
-                                       language=source_language, 
-                                       timezone=timezone,
-                                       past_date_referenced=past_date_referenced)  
-    >>> output = detector.detect(message=message, entity_name=entity_name,
-                                 structured_value=structured_value,
-                                 fallback_value=fallback_value)
-    >>> print(output)
+    message = u"आने वाले सोमवार को मेरा मैथ्स का एग्जाम है"
+    entity_name = 'date'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
+    timezone='UTC'
+    source_language='hi'
+    past_date_referenced=False 
+    
+    from ner_v2.detectors.temporal.date.date_detection import DateAdvanceDetector
+    detector = DateAdvanceDetector(entity_name=entity_name,language=source_language,
+                                   timezone=timezone,
+                                   past_date_referenced=past_date_referenced)  
+    output = detector.detect(message=message, entity_name=entity_name,
+                             structured_value=structured_value,
+                             fallback_value=fallback_value)
+    print(output)
     
     ```
 
@@ -444,9 +450,9 @@ The Date detector module has the capability to detect various form of dates from
 
 ### 3. Number
 
-> entity_type: number
-
 The Number detector module has the capability to detect number or number word from text in multiple languages. The detector supports an additional feature of detecting units along with number if given in text. For example -  for a given text `5 kg`, this module will return `5`  as detected value and `kg` as detected unit.  It also has the capability to detect only certain type of numbers like currency or temperature type numbers by specifying the unit type. 
+
+You can find the current supported unit_types in english [here](https://github.com/hellohaptik/chatbot_ner/blob/develop/ner_v2/detectors/numeral/number/en/data/units.csv)
 
 Currently number detection support has been provided for 6 different languages - `English`,  `Hindi`, `Marathi`,  `Bengali`,  `Gujrati`, `Tamil`. It also supports latin script of given languages.
 
@@ -462,26 +468,23 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    >>> message="i want to purchase 30 units of mobile abd 40 units of telivision"
-    >>> entity_name='number'
-    >>> structured_value=None
-    >>> fallback_value=None
-    >>> bot_message=None
-    >>> min_number_digits=1  # minimum number of digit 
-    >>> max_number_digits=6  # maximum number of digit
-    >>> source_language='en' # here language will be ISO 639-1 code
-    >>> unit_type=None       # this restrict the number detector to detect particular 
-                 # number type only.
+    message=u"i want to purchase 30 units of mobile abd 40 units of telivision"
+    entity_name='number'
+    structured_value=None
+    fallback_value=None
+    bot_message=None
+    min_number_digits=1  # minimum number of digit 
+    max_number_digits=6  # maximum number of digit
+    source_language='en' # here language will be ISO 639-1 code
+    unit_type=None       # this restrict the number detector to detect particular number type only.
     
-    >>> from ner_v2.detector.number.number.number_detection import NumberDetector
-    >>> detector = NumberDetector(entity_name=entity_name, language=source_language, 
-                                 unit_type=None)  
-    >>> detector.set_min_max_digits(min_digit=min_number_digits,
-                                    max_digit=max_number_digits) 
-    >>> output = detector.detect(message=message,structured_value=structured_value,
-                                fallback_value=fallback_value,
-                                bot_message=bot_message)
-    >> print(output)
+    from ner_v2.detector.number.number.number_detection import NumberDetector
+    detector = NumberDetector(entity_name=entity_name, language=source_language,
+                              unit_type=None)  
+    detector.set_min_max_digits(min_digit=min_number_digits, max_digit=max_number_digits) 
+    output = detector.detect(message=message,structured_value=structured_value,
+                             fallback_value=fallback_value, bot_message=bot_message)
+    print(output)
     ```
 
   - *CURL command:*
@@ -518,25 +521,23 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    >>> message="मुझे ३० किलो आटा और दो हजार का चीनी देना "
-    >>> entity_name='number'
-    >>> structured_value=None
-    >>> fallback_value=None
-    >>> bot_message=None
-    >>> min_number_digits=1  # minimum number of digit 
-    >>> max_number_digits=6  # maximum number of digit
-    >>> source_language='hi' # here language will be ISO 639-1 code
-    >>> unit_type="weight"  # this restrict the number detector to detect only weight type number entity 
+    message=u"मुझे ३० किलो आटा और दो हजार का चीनी देना "
+    entity_name='number'
+    structured_value=None
+    fallback_value=None
+    bot_message=None
+    min_number_digits=1  # minimum number of digit 
+    max_number_digits=6  # maximum number of digit
+    source_language='hi' # here language will be ISO 639-1 code
+    unit_type="weight"  # this restrict the number detector to detect only weight type number entity 
     
-    >>> from ner_v2.detector.number.number.number_detection import NumberDetector
-    >>> detector = NumberDetector(entity_name=entity_name, language=source_language, 
-                                 unit_type=None)  
-    >>> detector.set_min_max_digits(min_digit=min_number_digits,
-                                    max_digit=max_number_digits) 
-    >>> output = detector.detect(message=message,structured_value=structured_value,
-                                fallback_value=fallback_value,
-                                bot_message=bot_message)
-    >> print(output)
+    from ner_v2.detector.number.number.number_detection import NumberDetector
+    detector = NumberDetector(entity_name=entity_name, language=source_language, 
+                              unit_type=None)  
+    detector.set_min_max_digits(min_digit=min_number_digits, max_digit=max_number_digits) 
+    output = detector.detect(message=message,structured_value=structured_value,
+                             fallback_value=fallback_value, bot_message=bot_message)
+    print(output)
     
     ```
 
@@ -556,7 +557,7 @@ Currently number detection support has been provided for 6 different languages -
     {"data": [
         {
           "detection": "message",
-          "original_text": "३० किलो"
+          "original_text": "३० किलो",
           "entity_value": { "value": "३०", "unit": "kg"},
           "language": "hi"
         }]
@@ -570,26 +571,25 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    >>> message="mujhe 30 kilo aata aur 2 hajaar ka chini dena aur teen sau ka chawal"
-    >>> entity_name='number'
-    >>> structured_value=None
-    >>> fallback_value=None
-    >>> bot_message=None
-    >>> min_number_digits=1  # minimum number of digit 
-    >>> max_number_digits=6  # maximum number of digit
-    >>> source_language='hi' # here language will be ISO 639-1 code
-    >>> unit_type=None       # this restrict the number detector to detect particular 
-                 # number type only.
+    message=u"mujhe 30 kilo aata aur 2 hajaar ka chini dena aur teen sau ka chawal"
+    entity_name='number'
+    structured_value=None
+    fallback_value=None
+    bot_message=None
+    min_number_digits=1  # minimum number of digit 
+    max_number_digits=6  # maximum number of digit
+    source_language='hi' # here language will be ISO 639-1 code
+    unit_type=None       # this restrict the number detector to detect particular number type only.
     
-    >>> from ner_v2.detector.number.number.number_detection import NumberDetector
-    >>> detector = NumberDetector(entity_name=entity_name, language=source_language, 
-                                 unit_type=None)  
-    >>> detector.set_min_max_digits(min_digit=min_number_digits,
-                                    max_digit=max_number_digits) 
-    >>> output = detector.detect(message=message,structured_value=structured_value,
-                                fallback_value=fallback_value,
-                                bot_message=bot_message)
-    >> print(output)
+    from ner_v2.detector.number.number.number_detection import NumberDetector
+    detector = NumberDetector(entity_name=entity_name, language=source_language, 
+                              unit_type=None)  
+    detector.set_min_max_digits(min_digit=min_number_digits,
+                                max_digit=max_number_digits) 
+    output = detector.detect(message=message,structured_value=structured_value,
+                             fallback_value=fallback_value,
+                             bot_message=bot_message)
+    print(output)
     
     ```
 
@@ -637,26 +637,23 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    >>> message="i want more than Rupees 20k and 10 pendrive"
-    >>> entity_name='number'
-    >>> structured_value=None
-    >>> fallback_value=None
-    >>> bot_message=None
-    >>> min_number_digits=1
-    >>> max_number_digits=6
-    >>> source_language='en' # here language will be ISO 639-1 code
-    >>> unit_type='currency'       # this restrict the number detector to detect particular 
-                 # number type only.
+    message=u"i want more than Rupees 20k and 10 pendrive"
+    entity_name='number'
+    structured_value=None
+    fallback_value=None
+    bot_message=None
+    min_number_digits=1
+    max_number_digits=6
+    source_language='en' # here language will be ISO 639-1 code
+    unit_type='currency' # this restrict the number detector to detect particular number type only.
     
-    >>> from ner_v2.detector.number.number.number_detection import NumberDetector
-    >>> detector = NumberDetector(entity_name=entity_name, language=source_language, 
-                                 unit_type=None)  
-    >>> detector.set_min_max_digits(min_digit=min_number_digits,
-                                    max_digit=max_number_digits) 
-    >>> output = detector.detect(message=message,structured_value=structured_value,
-                                fallback_value=fallback_value,
-                                bot_message=bot_message)
-    >> print(output)
+    from ner_v2.detector.number.number.number_detection import NumberDetector
+    detector = NumberDetector(entity_name=entity_name, language=source_language, 
+                              unit_type=None)  
+    detector.set_min_max_digits(min_digit=min_number_digits, max_digit=max_number_digits) 
+    output = detector.detect(message=message,structured_value=structured_value,
+                             fallback_value=fallback_value, bot_message=bot_message)
+    print(output)
     
     ```
 
@@ -690,8 +687,6 @@ Currently number detection support has been provided for 6 different languages -
 
   ### 4. Phone number
 
-  > entity_type: phone_number
-
   The Phone Number Detector has the capability to detect phone numbers from within the given text. The detector has the ability to handle multilanguage text. Additionally, this detector is scaled to handle domestic as well as international phone numbers.  
 
   *This module has been updated to v2 version of chatbot_ner and is language agnostic.*
@@ -703,21 +698,20 @@ Currently number detection support has been provided for 6 different languages -
     - *Django Shell:* 
 
       ```python
-      >>> message = u'send a message on 91 9820334455'
-      >>> entity_name = 'phone_number'
-      >>> structured_value = None
-      >>> fallback_value = None
-      >>> bot_message = None
-      >>> source_langauge='en'       # here language will be ISO 639-1 code
+      message = u'send a message on 91 9820334455'
+      entity_name = 'phone_number'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+      source_langauge='en'       # here language will be ISO 639-1 code
       
-      >>> from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
-      >>> detector = PhoneDetector(language=source_langauge,
-                                   entity_name=entity_name) 
-      >>> output = detector.detect(message=message, entity_name=entity_name,
-                                   structured_value=structured_value,
-                                   fallback_value=fallback_value,
-                                   bot_message=bot_message,language=source_language)
-      >>> print(output)
+      from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
+      detector = PhoneDetector(language=source_langauge, entity_name=entity_name) 
+      output = detector.detect(message=message, entity_name=entity_name,
+                               structured_value=structured_value,
+                               fallback_value=fallback_value,
+                               bot_message=bot_message,language=source_language)
+      print(output)
       
       ```
 
@@ -727,7 +721,7 @@ Currently number detection support has been provided for 6 different languages -
       URL='localhost'
       PORT=8081
       
-      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=my%20contact%20number%20is%209049961794&entity_name=phone_number&structured_value=&fallback_value=None&bot_message=&source_language=en'
+      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=my%20contact%20number%20is%209049961794&entity_name=phone_number&structured_value=&fallback_value=&bot_message=&source_language=en'
       
       ```
 
@@ -739,7 +733,7 @@ Currently number detection support has been provided for 6 different languages -
               "detection": "message",
               "original_text": "9049961794",
               "entity_value": { "value": "9049961794"},
-            "language": "en"
+              "language": "en"
           }]
       }
       
@@ -750,21 +744,20 @@ Currently number detection support has been provided for 6 different languages -
     - *Django Shell:* 
 
       ```python
-      >>> message = u'मेरा मोबाइल नंबर है ९८९१९८९८७१'
-      >>> entity_name = 'phone_number'
-      >>> structured_value = None
-      >>> fallback_value = None
-      >>> bot_message = None
-      >>> source_langauge='hi'       # here language will be ISO 639-1 code
+      message = u'मेरा मोबाइल नंबर है ९८९१९८९८७१'
+      entity_name = 'phone_number'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
+       source_langauge='hi'       # here language will be ISO 639-1 code
       
-      >>> from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
-      >>> detector = PhoneDetector(language=source_langauge,
-                                   entity_name=entity_name) 
-      >>> output = detector.detect(message=message, entity_name=entity_name,
-                                   structured_value=structured_value,
-                                   fallback_value=fallback_value,
-                                   bot_message=bot_message,language=source_language)
-      >>> print(output)
+      from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
+      detector = PhoneDetector(language=source_langauge, entity_name=entity_name) 
+      output = detector.detect(message=message, entity_name=entity_name,
+                               structured_value=structured_value, 
+                               fallback_value=fallback_value,
+                               bot_message=bot_message,language=source_language)
+      print(output)
       
       ```
 
@@ -774,7 +767,7 @@ Currently number detection support has been provided for 6 different languages -
       URL='localhost'
       PORT=8081
       
-      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=मेरा मोबाइल नंबर है ९८९१९८९८७१entity_name=phone_number&structured_value=&fallback_value=None&bot_message=&source_language=en'
+      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=मेरा%20मोबाइल%20नंबर%20है%20९८९१९८९८७१entity_name=phone_number&structured_value=&fallback_value=&bot_message=&source_language=en'
       
       ```
 
@@ -784,7 +777,7 @@ Currently number detection support has been provided for 6 different languages -
       {"data": [
           {
               "detection": "message",
-              "original_text": "९८९१९८९८७१'",
+              "original_text": "९८९१९८९८७१",
               "entity_value": { "value": "981117971"},
               "language": "hi"
           }]
@@ -797,21 +790,20 @@ Currently number detection support has been provided for 6 different languages -
     - *Django Shell:* 
 
       ```python
-      >>> message = 'Please call me'
-      >>> entity_name = 'phone_number'
-      >>> structured_value = None
-      >>> fallback_value = '9049961794'
-      >>> bot_message = None
-      >>> source_langauge='en'
+      message = u'Please call me'
+      entity_name = 'phone_number'
+      structured_value = None
+      fallback_value = '9049961794'
+      bot_message = None
+      source_langauge='en'
       
-      >>> from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
-      >>> detector = PhoneDetector(language=source_langauge,
-                                   entity_name=entity_name) 
-      >>> output = detector.detect(message=message, entity_name=entity_name,
-                                   structured_value=structured_value,
-                                   fallback_value=fallback_value,
-                                   bot_message=bot_message,language=source_language)
-      >>> print(output)
+      from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
+      detector = PhoneDetector(language=source_langauge, entity_name=entity_name) 
+      output = detector.detect(message=message, entity_name=entity_name,
+                               structured_value=structured_value,
+                               fallback_value=fallback_value,
+                               bot_message=bot_message,language=source_language)
+      print(output)
       
       ```
 
@@ -843,8 +835,6 @@ Currently number detection support has been provided for 6 different languages -
 
   ### 5. Email
 
-  > entity_type: email
-
   The Email Detector has the capability to detect emails within the given text. 
 
   **API Example:**
@@ -854,17 +844,17 @@ Currently number detection support has been provided for 6 different languages -
     - *Django Shell:*
 
       ```python
-      >>> message = 'my email id is amans.rlx@gmail.com'
-      >>> entity_name = 'email'
-      >>> structured_value = None
-      >>> fallback_value = None
-      >>> bot_message = None
+      message = u'my email id is amans.rlx@gmail.com'
+      entity_name = 'email'
+      structured_value = None
+      fallback_value = None
+      bot_message = None
       
-      >>> from ner_v1.chatbot.entity_detection import get_email
-      >>> output = get_email(message=message,entity_name=entity_name,
-                             structured_value=structured_value,
-                             fallback_value=fallback_value, bot_message=bot_message)
-      >>> print(output)
+      from ner_v1.chatbot.entity_detection import get_email
+      output = get_email(message=message,entity_name=entity_name,
+                         structured_value=structured_value,
+                         fallback_value=fallback_value, bot_message=bot_message)
+      print(output)
       
       ```
 
@@ -896,18 +886,17 @@ Currently number detection support has been provided for 6 different languages -
     - *Django Shell:*
 
       ```python
-      >>> message = 'send this me to my email'
-      >>> entity_name = 'email'
-      >>> structured_value = None
-      >>> fallback_value = 'amans.rlx@gmail.com'
-      >>> bot_message = None
+      message = u'send this me to my email'
+      entity_name = 'email'
+      structured_value = None
+      fallback_value = 'amans.rlx@gmail.com'
+      bot_message = None
       
-      >>> from ner_v1.chatbot.entity_detection import get_email
-      >>> output = get_email(message=message,entity_name=entity_name,
-                             structured_value=structured_value,
-                             fallback_value=fallback_value, bot_message=bot_message)
-      >>> print(output)
-      
+      from ner_v1.chatbot.entity_detection import get_email
+      output = get_email(message=message,entity_name=entity_name,
+                         structured_value=structured_value,
+                         fallback_value=fallback_value, bot_message=bot_message)
+      print(output)
       ```
 
     - *CURL command:*
@@ -926,20 +915,17 @@ Currently number detection support has been provided for 6 different languages -
       {"data": [
           {
               "detection": "fallback_value",
-              "original_text": "amans.rlx@gmail.com",
-              "entity_value": {"value": "amans.rlx@gmail.com"}
+              "original_text": "abc.123@gmail.com",
+              "entity_value": {"value": "abc.123@gmail.com"}
           }]
       }
-      
       ```
 
   
 
 ### 6. Text
 
-> entity_type: text
-
-The Text Detector has the capability to detect custom text entity within the given text.  The detector has the ability to handle multilanguage text. 
+The Text Detector has the capability to detect custom text entity within the given text. This detector is language agnostic
 
 > To create new text type entities, follow the steps from [here](https://github.com/hellohaptik/chatbot_ner/blob/develop/docs/adding_entities.md).
 
@@ -950,19 +936,19 @@ The Text Detector has the capability to detect custom text entity within the giv
   - *Django Shell:* 
 
     ```python
-    >>> message='i want to order chinese from mainland china and pizza from dominos'
-    >>> entity_name='restaurant' # here detection NER will search for values in dictionary 'restaurant'  
-    >>> structured_value=None
-    >>> fallback_value=None
-    >>> bot_message=None
-    >>> source_language='en'
+    message=u'i want to order chinese from mainland china and pizza from dominos'
+    entity_name='restaurant' # here detection NER will search for values in dictionary 'restaurant'  
+    structured_value=None
+    fallback_value=None
+    bot_message=None
+    source_language='en'
     
-    >>> from ner_v1.chatbot.entity_detection import get_text
-    >>> output = get_text(message=message, entity_name=entity_name,
-                          structured_value=structured_value,
-                          fallback_value=fallback_value,
-                          bot_message=bot_message,language=source_language)
-    >>> print(output)
+    from ner_v1.chatbot.entity_detection import get_text
+    output = get_text(message=message, entity_name=entity_name,
+                      structured_value=structured_value,
+                      fallback_value=fallback_value,
+                      bot_message=bot_message,language=source_language)
+    print(output)
     
     ```
 
@@ -974,7 +960,7 @@ The Text Detector has the capability to detect custom text entity within the giv
     URL='localhost'
     PORT=8081
     
-    curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20want%20to%20order%20chinese%20from%20%20mainland%20china%20and%20pizza%20from%20domminos&entity_name=restaurant&structured_value=&fallback_value=None&bot_message=&source_language=en'
+    curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20want%20to%20order%20chinese%20from%20%20mainland%20china%20and%20pizza%20from%20domminos&entity_name=restaurant&structured_value=&fallback_value=&bot_message=&source_language=en'
     
     ```
 
@@ -1005,19 +991,19 @@ The Text Detector has the capability to detect custom text entity within the giv
   - *Django Shell:* 
 
     ```python
-    >>> message = 'मेरे लिए कैब बुक कर दीजिये'
-    >>> entity_name = 'city'
-    >>> structured_value = 'मुंबई'
-    >>> fallback_value = None
-    >>> bot_message = None
-    >>> source_langauge='hi'
+    message = u'मेरे लिए कैब बुक कर दीजिये'
+    entity_name = 'city'
+    structured_value = 'मुंबई'
+    fallback_value = None
+    bot_message = None
+    source_langauge='hi'
     
-    >>> from ner_v1.chatbot.entity_detection import get_text
-    >>> output = get_text(message=message, entity_name=entity_name,
-                        structured_value=structured_value,
-                        fallback_value=fallback_value,
-                        bot_message=bot_message,langauge=source_language)
-    >>> print(output)
+    from ner_v1.chatbot.entity_detection import get_text
+    output = get_text(message=message, entity_name=entity_name,
+                      structured_value=structured_value,
+                      fallback_value=fallback_value,
+                      bot_message=bot_message,langauge=source_language)
+    print(output)
     
     ```
 
@@ -1027,7 +1013,7 @@ The Text Detector has the capability to detect custom text entity within the giv
     URL='localhost'
     PORT=8081
     
-    curl -i 'http://'$URL':'$PORT'/v1/text/?message=मेरे लिए कैब बुक कर दीजिये&entity_name=movie&structured_value=मुंबई&fallback_value=None&bot_message=&source_language=en'
+    curl -i 'http://'$URL':'$PORT'/v1/text/?message=मेरे लिए कैब बुक कर दीजिये&entity_name=movie&structured_value=मुंबई&fallback_value=&bot_message=&source_language=en'
     
     ```
 
@@ -1049,8 +1035,6 @@ The Text Detector has the capability to detect custom text entity within the giv
 
 ### 7. PNR Number
 
-> *entity_type: pnr*
-
 The PNR Detector has the capability to detect Train/ Flight PNR number within the given text. 
 
 **API Examples**:
@@ -1060,17 +1044,17 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
   - *Django Shell*
 
     ```python
-    >>  message = 'check my pnr status for 2141215305'
-    >>> entity_name = 'train_pnr'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = None
+    message = 'check my pnr status for 2141215305'
+    entity_name = 'train_pnr'
+    structured_value = None
+    fallback_value = None
+    bot_message = None
     
-    >>> from ner_v1.chatbot.entity_detection import get_pnr
-    >>> output = get_pnr(message=message, entity_name=entity_name,
-                         structured_value=structured_value,
-                         fallback_value=fallback_value, bot_message=bot_message)
-    >>> print(output)
+    from ner_v1.chatbot.entity_detection import get_pnr
+    output = get_pnr(message=message, entity_name=entity_name,
+                     structured_value=structured_value,
+                     fallback_value=fallback_value, bot_message=bot_message)
+    print(output)
     
     ```
 
@@ -1099,9 +1083,7 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
 
 ### 8. Regex
 
-> entity_type: regex
-
-This functionality helps to detect  entities that abide by the specified regex.
+Detect entities that match by the specified pattern. If you are not familiar with regex, please see http://www.rexegg.com/regex-quickstart.html
 
 *IMPORTANT NOTES*
 
@@ -1117,19 +1099,19 @@ This functionality helps to detect  entities that abide by the specified regex.
   - *Django Shell:*
 
     ```python
-    >>> message = 'please apply AMAZON30 coupon code to my cart'
-    >>> entity_name = 'regex_coupon_code'
-    >>> structured_value = None
-    >>> fallback_value = None
-    >>> bot_message = 'Enter the coupon code'
-    >>> regex = '[A-Z]+\d{2,6}'
+    message = 'please apply AMAZON30 coupon code to my cart'
+    entity_name = 'regex_coupon_code'
+    structured_value = None
+    fallback_value = None
+    bot_message = 'Enter the coupon code'
+    regex = '[A-Z]+\d{2,6}'
     
-    >>> from ner_v1.chatbot.entity_detection import get_regex
-    >>> output = get_regex(message=message,entity_name=entity_name,
-                           structured_value=structured_value,
-                           fallback_value=fallback_value,bot_message=bot_message,
-                           pattern=regex)
-    >>> print(output)
+    from ner_v1.chatbot.entity_detection import get_regex
+    output = get_regex(message=message,entity_name=entity_name,
+                       structured_value=structured_value,
+                       fallback_value=fallback_value,bot_message=bot_message,
+                       pattern=regex)
+    print(output)
     ```
 
   - *CURL command:*
