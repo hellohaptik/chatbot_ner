@@ -18,7 +18,7 @@ We are currently providing number detection supports for 6 different languages, 
 - **Python Shell**
 
   ```python
-  from ner_v2.detector.number.number.number_detection import NumberDetector
+  from ner_v2.detectors.numeral.number.number_detection import NumberDetector
   detector = NumberDetector(entity_name='number', language='en', unit_type='currency')  # here language will be ISO 639-1 code
   detector.detect_entity(text= 'I want 4000 rs')
   # Note: if unit type is not given it will only detect 4000, not unit.
@@ -165,8 +165,8 @@ Next we define a custom detector. For our purposes we will add a detector to det
                               self.processed_text.lower())
         for pattern in patterns:
             number_list.append({
-                NUMBER_DETECT_VALUE: pattern[2],
-                NUMBER_DETECT_UNIT: 'people'
+                NUMBER_DETECTION_RETURN_DICT_VALUE: pattern[2],
+                NUMBER_DETECTION_RETURN_DICT_UNIT: 'people'
             })
             original_list.append(pattern[0])
         return number_list, original_list
