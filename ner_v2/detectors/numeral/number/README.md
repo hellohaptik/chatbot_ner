@@ -41,7 +41,7 @@ To check all unit type supported by english number detector please go through [u
   # unit_type=None 
   
   $ URL='localhost'
-    $ PORT=8081
+  $ PORT=8081
   
   $ curl -i 'http://'$URL':'$PORT'/v2/number/message=do%20hajaar%20char%20sau&entity_name=number&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=6&source_language=hi&language_script=hi&unit_type='
   ```
@@ -72,27 +72,23 @@ To check all unit type supported by english number detector please go through [u
 In order to add any new language you have to follow below steps:
 
 1. Create a directory with `ISO 639-1` code of that language inside `ner_v2/detectors/numeral/number/`.  
-
 2. Create a directory named `data` inside language_code folder.
-
 3. Add two files named `numerals_constant.csv`, `units.csv` inside data folder.  
 
-   Below is the folder structure of same after adding all the files for new language `xy`.
+Below is the folder structure of same after adding all the files for new language `xy`.
 
-   ```python
-   |__ner_v2
-         |___detectors
-             |___numeral
-                 |___number
-                     |___xy    # <- New language Added 
-                     |	  |___data
-                     |      |___numerals_constant.csv
-                     |      |___units.csv
-                     |
-                     |__number_detection.py 
-   ```
-
-
+```python
+|__ner_v2
+     |___detectors
+         |___numeral
+             |___number
+                 |___xy    # <- New language Added 
+                 |	  |___data
+                 |      |___numerals_constant.csv
+                 |      |___units.csv
+                 |
+                 |__number_detection.py 
+```
 
 ####  GuideLines to create data files
 
@@ -104,7 +100,7 @@ Below is the brief about how to create data files `numerals_constant.csv`, `unit
    | :----: | :--------------------: | :----: | :---: |
    |   ०    |    शून्य\|zero\|sunya    |   0    | unit  |
    |   १    |       एक\|ek\|ik       |   1    | unit  |
-   |  १.५   | डेढ़\|ढेड़\|देढ़\|dedh\|dhed |  1.5   | unit  |
+   |  १.५   | डेढ़\|ढेड़\|देढ़\|dedh\|dhed |  1.5   | unit  |
    |  १००   |      सौ\|sau\|sao      |  100   | scale |
    | १००००० | लाख\|lakh\|laakh\|lac  | 100000 | scale |
 
@@ -121,7 +117,7 @@ Below is the brief about how to create data files `numerals_constant.csv`, `unit
    | currency  |   rupees   | rupees \| rupay \| paisa \| paise \| inr \| रूपीस \| रुपया \| रूपए\| पैसा\| पैसे\| ₹ |
    | currency  |   dollar   |                  Dollar \| usd \| डॉलर \| $                  |
 
-   Here, the 1st column contains the type of unit (E.g. dollars, euros are "currency", centimetre, metre, kilometre are "distance"), 2nd column contains the value of unit which will be returned by number detector and 3rd column contains all the possible variants of that unit value (delimited by pipe `|`) for the language you are adding. (It is recommended to add Romanised versions of the variants you are adding)
+Here, the 1st column contains the type of unit (E.g. dollars, euros are "currency", centimetre, metre, kilometre are "distance"), 2nd column contains the value of unit which will be returned by number detector and 3rd column contains all the possible variants of that unit value (delimited by pipe `|`) for the language you are adding. (It is recommended to add Romanised versions of the variants you are adding)
 
 #### Guidelines to add new detectors for number apart from builtin ones:
 
@@ -176,7 +172,7 @@ Once having defined a custom detector, we now add it to `self.detector_preferenc
 `detectors.numeral.number.standard_number_detector.BaseNumberDetector` and inject your own detectors in between.
 Below we show an example where we put our custom detector on top to execute it before some builtin detectors.
 
-  ```python
+```python
 def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path,
@@ -187,7 +183,7 @@ def __init__(self, entity_name='number', unit_type=None):
             self._detect_number_from_digit,
             self._detect_number_from_numerals
         ]
-  ```
+```
 
 Also to run the custom detector only for few set of entities, you can do it by putting a `if` condition to check if given entity_name belong to list, and modify the detector preference only for them. Below is the example where custom detector will run just for `person_count` and `traveller_number` entity. For other entities it will follow the default pattern defined in BaseNumberDetector.
 
