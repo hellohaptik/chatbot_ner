@@ -135,10 +135,8 @@ class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
     def __init__(self, entity_name='number', unit_type=None):
-    super(NumberDetector, self).__init__(entity_name=entity_name,
-                                        
-                                    data_directory_path=NumberDetector.data_directory_path,
-                                         unit_type=unit_type)
+    	super(NumberDetector, self).__init__(entity_name=entity_name,
+                                             data_directory_path=NumberDetector.data_directory_path,unit_type=unit_type)
 ```
 
 Note that the class name must be `NumberDetector` 
@@ -155,7 +153,7 @@ Next we define a custom detector. For our purposes we will add a detector to det
 5. Finally your detector must return a tuple of (number_list, original_list). Ensure that `number_list` and `original_list` are of equal lengths before returning them.
 
 ```python
-def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
+	def _custom_detect_number_of_people_format(self, number_list=None, original_list=None):
         number_list = number_list or []
         original_list = original_list or []
         patterns = re.findall(r'\s((fo?r)*\s*([0-9]+)\s*(ppl|people|passengers?|travellers?|persons?|pax|adults?))\s',
@@ -166,7 +164,7 @@ def _custom_detect_number_of_people_format(self, number_list=None, original_list
                 NUMBER_DETECT_UNIT: 'people'
             })
             original_list.append(pattern[0])
-    return number_list, original_list
+    	return number_list, original_list
 ```
 Once having defined a custom detector, we now add it to `self.detector_preferences` attribute. You can simply append your custom detectors at the end of this list or you can copy the default ordering from 
 `detectors.numeral.number.standard_number_detector.BaseNumberDetector` and inject your own detectors in between.
@@ -175,8 +173,7 @@ Below we show an example where we put our custom detector on top to execute it b
 ```python
 def __init__(self, entity_name='number', unit_type=None):
         super(NumberDetector, self).__init__(entity_name=entity_name,
-                                             data_directory_path=NumberDetector.data_directory_path,
-                                            unit_type=unit_type)
+                                             data_directory_path=NumberDetector.data_directory_path, unit_type=unit_type)
 
         self.detector_preferences = [
             self._custom_detect_number_of_people_format,
