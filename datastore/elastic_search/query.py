@@ -386,7 +386,7 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
             'bool': {
                 'must': must_terms,
                 'should': [],
-                'minimum_number_should_match': 1
+                'minimum_should_match': 1
             }
         }
     }
