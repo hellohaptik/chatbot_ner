@@ -9,6 +9,7 @@ from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME
 def nth_weekday(weekday, n, ref_date):
     """
     Method to return python datetime object for given nth weekday w.r.t ref_date (reference date)
+
     Args:
         weekday (int): int count of weekday like 0 for monday, 1 for tuesday
         n (int): nth weekday
@@ -26,6 +27,7 @@ def nth_weekday(weekday, n, ref_date):
 def next_weekday(current_date, weekday, n):
     """
     Method to return python datetime object to find next weekday from current date
+
     Args:
         current_date (datetime): python datetime object
         weekday (int): int count of weekday like 0 for monday, 1 for tuesday
@@ -44,9 +46,11 @@ def next_weekday(current_date, weekday, n):
 def get_hour_min_diff(time1, time2):
     """
     Method to return difference between two times in hours and minutes.
+
     Args:
         time1 (datetime): datetime object
         time2 (datetime): datetime object
+
     Returns:
         hh (int): hour difference between two times
         mm (int): minute difference between two times
@@ -66,6 +70,7 @@ def get_hour_min_diff(time1, time2):
 def get_tuple_dict(csv_file):
     """
     Method to convert language constant csv into tuple dict
+
     Args:
         csv_file (str): csv file path
 
@@ -87,10 +92,12 @@ def get_tuple_dict(csv_file):
 def get_weekdays_for_month(weeknumber, month, year):
     """
     Return list of day for given weeknumber of given month and year
+
     Args:
         weeknumber (int): week number
         month (int): month
         year (int): year
+
     Returns:
         (list): list of days
     """
@@ -103,12 +110,27 @@ def get_weekdays_for_month(weeknumber, month, year):
 
 
 def is_valid_date(dd, mm, yy, tz=None):
-    # type: (int, int, int, pytz.tzfile.*) -> bool
+    # type: (int, int, int, 'pytz.tzfile.*') -> bool
+    """
+    Given dd, mm, yy check if it is a valid date in a year
+
+    Args:
+        dd (int): upto 2 digit integer
+        mm (int): upto 2 digit integer
+        yy (int): upto 4 digit integer
+        tz (pytz.tzfile.*, optional): A valid pytz timezone. defaults to None
+
+    Returns:
+        bool: if dd/mm/yy is a valid date
+
+    Raises:
+        TypeError: when any of dd, mm, yy is not an int
+    """
     if dd and mm and yy:
         try:
             dt = datetime(year=yy, month=mm, day=dd)
             if tz:
-                dt = tz.localize(dt)
+                tz.localize(dt)
             return True
         except (ValueError, AttributeError):
             pass
@@ -117,6 +139,22 @@ def is_valid_date(dd, mm, yy, tz=None):
 
 def get_previous_month_number(mm, yy):
     # type: (int, int) -> Tuple[int, int]
+    """
+    Given month number and year get previous month number and adjust year if we flow into previous year
+
+    Args:
+        mm (int): upto 2 digit month number, between 1 and 12
+        yy (int): any year
+
+    Returns:
+        tuple: tuple containing
+            int: previous month number after mm
+            int: adjusted year for the previous month number
+
+    Raises:
+        ValueError: when mm is not between 1 and 12
+
+    """
     if 1 <= mm <= 12:
         if mm == 1:
             mm = 12
@@ -131,6 +169,22 @@ def get_previous_month_number(mm, yy):
 
 def get_next_month_number(mm, yy):
     # type: (int, int) -> Tuple[int, int]
+    """
+    Given month number and year get next month number and adjust year if we flow into next year
+
+    Args:
+        mm (int): upto 2 digit month number, between 1 and 12
+        yy (int): any year
+
+    Returns:
+        tuple: tuple containing
+            int: next month number after mm
+            int: adjusted year for the next month number
+
+    Raises:
+        ValueError: when mm is not between 1 and 12
+
+    """
     if 1 <= mm <= 12:
         if mm == 12:
             mm = 1
@@ -145,6 +199,21 @@ def get_next_month_number(mm, yy):
 
 def get_previous_date_with_dd(dd, before_datetime):
     # type: (int, datetime.datetime) -> Tuple[Optional[int], Optional[int], Optional[int]]
+    """
+    Get closest date with day same as `dd` on or before `before_datetime`
+
+    Args:
+        dd (int): 2 digit int, expected between 1 and 31
+        before_datetime (datetime.datetime): python datetime object, the date to look back from
+
+    Returns:
+        tuple: tuple containing
+            int or None: day part of found date, if no such valid date can be found None
+            int or None: month part of found date, if no such valid date can be found None
+            int or None: year part of found date, if no such valid date can be found None
+
+    """
+
     end_dd = before_datetime.day
     mm = before_datetime.month
     yy = before_datetime.year
@@ -163,6 +232,20 @@ def get_previous_date_with_dd(dd, before_datetime):
 
 def get_next_date_with_dd(dd, after_datetime):
     # type: (int, datetime.datetime) -> Tuple[Optional[int], Optional[int], Optional[int]]
+    """
+    Get closest date with day same as `dd` on or after `after_datetime`
+
+    Args:
+        dd (int): 2 digit int, expected between 1 and 31
+        after_datetime (datetime.datetime): python datetime object, the date to look ahead from
+
+    Returns:
+        tuple: tuple containing
+            int or None: day part of found date, if no such valid date can be found None
+            int or None: month part of found date, if no such valid date can be found None
+            int or None: year part of found date, if no such valid date can be found None
+
+    """
     start_dd = after_datetime.day
     mm = after_datetime.month
     yy = after_datetime.year

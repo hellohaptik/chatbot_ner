@@ -211,7 +211,6 @@ class DateAdvancedDetector(BaseDetector):
 
         elif dd_mmm_to_dd_matches:
             for match in dd_mmm_to_dd_matches:
-                print('>>>', match)
                 date_dicts = self._date_dict_from_text(text=match[0])
                 if len(date_dicts) == 2:
                     date_dicts[0][temporal_constant.DATE_START_RANGE_PROPERTY] = True
