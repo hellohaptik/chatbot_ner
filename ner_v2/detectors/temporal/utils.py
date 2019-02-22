@@ -1,6 +1,8 @@
 import calendar
 from datetime import datetime, timedelta
+
 import pandas as pd
+
 from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF, CONSTANT_FILE_KEY
 
 
@@ -98,3 +100,80 @@ def get_weekdays_for_month(weeknumber, month, year):
     elif 0 < weeknumber <= len(calendar_month):
         return [day for day in calendar_month[weeknumber - 1] if day != 0]
     return []
+
+
+def is_valid_date(dd, mm, yy, tz=None):
+    # type: (int, int, int, pytz.tzfile.*) -> bool
+    if dd and mm and yy:
+        try:
+            dt = datetime(year=yy, month=mm, day=dd)
+            if tz:
+                dt = tz.localize(dt)
+            return True
+        except (ValueError, AttributeError):
+            pass
+    return False
+
+
+def get_previous_month_number(mm, yy):
+    # type: (int, int) -> Tuple[int, int]
+    if 1 <= mm <= 12:
+        if mm == 1:
+            mm = 12
+            yy -= 1
+        else:
+            mm -= 1
+    else:
+        raise ValueError('mm should be between 1 and 12 inclusive')
+
+    return mm, yy
+
+
+def get_next_month_number(mm, yy):
+    # type: (int, int) -> Tuple[int, int]
+    if 1 <= mm <= 12:
+        if mm == 12:
+            mm = 1
+            yy += 1
+        else:
+            mm += 1
+    else:
+        raise ValueError('mm should be between 1 and 12 inclusive')
+
+    return mm, yy
+
+
+def get_previous_date_with_dd(dd, before_datetime):
+    # type: (int, datetime.datetime) -> Tuple[Optional[int], Optional[int], Optional[int]]
+    end_dd = before_datetime.day
+    mm = before_datetime.month
+    yy = before_datetime.year
+
+    if dd > end_dd:
+        mm, yy = get_previous_month_number(mm=mm, yy=yy)
+
+    # Try in previous three months, it should be possible to get closest valid date with same dd in last 3 months
+    for _ in range(3):
+        if is_valid_date(dd=dd, mm=mm, yy=yy):
+            return dd, mm, yy
+        mm, yy = get_previous_month_number(mm=mm, yy=yy)
+
+    return None, None, None
+
+
+def get_next_date_with_dd(dd, after_datetime):
+    # type: (int, datetime.datetime) -> Tuple[Optional[int], Optional[int], Optional[int]]
+    start_dd = after_datetime.day
+    mm = after_datetime.month
+    yy = after_datetime.year
+
+    if dd < start_dd:
+        mm, yy = get_next_month_number(mm=mm, yy=yy)
+
+    # Try in next three months, it should be possible to get closest valid date with same dd in next 3 months
+    for _ in range(3):
+        if is_valid_date(dd=dd, mm=mm, yy=yy):
+            return dd, mm, yy
+        mm, yy = get_next_month_number(mm=mm, yy=yy)
+
+    return None, None, None
