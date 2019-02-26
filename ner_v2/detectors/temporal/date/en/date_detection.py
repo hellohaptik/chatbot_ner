@@ -1736,7 +1736,7 @@ class DateDetector(object):
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
                                    r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
                                    r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\s\,]+(?:of\s+)?'
-                                   r'(?:next|nxt|comm?ing?|foll?owing?)?\s+(?:mo?nth))\b')
+                                   r'(?:next|nxt|comm?ing?|foll?owing?)\s+(?:mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1862,6 +1862,7 @@ class DateDetector(object):
         return date_list, original_list
 
     def __get_month_index(self, value):
+        # type: (str) -> Optional[int]
         """
         Gets the index of month by comparing the value with month names and their variants from the data store
 
@@ -1878,6 +1879,7 @@ class DateDetector(object):
         return None
 
     def __get_day_index(self, value):
+        # type: (str) -> Optional[int]
         """
         Gets the index of month by comparing the value with day names and their variants from the data store
 
