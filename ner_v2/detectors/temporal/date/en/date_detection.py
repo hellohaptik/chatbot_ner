@@ -273,13 +273,13 @@ class DateDetector(object):
             date_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
                                    r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)(?:\s|$)')
-        matches = regex_pattern.findall(self.processed_text.lower())
-        for match in matches:
-            original = match[0]
-            dd = int(match[1])
-            mm = int(match[2])
-            yy = int(self.normalize_year(match[3])) if match[3] else self.now_date.year
-            if not match[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) < self.now_date:
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd = int(pattern[1])
+            mm = int(pattern[2])
+            yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
+            if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) < self.now_date:
                 yy += 1
 
             date = {
@@ -327,8 +327,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?'
-                                   r'((?:20|19)?[0-9]{2}))(\s|$)')
+        regex_pattern = re.compile(r'\b((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]'
+                                   r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -381,8 +381,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?(1[0-2]|0?[1-9])\s?[/\-\.]\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?'
+                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -435,8 +435,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]'
-                                   r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
+                                   r'((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -547,8 +547,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?[\/\ \,\-]\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?'
+                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -603,8 +603,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
-                                   r'[\ \,]([A-Za-z]+))\b')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?'
+                                   r'(?:nd|st|rd|th)?[\ \,]([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1108,8 +1108,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "next Sunday" would return [{"dd": 12, "mm": 2, "type": 'day_in_next_week', "yy": 2017}]
-            "next Saturday" would return [{"dd": 18, "mm": 2, "type": 'day_in_next_week', "yy": 2017}]
+            "next Sunday" would return [{'dd': 12, 'mm': 2, 'type': 'day_in_next_week', 'yy': 2017}]
+            "next Saturday" would return [{'dd': 18, 'mm': 2, 'type': 'day_in_next_week', 'yy': 2017}]
             and other days would return dates between these dates
 
         Args:
@@ -1165,8 +1165,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "this Tuesday" would return [{"dd": 7, "mm": 2, "type": 'day_within_one_week', "yy": 2017}]
-            "for Monday" would return [{"dd": 13, "mm": 2, "type": 'day_within_one_week', "yy": 2017}]
+            "this Tuesday" would return [{'dd': 7, 'mm': 2, 'type': 'day_within_one_week', 'yy': 2017}]
+            "for Monday" would return [{'dd': 13, 'mm': 2, 'type': 'day_within_one_week', 'yy': 2017}]
             and other days would return dates between these dates
 
         Args:
@@ -1226,8 +1226,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "2nd" would return [{"dd": 2, "mm": 2, "type": 'possible_day', "yy": 2017}]
-            "29th" would return [{"dd": 29, "mm": 2, "type": 'possible_day', "yy": 2017}]
+            "2nd" would return [{'dd': 2, 'mm': 2, 'type': 'possible_day', 'yy': 2017}]
+            "29th" would return [{'dd': 29, 'mm': 2, 'type': 'possible_day', 'yy': 2017}]
             Please note that 29/2/2017 is not a valid date on calendar but would be returned anyway as a probable date
 
         Args:
