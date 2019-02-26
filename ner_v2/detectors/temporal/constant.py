@@ -54,7 +54,6 @@ TYPE_NEXT_DAY = 'day_in_next_week'
 TYPE_THIS_DAY = 'day_within_one_week'
 TYPE_POSSIBLE_DAY = 'possible_day'
 
-
 # ORIGINAL constants
 # TYPE_NEXT_DAY = 'next_day'
 # TYPE_CURRENT_DAY = 'current_day'
@@ -73,27 +72,27 @@ REPEAT_WEEKENDS = 'repeat_weekends'
 TYPE_REPEAT_DAY = 'repeat_day'
 
 MONTH_DICT = {
-    u'1': [u'jan', u'january'],
-    u'10': [u'october', u'oct'],
-    u'11': [u'november', u'nov'],
-    u'12': [u'december', u'dec'],
-    u'2': [u'february', u'feb'],
-    u'3': [u'mar', u'march'],
-    u'4': [u'apr', u'april'],
-    u'5': [u'may'],
-    u'6': [u'jun', u'june'],
-    u'7': [u'july', u'jul'],
-    u'8': [u'august', u'aug'],
-    u'9': [u'september', u'sept', u'sep']
+    1: [u'jan', u'january'],
+    10: [u'october', u'oct'],
+    11: [u'november', u'nov'],
+    12: [u'december', u'dec'],
+    2: [u'february', u'feb'],
+    3: [u'mar', u'march'],
+    4: [u'apr', u'april'],
+    5: [u'may'],
+    6: [u'jun', u'june'],
+    7: [u'july', u'jul'],
+    8: [u'august', u'aug'],
+    9: [u'september', u'sept', u'sep']
 }
 DAY_DICT = {
-    u'1': [u'sun', u'sunday'],
-    u'2': [u'mon', u'monday'],
-    u'3': [u'tuesday', u'tue'],
-    u'4': [u'wednesday', u'wed'],
-    u'5': [u'thu', u'thursday', u'thurs', u'thur'],
-    u'6': [u'fri', u'friday'],
-    u'7': [u'saturday', u'sat']
+    1: [u'sun', u'sunday'],
+    2: [u'mon', u'monday'],
+    3: [u'tuesday', u'tue'],
+    4: [u'wednesday', u'wed'],
+    5: [u'thu', u'thursday', u'thurs', u'thur'],
+    6: [u'fri', u'friday'],
+    7: [u'saturday', u'sat']
 }
 
 # CONSTANTS USED FOR DATE DETECTION
@@ -127,5 +126,5 @@ ORDINALS_MAP = {
     '9th': 9,
     'tenth': 10,
     '10th': 10,
-    'last': -1   # used to get last week of any month
+    'last': -1  # used to get last week of any month
 }
