@@ -2,7 +2,7 @@ import datetime
 import re
 
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
-from ner_v2.detectors.utils import get_timezone
+from ner_v2.detectors.temporal.utils import get_timezone
 
 
 class TimeDetector(object):

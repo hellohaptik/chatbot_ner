@@ -10,6 +10,7 @@ import dateutil.relativedelta as relativedelta
 import pytz
 
 import ner_v2.detectors.temporal.constant as temporal_constants
+import ner_v2.detectors.temporal.utils
 import ner_v2.detectors.temporal.utils as temporal_utils
 import ner_v2.detectors.utils as detector_utils
 
@@ -35,7 +36,7 @@ class BaseRegexDate(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = "__" + entity_name + "__"
-        self.timezone = detector_utils.get_timezone(pytz.timezone(timezone))
+        self.timezone = ner_v2.detectors.temporal.utils.get_timezone(pytz.timezone(timezone))
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
