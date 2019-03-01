@@ -1,6 +1,5 @@
 # coding=utf-8
 import re
-
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
@@ -9,7 +8,7 @@ from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUE
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-
+import string
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
 # TODO: Make this module python 3 compatible
@@ -173,7 +172,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_english_name(self,text=None):
+    def detect_english_name(self, text=None):
         """
         This method is used to detect English names from the provided text
         Returns:
@@ -232,7 +231,8 @@ class NameDetector(object):
             english_present_regex = re.compile(ur'[a-zA-Z\s]+', re.U)
             if english_present_regex.search(text_before_hindi_regex_operations):
                 remove_everything_except_english = re.compile(ur'[^a-zA-Z\s]+', re.U)
-                text_only_english =  remove_everything_except_english.sub(string=text_before_hindi_regex_operations, repl='')
+                text_only_english =  remove_everything_except_english.sub(
+                    string=text_before_hindi_regex_operations, repl='')
                 entity_value, original_text = self.detect_english_name(text=text_only_english.strip())
 
         return entity_value, original_text
@@ -313,7 +313,7 @@ class NameDetector(object):
             True
         """
 
-        regex_pattern = re.compile(r'[\|\,+\:\?\!\"\(\)\'\.\%\[\]]+')
+        regex_pattern = re.compile(r'[{}]+'.format(re.escape(string.punctuation)))
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
