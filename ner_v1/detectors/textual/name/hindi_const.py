@@ -302,7 +302,7 @@ HINDI_QUESTIONWORDS = [u'क्या', u'कब', u'कहा', u'क्यो�
 # Variants in "name" to check for previous context flag
 NAME_VARIATIONS = ['name', u'नाम']
 
-#Common hindi words occuring in context to a name
+# Common hindi words occuring in context to a name
 COMMON_HINDI_WORDS_OCCURING_WITH_NAME = {u"मुझे",
                                          u"हमें",
                                          u"मुझको",
