@@ -62,7 +62,7 @@ class NameDetector(object):
 
         Returns:
             (
-                [{first_name: "yash", middle_name: None, last_name: "modi"}],
+                [{first_name: "yash", middle_name: None, last_name: "doshi"}],
                 ["yash modi"]
             )
         """
@@ -367,10 +367,8 @@ class NameDetector(object):
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
         """
         text = self.replace_stopwords_hindi(text)
-        word_list = [word for word in text.split(" ") if word not in COMMON_HINDI_WORDS_OCCURING_WITH_NAME]
-        if word_list:
-            text = " ".join(word_list)
-        else:
+        text = " ".join([word for word in text.split(" ") if word not in COMMON_HINDI_WORDS_OCCURING_WITH_NAME])
+        if not text.strip():
             return [], []
         original_text_list = text.strip().split()
         if len(original_text_list) > 4:
