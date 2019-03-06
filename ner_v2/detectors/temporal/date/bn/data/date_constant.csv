@@ -6,6 +6,7 @@ key,numeric_representation,date_type
 তারিখ|Tarikh,NA,month_date_ref
 দিন|Dina|din,NA,date_literal
 মাস|মাসে|Maas|maser|mas,NA,month_literal
+দৈনন্দিন|দৈনিক|প্রাত্যহিক|প্রতিদিনকার|রোজ|রোজকার|প্রতিদিন|নিত্য|প্রত্যহ|অহরহ|রোজ-রোজ|every day|everyday|daily|pratidin|prati din,NA,everyday_literal
 সোমবার|Sombar,0,weekday
 মঙ্গলবার|Mongolbar,1,weekday
 বুধবার|Budhbar,2,weekday

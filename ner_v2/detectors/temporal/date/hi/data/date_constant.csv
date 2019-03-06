@@ -6,6 +6,7 @@ key,numeric_representation,date_type
 तारीख|तारिख|tareekh|tarikh,NA,month_date_ref
 दिन|दिनों|din|dino,NA,date_literal
 महीना|महीने|महीनो|महीनों|months|month|mahina|mahine|mahino|mahina,NA,month_literal
+प्रतिदिन|रोजाना|हर रोज|हर दिन|रोज|every day|everyday|daily|roj|roz|hardin|har din|har roj|harroj|harroz|har roz|pratidin|prati din,NA,everyday_literal
 सोमवार|monday|somvar|somwar,0,weekday
 मंगलवार|tuesday|mangalvar|mangalwar,1,weekday
 बुधवार|wednesday|budhvar|budhwar,2,weekday
