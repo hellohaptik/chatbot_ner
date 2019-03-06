@@ -7,8 +7,8 @@ import pandas as pd
 import regex as re  # We are using regex because it provides accurate word boundaries than built in re module
 
 import ner_v2.detectors.utils as v2_utils
-from ner_v2.detectors.property_assignor.fields import PropertyContextPatterns
-from ner_v2.detectors.property_assignor.utils import clean_text
+from ner_v2.property_assignor.fields import PropertyContextPatterns
+from ner_v2.property_assignor.utils import clean_text
 
 
 class PropertyDataField:

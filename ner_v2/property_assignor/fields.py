@@ -73,8 +73,8 @@ class PropertyContextPatterns(object):
             self._bot_contexts_re = re.compile(bot_contexts_pattern, flags=re.UNICODE | re.WORD | re.V1)
 
     def get_matches(self, prefix=None, suffix=None, bot_message=None):
-        # pylint: disable=line-too-long,C0301
-        # type: (Optional[Text], Optional[Text], Optional[Text]) -> Tuple[Optional[Text], Optional[Text], Optional[Text]]
+        # type: (Optional[Text], Optional[Text], Optional[Text])
+        # -> Tuple[Optional[Text], Optional[Text], Optional[Text]]
         """
         Search given prefix, suffix and bot_message with compiled patterns and return matches if found
 
