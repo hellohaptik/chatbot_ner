@@ -10,9 +10,7 @@ import dateutil.relativedelta as relativedelta
 import pytz
 
 import ner_v2.detectors.temporal.constant as temporal_constants
-import ner_v2.detectors.temporal.utils
 import ner_v2.detectors.temporal.utils as temporal_utils
-import ner_v2.detectors.utils as detector_utils
 
 
 # TODO: Some detectors don't return proper date types
@@ -67,7 +65,7 @@ class BaseRegexDate(object):
             self._detect_weekday
         ]
 
-    def detect_date(self, text):
+    def detect_date(self, text, **kwargs):
         self.text = text
         self.processed_text = text
         self.tagged_text = text
@@ -104,9 +102,9 @@ class BaseRegexDate(object):
         datetime_constants_path = os.path.join(data_directory_path, temporal_constants.DATETIME_CONSTANT_FILE)
         numeral_constans_path = os.path.join(data_directory_path, temporal_constants.NUMERALS_CONSTANT_FILE)
 
-        self._date_constants_dict = temporal_utils.get_tuple_dict(date_constants_path)
-        self._datetime_constants_dict = temporal_utils.get_tuple_dict(datetime_constants_path)
-        self._numerals_constants_dict = temporal_utils.get_tuple_dict(numeral_constans_path)
+        self._date_constants_dict = temporal_utils.read_variants_data(date_constants_path)
+        self._datetime_constants_dict = temporal_utils.read_variants_data(datetime_constants_path)
+        self._numerals_constants_dict = temporal_utils.read_variants_data(numeral_constans_path)
 
         date_part_choices = collections.defaultdict(list)
 
@@ -567,7 +565,7 @@ class BaseRegexDate(object):
             weekday = self._date_constants_dict[day_of_week][0]
             ref_date = self.now_date + relativedelta.relativedelta(
                 months=self._datetime_constants_dict[months_delta][1])
-            req_date = temporal_utils.nth_weekday(n_weekday, weekday, ref_date)
+            req_date = temporal_utils.nth_weekday_of_month(weekday=weekday, n=n_weekday, reference_datetime=ref_date)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
@@ -609,7 +607,7 @@ class BaseRegexDate(object):
             weekday = self._date_constants_dict[day_of_week][0]
             ref_date = self.now_date + relativedelta.relativedelta(
                 months=self._datetime_constants_dict[months_delta][1])
-            req_date = temporal_utils.nth_weekday(weekday, n_weekday, ref_date)
+            req_date = temporal_utils.nth_weekday_of_month(weekday=weekday, n=n_weekday, reference_datetime=ref_date)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
@@ -658,7 +656,7 @@ class BaseRegexDate(object):
             if delta_variant:
                 n = self._datetime_constants_dict[delta_variant][1]
             weekday = self._date_constants_dict[day_of_week][0]
-            req_date = temporal_utils.next_weekday(current_date=self.now_date, n=n, weekday=weekday)
+            req_date = temporal_utils.nth_weekday(weekday=weekday, n=n, from_datetime=self.now_date)
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,

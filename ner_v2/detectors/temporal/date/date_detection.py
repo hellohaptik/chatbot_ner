@@ -738,8 +738,6 @@ class DateDetector(object):
         entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tagged_text: string with date entities replaced with tag defichaloned by entity name
         processed_text: string with detected date entities removed
-        date: list of date entities detected
-        original_date_text: list to store substrings of the text detected as date entities
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         now_date: datetime object holding timestamp while DateDetector instantiation
@@ -760,8 +758,6 @@ class DateDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.date = []
-        self.original_date_text = []
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
         self.timezone = get_timezone(timezone)
@@ -772,14 +768,14 @@ class DateDetector(object):
         try:
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
-            self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
-                                                                            past_date_referenced=past_date_referenced,
-                                                                            timezone=timezone)
+            self._date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
+                                                                    past_date_referenced=past_date_referenced,
+                                                                    timezone=timezone)
         except ImportError:
             standard_date_regex = importlib.import_module(
                 'ner_v2.detectors.temporal.date.standard_date_regex'
             )
-            self.language_date_detector = standard_date_regex.DateDetector(
+            self._date_detector = standard_date_regex.DateDetector(
                 entity_name=self.entity_name,
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
@@ -815,13 +811,14 @@ class DateDetector(object):
         self.text = ' ' + text.strip().lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        if self.language_date_detector:
-            self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text)
+        dates, original_texts = [], []
+        if self._date_detector:
+            dates, original_texts = self._date_detector.detect_date(self.processed_text, **kwargs)
 
         validated_date_list, validated_original_list = [], []
 
         # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
-        for date, original_text in zip(self.date, self.original_date_text):
+        for date, original_text in zip(dates, original_texts):
             try:
                 datetime.date(year=date['yy'], month=date['mm'], day=date['dd'])
                 if "dinfo" in date:
@@ -842,19 +839,19 @@ class DateDetector(object):
         """
         self.bot_message = bot_message
 
-    def to_datetime_object(self, base_date_value_dict):
+    def to_datetime_object(self, date_dict):
         """
         Convert the given date value dict to a timezone localised datetime object
 
         Args:
-            base_date_value_dict (dict): dict containing dd, mm, yy
+            date_dict (dict): dict containing dd, mm, yy
 
         Returns:
             datetime object: datetime object localised with the timezone given on initialisation
         """
-        datetime_object = datetime.datetime(year=base_date_value_dict['yy'],
-                                            month=base_date_value_dict['mm'],
-                                            day=base_date_value_dict['dd'], )
+        datetime_object = datetime.datetime(year=date_dict['yy'],
+                                            month=date_dict['mm'],
+                                            day=date_dict['dd'], )
         return self.timezone.localize(datetime_object)
 
     @staticmethod

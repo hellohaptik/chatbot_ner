@@ -5,6 +5,7 @@ key,numeric_representation,date_type
 તારીખ|તારીખે|તારિખ|tareekh|tarikh|tarikhe|tarikhey|taarikh,NA,month_date_ref
 દિવસ|દિવસે|din|dino|divas|divase|divasey,NA,date_literal
 મહિનો|મહિના|મહિને|months|month|mahina|mahine|mahino|mahina,NA,month_literal
+દરરોજ|રોજનું|દૈનિક|every day|everyday|daily|roj|roz|har roj|harroj|harroz|har roz|roznu|rojnu|dainik,NA,everyday_literal
 સોમવાર|સોમવારે|monday|somvar|somwar|somvare|somware,0,weekday
 મંગળવાર|મંગળવારે|tuesday|mangadvar|mangadwar|mangalwar|mangadvare|mangadware|mangalware,1,weekday
 બુધવાર|બુધવારે|wednesday|budhvar|budhwar|budhware|budhvare,2,weekday

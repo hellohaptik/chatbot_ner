@@ -6,6 +6,7 @@ Ceviliyarkal,3,relative_date
 மீது|வது|Mitu|vatu,NA,month_date_ref
 நாள்|நாட்களுக்கு|Nal|Natkalukku,NA,date_literal
 மதம்|Matam|Madham,NA,month_literal
+தினசரி|அன்றாடம்|நாள்தோறும்|தினமும்|every day|everyday|daily,NA,everyday_literal
 திங்கள்|திங்கட்கிழமை|ThingGal|tingal|tinkatkilamai,0,weekday
 செவ்வாய்|சனிக்கிழமை|செவ்வாயன்று|Sevvaai|Savai|Sevai|canikkilamai|cevvayanru,1,weekday
 புதன்|Budhan|Budan,2,weekday

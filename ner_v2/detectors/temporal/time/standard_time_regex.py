@@ -9,7 +9,7 @@ from ner_v2.detectors.temporal.constant import (DATETIME_CONSTANT_FILE, ADD_DIFF
                                                 TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE,
                                                 MINUTE_TIME_TYPE, DAYTIME_MERIDIEM, AM_MERIDIEM, PM_MERIDIEM,
                                                 TWELVE_HOUR)
-from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff, get_timezone
+from ner_v2.detectors.temporal.utils import read_variants_data, get_hour_min_diff, get_timezone
 
 
 class BaseRegexTime(object):
@@ -98,14 +98,14 @@ class BaseRegexTime(object):
         Returns:
             None
         """
-        self.time_constant_dict = get_tuple_dict(
-            csv_file=os.path.join(data_directory_path.rstrip(os.sep), TIME_CONSTANT_FILE)
+        self.time_constant_dict = read_variants_data(
+            csv_filepath=os.path.join(data_directory_path.rstrip(os.sep), TIME_CONSTANT_FILE)
         )
-        self.datetime_constant_dict = get_tuple_dict(
-            csv_file=os.path.join(data_directory_path.rstrip(os.sep), DATETIME_CONSTANT_FILE)
+        self.datetime_constant_dict = read_variants_data(
+            csv_filepath=os.path.join(data_directory_path.rstrip(os.sep), DATETIME_CONSTANT_FILE)
         )
-        self.numerals_constant_dict = get_tuple_dict(
-            csv_file=os.path.join(data_directory_path.rstrip(os.sep), NUMERALS_CONSTANT_FILE)
+        self.numerals_constant_dict = read_variants_data(
+            csv_filepath=os.path.join(data_directory_path.rstrip(os.sep), NUMERALS_CONSTANT_FILE)
         )
 
         # datetime_add_diff choices for regex
