@@ -29,7 +29,7 @@ def replace_puncts(text, replace_with=u" ", except_puncts=(u"_",)):
     puncts = __punctuations.copy() - set(except_puncts)
     puncts_pattern = u"[{}]+".format(re.escape(u"".join(puncts)))
     puncts_pattern = re.compile(puncts_pattern, flags=re.UNICODE)
-    return re.sub(puncts_pattern, replace_with, text, flags=re.UNICODE)
+    return puncts_pattern.sub(replace_with, text)
 
 
 def clean_text(text, drop_puncts=True, except_puncts=(u"_",)):
