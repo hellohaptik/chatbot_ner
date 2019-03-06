@@ -3,8 +3,8 @@ import datetime
 import re
 
 import ner_v2.detectors.temporal.constant as temporal_constants
-from ner_v2.detectors.temporal.utils import get_weekdays_for_month
-from ner_v2.detectors.utils import get_timezone
+from ner_v2.detectors.temporal.utils import (get_timezone, get_weekdays_for_month, get_next_date_with_dd,
+                                             get_previous_date_with_dd)
 
 
 # TODO: remove date_list=None, original_list=None arguments from all sub detectors methods. Sub detectors need not see
@@ -27,6 +27,13 @@ class DateDetector(object):
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
         now_date: datetime object holding timestamp while DateDetector instantiation
+<<<<<<< HEAD
+=======
+        month_dictionary: dictonary mapping month indexes to month spellings and
+                          fuzzy variants(spell errors, abbreviations)
+        day_dictionary: dictonary mapping day indexes to day of week spellings and
+        fuzzy variants(spell errors, abbreviations)
+>>>>>>> 353571a6f225fe722cb13e9adb8444fd60ba7716
         bot_message: str, set as the outgoing bot text/message
 
         SUPPORTED_FORMAT                                            METHOD_NAME
@@ -264,26 +271,19 @@ class DateDetector(object):
 
         """
         if original_list is None:
-            original_list = original_list or []
+            original_list = []
         if date_list is None:
-            date_list = date_list or []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'(1[0-2]|0?[1-9])'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'((?:20|19)?[0-9]{2})'
-                                   r')(\s|$)')
-        matches = regex_pattern.findall(self.processed_text.lower())
-        for match in matches:
-            original = match[0]
-            dd = match[1]
-            mm = match[2]
-            yy = self.normalize_year(match[3])
+            date_list = []
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)(?:\s|$)')
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd = int(pattern[1])
+            mm = int(pattern[2])
+            yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
+            if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) < self.now_date:
+                yy += 1
 
             date = {
                 "dd": int(dd),
@@ -330,17 +330,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(1[0-2]|0?[1-9])'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'((?:20|19)?[0-9]{2})'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]'
+                                   r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -393,17 +384,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'((?:20|19)[0-9]{2})'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'(1[0-2]|0?[1-9])'
-                                   r'\s?'
-                                   r'[/\-\.]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?'
+                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -456,17 +438,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'[\/\ \-\.\,]'
-                                   r'\s?'
-                                   r'([A-Za-z]+)'
-                                   r'\s?'
-                                   r'[\/\ \-\.\,]'
-                                   r'\s?'
-                                   r'((?:20|19)?[0-9]{2})'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
+                                   r'((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -521,19 +494,8 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'\s?'
-                                   r'(?:of)?'
-                                   r'[\s\,]'
-                                   r'\s?'
-                                   r'([A-Za-z]+)'
-                                   r'[\s\,]'
-                                   r'\s?'
-                                   r'((?:20|19)?[0-9]{2})'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,\-]\s?'
+                                   r'([A-Za-z]+)[\s\,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -588,17 +550,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'((?:20|19)[0-9]{2})'
-                                   r'\s?'
-                                   r'[\/\ \,\-]'
-                                   r'\s?'
-                                   r'([A-Za-z]+)'
-                                   r'\s?'
-                                   r'[\/\ \,\-]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?'
+                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -653,16 +606,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'((?:20|19)[0-9]{2})'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'[\ \,]'
-                                   r'([A-Za-z]+)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?'
+                                   r'(?:nd|st|rd|th)?[\ \,]([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -717,17 +662,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([A-Za-z]+)'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'((?:20|19)?[0-9]{2})'
-                                   r')(\s|$)')
+        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,\-]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
+                                   r'[\ \,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -782,14 +718,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([A-Za-z]+)'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'(?:nd|st|rd|th)?'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -851,16 +780,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s?'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'(?:of)?'
-                                   r'\s?'
-                                   r'([A-Za-z]+)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -948,13 +868,11 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'tomm?orr?o?w|tmr?rw|tomro|2morow|2mrw|2mrr?o?w|kal|next day|'
-                                   r'afte?r\s+1\s+da?y|afte?r\s+one\s+da?y|afte?r\s+a\s+da?y'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(tomm?orr?o?w|tmr?rw|tomro|2morow|2mrw|2mrr?o?w|kal|next day|'
+                                   r'afte?r\s+1\s+da?y|afte?r\s+one\s+da?y|afte?r\s+a\s+da?y)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern
             tomorrow = self.now_date + datetime.timedelta(days=1)
             dd = tomorrow.day
             mm = tomorrow.month
@@ -993,12 +911,10 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'yeste?rday|sterday|yeste?rdy|previous day|prev day|prevday'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(yeste?rday|sterday|yeste?rdy|previous day|prev day|prevday)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
-            original = pattern[0]
+            original = pattern
             yesterday = self.now_date - datetime.timedelta(days=1)
             dd = yesterday.day
             mm = yesterday.month
@@ -1037,11 +953,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(da?y afte?r)'
-                                   r'\s+'
-                                   r'(tomm?orr?o?w|tmr?rw|tomro|2morow|2mrr?o?w|kal)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b((da?y afte?r)\s+(tomm?orr?o?w|tmr?rw|tomro|2morow|2mrr?o?w|kal))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1081,9 +993,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'afte?r\s+(\d+)\s+(da?y|da?ys)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(afte?r\s+(\d+)\s+(da?y|da?ys))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1124,14 +1034,7 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(\d+)'
-                                   r'\s+'
-                                   r'(da?y|da?ys)'
-                                   r'\s?'
-                                   r'(later|ltr|latr|lter)'
-                                   r's?'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b((\d+)\s+(da?y|da?ys)\s?(later|ltr|latr|lter)s?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1175,11 +1078,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(da?y befo?re)'
-                                   r'\s+'
-                                   r'(yesterday|sterday|yesterdy|yestrdy|yestrday)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b((da?y befo?re)\s+(yesterday|sterday|yesterdy|yestrdy|yestrday))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1212,8 +1111,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "next Sunday" would return [{"dd": 12, "mm": 2, "type": 'day_in_next_week', "yy": 2017}]
-            "next Saturday" would return [{"dd": 18, "mm": 2, "type": 'day_in_next_week', "yy": 2017}]
+            "next Sunday" would return [{'dd': 12, 'mm': 2, 'type': 'day_in_next_week', 'yy': 2017}]
+            "next Saturday" would return [{'dd': 18, 'mm': 2, 'type': 'day_in_next_week', 'yy': 2017}]
             and other days would return dates between these dates
 
         Args:
@@ -1229,11 +1128,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(ne?xt)'
-                                   r'\s+'
-                                   r'([A-Za-z]+)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b((ne?xt)\s+([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1241,7 +1136,8 @@ class DateDetector(object):
             day = self.__get_day_index(probable_day)
             current_day = self.__get_day_index(self.now_date.strftime("%A"))
             if day and current_day:
-                date_after_days = int(day) - int(current_day) + 7
+                day, current_day = int(day), int(current_day)
+                date_after_days = day - current_day + 7
                 day_to_set = self.now_date + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
@@ -1272,8 +1168,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "this Tuesday" would return [{"dd": 7, "mm": 2, "type": 'day_within_one_week', "yy": 2017}]
-            "for Monday" would return [{"dd": 13, "mm": 2, "type": 'day_within_one_week', "yy": 2017}]
+            "this Tuesday" would return [{'dd': 7, 'mm': 2, 'type': 'day_within_one_week', 'yy': 2017}]
+            "for Monday" would return [{'dd': 13, 'mm': 2, 'type': 'day_within_one_week', 'yy': 2017}]
             and other days would return dates between these dates
 
         Args:
@@ -1289,11 +1185,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'(this|dis|coming|on|for)*'
-                                   r'[\s\-]*'
-                                   r'([A-Za-z]+)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b((this|dis|coming|on|for)*[\s\-]*([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -1301,10 +1193,11 @@ class DateDetector(object):
             day = self.__get_day_index(probable_day)
             current_day = self.__get_day_index(self.now_date.strftime("%A"))
             if day and current_day:
-                if int(current_day) <= int(day):
-                    date_after_days = int(day) - int(current_day)
+                day, current_day = int(day), int(current_day)
+                if current_day <= day:
+                    date_after_days = day - current_day
                 else:
-                    date_after_days = int(day) - int(current_day) + 7
+                    date_after_days = day - current_day + 7
                 day_to_set = self.now_date + datetime.timedelta(days=date_after_days)
                 dd = day_to_set.day
                 mm = day_to_set.month
@@ -1336,8 +1229,8 @@ class DateDetector(object):
 
         Example:
             If it is 7th February 2017, Tuesday while invoking this function,
-            "2nd" would return [{"dd": 2, "mm": 2, "type": 'possible_day', "yy": 2017}]
-            "29th" would return [{"dd": 29, "mm": 2, "type": 'possible_day', "yy": 2017}]
+            "2nd" would return [{'dd': 2, 'mm': 2, 'type': 'possible_day', 'yy': 2017}]
+            "29th" would return [{'dd': 29, 'mm': 2, 'type': 'possible_day', 'yy': 2017}]
             Please note that 29/2/2017 is not a valid date on calendar but would be returned anyway as a probable date
 
         Args:
@@ -1353,11 +1246,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s*'
-                                   r'(?:nd|st|rd|th)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1415,19 +1304,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s*'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'\s*'
-                                   r'(?:of)?'
-                                   r'\s*'
-                                   r'(?:this|dis)'
-                                   r'\s*'
-                                   r'(?:curr?ent)?'
-                                   r'\s*'
-                                   r'(mo?nth)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th)?\s*(?:of)?\s*(?:this|dis)\s*'
+                                   r'(?:curr?ent)?\s*(mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1481,17 +1359,8 @@ class DateDetector(object):
             date_list = []
         if original_list is None:
             original_list = []
-        regex_pattern = re.compile(r'\b('
-                                   r'([12][0-9]|3[01]|0?[1-9])'
-                                   r'\s*'
-                                   r'(?:nd|st|rd|th)?'
-                                   r'\s*'
-                                   r'(?:of)?'
-                                   r'\s*'
-                                   r'(?:ne?xt|comm?ing?|foll?owing?)'
-                                   r'\s*'
-                                   r'(mo?nth)'
-                                   r')\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th)?\s*(?:of)?\s*'
+                                   r'(?:ne?xt|comm?ing?|foll?owing?)\s*(mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1594,11 +1463,11 @@ class DateDetector(object):
             date_list = []
         now = self.now_date
         end = now + datetime.timedelta(days=n_days)
-        regex_pattern = re.compile(r'\b(([eE]veryday|[dD]aily)|all\sdays[\s]?except[\s]?([wW]eekend|[wW]eekends))\b')
+        regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekends?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
 
         if not patterns:
-            weekday_regex_pattern = re.compile(r'\b((weekdays|weekday|week day|week days| all weekdays))\b')
+            weekday_regex_pattern = re.compile(r'\b((week\s?days?|all\sweekdays))\b')
             patterns = weekday_regex_pattern.findall(self.processed_text.lower())
         constant_type = temporal_constants.WEEKDAYS
         if self._is_everyday_present(self.text):
@@ -1673,11 +1542,10 @@ class DateDetector(object):
             original_list = []
         now = self.now_date
         end = now + datetime.timedelta(days=n_days)
-        regex_pattern = re.compile(r'\b(([eE]veryday|[dD]aily)|[eE]very\s*day|all[\s]?except[\s]?'
-                                   r'([wW]eekday|[wW]eekdays))\b')
+        regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekdays?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         if not patterns:
-            weekend_regex_pattern = re.compile(r'\b((weekends|weekend|week end|week ends | all weekends))\b')
+            weekend_regex_pattern = re.compile(r'\b((week\s?ends?|all\sweekends))\b')
             patterns = weekend_regex_pattern.findall(self.processed_text.lower())
         constant_type = temporal_constants.WEEKENDS
         if self._is_everyday_present(self.text):
@@ -1751,30 +1619,37 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:-|to|-|till)\s?'
-                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,]\s?(?:of)?\s?([A-Za-z]+))\b')
+        # FIXME: This ignores any mentioned year
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s*(?:nd|st|rd|th)?'
+                                   r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\s\,]+(?:of\s+)?([A-Za-z]+))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            dd1 = pattern[1]
-            dd2 = pattern[2]
-            probable_mm = pattern[3]
-            mm = self.__get_month_index(probable_mm)
-            yy = self.now_date.year
-            if mm:
-                if self.now_date.month > int(mm):
-                    yy += 1
+            dd1, mm1, yy1 = int(pattern[1]), None, None
+            dd2, mm2, yy2 = int(pattern[2]), self.__get_month_index(pattern[3]), self.now_date.year
+
+            if mm2:
+                mm2 = int(mm2)
+                dt2 = self.timezone.localize(datetime.datetime(year=yy2, month=mm2, day=dd2))
+                dd1, mm1, yy1 = get_previous_date_with_dd(dd=dd1, before_datetime=dt2)
+                if dd1 and mm1 and yy1:
+                    dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
+                    if dt1 < self.now_date:
+                        yy1 = yy2 = yy2 + 1
+
+            if all(part for part in [dd1, mm1, yy1, dd2, mm2, yy2]):
                 date_dict_1 = {
                     "dd": int(dd1),
-                    "mm": int(mm),
-                    "yy": int(yy),
+                    "mm": int(mm1),
+                    "yy": int(yy1),
                     "type": temporal_constants.TYPE_EXACT
                 }
                 date_dict_2 = {
-                    "dd": int(dd2),
-                    "mm": int(mm),
-                    "yy": int(yy),
-                    "type": temporal_constants.TYPE_EXACT
+                    'dd': int(dd2),
+                    'mm': int(mm2),
+                    'yy': int(yy2),
+                    'type': temporal_constants.TYPE_EXACT
                 }
                 date_list.append(date_dict_1)
                 date_list.append(date_dict_2)
@@ -1811,7 +1686,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         ordinal_choices = "|".join(temporal_constants.ORDINALS_MAP.keys())
-        regex_pattern = re.compile(r'((' + ordinal_choices + r')\s+week\s+(of\s+)?([a-zA-z]+)(?:\s+month)?)\s+')
+        regex_pattern = re.compile(r'((' + ordinal_choices + r')\s+week\s+(of\s+)?([A-Za-z]+)(?:\s+month)?)\s+')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -1869,45 +1744,33 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s+(?:of\s+)?([A-Za-z]+)\s+'
-                                   r'(?:-|to|-|till)\s+([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?([a-zA-Z]+)?)\b')
+        # FIXME: This ignores any mentioned year
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\s\,]+(?:of\s+)?([A-Za-z]+)'
+                                   r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
+                                   r'(?:[\s\,]+(?:of\s+)?([A-Za-z]+))?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            dd1 = int(pattern[1])
-            dd2 = int(pattern[3])
-            probable_mm1 = pattern[2]
-            probable_mm2 = pattern[4]
-            mm1 = self.__get_month_index(probable_mm1)
-            mm2_mention = self.__get_month_index(probable_mm2)
-
-            mm2 = mm2_mention
-            if not mm2:
-                mm2 = mm1
-
-            yy1 = self.now_date.year
-
-            if mm1 and mm2:
+            dd1, mm1, yy1 = int(pattern[1]), self.__get_month_index(pattern[2]), self.now_date.year
+            dd2, mm2, yy2 = int(pattern[3]), self.__get_month_index(pattern[4]), self.now_date.year
+            if mm1:
                 mm1 = int(mm1)
-                mm2 = int(mm2)
-
-                if not mm2_mention and dd2 < dd1:
-                    mm2 += 1
-                    if mm2 > 12:
-                        mm2 = 1
-
                 dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
-
                 if dt1 < self.now_date:
-                    yy1 += 1
+                    yy2 = yy1 = yy1 + 1
+                    dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
 
-                yy2 = yy1
-                dt1 = self.timezone.localize(datetime.datetime(year=yy1, month=mm1, day=dd1))
-                dt2 = self.timezone.localize(datetime.datetime(year=yy2, month=mm2, day=dd2))
+                if mm2:
+                    # find the correct yy2 such that dd2/mm2/yy2 >= dd1/mm1/yy1
+                    mm2 = int(mm2)
+                    dt2 = self.timezone.localize(datetime.datetime(year=yy2, month=mm2, day=dd2))
+                    yy2 = yy2 + 1 if dt2 < dt1 else yy2
+                else:
+                    # find the closest dd2 after dt1
+                    dd2, mm2, yy2 = get_next_date_with_dd(dd=dd2, after_datetime=dt1)
 
-                if dt2 < dt1:
-                    yy2 += 1
-
+            if all(part for part in [dd1, mm1, yy1, dd2, mm2, yy2]):
                 date_dict_1 = {
                     "dd": int(dd1),
                     "mm": int(mm1),
@@ -1956,9 +1819,10 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s+(?:-|to|-|till)\s+'
-                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\ \,\s]+(?:of\s+)?'
-                                   r'(?:next|nxt|comm?ing?|foll?owing?|)\s+(?:mo?nth))\b')
+        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
+                                   r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
+                                   r'([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?[\s\,]+(?:of\s+)?'
+                                   r'(?:next|nxt|comm?ing?|foll?owing?)\s+(?:mo?nth))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -2083,6 +1947,7 @@ class DateDetector(object):
         return date_list, original_list
 
     def __get_month_index(self, value):
+        # type: (str) -> Optional[int]
         """
         Gets the index of month by comparing the value with month names and their variants from the data store
 
@@ -2101,6 +1966,7 @@ class DateDetector(object):
         return None
 
     def __get_day_index(self, value):
+        # type: (str) -> Optional[int]
         """
         Gets the index of month by comparing the value with day names and their variants from the data store
 

@@ -15,7 +15,8 @@ from ner_constants import (FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VER
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST,
                                                 TYPE_NEXT_DAY, TYPE_REPEAT_DAY)
-from ner_v2.detectors.utils import get_lang_data_path, get_timezone
+from ner_v2.detectors.temporal.utils import get_timezone
+from ner_v2.detectors.utils import get_lang_data_path
 
 
 class DateAdvancedDetector(BaseDetector):
@@ -177,63 +178,67 @@ class DateAdvancedDetector(BaseDetector):
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])'
                                    r'\s?'
                                    r'(?:nd|st|rd|th)?'
-                                   r'\s?'
-                                   r'(?:to|\-|till)'
-                                   r'\s?'
+                                   r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
                                    r'([12][0-9]|3[01]|0?[1-9])'
                                    r'\s?'
                                    r'(?:nd|st|rd|th)?'
-                                   r'[\ \,]'
-                                   r'\s?'
-                                   r'(?:of)?'
-                                   r'\s?'
+                                   r'[\s\,]+'
+                                   r'(?:of\s+)?'
                                    r'([A-Za-z]+))\b', flags=re.UNICODE)
 
         regex_pattern_2 = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])'
                                      r'\s?'
                                      r'(?:nd|st|rd|th)?'
-                                     r'\s+'
+                                     r'[\s\,]+'
+                                     r'(?:of\s+)?'
                                      r'([A-Za-z]+)'
-                                     r'\s+'
-                                     r'(?:to|\-|till)'
-                                     r'\s+'
+                                     r'(?:(?:\s*\-\s*)|\s+(?:to|till|se)\s+)'
                                      r'([12][0-9]|3[01]|0?[1-9])'
                                      r'\s?'
                                      r'(?:nd|st|rd|th)?'
-                                     r'\s?'
-                                     r'([a-zA-Z]+)?)\b', flags=re.UNICODE)
+                                     r'(?:[\s\,]+(?:of\s+)?([A-Za-z]+))?)\b', flags=re.UNICODE)
 
-        patterns = regex_pattern.findall(self.processed_text.lower())
-        patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
-        if patterns:
-            for pattern in patterns:
-                date_dicts = self._date_dict_from_text(text=pattern[0])
+        dd_to_dd_mmm_matches = regex_pattern.findall(self.processed_text)
+        dd_mmm_to_dd_matches = regex_pattern_2.findall(self.processed_text)
+        if dd_to_dd_mmm_matches:
+            for match in dd_to_dd_mmm_matches:
+                date_dicts = self._date_dict_from_text(text=match[0])
                 if len(date_dicts) == 2:
                     date_dicts[0][temporal_constant.DATE_START_RANGE_PROPERTY] = True
                     date_dicts[1][temporal_constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
 
-        elif patterns_2:
-            for pattern in patterns_2:
-                date_dicts = self._date_dict_from_text(text=pattern[0])
+        elif dd_mmm_to_dd_matches:
+            for match in dd_mmm_to_dd_matches:
+                date_dicts = self._date_dict_from_text(text=match[0])
                 if len(date_dicts) == 2:
                     date_dicts[0][temporal_constant.DATE_START_RANGE_PROPERTY] = True
                     date_dicts[1][temporal_constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
         else:
-            parts = re.split(r'\s+(?:\-|to|se)\s+', self.processed_text.lower())
-            if len(parts) > 1:
-                for start_part, end_part in zip(parts[:-1], parts[1:]):
-                    start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
-                    end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
-                    if start_date_list and end_date_list:
-                        start_date_list, end_date_list = self._generate_range(start_date_dict=start_date_list[0],
-                                                                              end_date_dict=end_date_list[-1])
-                        date_dict_list.extend(start_date_list)
-                        date_dict_list.extend(end_date_list)
+            parts = iter(re.split(r'\s+(?:\-|to|till|se)\s+', self.processed_text))
+            _day_of_week_types = [temporal_constant.TYPE_THIS_DAY, temporal_constant.TYPE_NEXT_DAY]
+            for start_part, end_part in zip(parts, parts):  # Consumes 2 items at a time from parts
+                start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
+                end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
+                if start_date_list and end_date_list:
+                    possible_start_date = start_date_list[0]
+                    possible_end_date = end_date_list[-1]
+                    start_date_type = possible_start_date[temporal_constant.DATE_VALUE]['type']
+                    end_date_type = possible_end_date[temporal_constant.DATE_VALUE]['type']
+                    if start_date_type in _day_of_week_types and end_date_type in _day_of_week_types:
+                        start_date_list, end_date_list = self._fix_day_range(start_date_dict=possible_start_date,
+                                                                             end_date_dict=possible_end_date)
+                    else:
+                        # FIXME: Assumes end_date > start_date. Also can return dates in past when date detector
+                        # returns dates in the past
+                        start_date_list = [possible_start_date]
+                        end_date_list = [possible_end_date]
+                    date_dict_list.extend(start_date_list)
+                    date_dict_list.extend(end_date_list)
         return date_dict_list
 
-    def _generate_range(self, start_date_dict, end_date_dict):
+    def _fix_day_range(self, start_date_dict, end_date_dict):
         """
         If today is between the detected range, generate two day ranges - range for current week and the same range
         for next week, other wise both start date and end date dicts are returned as only elements of start date list
@@ -296,14 +301,15 @@ class DateAdvancedDetector(BaseDetector):
             For departure date the key "From" will be set to True.
         """
         date_dict_list = []
-        regex_pattern = re.compile(r'\b((onward date\:|onward date -|departure date|leaving on|starting from|'
-                                   r'departing on|departing|going on|for|departs on)\s+(.+))\b', flags=re.UNICODE)
-        patterns = regex_pattern.findall(self.processed_text.lower())
+        regex_pattern = re.compile(r'\b'
+                                   r'(?:check(?:\s|\-)?in date (?:is|\:)?|'
+                                   r'onward date\s?(?:\:|\-)?|departure date|leaving on|starting from|'
+                                   r'departing on|departing|going on|departs on|for)'
+                                   r'\s+(.+?)(?:\band|&|(?<!\d)\.|$)', flags=re.UNICODE)
+        matches = regex_pattern.findall(self.processed_text)
 
-        for pattern in patterns:
-            date_dict_list.extend(
-                self._date_dict_from_text(text=pattern[2], from_property=True)
-            )
+        for match in matches:
+            date_dict_list.extend(self._date_dict_from_text(text=match, from_property=True))
         return date_dict_list
 
     def _detect_return_date(self):
@@ -320,21 +326,24 @@ class DateAdvancedDetector(BaseDetector):
         """
 
         date_dict_list = []
-        regex_pattern_1 = re.compile(r'\s?((coming back|back|return date\:?|return date -|returning on|'
-                                     r'arriving|arrive|return|returning at)\s+(.+))\.?\s?', flags=re.UNICODE)
-        regex_pattern_2 = re.compile(r'(.+)\s+(ko|k|)\s*(aana|ana|aunga|aaun)', flags=re.UNICODE)
-        patterns_1 = regex_pattern_1.findall(self.processed_text.lower())
-        patterns_2 = regex_pattern_2.findall(self.processed_text.lower())
-        if patterns_1:
-            for pattern in patterns_1:
-                date_dict_list.extend(
-                    self._date_dict_from_text(text=pattern[2], to_property=True)
-                )
-        elif patterns_2:
-            for pattern in patterns_2:
-                date_dict_list.extend(
-                    self._date_dict_from_text(text=pattern[0], to_property=True)
-                )
+        regex_pattern_1 = re.compile(r'\b'
+                                     r'(?:check(?:\s|\-)?out date (?:is|\:)?|'
+                                     r'coming back|return date\s?(?:\:|\-)?|returning on|returning at|'
+                                     r'arriving|arrive|return|back)'
+                                     r'\s+(.+?)(?:\band|&|(?<!\d)\.|$)', flags=re.UNICODE)
+        regex_pattern_2 = re.compile(r'(.+?)\s+(?:ko?\s+)?(?:aana|ana|aunga|aaun)', flags=re.UNICODE)
+        matches = None
+        matches_1 = regex_pattern_1.findall(self.processed_text)
+        matches_2 = regex_pattern_2.findall(self.processed_text)
+
+        if matches_1:
+            matches = matches_1
+        elif matches_2:
+            matches = matches_2
+
+        matches = matches or []
+        for match in matches:
+            date_dict_list.extend(self._date_dict_from_text(text=match, to_property=True))
         return date_dict_list
 
     def _detect_any_date(self):
@@ -355,7 +364,6 @@ class DateAdvancedDetector(BaseDetector):
             Whereas for arrival date the key "to" will be set to True.
             Otherwise the normal date with the key 'normal' will be set to True
         """
-        date_dict_list = []
         departure_date_flag = False
         return_date_flag = False
         if self.bot_message:
@@ -376,22 +384,18 @@ class DateAdvancedDetector(BaseDetector):
             elif arrival_regexp.search(self.bot_message) is not None:
                 return_date_flag = True
 
-        patterns = re.compile(r'\s((.+))\.?', flags=re.UNICODE).findall(self.processed_text.lower())
-
-        for pattern in patterns:
-            pattern = list(pattern)
-            date_dict_list = self._date_dict_from_text(text=pattern[1])
-            if date_dict_list:
-                if len(date_dict_list) > 1:
-                    for i in range(len(date_dict_list)):
-                        date_dict_list[i][temporal_constant.DATE_NORMAL_PROPERTY] = True
+        date_dict_list = self._date_dict_from_text(text=self.processed_text)
+        if date_dict_list:
+            if len(date_dict_list) > 1:
+                for i in range(len(date_dict_list)):
+                    date_dict_list[i][temporal_constant.DATE_NORMAL_PROPERTY] = True
+            else:
+                if departure_date_flag:
+                    date_dict_list[0][temporal_constant.DATE_FROM_PROPERTY] = True
+                elif return_date_flag:
+                    date_dict_list[0][temporal_constant.DATE_TO_PROPERTY] = True
                 else:
-                    if departure_date_flag:
-                        date_dict_list[0][temporal_constant.DATE_FROM_PROPERTY] = True
-                    elif return_date_flag:
-                        date_dict_list[0][temporal_constant.DATE_TO_PROPERTY] = True
-                    else:
-                        date_dict_list[0][temporal_constant.DATE_NORMAL_PROPERTY] = True
+                    date_dict_list[0][temporal_constant.DATE_NORMAL_PROPERTY] = True
         return date_dict_list
 
     def _update_processed_text(self, date_dict_list):
