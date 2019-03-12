@@ -17,7 +17,7 @@ import ner_v2.detectors.temporal.utils as temporal_utils
 # NOTE: This detector ignores year mentions
 
 class BaseRegexDate(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, data_directory_path, timezone="UTC", past_date_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -34,7 +34,7 @@ class BaseRegexDate(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = "__" + entity_name + "__"
-        self.timezone = ner_v2.detectors.temporal.utils.get_timezone(pytz.timezone(timezone))
+        self.timezone = temporal_utils.get_timezone(pytz.timezone(timezone))
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
@@ -64,6 +64,9 @@ class BaseRegexDate(object):
             self._detect_weekday_ref_month_2,
             self._detect_weekday
         ]
+
+    def set_bot_message(self, bot_message):
+        self.bot_message = bot_message
 
     def detect_date(self, text, **kwargs):
         self.text = text
@@ -608,6 +611,7 @@ class BaseRegexDate(object):
             ref_date = self.now_date + relativedelta.relativedelta(
                 months=self._datetime_constants_dict[months_delta][1])
             req_date = temporal_utils.nth_weekday_of_month(weekday=weekday, n=n_weekday, reference_datetime=ref_date)
+
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,

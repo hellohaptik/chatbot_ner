@@ -725,7 +725,7 @@ class DateAdvancedDetector(BaseDetector):
                                             detection_method=method, detection_language=self._processing_language)
 
 
-class DateDetector(object):
+class DateDetector(BaseDetector):
     """
     Detects date in various formats from given text and tags them.
 
@@ -738,14 +738,26 @@ class DateDetector(object):
         entity_name: string by which the detected date entities would be replaced with on calling detect_entity()
         tagged_text: string with date entities replaced with tag defichaloned by entity name
         processed_text: string with detected date entities removed
-        tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
-        now_date: datetime object holding timestamp while DateDetector instantiation
-        bot_message: str, set as the outgoing bot text/message
         language: source language of text
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    @staticmethod
+    def get_supported_languages():
+        """
+        Return list of supported languages
+        Returns:
+            (list): supported languages
+        """
+        supported_languages = []
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        cwd_dirs = [x for x in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, x))]
+        for _dir in cwd_dirs:
+            if len(_dir.rstrip(os.sep)) == 2:
+                supported_languages.append(_dir)
+        return supported_languages
+
+    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -755,20 +767,18 @@ class DateDetector(object):
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
         """
+        self._supported_languages = self.get_supported_languages()
+        super(DateDetector, self).__init__(language=language)
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.entity_name = entity_name
-        self.tag = '__' + entity_name + '__'
         self.timezone = get_timezone(timezone)
-        self.now_date = datetime.datetime.now(tz=self.timezone)
-        self.bot_message = None
         self.language = language
 
         try:
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
-            self._date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
+            self._date_detector = date_detector_module.DateDetector(entity_name=entity_name,
                                                                     past_date_referenced=past_date_referenced,
                                                                     timezone=timezone)
         except ImportError:
@@ -776,14 +786,18 @@ class DateDetector(object):
                 'ner_v2.detectors.temporal.date.standard_date_regex'
             )
             self._date_detector = standard_date_regex.DateDetector(
-                entity_name=self.entity_name,
+                entity_name=entity_name,
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
                 timezone=timezone,
                 past_date_referenced=past_date_referenced
             )
 
-    def detect_entity(self, text, **kwargs):
+    @property
+    def supported_languages(self):
+        return self._supported_languages
+
+    def detect_entity(self, text, detect_ranges=True, assign_properties=True, **kwargs):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.
@@ -815,6 +829,9 @@ class DateDetector(object):
         if self._date_detector:
             dates, original_texts = self._date_detector.detect_date(self.processed_text, **kwargs)
 
+        self.processed_text = self._date_detector.processed_text
+        self.tagged_text = self._date_detector.tagged_text
+
         validated_date_list, validated_original_list = [], []
 
         # Note: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
@@ -837,7 +854,7 @@ class DateDetector(object):
         Args:
             bot_message: is the previous message that is sent by the bot
         """
-        self.bot_message = bot_message
+        self._date_detector.set_bot_message(bot_message)
 
     def to_datetime_object(self, date_dict):
         """

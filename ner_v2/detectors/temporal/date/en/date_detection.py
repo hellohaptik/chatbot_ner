@@ -62,8 +62,9 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
-        """Initializes a DateDetector object with given entity_name and pytz timezone object
+    def __init__(self, entity_name, timezone="UTC", past_date_referenced=False):
+        """
+        Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
             entity_name: A string by which the detected date entity substrings would be replaced with on calling
@@ -73,13 +74,13 @@ class DateDetector(object):
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
 
         """
-        self.text = ''
-        self.tagged_text = ''
-        self.processed_text = ''
+        self.text = ""
+        self.tagged_text = ""
+        self.processed_text = ""
         self.date = []
         self.original_date_text = []
         self.entity_name = entity_name
-        self.tag = '__' + entity_name + '__'
+        self.tag = "__" + entity_name + "__"
         self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
