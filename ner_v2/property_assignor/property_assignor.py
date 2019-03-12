@@ -46,7 +46,9 @@ class PropertyAssignor(object):
             - Replace all detected spans in text with an entity placeholder
             - Drop punctuations, Reduce whitespace from text and bot_message
             - If `detected_spans` has only one item, matches are allowed throughout the text instead
-                of being immediately around the detected entity
+                of being immediately around the detected entity. If there are more than one `detected_spans`
+                then any prefix must strictly end just before the entity mention and any suffix must strictly start
+                just after the entity mention
             - prop_from_bot = get the first property for which one of the bot contexts is present in bot message
             - For each replaced entity placeholder
                 prefix = part of text before this entity placeholder
@@ -65,6 +67,11 @@ class PropertyAssignor(object):
 
                 If no property was assigned and prop_from_bot is not null:
                     Assign prop_from_bot
+
+        Known Limitations:
+            - if any punctuations are expected in prefix or suffix like say for date range, 25th-26th, the "-" is
+              prefix to "26th", will not work because we drop punctuations. However, with small
+              modifications it is possible to get this working
 
         Args:
             text (str): the text from which entities were detetced
