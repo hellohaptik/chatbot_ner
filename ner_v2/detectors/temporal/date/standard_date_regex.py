@@ -73,10 +73,11 @@ class BaseRegexDate(object):
         self.processed_text = text
         self.tagged_text = text
 
-        date_list, original_list = None, None
+        date_list, original_list = [], []
         for detector in self.detector_preferences:
-            # FIXME: this just overwrites the results from successive detectors, is this correct ?
-            date_list, original_list = detector(date_list=None, original_list=None)
+            dates, texts = detector(date_list=None, original_list=None)
+            date_list.extend(dates)
+            original_list.extend(texts)
             self._update_processed_text(original_list)
         return date_list, original_list
 

@@ -1,9 +1,14 @@
+# TODO: Separate date and time constants into their namespaces/modules
+
 DATE_CONSTANT_FILE = 'date_constant.csv'
 TIME_CONSTANT_FILE = 'time_constant.csv'
 DATETIME_CONSTANT_FILE = 'datetime_diff_constant.csv'
 NUMERALS_CONSTANT_FILE = 'numbers_constant.csv'
-RANGE_REPEAT_PROPERTIES_FILE = 'range_repeat_properties.csv'
+
+DATE_RANGE_REPEAT_PROPERTIES_FILE = 'range_repeat_properties.csv'
 DATE_PROPERTIES_FILE = 'properties.csv'
+DATE_RANGE_PROPERTIES = ['start', 'end']
+DATE_REPEAT_PROPERTIES = ['every']
 
 CONSTANT_FILE_KEY = 'key'
 

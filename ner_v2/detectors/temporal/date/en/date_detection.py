@@ -149,18 +149,7 @@ class DateDetector(object):
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
         date_list, original_list = self.get_possible_date(date_list, original_list)
-        validated_date_list, validated_original_list = [], []
-
-        # TODO: Following leaves tagged text incorrect but avoids returning invalid dates like 30th Feb
-        for date, original_text in zip(date_list, original_list):
-            try:
-                datetime.date(year=date["yy"], month=date["mm"], day=date["dd"])
-                validated_date_list.append(date)
-                validated_original_list.append(original_text)
-            except ValueError:
-                pass
-
-        return validated_date_list, validated_original_list
+        return date_list, original_list
 
     def get_exact_date(self, date_list=None, original_list=None):
         """
