@@ -3,6 +3,7 @@ args:
     dd: 15
     mm: 2
     yy: 2019
+    timezone: "UTC"
 tests:
   en:
     - message: "17/12/19"
@@ -22,16 +23,16 @@ tests:
           mm: 12
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from 20th Dec"
+          original_text: "20th Dec"
         - dd: 30
           mm: 1
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "to 30th Jan"
+          original_text: "30th Jan"
     - message: "from this Monday to next Tuesday"
       bot_message: null
       outputs:
@@ -39,16 +40,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from this Monday"
+          original_text: "this monday"
         - dd: 19
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "to next Tuesday"
+          original_text: "next tuesday"
     - message: "wake me up today and tomorrow at 8 am"
       bot_message: null
       outputs:
@@ -92,7 +93,7 @@ tests:
           property: null
           range: null
           repeat: null
-          original_text: "23rd September, 2022"
+          original_text: "23rd september, 2022"
     - message: "Wake me up on 23 September 2022"
       bot_message: null
       outputs:
@@ -102,7 +103,7 @@ tests:
           property: null
           range: null
           repeat: null
-          original_text: "23 September 2022"
+          original_text: "23 september 2022"
     - message: "Wake me up on 23 Sept 2022"
       bot_message: null
       outputs:
@@ -112,7 +113,7 @@ tests:
           property: null
           range: null
           repeat: null
-          original_text: "23 Sept 2022"
+          original_text: "23 sept 2022"
     - message: "Wake me up on 23rd September"
       bot_message: null
       outputs:
@@ -122,7 +123,7 @@ tests:
           property: null
           range: null
           repeat: null
-          original_text: "23rd September"
+          original_text: "23rd september"
     - message: "Wake me up everyday at 8 am"
       bot_message: null
       outputs:
@@ -132,7 +133,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 1
+            interval: 1
           original_text: "everyday"
     - message: "Wake me up every monday at 8 am"
       bot_message: null
@@ -143,7 +144,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every monday"
     - message: "Wake me up every weekend at 8 am"
       bot_message: null
@@ -154,7 +155,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekend"
         - dd: 17
           mm: 2
@@ -162,7 +163,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekend"
     - message: "Wake me up every weekday at 8 am"
       bot_message: null
@@ -173,7 +174,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekday"
         - dd: 18
           mm: 2
@@ -181,7 +182,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekday"
         - dd: 19
           mm: 2
@@ -189,7 +190,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekday"
         - dd: 20
           mm: 2
@@ -197,7 +198,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekday"
         - dd: 21
           mm: 2
@@ -205,7 +206,7 @@ tests:
           property: null
           range: null
           repeat:
-            - interval: 7
+            interval: 7
           original_text: "every weekday"
     - message: "Wake me up on weekend at 8 am"
       bot_message: null
@@ -269,16 +270,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "this Monday onwards"
+          original_text: "monday"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "till Thursday"
+          original_text: "thursday"
     - message: "remind me from Monday till Thursday"
       bot_message: null
       outputs:
@@ -286,16 +287,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from Monday"
+          original_text: "monday"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "till Thursday"
+          original_text: "thursday"
     - message: "remind me starting Monday"
       bot_message: null
       outputs:
@@ -303,9 +304,9 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "starting Monday"
+          original_text: "monday"
     - message: "remind me till Thursday"
       bot_message: null
       outputs:
@@ -313,9 +314,9 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "till Thursday"
+          original_text: "thursday"
     - message: "remind me from 18th feb to 21st feb"
       bot_message: null
       outputs:
@@ -323,16 +324,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from 18th feb"
+          original_text: "18th feb"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "to 21st feb"
+          original_text: "21st feb"
     - message: "remind me from 18th to 21st feb"
       bot_message: null
       outputs:
@@ -340,16 +341,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from 18th"
+          original_text: "18th"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "to 21st feb"
+          original_text: "21st feb"
     - message: "remind me from 18th to 21st feb 2020"
       bot_message: null
       outputs:
@@ -357,16 +358,50 @@ tests:
           mm: 2
           yy: 2020
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "from 18th"
+          original_text: "18th"
         - dd: 21
           mm: 2
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "to 21st feb 2020"
+          original_text: "21st feb 2020"
+    - message: "2nd jan to 5th"
+      bot_message: null
+      outputs:
+        - dd: 2
+          mm: 1
+          yy: 2020
+          property: null
+          range: "start"
+          repeat: null
+          original_text: "2nd jan"
+        - dd: 5
+          mm: 1
+          yy: 2020
+          property: null
+          range: "end"
+          repeat: null
+          original_text: "5th"
+    - message: "first week of jan"
+      bot_message: null
+      outputs:
+        - dd: 1
+          mm: 1
+          yy: 2020
+          property: null
+          range: "start"
+          repeat: null
+          original_text: "first week of jan"
+        - dd: 5
+          mm: 1
+          yy: 2020
+          property: null
+          range: "end"
+          repeat: null
+          original_text: "first week of jan"
   hi:
     - message: "१७/१२/१९"
       bot_message: null
@@ -385,16 +420,16 @@ tests:
           mm: 12
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "२० दिसंबर से लेकर"
+          original_text: "२० दिसंबर"
         - dd: 30
           mm: 1
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "३० जनवरी तक"
+          original_text: "३० जनवरी"
     - message: "इस सोमवार से लेकर अगले मंगलवार तक"
       bot_message: null
       outputs:
@@ -402,16 +437,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "इस सोमवार से लेकर"
+          original_text: "इस सोमवार"
         - dd: 19
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "अगले मंगलवार तक"
+          original_text: "अगले मंगलवार"
     - message: "मुझे आज सुबह और कल सुबह ८ बजे उठा देना"
       bot_message: null
       outputs:
@@ -497,7 +532,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर सोमवार"
+          original_text: "सोमवार"
     - message: "मुझे हर वीकेंड को सुबह ८ बजे उठा दिया करो"
       bot_message: null
       outputs:
@@ -508,7 +543,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकेंड"
+          original_text: "वीकेंड"
         - dd: 17
           mm: 2
           yy: 2019
@@ -516,7 +551,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकेंड"
+          original_text: "वीकेंड"
     - message: "मुझे हर वीकडे को सुबह ८ बजे उठा दिया करो"
       bot_message: null
       outputs:
@@ -527,7 +562,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 18
           mm: 2
           yy: 2019
@@ -535,7 +570,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 19
           mm: 2
           yy: 2019
@@ -543,7 +578,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 20
           mm: 2
           yy: 2019
@@ -551,7 +586,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 21
           mm: 2
           yy: 2019
@@ -559,7 +594,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
     - message: "मुझे वीकेंड पे सुबह ८ बजे उठा देना"
       bot_message: null
       outputs:
@@ -622,16 +657,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "इस सोमवार से लेकर"
+          original_text: "इस सोमवार"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "बुद्धवार तक"
+          original_text: "बुद्धवार"
     - message: "मुझे सोमवार से लेकर बुद्धवार तक याद देना"
       bot_message: null
       outputs:
@@ -639,16 +674,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "सोमवार से लेकर"
+          original_text: "सोमवार"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "बुद्धवार तक"
+          original_text: "बुद्धवार"
     - message: "सोमवार से याद दिला देना"
       bot_message: null
       outputs:
@@ -656,9 +691,9 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "सोमवार से"
+          original_text: "सोमवार"
     - message: "बुद्धवार तक याद दिलाना"
       bot_message: null
       outputs:
@@ -666,9 +701,9 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "बुद्धवार तक"
+          original_text: "बुद्धवार"
     - message: "१८ फरवरी से २१ फरवरी तक याद दिलाना"
       bot_message: null
       outputs:
@@ -676,16 +711,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "१८ फरवरी से"
+          original_text: "१८ फरवरी"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "२१ फरवरी तक"
+          original_text: "२१ फरवरी"
     - message: "१८ से २१ फरवरी तक याद दिलाना"
       bot_message: null
       outputs:
@@ -693,16 +728,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "१८ से"
+          original_text: "१८"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "२१ फरवरी तक"
+          original_text: "२१ फरवरी"
     - message: "१८ फरवरी से २१ फरवरी २०२० तक  याद दिलाना"
       bot_message: null
       outputs:
@@ -710,14 +745,14 @@ tests:
           mm: 2
           yy: 2020
           property: null
-          range: start
+          range: "start"
           repeat: null
           original_text: "१८ फरवरी"
         - dd: 21
           mm: 2
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
           original_text: "२१ फरवरी २०२०"
     - message: "17/12/19"
@@ -737,16 +772,16 @@ tests:
           mm: 12
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "20 दिसंबर से लेकर"
+          original_text: "20 दिसंबर"
         - dd: 30
           mm: 1
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "30 जनवरी तक"
+          original_text: "30 जनवरी"
     - message: "मुझे आज सुबह और कल सुबह 8 बजे उठा देना"
       bot_message: null
       outputs:
@@ -815,7 +850,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर सोमवार"
+          original_text: "सोमवार"
     - message: "मुझे हर वीकेंड को सुबह 8 बजे उठा दिया करो"
       bot_message: null
       outputs:
@@ -826,7 +861,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकेंड"
+          original_text: "वीकेंड"
         - dd: 17
           mm: 2
           yy: 2019
@@ -834,7 +869,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकेंड"
+          original_text: "वीकेंड"
     - message: "मुझे हर वीकडे को सुबह 8 बजे उठा दिया करो"
       bot_message: null
       outputs:
@@ -845,7 +880,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 18
           mm: 2
           yy: 2019
@@ -853,7 +888,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 19
           mm: 2
           yy: 2019
@@ -861,7 +896,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 20
           mm: 2
           yy: 2019
@@ -869,7 +904,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
         - dd: 21
           mm: 2
           yy: 2019
@@ -877,7 +912,7 @@ tests:
           range: null
           repeat:
             interval: 7
-          original_text: "हर वीकडे"
+          original_text: "वीकडे"
     - message: "मुझे वीकेंड पे सुबह 8 बजे उठा देना"
       bot_message: null
       outputs:
@@ -940,16 +975,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "18 फरवरी से"
+          original_text: "18 फरवरी"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "21 फरवरी तक"
+          original_text: "21 फरवरी"
     - message: "18 से 21 फरवरी तक याद दिलाना"
       bot_message: null
       outputs:
@@ -957,16 +992,16 @@ tests:
           mm: 2
           yy: 2019
           property: null
-          range: start
+          range: "start"
           repeat: null
-          original_text: "18 से"
+          original_text: "18"
         - dd: 21
           mm: 2
           yy: 2019
           property: null
-          range: end
+          range: "end"
           repeat: null
-          original_text: "21 फरवरी तक"
+          original_text: "21 फरवरी"
     - message: "18 फरवरी से 21 फरवरी 2020 तक  याद दिलाना"
       bot_message: null
       outputs:
@@ -974,13 +1009,13 @@ tests:
           mm: 2
           yy: 2020
           property: null
-          range: start
+          range: "start"
           repeat: null
           original_text: "18 फरवरी"
         - dd: 21
           mm: 2
           yy: 2020
           property: null
-          range: end
+          range: "end"
           repeat: null
           original_text: "21 फरवरी 2020"

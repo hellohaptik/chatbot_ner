@@ -176,6 +176,10 @@ class DateDetector(BaseDetector):
         for date, original_text in zip(dates, original_texts):
             try:
                 datetime.date(year=date["value"]["yy"], month=date["value"]["mm"], day=date["value"]["dd"])
+
+                if "dinfo" in date["value"]:
+                    date["value"].pop("dinfo")
+
                 validated_date_list.append(date)
                 validated_original_list.append(original_text)
             except ValueError:
@@ -191,6 +195,9 @@ class DateDetector(BaseDetector):
             bot_message: is the previous message that is sent by the bot
         """
         self._date_detector.set_bot_message(bot_message)
+
+    def set_now_datetime(self, now_datetime):
+        self._date_detector.set_now_datetime(now_datetime)
 
     def to_datetime_object(self, date_dict):
         """
@@ -266,10 +273,6 @@ class DateDetector(BaseDetector):
         entity_list = []
         for i, date_dict in enumerate(entity_value_list):
             entity_value = date_dict["value"]
-
-            if "dinfo" in entity_value:
-                entity_value.pop("dinfo")
-
             range_ = date_dict.get("range", None)
             repeat = date_dict.get("repeat", None)
             property_ = date_dict.get("property", None)

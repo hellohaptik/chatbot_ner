@@ -34,7 +34,7 @@ class BaseRegexDate(object):
         self.original_date_text = []
         self.entity_name = entity_name
         self.tag = "__" + entity_name + "__"
-        self.timezone = temporal_utils.get_timezone(pytz.timezone(timezone))
+        self.timezone = temporal_utils.get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
@@ -64,9 +64,6 @@ class BaseRegexDate(object):
             self._detect_weekday_ref_month_2,
             self._detect_weekday
         ]
-
-    def set_bot_message(self, bot_message):
-        self.bot_message = bot_message
 
     def detect_date(self, text, **kwargs):
         self.text = text
@@ -235,7 +232,7 @@ class BaseRegexDate(object):
                               temporal_constants.TYPE_TODAY,
                               temporal_constants.TYPE_TOMORROW,
                               temporal_constants.TYPE_DAY_AFTER]
-            if 0 <= delta + 2 < len(delta):
+            if 0 <= delta + 2 < len(relative_types):
                 return relative_types[delta + 2]
 
             return temporal_constants.TYPE_EXACT
@@ -246,16 +243,17 @@ class BaseRegexDate(object):
         relative_date_matches = self._patterns["regex_relative_date"].findall(self.processed_text)
         for date_match in relative_date_matches:
             original = date_match[0]
+            num_days = int(self._date_constants_dict[date_match[1]][0])
             if not self.is_past_referenced:
-                req_date = self.now_date + datetime.timedelta(days=self._date_constants_dict[date_match[1]][0])
+                req_date = self.now_date + datetime.timedelta(days=num_days)
             else:
-                req_date = self.now_date - datetime.timedelta(days=self._date_constants_dict[date_match[1]][0])
+                req_date = self.now_date - datetime.timedelta(days=num_days)
 
             date = {
                 "dd": req_date.day,
                 "mm": req_date.month,
                 "yy": req_date.year,
-                "type": get_type(self._date_constants_dict[date_match[1]][0]),
+                "type": get_type(num_days),
                 "dinfo": {
                     "dd": "detected",
                     "mm": "detected",
@@ -660,6 +658,7 @@ class BaseRegexDate(object):
             n = 0
             if delta_variant:
                 n = self._datetime_constants_dict[delta_variant][1]
+            n = int(n)
             weekday = self._date_constants_dict[day_of_week][0]
             req_date = temporal_utils.nth_weekday(weekday=weekday, n=n, from_datetime=self.now_date)
             date = {
@@ -691,6 +690,12 @@ class BaseRegexDate(object):
         for detected_text in original_date_list:
             self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
             self.processed_text = self.processed_text.replace(detected_text, '')
+
+    def set_bot_message(self, bot_message):
+        self.bot_message = bot_message
+
+    def set_now_datetime(self, now_datetime):
+        self.now_date = now_datetime
 
 
 class DateDetector(BaseRegexDate):

@@ -1539,3 +1539,6 @@ class DateDetector(object):
             bot_message: is the previous message that is sent by the bot
         """
         self.bot_message = bot_message
+
+    def set_now_datetime(self, now_datetime):
+        self.now_date = now_datetime
