@@ -1,0 +1,21 @@
+mergeable:
+  pull_requests:
+    stale:
+      days: 14
+      message: 'This PR is stale. Please follow up!'
+
+    label:
+      must_include:
+        regex: '(new-feature)|(documentation)|(bug-fixes)|(enhancement)|(needs-migration)|(packages-updated)|(miscellaneous)'
+        message: 'Can you please add a valid label! [One of (new-feature) / (documentation) / (bug-fixes) / (enhancement) / (needs-migration) / (packages-updated) / (miscellaneous)]'
+      must_exclude:
+        regex: '(do-not-merge)'
+        message: 'This PR is work in progress. Cannot be merged yet.'
+
+    description:
+      no_empty:
+        enabled: true
+        message: 'Can you please add a description!'
+      must_exclude:
+        regex: 'do not merge'
+        message: 'This PR is work in progress. Cannot be merged yet.'
