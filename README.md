@@ -58,5 +58,3 @@ We have classified entities into four main types i.e. *numeral*, *pattern*, *tem
 
 **Numeral, temporal and pattern** have been moved to ner_v2 for language portability with more flexible detection logic.
 In ner_v1, currently only **text** entity has language support. We will be moving it to ner_v2 without any major API changes.
-
-
