@@ -1,0 +1,21 @@
+name-template: $NEXT_PATCH_VERSION
+tag-template: $NEXT_PATCH_VERSION
+branches: master
+template: |
+    # What's Changed
+    $CHANGES
+categories:
+  - title: 🚀 Features
+    label: new-feature
+  - title: 🐛 Bug Fixes
+    label: bug-fixes
+  - title: 📖 Documentation
+    label: documentation
+  - title: 💯 Enhancements
+    label: enhancement
+  - title: 🚒 Migrations
+    label: needs-migration
+  - title: 📦 Packages Updated
+    label: packages-updated
+  - title: 👺 Miscellaneous 
+    label: miscellaneous
