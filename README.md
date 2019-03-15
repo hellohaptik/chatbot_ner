@@ -68,8 +68,8 @@ We will work on removing few architectural limitations which will ease out proce
  For example, date detection in Hindi and Hinglish can be improved by adding data in csv files mentioned in the image below. You can refer to
  documentation for [date](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/date), [time](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) and [numbers](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number) respectively if you wish to contribute.
  ![Date Contribution](docs/images/date_contribution_example.png)
-- **Adding Detection Pattern Contribution**: You can simply add custom language patterns for different languages by adding simple functions. An example of adding
-custom pattern for detecting number of people can be referred [here](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number)
+- **Adding Detection Pattern**: You can simply add custom language patterns for different languages by adding simple functions. An example of adding
+custom pattern for detecting number of people can be referred [here](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number).
 
 Please refer to general steps of contribution, approval and coding guidelines mentioned here.
 
