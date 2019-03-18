@@ -267,12 +267,12 @@ class BaseNumberDetector(object):
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             number, scale, original_text = None, None, None
-            if pattern[1].replace(',', ''):
+            if pattern[1] and pattern[1].replace(',', '').replace('.', '').isdigit():
                 number = pattern[1].replace(',', '')
                 original_text = pattern[0].strip()
                 scale = self.scale_map[pattern[2].strip()]
 
-            elif pattern[3].replace(',', ''):
+            elif pattern[3] and pattern[3].replace(',', '').replace('.', '').isdigit():
                 number = pattern[3].replace(',', '')
                 original_text = pattern[3].strip()
                 scale = 1
