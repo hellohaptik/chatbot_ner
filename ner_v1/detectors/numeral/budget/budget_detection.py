@@ -201,7 +201,7 @@ class BudgetDetector(BaseDetector):
         if original_list is None:
             original_list = []
         pattern = re.compile(r'\s('
-                             r'(?:above|more? than|more?|greater than|greater|abv|abov|more? den|\>\s*\=?)'
+                             r'(?:above|more? than|more?|at ?least|greater than|greater|abv|abov|more? den|\>\s*\=?)'
                              r'\s+' +
                              self._budget_pattern +
                              r')(?:\b|\.|\s)', flags=re.UNICODE | re.IGNORECASE)
@@ -247,7 +247,7 @@ class BudgetDetector(BaseDetector):
             original_list = []
 
         pattern = re.compile(r'\s('
-                             r'(?:max|upto|o?nly|around|below|less than|less|less den|\<\s*\=?)'
+                             r'(?:max|upto|o?nly|around|below|at ?most|less than|less|less den|\<\s*\=?)'
                              r'\s+' +
                              self._budget_pattern +
                              r')(?:\b|\.|\s)', flags=re.UNICODE | re.IGNORECASE)
@@ -294,7 +294,7 @@ class BudgetDetector(BaseDetector):
 
         pattern = re.compile(r'\s(' +
                              self._budget_pattern +
-                             r'\s*(?:\-|to|and)\s*' +
+                             r'\s*(?:\-|to|and|till)\s*' +
                              self._budget_pattern +
                              r')(?:\b|\.|\s)', flags=re.UNICODE | re.IGNORECASE)
 
