@@ -101,7 +101,7 @@ class BudgetDetector(BaseDetector):
         self.tag = '__' + self.entity_name + '__'
         self._use_text_detection = use_text_detection
 
-        self.allowed_units = [
+        self._allowed_units = [
             (['k', 'ha?zaa?r', 'ha?ja?ar', 'thousa?nd'], 1000),
             (['l', 'lacs?', 'lakh?s?', 'lakhs'], 100000),
             (['m', 'mn', 'million', 'mill?'], 1000000),
