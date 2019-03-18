@@ -30,5 +30,5 @@ number,name_variants,number_value,number_type
 100,hundred,100,scale
 1000,Thousand|thousands|k,1000,scale
 100000,lakh|lakhs|lac|lacs|l,100000,scale
-100000,million|mil|ml|m,1000000,scale
+100000,million|mil|m,1000000,scale
 10000000,crore|crores|c|cr,10000000,scale
