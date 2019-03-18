@@ -77,7 +77,8 @@ class BudgetDetector(BaseDetector):
 
     """
 
-    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False,
+                 use_text_detection=False):
         """Initializes a BudgetDetector object
 
         Args:
@@ -98,8 +99,9 @@ class BudgetDetector(BaseDetector):
         self.budget = []
         self.original_budget_text = []
         self.tag = '__' + self.entity_name + '__'
+        self._use_text_detection = use_text_detection
 
-        self._allowed_units = [
+        self.allowed_units = [
             (['k', 'ha?zaa?r', 'ha?ja?ar', 'thousa?nd'], 1000),
             (['l', 'lacs?', 'lakh?s?', 'lakhs'], 100000),
             (['m', 'mn', 'million', 'mill?'], 1000000),
@@ -176,9 +178,9 @@ class BudgetDetector(BaseDetector):
         self._update_processed_text(original_list)
         budget_list, original_list = self._detect_any_budget(budget_list, original_list)
         self._update_processed_text(original_list)
-        # if not budget_list:
-        #     budget_list, original_list = self._detect_text_budget(budget_list, original_list)
-        #     self._update_processed_text(original_list)
+        if not budget_list and self._use_text_detection:
+            budget_list, original_list = self._detect_text_budget(budget_list, original_list)
+            self._update_processed_text(original_list)
 
         return budget_list, original_list
 

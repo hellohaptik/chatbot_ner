@@ -988,7 +988,7 @@ def get_budget(message, entity_name, structured_value, fallback_value, bot_messa
 
 
     """
-    budget_detection = BudgetDetector(entity_name=entity_name)
+    budget_detection = BudgetDetector(entity_name=entity_name, use_text_detection=True)
     if min_digit and max_digit:
         min_digit = int(min_digit)
         max_digit = int(max_digit)
