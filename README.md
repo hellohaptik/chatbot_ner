@@ -59,4 +59,17 @@ We have classified entities into four main types i.e. *numeral*, *pattern*, *tem
 **Numeral, temporal and pattern** have been moved to ner_v2 for language portability with more flexible detection logic.
 In ner_v1, currently only **text** entity has language support. We will be moving it to ner_v2 without any major API changes.
 
+### **Contribution Guidelines**
 
+Currently, you can contribute to ner_v2 in Chatbot NER either by adding **Training Data** or by contributing **Detection Patterns** in form of regex.
+We will work on removing few architectural limitations which will ease out process of adding **ML models** and **New Entities** in future.
+
+- **Adding Training Data**: You can significantly improve detection capabilities of Chatbot NER by simply adding data in csv files.
+ For example, date detection in Hindi and Hinglish can be improved by adding data in csv files mentioned in the image below. You can refer to
+ documentation for [date](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/date), [time](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/temporal/time) and [numbers](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number) respectively if you wish to contribute.
+ ![Date Contribution](docs/images/date_contribution_example.png)
+- **Adding Detection Pattern**: You can simply add custom language patterns for different languages by adding simple functions. An example of adding
+custom pattern for detecting number of people can be referred [here](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number).
+
+Please refer to general steps of contribution, approval and coding guidelines mentioned
+[here](https://github.com/hellohaptik/chatbot_ner/tree/develop/docs/contributing.md).
