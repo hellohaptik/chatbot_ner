@@ -58,7 +58,6 @@ confidence=
 
 disable=invalid-name,
         trailing-whitespace,
-        mixed-line-endings,
         invalid-characters-in-docstring,
         import-error,
         too-few-public-methods

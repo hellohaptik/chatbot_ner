@@ -31,6 +31,14 @@ with few exceptions that will be mentioned here. Although Google's styleguide pr
 
 #### Exceptions/Additions to Google's Python styleguide
 
+##### 2.20 Py 2/3 cross compatibility
+
+- Take some effort to ensure code compatibility between Python 2.6.x and 3.x+ . Follow section 2.20,
+  use future and six libraries to write cross compatible code. Note, we can drop this compatibility,
+  once we finish porting to Py3.
+  
+  Handy guide: http://python-future.org/compatible_idioms.html 
+  
 ##### 3.2 Line length
 
 Maximum line length is *119 characters*.
@@ -72,8 +80,9 @@ ids (Optional[Dict[str, int]], optional): dict mapping str to int. Defaults to N
 
 Note that 1st and 3rd are compact and understood by IDEs like PyCharm but harder to read.
 2nd format is easier to read but would need more explaning about the types in explanation part.
-3rd style is defined by PEP 484, it is much more consistent and already had a detailed guideline
+3rd style is defined by PEP 484, it is much more consistent and already has a detailed guideline
 on how to write complex types.
+
 Notice it uses `Optional[]` which indicates this argument can take `None` value;
 `Union[]` where members can be multiple types;
 whereas 1st format needs the use of `or` to mention multiple types explicitly. 
@@ -81,20 +90,16 @@ The `, optional` part indicates if the argument is optional (default) argument f
 and is present in all three formats. It is different from `Optional[]`.
 Also note that `List, Union, Tuple, Dict` all are in title case. These are defined in `typing` module
 
-Before we finalize, it is highly recommended that you go through
+It is highly recommended that you go through
 [Type Annotation cheat sheet for Python 2](https://mypy.readthedocs.io/en/latest/cheat_sheet.html)
 to understand how 3rd format's type annotation works.
-We would want to use 3rd format because it has less ambiguity involved, 
-but this is still open to change. 
+We would recommend you follow Format 2 plus adding type annotations with `typing`.
 
+##### 3.10 Strings
 
-##### 2.20 Py 2/3 cross compatibility
+Use double quotes `"` for string literals so it becomes easy to copy to other formats (like JSON, C++, Java). It is
+okay to use sinngle quote to to avoid the need to `\\` escape within the string
 
-- Take some effort to ensure code compatibility between Python 2.6.x and 3.x+ . Follow section 2.20,
-  use future and six libraries to write cross compatible code. Note, we can drop this compatibility,
-  once we finish porting to Py3.
-  
-  Handy guide: http://python-future.org/compatible_idioms.html 
 ---
 
 ### Some other documents to read
@@ -110,6 +115,8 @@ but this is still open to change.
 
 We will use [flake8](http://flake8.pycqa.org/en/latest/), [pylint](http://pylint.pycqa.org/en/latest/),
 and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encouraged but not required)
+
+> Note: Our CI does not run pylint because it is too verbose. However, we would still recommend running it locally
 
 1. **Running flake8**
 
@@ -204,97 +211,83 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
     ```
 
     ```
-    ************* Module chatbot_ner.datastore
+    Using config file ~/chatbot_ner/.pylintrc
+    ************* Module datastore
     datastore/__init__.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/__init__.py:1: [W0403(relative-import), ] Relative import 'datastore', should be 'chatbot_ner.datastore.datastore'
-    ************* Module chatbot_ner.datastore.constants
+    datastore/__init__.py:1: [W0403(relative-import), ] Relative import 'datastore', should be 'datastore.datastore'
+    ************* Module datastore.constants
     datastore/constants.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/constants.py:3: [E0611(no-name-in-module), ] No name 'settings' in module 'chatbot_ner'
-    datastore/constants.py:3: [E0401(import-error), ] Unable to import 'chatbot_ner.settings'
-    datastore/constants.py:4: [E0611(no-name-in-module), ] No name 'config' in module 'chatbot_ner'
-    datastore/constants.py:4: [E0401(import-error), ] Unable to import 'chatbot_ner.config'
     datastore/constants.py:2: [C0411(wrong-import-order), ] standard import "import os" should be placed before "import elasticsearch"
-    ************* Module chatbot_ner.datastore.utils
+    ************* Module datastore.utils
     datastore/utils.py:1: [C0111(missing-docstring), ] Missing module docstring
-    ************* Module chatbot_ner.datastore.exceptions
+    ************* Module datastore.exceptions
     datastore/exceptions.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/exceptions.py:11: [C0111(missing-docstring), DataStoreSettingsImproperlyConfiguredException] Missing class docstring
-    datastore/exceptions.py:12: [W0231(super-init-not-called), DataStoreSettingsImproperlyConfiguredException.__init__] __init__ method from base class 'Exception' is not called
     ...
-    ************* Module chatbot_ner.datastore.datastore
+    datastore/exceptions.py:185: [W0231(super-init-not-called), DeleteIndexFromAliasException.__init__] __init__ method from base class 'Exception' is not called
+    ************* Module datastore.datastore
     datastore/datastore.py:341: [W0511(fixme), ] TODO: repopulate code for crf index missing
     datastore/datastore.py:93: [C0301(line-too-long), ] Line too long (126/119)
     datastore/datastore.py:94: [C0301(line-too-long), ] Line too long (131/119)
     datastore/datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/datastore.py:3: [W0403(relative-import), ] Relative import 'elastic_search', should be 'chatbot_ner.datastore.elastic_search'
-    datastore/datastore.py:4: [E0611(no-name-in-module), ] No name 'config' in module 'chatbot_ner'
-    datastore/datastore.py:4: [E0401(import-error), ] Unable to import 'chatbot_ner.config'
-    datastore/datastore.py:407: [C0103(invalid-name), DataStore.transfer_entities_elastic_search] Method name "transfer_entities_elastic_search" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    ************* Module chatbot_ner.datastore.commands.populate_datastore
+    datastore/datastore.py:3: [W0403(relative-import), ] Relative import 'elastic_search', should be 'datastore.elastic_search'
+    datastore/datastore.py:457: [W1201(logging-not-lazy), DataStore.get_crf_data_for_entity_name] Specify string format arguments as logging function parameters
+    datastore/datastore.py:475: [W1201(logging-not-lazy), DataStore.get_crf_data_for_entity_name] Specify string format arguments as logging function parameters
+    ************* Module datastore.commands.populate_datastore
     datastore/commands/populate_datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/commands/populate_datastore.py:8: [C0111(missing-docstring), Command] Missing class docstring
-    datastore/commands/populate_datastore.py:42: [C0103(invalid-name), Command.handle] Variable name "db" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/commands/populate_datastore.py:51: [E1101(no-member), Command.handle] Instance of 'Style' has no 'ERROR' member
-    ************* Module chatbot_ner.datastore.commands.delete_entity_data_datastore
+    ************* Module datastore.commands.delete_entity_data_datastore
     datastore/commands/delete_entity_data_datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/commands/delete_entity_data_datastore.py:5: [C0111(missing-docstring), Command] Missing class docstring
-    datastore/commands/delete_entity_data_datastore.py:18: [C0103(invalid-name), Command.handle] Variable name "db" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/commands/delete_entity_data_datastore.py:22: [E1101(no-member), Command.handle] Instance of 'Style' has no 'ERROR' member
-    ************* Module chatbot_ner.datastore.commands.delete_datastore
+    ************* Module datastore.commands.delete_datastore
     datastore/commands/delete_datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/commands/delete_datastore.py:5: [C0111(missing-docstring), Command] Missing class docstring
-    datastore/commands/delete_datastore.py:9: [C0103(invalid-name), Command.handle] Variable name "db" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    ...
-    ************* Module chatbot_ner.datastore.commands.create_datastore
+    ************* Module datastore.commands.repopulate_datastore
+    datastore/commands/repopulate_datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
+    datastore/commands/repopulate_datastore.py:8: [C0111(missing-docstring), Command] Missing class docstring
+    datastore/commands/repopulate_datastore.py:53: [E1101(no-member), Command.handle] Instance of 'Style' has no 'ERROR' member
+    ************* Module datastore.commands.create_datastore
     datastore/commands/create_datastore.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/commands/create_datastore.py:5: [C0111(missing-docstring), Command] Missing class docstring
-    datastore/commands/create_datastore.py:9: [C0103(invalid-name), Command.handle] Variable name "db" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    ************* Module chatbot_ner.datastore.elastic_search.create
+    ************* Module datastore.elastic_search.create
     datastore/elastic_search/create.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/elastic_search/create.py:1: [W0403(relative-import), ] Relative import 'utils', should be 'chatbot_ner.datastore.elastic_search.utils'
-    datastore/elastic_search/create.py:3: [C0103(invalid-name), ] Constant name "log_prefix" doesn't conform to u'(([A-Z_][A-Z0-9_]*)|(__.*__))$' pattern
+    datastore/elastic_search/create.py:1: [W0403(relative-import), ] Relative import 'utils', should be 'datastore.elastic_search.utils'
     datastore/elastic_search/create.py:26: [W0703(broad-except), delete_index] Catching too general exception Exception
-    datastore/elastic_search/create.py:26: [C0103(invalid-name), delete_index] Variable name "e" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/elastic_search/create.py:91: [W0703(broad-except), _create_index] Catching too general exception Exception
-    datastore/elastic_search/create.py:91: [C0103(invalid-name), _create_index] Variable name "e" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    ************* Module chatbot_ner.datastore.elastic_search.query
+    ************* Module datastore.elastic_search.query
     datastore/elastic_search/query.py:286: [W1401(anomalous-backslash-in-string), ] Anomalous backslash in string: '\s'. String constant might be missing an r prefix.
     datastore/elastic_search/query.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/elastic_search/query.py:9: [C0103(invalid-name), ] Constant name "log_prefix" doesn't conform to u'(([A-Z_][A-Z0-9_]*)|(__.*__))$' pattern
     datastore/elastic_search/query.py:50: [R0913(too-many-arguments), full_text_query] Too many arguments (7/5)
     datastore/elastic_search/query.py:2: [C0411(wrong-import-order), ] standard import "import re" should be placed before "from six import string_types"
     datastore/elastic_search/query.py:3: [C0411(wrong-import-order), ] standard import "import collections" should be placed before "from six import string_types"
     datastore/elastic_search/query.py:6: [C0411(wrong-import-order), ] first party import "from external_api.constants import SENTENCE_LIST, ENTITY_LIST" should be placed before "from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR"
     datastore/elastic_search/query.py:7: [C0411(wrong-import-order), ] first party import "from language_utilities.constant import ENGLISH_LANG" should be placed before "from ..constants import ELASTICSEARCH_SEARCH_SIZE, ELASTICSEARCH_VERSION_MAJOR, ELASTICSEARCH_VERSION_MINOR"
-    ************* Module chatbot_ner.datastore.elastic_search.connect
+    ************* Module datastore.elastic_search.connect
     datastore/elastic_search/connect.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/elastic_search/connect.py:2: [E0611(no-name-in-module), ] No name 'config' in module 'chatbot_ner'
-    datastore/elastic_search/connect.py:2: [E0401(import-error), ] Unable to import 'chatbot_ner.config'
-    datastore/elastic_search/connect.py:4: [C0103(invalid-name), ] Constant name "log_prefix" doesn't conform to u'(([A-Z_][A-Z0-9_]*)|(__.*__))$' pattern
-    ************* Module chatbot_ner.datastore.elastic_search.__init__
+    ************* Module datastore.elastic_search.__init__
     datastore/elastic_search/__init__.py:5: [C0304(missing-final-newline), ] Final newline missing
-    ************* Module chatbot_ner.datastore.elastic_search
+    ************* Module datastore.elastic_search
     datastore/elastic_search/__init__.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/elastic_search/__init__.py:1: [W0403(relative-import), ] Relative import 'connect', should be 'chatbot_ner.datastore.elastic_search.connect'
-    datastore/elastic_search/__init__.py:2: [W0403(relative-import), ] Relative import 'create', should be 'chatbot_ner.datastore.elastic_search.create'
-    datastore/elastic_search/__init__.py:3: [W0403(relative-import), ] Relative import 'populate', should be 'chatbot_ner.datastore.elastic_search.populate'
-    datastore/elastic_search/__init__.py:4: [W0403(relative-import), ] Relative import 'query', should be 'chatbot_ner.datastore.elastic_search.query'
-    datastore/elastic_search/__init__.py:5: [W0403(relative-import), ] Relative import 'transfer', should be 'chatbot_ner.datastore.elastic_search.transfer'
-    ************* Module chatbot_ner.datastore.elastic_search.transfer
+    ...
+    datastore/elastic_search/__init__.py:5: [W0403(relative-import), ] Relative import 'transfer', should be 'datastore.elastic_search.transfer'
+    ************* Module datastore.elastic_search.transfer
     datastore/elastic_search/transfer.py:276: [W0511(fixme), ] TODO - this works differently from other connects, picks scheme from the full URL
     datastore/elastic_search/transfer.py:207: [C0325(superfluous-parens), ] Unnecessary parens after 'while' keyword
     datastore/elastic_search/transfer.py:1: [C0111(missing-docstring), ] Missing module docstring
-    datastore/elastic_search/transfer.py:5: [E0611(no-name-in-module), ] No name 'config' in module 'chatbot_ner'
-    datastore/elastic_search/transfer.py:5: [E0401(import-error), ] Unable to import 'chatbot_ner.config'
-    datastore/elastic_search/transfer.py:213: [C0103(invalid-name), ESTransfer._scroll_over_es_return_object] Variable name "r" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    datastore/elastic_search/transfer.py:236: [C0103(invalid-name), ESTransfer._get_all_entities] Variable name "r" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
+    datastore/elastic_search/transfer.py:192: [W1201(logging-not-lazy), ESTransfer.check_if_index_exits] Specify string format arguments as logging function parameters
     datastore/elastic_search/transfer.py:247: [R0201(no-self-use), ESTransfer._generate_update_json] Method could be a function
-    datastore/elastic_search/transfer.py:278: [C0103(invalid-name), ESTransfer._run_update_query_on_es] Variable name "ip" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/elastic_search/transfer.py:464: [W0102(dangerous-default-value), ESTransfer.transfer_specific_entities] Dangerous default value [] as argument
+    datastore/elastic_search/transfer.py:471: [W1201(logging-not-lazy), ESTransfer.transfer_specific_entities] Specify string format arguments as logging function parameters
+    datastore/elastic_search/transfer.py:477: [W1201(logging-not-lazy), ESTransfer.transfer_specific_entities] Specify string format arguments as logging function parameters
+    datastore/elastic_search/transfer.py:480: [W1201(logging-not-lazy), ESTransfer.transfer_specific_entities] Specify string format arguments as logging function parameters
+    datastore/elastic_search/transfer.py:484: [W1201(logging-not-lazy), ESTransfer.transfer_specific_entities] Specify string format arguments as logging function parameters
+    datastore/elastic_search/transfer.py:492: [W1201(logging-not-lazy), ESTransfer.transfer_specific_entities] Specify string format arguments as logging function parameters
     datastore/elastic_search/transfer.py:2: [C0411(wrong-import-order), ] standard import "import json" should be placed before "import requests"
-    ************* Module chatbot_ner.datastore.elastic_search.utils
+    ************* Module datastore.elastic_search.utils
     datastore/elastic_search/utils.py:1: [C0111(missing-docstring), ] Missing module docstring
-    ************* Module chatbot_ner.datastore.elastic_search.populate
+    ************* Module datastore.elastic_search.populate
+    datastore/elastic_search/populate.py:114: [C0301(line-too-long), ] Line too long (120/119)
     datastore/elastic_search/populate.py:154: [C0330(bad-continuation), ] Wrong continued indentation (remove 1 space).
                           }
                          |^
@@ -309,52 +302,19 @@ and optionally [mypy](https://mypy.readthedocs.io/en/latest/python2.html) (encou
                          |^
     datastore/elastic_search/populate.py:1: [C0111(missing-docstring), ] Missing module docstring
     datastore/elastic_search/populate.py:4: [W0401(wildcard-import), ] Wildcard import utils
-    datastore/elastic_search/populate.py:7: [C0103(invalid-name), ] Constant name "log_prefix" doesn't conform to u'(([A-Z_][A-Z0-9_]*)|(__.*__))$' pattern
     datastore/elastic_search/populate.py:10: [R0913(too-many-arguments), create_all_dictionary_data] Too many arguments (6/5)
     datastore/elastic_search/populate.py:42: [R0913(too-many-arguments), recreate_all_dictionary_data] Too many arguments (6/5)
-    datastore/elastic_search/populate.py:74: [C0103(invalid-name), get_variants_dictionary_value_from_key] Function name "get_variants_dictionary_value_from_key" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/elastic_search/populate.py:105: [W0703(broad-except), get_variants_dictionary_value_from_key] Catching too general exception Exception
     datastore/elastic_search/populate.py:101: [W0703(broad-except), get_variants_dictionary_value_from_key] Catching too general exception Exception
-    datastore/elastic_search/populate.py:101: [C0103(invalid-name), get_variants_dictionary_value_from_key] Variable name "e" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    datastore/elastic_search/populate.py:105: [C0103(invalid-name), get_variants_dictionary_value_from_key] Variable name "e" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
     datastore/elastic_search/populate.py:74: [W0613(unused-argument), get_variants_dictionary_value_from_key] Unused argument 'kwargs'
-    datastore/elastic_search/populate.py:114: [R0913(too-many-arguments), add_data_elastic_search] Too many arguments (7/5)
-    datastore/elastic_search/populate.py:165: [C0103(invalid-name), create_dictionary_data_from_file] Function name "create_dictionary_data_from_file" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    datastore/elastic_search/populate.py:165: [R0913(too-many-arguments), create_dictionary_data_from_file] Too many arguments (6/5)
-    datastore/elastic_search/populate.py:197: [C0111(missing-docstring), delete_entity_by_name] Missing function docstring
-    datastore/elastic_search/populate.py:197: [R0914(too-many-locals), delete_entity_by_name] Too many local variables (16/15)
-    datastore/elastic_search/populate.py:235: [R0913(too-many-arguments), entity_data_update] Too many arguments (7/5)
-    datastore/elastic_search/populate.py:267: [R0913(too-many-arguments), update_entity_crf_data_populate] Too many arguments (8/5)
-    datastore/elastic_search/populate.py:297: [C0103(invalid-name), add_training_data_elastic_search] Function name "add_training_data_elastic_search" doesn't conform to u'(([a-z][a-z0-9_]{2,30})|(_[a-z0-9_]*))$' pattern
-    datastore/elastic_search/populate.py:297: [R0913(too-many-arguments), add_training_data_elastic_search] Too many arguments (8/5)
+    ...
     datastore/elastic_search/populate.py:4: [W0614(unused-wildcard-import), ] Unused import csv from wildcard import
     datastore/elastic_search/populate.py:5: [C0411(wrong-import-order), ] first party import "from language_utilities.constant import ENGLISH_LANG" should be placed before "from ..constants import ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE, ELASTICSEARCH_SEARCH_SIZE"
     datastore/elastic_search/populate.py:1: [R0801(duplicate-code), ] Similar lines in 2 files
-    ==chatbot_ner.datastore.commands.populate_datastore:11
-    ==chatbot_ner.datastore.commands.repopulate_datastore:13
-       ...
-    datastore/elastic_search/populate.py:1: [R0801(duplicate-code), ] Similar lines in 3 files
-    ==chatbot_ner.datastore.elastic_search.populate:197
-    ==chatbot_ner.datastore.elastic_search.query:28
-    ==chatbot_ner.datastore.elastic_search.query:330
-        data = {
-            'query': {
-                'term': {
-                    'entity_data': {
-                        'value': entity_name
-                    }
-                }
-    datastore/elastic_search/populate.py:1: [R0801(duplicate-code), ] Similar lines in 2 files
-    ==chatbot_ner.datastore.elastic_search.populate:199
-    ==chatbot_ner.datastore.elastic_search.query:174
-                'term': {
-                    'entity_data': {
-                        'value': entity_name
-                    }
-                }
-
-    ------------------------------------------------------------------
-    Your code has been rated at 7.54/10 (previous run: 6.67/10, +0.87)
+    ==datastore.commands.populate_datastore:11
+    ==datastore.commands.repopulate_datastore:13
+    ...
+    Your code has been rated at 8.30/10
     ```
 
     As you see it warns about missing documentation, non standard naming conventions, indentation mistakes, long lines,

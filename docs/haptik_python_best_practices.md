@@ -4,7 +4,7 @@
 * Lines should be 120 characters in length or less.
 * Continuations of long expressions onto additional lines should be indented by four extra spaces from their normal indentation level.
 * In a file, functions and classes should be separated by two blank lines.
-* Don’t put spaces around
+* Don't put spaces around
     * List indexes
     * Function calls
     * Keyword argument assignments
@@ -24,7 +24,7 @@ format.
 * Class methods should use `cls` as the name of the first parameter (which refers to the class).
 
 # Expressions and Statements
-* Don’t check for empty values (like [] or '') by checking the length 
+* Don't check for empty values (like [] or '') by checking the length 
 `if len(somelist) == 0)`. Use `if not somelist` and assume empty values implicitly evaluate to False.
 * The same thing goes for non-empty values (like [1] or 'hello'). The statement `if somelist` is implicitly True for non-empty values.
 * If you want to check if a value is None. Use `if var is None`. Do not do `if not var`.it will return True even if var value is 0. 
@@ -41,13 +41,13 @@ import sys
 from django.core.cache import caches
 from django.db.models import Q
 
-# HaptiK modules
-from haptik_chats.models import ChatCollections
+# App imports
+from ner_v2.detectors.numeral.number import number_detection
 
 ```
 
-* Python’s syntax makes it all too easy to write single-line expressions that are overly complicated and difficult to read. Move complex expressions into helper functions, especially if you need to use the same logic repeatedly.
-* Prefer using List comprehensions instead of map and filter. Its easier to read as they don’t require extra lambda expressions.
+* Python's syntax makes it all too easy to write single-line expressions that are overly complicated and difficult to read. Move complex expressions into helper functions, especially if you need to use the same logic repeatedly.
+* Prefer using List comprehensions instead of map and filter. Its easier to read as they don't require extra lambda expressions.
 ```python
 # list comprehension
 even_squares = [x**2 for x in a if x % 2 == 0]
@@ -58,7 +58,7 @@ even_squares = list(map(lambda x: x**2, filter(lambda x: x % 2 == 0, a)))
 * Dictonary also support comprehension expressions
 ```python
 names = ['James', 'Jack', 'Alley']
-names_len = {a:len(a) for a in names }
+names_len = {a: len(a) for a in names }
 ```
 * List comprehensions with more than two expressions are very difficult to read and should be avoided.
 * List comprehensions can cause problems for large inputs by using too much
@@ -66,10 +66,10 @@ memory. Use Generator expressions to avoid memory issues by producing outputs on
 
 ```python
 # List comprehension
-values = [len(x) for x in open(‘/tmp/my_file.txt’)]
+values = [len(x) for x in open('/tmp/my_file.txt')]
 
 # Generator expression
-it = (len(x) for x in open(‘/tmp/my_file.txt’))
+it = (len(x) for x in open('/tmp/my_file.txt'))
 print next(it)
 ```
 
@@ -79,11 +79,11 @@ print next(it)
 ```python
 # Do not do this
 def log(message, when=datetime.now()):
-    print(‘%s: %s’ % (when, message))
+    print('%s: %s' % (when, message))
 
-log(‘Hi’)
+log('Hi')
 sleep(1)
-log(‘Hello’)
+log('Hello')
 
 >>
 2017-11-15 21:10:10.371432: Hi
@@ -92,11 +92,11 @@ log(‘Hello’)
 # Do this
 def log(message, when=None):
     when = datetime.now() if when is None else when
-    print(‘%s: %s’ % (when, message))
+    print('%s: %s' % (when, message))
     
-log(‘Hi’)
+log('Hi')
 sleep(1)
-log(‘Hello’)
+log('Hello')
 
 >>
 2017-11-15 21:10:10.371432: Hi
@@ -112,18 +112,18 @@ def decode(data, default={}):
     except ValueError:
         return default
         
-foo = decode(‘bad data’)
-foo[‘stuff’] = 5
-bar = decode(‘also bad’)
-bar[‘meep’] = 1
-print(‘Foo:’, foo)
-print(‘Bar:’, bar)
+foo = decode('bad data')
+foo['stuff'] = 5
+bar = decode('also bad')
+bar['meep'] = 1
+print('Foo:', foo)
+print('Bar:', bar)
 
 >>
-Foo: {‘stuff’: 5, ‘meep’: 1}  # Expected Foo: {‘stuff’: 5}
-Bar: {‘stuff’: 5, ‘meep’: 1}  # Expected Bar: {‘meep’: 1}
+Foo: {'stuff': 5, 'meep': 1}  # Expected Foo: {'stuff': 5}
+Bar: {'stuff': 5, 'meep': 1}  # Expected Bar: {'meep': 1}
 ```
-You’d expect two different dictionaries, each with a single key and value. But modifying one seems to also modify the other as they are using same dictionary object.
+You'd expect two different dictionaries, each with a single key and value. But modifying one seems to also modify the other as they are using same dictionary object.
 
 ```python
 def decode(data, default=None):
@@ -134,15 +134,15 @@ def decode(data, default=None):
     except ValueError:
         return default
         
-foo = decode(‘bad data’)
-foo[‘stuff’] = 5
-bar = decode(‘also bad’)
-bar[‘meep’] = 1
-print(‘Foo:’, foo)
-print(‘Bar:’, bar)
+foo = decode('bad data')
+foo['stuff'] = 5
+bar = decode('also bad')
+bar['meep'] = 1
+print('Foo:', foo)
+print('Bar:', bar)
 >>>
-Foo: {‘stuff’: 5}
-Bar: {‘meep’: 1}
+Foo: {'stuff': 5}
+Bar: {'meep': 1}
 ```
 
 * You can enforce clarity in function call using keyword arguments.
@@ -157,7 +157,7 @@ def send_automated_reply(msg, should_type, send_athena):
         
 send_automated_reply(msg, True, False)
 ```
-The problem is that it’s easy to confuse the position of the two Boolean arguments that control sending typing indicator and sending msg to athena. This can easily cause bugs that are hard to trackdown. To avoid this condition we should use keyword arguments.
+The problem is that it's easy to confuse the position of the two Boolean arguments that control sending typing indicator and sending msg to athena. This can easily cause bugs that are hard to trackdown. To avoid this condition we should use keyword arguments.
 
 ```python
 def send_automated_reply(msg, should_type=True, send_athena=True):
