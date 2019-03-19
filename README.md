@@ -71,5 +71,5 @@ We will work on removing few architectural limitations which will ease out proce
 - **Adding Detection Pattern**: You can simply add custom language patterns for different languages by adding simple functions. An example of adding
 custom pattern for detecting number of people can be referred [here](https://github.com/hellohaptik/chatbot_ner/tree/develop/ner_v2/detectors/numeral/number).
 
-Please refer to general steps of contribution, approval and coding guidelines mentioned here.
-
+Please refer to general steps of contribution, approval and coding guidelines mentioned
+[here](https://github.com/hellohaptik/chatbot_ner/tree/develop/docs/contributing.md).
