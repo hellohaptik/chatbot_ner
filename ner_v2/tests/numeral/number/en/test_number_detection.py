@@ -37,7 +37,6 @@ class NumberDetectionTest(TestCase):
             u'm': NumberVariant(scale=1000000, increment=0),
             u'mil': NumberVariant(scale=1000000, increment=0),
             u'million': NumberVariant(scale=1000000, increment=0),
-            u'ml': NumberVariant(scale=1000000, increment=0),
             u'nine': NumberVariant(scale=1, increment=9),
             u'nineteen': NumberVariant(scale=1, increment=19),
             u'ninety': NumberVariant(scale=1, increment=90),
