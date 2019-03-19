@@ -45,4 +45,5 @@
 4. You're done. Just wait for the PR checks to pass as shown below:
    ![PR-Checks](images/PR-Checks.png) One of the admins will approve your PR and merge it. 
 
-5. You can follow this link to checkout basic coding [guidelines]       (https://github.com/hellohaptik/chatbot_ner/tree/develop/docs/code_style_guide.md)
+5. You can follow this link to checkout basic coding 
+[guidelines](https://github.com/hellohaptik/chatbot_ner/tree/develop/docs/code_style_guide.md)
