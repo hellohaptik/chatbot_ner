@@ -1,11 +1,11 @@
-key,time_type,meridian
+key,time_type,meridiem
 अभी|abhi,relative_time,NA
 तुरंत|turant,relative_time,NA
 बजे|बजकर|बज|baje|bajkr|bajkar|bje|baj,hour,NA
 घंटा|घंटे|घंटों|ghanta|ghante|ghanton,hour,NA
 मिनट|मिनटों|minton|minutes|mins|minute|min,minute,NA
 सेकंड|second|sec,second,NA
-सुबह|subah|subeh,daytime_meridian,am
-दुपहर|dopahar|dopehar|dupahar,daytime_meridian,pm
-शाम|साम|स्याम|shaam|sandhya|sham|saam,daytime_meridian,pm
-रात|raat,daytime_meridian,pm
+सुबह|subah|subeh,daytime_meridiem,am
+दुपहर|dopahar|dopehar|dupahar,daytime_meridiem,pm
+शाम|साम|स्याम|shaam|sandhya|sham|saam,daytime_meridiem,pm
+रात|raat,daytime_meridiem,pm
