@@ -62,6 +62,39 @@ def get_entity_word_variants(request):
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 
+def read_unique_values_for_text_entity(request):
+    """
+    This function is used obtain the unique values for given text entity name.
+    Args:
+        request (HttpResponse): HTTP response from url
+
+    Returns:
+        HttpResponse : With data consisting of a list of unique values.
+    """
+    response = {"success": False, "error": "", "result": []}
+    try:
+        entity_name = request.GET.get(ENTITY_NAME)
+        datastore_obj = DataStore()
+        result = datastore_obj.get_entity_unique_values(entity_name=entity_name)
+
+        response['result'] = result
+        response['success'] = True
+
+    except (DataStoreSettingsImproperlyConfiguredException,
+            EngineNotImplementedException,
+            EngineConnectionException, FetchIndexForAliasException) as error_message:
+        response['error'] = str(error_message)
+        ner_logger.exception('Error: %s' % error_message)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    except BaseException as e:
+        response['error'] = str(e)
+        ner_logger.exception('Error: %s' % e)
+        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
+
+    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+
+
 @csrf_exempt
 def update_dictionary(request):
     """
