@@ -324,3 +324,19 @@ def entity_data_view(request, entity_name):
 
     else:
         raise APIHandlerException("{0} is not allowed.".format(request.method))
+
+
+@external_api_response_wrapper
+def read_unique_values_for_text_entity(request, entity_name):
+    """
+    API call to View unique values for text entity.
+    """
+    if request.method == 'GET':
+        try:
+            return dictionary_utils.get_entity_unique_values(entity_name=entity_name)
+        except (DataStoreSettingsImproperlyConfiguredException,
+                EngineNotImplementedException,
+                EngineConnectionException, FetchIndexForAliasException) as error_message:
+            raise APIHandlerException(str(error_message))
+    else:
+        raise APIHandlerException("{0} is not allowed.".format(request.method))
