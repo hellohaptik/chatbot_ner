@@ -49,5 +49,9 @@ urlpatterns = [
     url(r'^entities/train_crf_model', external_api.train_crf_model),
 
     url(r'^entities/languages/v1/(?P<entity_name>.+)$', external_api.entity_language_view),
-    url(r'^entities/data/v1/(?P<entity_name>.+)$', external_api.entity_data_view)
+    url(r'^entities/data/v1/(?P<entity_name>.+)$', external_api.entity_data_view),
+
+    #  Read unique values for text entity
+    url(r'^entities/values/v1/(?P<entity_name>.+)$', external_api.read_unique_values_for_text_entity),
+
 ]
