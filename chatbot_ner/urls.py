@@ -52,6 +52,6 @@ urlpatterns = [
     url(r'^entities/data/v1/(?P<entity_name>.+)$', external_api.entity_data_view),
 
     #  Read unique values for text entity
-    url(r'^entities/get_unique_values', external_api.read_unique_values_for_text_entity),
+    url(r'^entities/values/v1/(?P<entity_name>.+)$', external_api.read_unique_values_for_text_entity),
 
 ]
