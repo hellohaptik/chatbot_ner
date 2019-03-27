@@ -19,3 +19,5 @@ python-dateutil==2.7.3
 pandas==0.19.0
 mock==2.0.0
 django-nose==1.4.5
+typing==3.6.2
+flake8==3.4.1
