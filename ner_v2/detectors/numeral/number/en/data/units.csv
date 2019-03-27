@@ -1,9 +1,9 @@
 unit_type,unit_value,unit_variants
 currency,rupees,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | paisa | paise | inr | ₹
 currency,dollar,Dollar | usd | $
-package_metric_unit,mg,mg | milligram | milligrams
-package_metric_unit,gms,gms | grams | gram
-package_metric_unit,kg,kilogram | kilograms | kg
-package_metric_unit,ml,ml | milliliter
-package_metric_unit,ltr,ltr | litre
-package_metric_unit,pcs,pcs
+package_metric_unit,mg,mg | milligram | milligrams | mgs
+package_metric_unit,gms,gms | grams | gram | gm | g
+package_metric_unit,kg,kilogram | kilograms | kg | kilo | kgs
+package_metric_unit,ml,ml | milliliter | millilitre | milliliters | millilitres
+package_metric_unit,ltr,ltr | litre | liter | litres | liters | l
+package_metric_unit,pcs,pcs | pc | pieces | piece
