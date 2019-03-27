@@ -259,7 +259,7 @@ class TextDetector(BaseDetector):
 
         return u' '.join(matched_tokens)
 
-    def detect_entity(self, texts, **kwargs):
+    def detect_entity(self, text, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -268,7 +268,7 @@ class TextDetector(BaseDetector):
         is returned. For more information on how data is stored, see Datastore docs.
 
         Args:
-            texts (unicode or list): string or list of strings(bulk detect) to extract textual entities from
+            text (unicode or list): string or list of strings(bulk detect) to extract textual entities from
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:

@@ -239,7 +239,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     return values
 
 
-def full_text_query(connection, index_name, doc_type, entity_name, sentences, fuzziness_threshold,
+def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
                     search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given sentence . The query
@@ -250,7 +250,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
-        sentences(list of strings): sentences in which entity has to be searched
+        sentence(list of strings): sentences in which entity has to be searched
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
@@ -284,8 +284,8 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'pune': u'pune'}
     """
     data = [
-        _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
-                                       language_script=search_language_script) for sentence in sentences]
+        _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
+                                       language_script=search_language_script) for sentence_ in sentence]
     # kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     query_data = []
     index_for_each_query = {}

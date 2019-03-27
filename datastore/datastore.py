@@ -275,7 +275,7 @@ class DataStore(object):
                                                                 doc_type=self._connection_settings[
                                                                     ELASTICSEARCH_DOC_TYPE],
                                                                 entity_name=entity_name,
-                                                                sentences=text,
+                                                                sentence=text,
                                                                 fuzziness_threshold=fuzziness_threshold,
                                                                 search_language_script=search_language_script,
                                                                 request_timeout=request_timeout,
