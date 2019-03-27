@@ -99,3 +99,32 @@ class TestBudgetDetector(TestCase):
             budget_dicts, original_texts = self.budget_detector.detect_entity(text=test)
             self.assertEqual(budget_dicts, [self.make_budget_dict(max_budget=max_budget)])
             self.assertEqual(original_texts, [original_text])
+
+    def test_not_budgets(self):
+        """
+        Test sentences that do not have any budget
+        """
+        tests = [
+            'I want to buy 5liters of milk',
+            'Your flight number is 9w998',
+            'hello, your coupon code is Amazon50',
+            'hello, your coupon code is 50Amazon',
+            'the insect is 120millimeters tall'
+        ]
+
+        for test in tests:
+            budget_dicts, original_texts = self.budget_detector.detect_entity(text=test)
+            self.assertEqual(budget_dicts, [])
+            self.assertEqual(original_texts, [])
+
+    def test_unitless_budgets(self):
+        tests = [
+            ('I want to buy 5 liters of milk', 0, 5, '5'),
+            ('the insect is 120 millimeters tall', 0, 120, '120'),
+            ('hello, your coupon code is 50 Amazon', 0, 50, '50'),
+            ('Your flight number is 9w 998', 0, 998, '998'),
+        ]
+        for test, min_budget, max_budget, original_text in tests:
+            budget_dicts, original_texts = self.budget_detector.detect_entity(text=test)
+            self.assertEqual(budget_dicts, [self.make_budget_dict(max_budget=max_budget)])
+            self.assertEqual(original_texts, [original_text])
