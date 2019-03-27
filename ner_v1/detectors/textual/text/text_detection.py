@@ -325,12 +325,12 @@ class TextDetector(BaseDetector):
         respectively.
         """
         bulk_query = False
-        if type(texts) is list:
+        if type(text) is list:
             bulk_query = True
         else:
-            texts = [texts]
+            text = [text]
 
-        self._process_text(texts)
+        self._process_text(text)
         values, original_texts = self._text_detection_with_variants()
 
         self.text_entity_values, self.original_texts = values, original_texts
