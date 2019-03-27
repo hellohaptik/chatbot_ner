@@ -117,7 +117,7 @@ class TestBudgetDetector(TestCase):
             self.assertEqual(budget_dicts, [])
             self.assertEqual(original_texts, [])
 
-    def test_unitless_budgets(self):
+    def test_budgets_without_scales(self):
         tests = [
             ('I want to buy 5 liters of milk', 0, 5, '5'),
             ('the insect is 120 millimeters tall', 0, 120, '120'),
