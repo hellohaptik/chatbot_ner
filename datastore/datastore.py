@@ -1,5 +1,3 @@
-import collections
-
 import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from lib.singleton import Singleton
@@ -90,8 +88,9 @@ class DataStore(object):
                     ignore_unavailable: Whether specified concrete indices should be ignored when unavailable
                                         (missing or closed)
 
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
+        Refer--
+           https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
+           https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
 
         Raises:
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
@@ -236,7 +235,7 @@ class DataStore(object):
         """
         Args:
             entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
-            text: the text for which variants need to be find out
+            text(list of strings): the text for which variants need to be find out
             fuzziness_threshold: fuzziness allowed for search results on entity value variants
             search_language_script: language of elasticsearch documents which are eligible for match
             kwargs:
@@ -244,7 +243,7 @@ class DataStore(object):
                     Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
         Returns:
-            collections.OrderedDict: dictionary mapping entity value variants to their entity value
+            list of collections.OrderedDict: dictionary mapping entity value variants to their entity value
 
         Example:
             db = DataStore()
@@ -252,34 +251,36 @@ class DataStore(object):
             db.get_similar_ngrams_dictionary(entity_name='city', ngrams_list=ngrams_list, fuzziness_threshold=2)
 
             Output:
-                {u'Bangalore': u'Bangalore',
-                 u'Mulbagal': u'Mulbagal',
-                 u'Multai': u'Multai',
-                 u'Mumbai': u'Mumbai',
-                 u'Pune': u'Pune',
-                 u'Puri': u'Puri',
-                 u'bangalore': u'bengaluru',
-                 u'goa': u'goa',
-                 u'mumbai': u'mumbai',
-                 u'pune': u'pune'}
+                [
+                    {u'Bangalore': u'Bangalore',
+                     u'Mulbagal': u'Mulbagal',
+                     u'Multai': u'Multai',
+                     u'Mumbai': u'Mumbai',
+                     u'Pune': u'Pune',
+                     u'Puri': u'Puri',
+                     u'bangalore': u'bengaluru',
+                     u'goa': u'goa',
+                     u'mumbai': u'mumbai',
+                     u'pune': u'pune'}
+                 ]
         """
-        results_dictionary = collections.OrderedDict()
+        results_list = []
         if self._client_or_connection is None:
             self._connect()
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_dictionary = elastic_search.query.full_text_query(connection=self._client_or_connection,
-                                                                      index_name=self._store_name,
-                                                                      doc_type=self._connection_settings[
-                                                                          ELASTICSEARCH_DOC_TYPE],
-                                                                      entity_name=entity_name,
-                                                                      sentence=text,
-                                                                      fuzziness_threshold=fuzziness_threshold,
-                                                                      search_language_script=search_language_script,
-                                                                      request_timeout=request_timeout,
-                                                                      **kwargs)
-        return results_dictionary
+            results_list = elastic_search.query.full_text_query(connection=self._client_or_connection,
+                                                                index_name=self._store_name,
+                                                                doc_type=self._connection_settings[
+                                                                    ELASTICSEARCH_DOC_TYPE],
+                                                                entity_name=entity_name,
+                                                                sentences=text,
+                                                                fuzziness_threshold=fuzziness_threshold,
+                                                                search_language_script=search_language_script,
+                                                                request_timeout=request_timeout,
+                                                                **kwargs)
+        return results_list
 
     def delete_entity(self, entity_name, **kwargs):
         """

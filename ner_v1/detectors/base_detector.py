@@ -10,6 +10,7 @@ from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+import time
 
 
 class BaseDetector(object):
@@ -144,7 +145,6 @@ class BaseDetector(object):
 
         text = structured_value if structured_value else message
         entity_list, original_text_list = self.detect_entity(text=text)
-
         if structured_value:
             if entity_list:
                 value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list
@@ -158,8 +158,85 @@ class BaseDetector(object):
         else:
             return None
 
+        if value and type(value[0]) is list:
+            return self.output_entity_bulk(entity_value_list=value, original_text_list=original_text,
+                                           detection_method=method,
+                                           detection_language=self._target_language_script)
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
                                             detection_method=method, detection_language=self._target_language_script)
+
+    def output_entity_bulk(self, entity_value_list, original_text_list, detection_method=None,
+                           detection_method_list=None, detection_language=ENGLISH_LANG):
+        """
+        Format detected entity values for bulk detection
+        Args:
+            entity_value_list (list of lists): containing list of entity values which are identified from given
+                                                detection logic
+            original_text_list (list of lists): containing list original values or actual values from
+                                                messages which are identified
+            detection_method (str, optional): how the entity was detected
+                                              i.e. whether from message, structured_value
+                                                   or fallback, verified from model or not.
+                                              defaults to None
+            detection_method_list(list, optional): list containing how each entity was detected in the entity_value
+                                                list.If provided, this argument will be used over detection method
+                                                defaults to None
+            detection_language(str): ISO 639 code for language in which entity is detected
+
+        Returns:
+            list of lists of dict: list of lists containing dictionaries, each containing entity_value,
+                                    original_text and detection;
+                                    entity_value is in itself a dict with its keys varying from entity to entity
+        Example Output:
+            [
+                [
+                    {
+                        "entity_value": entity_value_1,
+                        "detection": detection_method,
+                        "original_text": original_text_1
+                    },
+                    {
+                        "entity_value": entity_value_2,
+                        "detection": detection_method,
+                        "original_text": original_text_2
+                    }
+
+                ],
+                [
+                    {
+                        "entity_value": entity_value,
+                        "detection": detection_method,
+                        "original_text": original_text
+                    }
+                ]
+            ]
+        """
+        st = time.time()
+        if detection_method_list is None:
+            detection_method_list = []
+        if entity_value_list is None:
+            entity_value_list = []
+
+        bulk_detection_entity_list = []
+        for index, entity_values in enumerate(entity_value_list):
+            entity_list = []
+            for i, entity_value in enumerate(entity_values):
+                if type(entity_value) in [str, six.text_type]:
+                    entity_value = {
+                        ENTITY_VALUE_DICT_KEY: entity_value
+                    }
+                method = detection_method_list[i] if detection_method_list else detection_method
+                entity_list.append(
+                    {
+                        ENTITY_VALUE: entity_value,
+                        DETECTION_METHOD: method,
+                        ORIGINAL_TEXT: original_text_list[index][i],
+                        DETECTION_LANGUAGE: detection_language
+                    }
+                )
+            bulk_detection_entity_list.append(entity_list)
+        print("extra time in base detector = {}".format(time.time()-st))
+        return bulk_detection_entity_list
 
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
@@ -174,7 +251,7 @@ class BaseDetector(object):
                                               i.e. whether from message, structured_value
                                                    or fallback, verified from model or not.
                                               defaults to None
-            detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
+            detection_method_list(list, optional): list containing detection method of entity the entity_value list.
                                                    if provided, this argument will be used over detection method
                                                    defaults to None
             detection_language(str): ISO 639 code for language in which entity is detected                                        
@@ -192,6 +269,7 @@ class BaseDetector(object):
                 }
             ]
         """
+        st = time.time()
         if detection_method_list is None:
             detection_method_list = []
         if entity_value_list is None:
@@ -212,4 +290,5 @@ class BaseDetector(object):
                     DETECTION_LANGUAGE: detection_language
                 }
             )
+        print("extra time in base detector = {}".format(time.time() - st))
         return entity_list

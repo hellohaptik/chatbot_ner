@@ -9,6 +9,7 @@ from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
+import time
 
 
 class TextDetector(BaseDetector):
@@ -154,20 +155,24 @@ class TextDetector(BaseDetector):
         """
         self._min_token_size_for_fuzziness = min_size
 
-    def _process_text(self, text):
-        self.text = text.lower()
-        if isinstance(self.text, bytes):
-            self.text = self.text.decode('utf-8')
+    def _process_text(self, texts):
+        text_lowercase = [text.lower() for text in texts]
+        self.text = []
+        for text in text_lowercase:
+            if isinstance(text, bytes):
+                self.text.append(text.decode('utf-8'))
+            else:
+                self.text.append(text)
 
         self.processed_text = self.text
 
         # Note: following rules have been disabled because cause problem with generating original text
-        # regx_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
+        # regex_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
         # self.processed_text = self.regx_to_process.text_substitute(self.processed_text)
-        self.processed_text = u' ' + self.processed_text + u' '
+        self.processed_text = [u' ' + processed_text + u' ' for processed_text in self.processed_text]
         self.tagged_text = self.processed_text
 
-    def _get_substring_from_processed_text(self, matched_tokens):
+    def _get_substring_from_processed_text(self, matched_tokens, sentence):
         """
         Get part of original text that was detected as some entity value.
 
@@ -176,8 +181,10 @@ class TextDetector(BaseDetector):
 
         Args:
             matched_tokens (list): list of tokens (usually tokens from fuzzy match results from ES)
-                                   to find as a contiguous substring in the processed text considering the effects
+                                   to find as a contiguous substring in the processed sentence considering the effects
                                    of tokenizer
+            sentence (string or unicode): sentence from self.processed_text  from where indices of given token will be
+                                            given
 
         Returns:
             str or unicode: part of original text that corresponds to given tokens
@@ -242,18 +249,18 @@ class TextDetector(BaseDetector):
 
         try:
             n = len(matched_tokens)
-            tokens, indices = _get_tokens_and_indices(self.processed_text)
+            tokens, indices = _get_tokens_and_indices(sentence)
             for i in range(len(tokens) - n + 1):
                 if tokens[i:i + n] == matched_tokens:
                     start = indices[i][0]
                     end = indices[i + n - 1][1]
-                    return self.processed_text[start:end]
+                    return sentence[start:end]
         except (ValueError, IndexError):
-            ner_logger.exception('Error getting original text (%s, %s)' % (matched_tokens, self.processed_text))
+            ner_logger.exception('Error getting original text (%s, %s)' % (matched_tokens, sentence))
 
         return u' '.join(matched_tokens)
 
-    def detect_entity(self, text, **kwargs):
+    def detect_entity(self, texts, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -262,13 +269,12 @@ class TextDetector(BaseDetector):
         is returned. For more information on how data is stored, see Datastore docs.
 
         Args:
-            text (unicode): string to extract textual entities from
+            texts (unicode or list): string or list of strings(bulk detect) to extract textual entities from
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
-                list: containing entity value as defined into datastore
-                list: containing corresponding original substrings in text
-
+                list or list of lists(bulk detect): containing entity value as defined into datastore
+                list or list of lists(bulk detect): containing corresponding original substrings in text
         Example:
             DataStore().get_entity_dictionary('city')
 
@@ -281,28 +287,62 @@ class TextDetector(BaseDetector):
                         u'hyderabad': [u'hyderabad'],
                         u'koramangala': [u'koramangala']
                     }
+            -- Single message
+                    text_detection = TextDetector('city')
+                    text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
 
-            text_detection = TextDetector('city')
-            text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
+                        Output:
+                            ([u'Chennai', u'New Delhi', u'chennai'], ['chennai', 'delhi', 'tamilnadu'])
 
-                Output:
-                    ([u'Chennai', u'New Delhi', u'chennai'], ['chennai', 'delhi', 'tamilnadu'])
+                    text_detection.tagged_text
 
-            text_detection.tagged_text
+                        Output:
+                            [' come to __city__, __city__,  i will visit __city__ next year ']
+            --Bulk detection
+                    text_detection = TextDetector('city')
+                    list_of_sentences = ['Come to Chennai, TamilNadu,  I will visit Delhi next year',
+                                        'I live in Delhi]
 
-                Output:
-                    ' come to __city__, __city__,  i will visit __city__ next year '
+                    text_detection.detect_entity(list_of_sentences)
+                        Output:
+                            (   [
+                                    [u'Chennai', u'New Delhi', u'chennai'],
+                                    [u'New Delhi']
+                                ],
+                                [
+                                    ['chennai', 'delhi', 'tamilnadu'],
+                                    [delhi]
+                                ]
+                            )
+
+                    text_detection.tagged_text
+                        Output:
+                            [
+                                ' come to __city__, __city__,  i will visit __city__ next year ',
+                                ' i live in __city__ '
+                            ]
 
         Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        self._process_text(text)
+        st = time.time()
+        bulk_query = False
+        if type(texts) is list:
+            bulk_query = True
+        else:
+            texts = [texts]
 
+        self._process_text(texts)
+        print("time by process_text in text detection = {}".format(time.time()-st))
         values, original_texts = self._text_detection_with_variants()
 
         self.text_entity_values, self.original_texts = values, original_texts
-
-        return self.text_entity_values, self.original_texts
+        if bulk_query is True:
+            return self.text_entity_values, self.original_texts
+        else:
+            if len(self.text_entity_values) > 0 and len(self.original_texts) > 0:
+                return self.text_entity_values[0], self.original_texts[0]
+            return [], []
 
     def _text_detection_with_variants(self):
         """
@@ -313,61 +353,70 @@ class TextDetector(BaseDetector):
 
         Returns:
              tuple:
-                list: containing the detected text entities
-                list: containing their corresponding substrings in the original message.
+                list of lists: list of lists containing the detected text entities
+                list of lists: list of lists containing their corresponding substrings in the original message.
         """
-        original_final_list = []
-        value_final_list = []
-        variants_to_values = collections.OrderedDict()
 
-        text = u' '.join(TOKENIZER.tokenize(self.processed_text))
-        _variants_to_values = self.db.get_similar_dictionary(entity_name=self.entity_name,
-                                                             text=text,
-                                                             fuzziness_threshold=self._fuzziness,
-                                                             search_language_script=self._target_language_script)
-        for variant, value in iteritems(_variants_to_values):
-            variant = variant.lower()
-            if isinstance(variant, bytes):
-                variant = variant.decode('utf-8')
+        original_final_list_ = []
+        value_final_list_ = []
+        text = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.processed_text]
 
-            variants_to_values[variant] = value
+        _variants_to_values_list = self.db.get_similar_dictionary(entity_name=self.entity_name,
+                                                                  text=text,
+                                                                  fuzziness_threshold=self._fuzziness,
+                                                                  search_language_script=self._target_language_script)
+        st = time.time()
+        for index, _variants_to_values in enumerate(_variants_to_values_list):
+            original_final_list = []
+            value_final_list = []
+            variants_to_values = collections.OrderedDict()
+            for variant, value in iteritems(_variants_to_values):
+                variant = variant.lower()
+                if isinstance(variant, bytes):
+                    variant = variant.decode('utf-8')
 
-        variants_list = variants_to_values.keys()
+                variants_to_values[variant] = value
+            variants_list = variants_to_values.keys()
 
-        # Length based ordering, this reorders the results from datastore
-        # that are already sorted by some relevance scoring
+            # Length based ordering, this reorders the results from datastore
+            # that are already sorted by some relevance scoring
 
-        exact_matches, fuzzy_variants = [], []
-        _text = u' '.join(TOKENIZER.tokenize(self.processed_text))
-        for variant in variants_list:
-            if u' '.join(TOKENIZER.tokenize(variant)) in _text:
-                exact_matches.append(variant)
-            else:
-                fuzzy_variants.append(variant)
+            exact_matches, fuzzy_variants = [], []
+            _text = text
+            for variant in variants_list:
+                if u' '.join(TOKENIZER.tokenize(variant)) in _text[index]:
+                    exact_matches.append(variant)
+                else:
+                    fuzzy_variants.append(variant)
+            exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+            fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+            variants_list = exact_matches + fuzzy_variants
 
-        exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-        fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-        variants_list = exact_matches + fuzzy_variants
+            for variant in variants_list:
 
-        for variant in variants_list:
-            original_text = self._get_entity_substring_from_text(variant)
-            if original_text:
-                value_final_list.append(variants_to_values[variant])
-                original_final_list.append(original_text)
-                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), re.UNICODE)
-                self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
-                # Instead of dropping completely like in other entities,
-                # we replace with tag to avoid matching non contiguous segments
-                self.processed_text = _pattern.sub(self.tag, self.processed_text)
-        return value_final_list, original_final_list
+                original_text = self._get_entity_substring_from_text(variant, self.processed_text[index])
+                if original_text:
+                    value_final_list.append(variants_to_values[variant])
+                    original_final_list.append(original_text)
+                    _pattern = re.compile(r'\b%s\b' % re.escape(original_text), re.UNICODE)
+                    self.tagged_text[index] = _pattern.sub(self.tag, self.tagged_text[index])
+                    # Instead of dropping completely like in other entities,
+                    # we replace with tag to avoid matching non contiguous segments
+                    self.processed_text[index] = _pattern.sub(self.tag, self.processed_text[index])
+            value_final_list_.append(value_final_list)
+            original_final_list_.append(original_final_list)
+        print("time taken to process in _text_detection_with_variants = {}".format(time.time()-st))
 
-    def _get_entity_substring_from_text(self, variant):
+        return value_final_list_, original_final_list_
+
+    def _get_entity_substring_from_text(self, variant, sentence):
         """
         Check ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
         and return the closest substring in the text that matches the variant
 
         Args:
             variant(str or unicode): string, ngram of variant to fuzzy detect in the text using Levenshtein distance
+            sentence(str or unicode): sentence from self.processed on which detection is being done
 
         Returns:
             str or unicode or None: part of the given text that was detected as entity given the variant,
@@ -383,14 +432,13 @@ class TextDetector(BaseDetector):
             'delehi'
 
         """
-        text = self.processed_text
+        text = sentence
         variant_tokens = TOKENIZER.tokenize(variant)
         text_tokens = TOKENIZER.tokenize(text)
         original_text_tokens = []
         variant_token_i = 0
         for text_token in text_tokens:
             variant_token = variant_tokens[variant_token_i]
-
             same = variant_token == text_token
             ft = self._get_fuzziness_threshold_for_token(text_token)
             if same or (len(text_token) > self._min_token_size_for_fuzziness
@@ -400,7 +448,7 @@ class TextDetector(BaseDetector):
                 original_text_tokens.append(text_token)
                 variant_token_i += 1
                 if variant_token_i == len(variant_tokens):
-                    return self._get_substring_from_processed_text(original_text_tokens)
+                    return self._get_substring_from_processed_text(original_text_tokens, sentence)
             else:
                 original_text_tokens = []
                 variant_token_i = 0

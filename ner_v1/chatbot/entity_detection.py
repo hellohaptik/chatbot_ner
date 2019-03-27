@@ -94,7 +94,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
-        message (str or unicode or None): natural language text on which detection logic is to be run.
+        message (str or unicode or None or list): natural language text on which detection logic is to be run.
                                           Note if structured value is passed detection is run on
                                           structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
@@ -109,7 +109,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         bot_message (str or unicode or None): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
         **kwargs: extra configuration arguments for TextDetector
-            fuzziness (str or int or None): fuziness to apply while detecting text entities
+            fuzziness (str or int or None): fuzziness to apply while detecting text entities
             min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
             live_crf_model_path (str) : path to the CRF model to use to detect entites. Defaults to None
             read_model_from_s3 (bool): If True read CRF model from S3. Defaults to False

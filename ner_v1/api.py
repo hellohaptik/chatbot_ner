@@ -22,6 +22,7 @@ from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZIN
                              PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3,
                              PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
                              PARAMETER_LIVE_CRF_MODEL_PATH)
+from django.views.decorators.csrf import csrf_exempt
 
 
 def to_bool(value):
@@ -74,6 +75,41 @@ def get_parameters_dictionary(request):
     return parameters_dict
 
 
+def parse_post_request(request):
+    # type: (django.http.HttpRequest) -> Dict[str, Any]
+    """
+    Extract POST request body from HTTP request
+
+    Args:
+        request (django.http.HttpRequest): HTTP response from url
+
+    Returns:
+       dict: parameters from the request
+    """
+    request_data = json.loads(request.body)
+    parameters_dict = {
+        PARAMETER_MESSAGE: request_data.get('message'),
+        PARAMETER_ENTITY_NAME: request_data.get('entity_name'),
+        PARAMETER_STRUCTURED_VALUE: request_data.get('structured_value'),
+        PARAMETER_FALLBACK_VALUE: request_data.get('fallback_value'),
+        PARAMETER_BOT_MESSAGE: request_data.get('bot_message'),
+        PARAMETER_TIMEZONE: request_data.get('timezone'),
+        PARAMETER_REGEX: request_data.get('regex'),
+        PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
+        PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
+        PARAMETER_FUZZINESS: request_data.get('fuzziness'),
+        PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request_data.get('min_token_len_fuzziness'),
+        PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
+        PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
+        PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
+        PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
+        PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path')
+    }
+
+    return parameters_dict
+
+
+@csrf_exempt
 def text(request):
     """
     Run text detector with crf model on the 'message' passed in the request
@@ -85,8 +121,13 @@ def text(request):
        dict: GET parameters from the request
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_text(
             message=parameters_dict[PARAMETER_MESSAGE],
             entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
@@ -105,6 +146,39 @@ def text(request):
         ner_logger.exception('Exception for text_synonym: %s ' % e)
         return HttpResponse(status=500)
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
+# def text_bulk_detection(request):
+#     """
+#     Run text detector for a list of messages
+#
+#     Args:
+#         request (django.http.HttpRequest): HTTP response from url
+#
+#     Returns:
+#        dict: GET parameters from the request
+#     """
+#     try:
+#         parameters_dict = get_parameters_dictionary_post_request(request)
+#         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+#         entity_output = get_text(
+#             message=parameters_dict[PARAMETER_MESSAGE],
+#             entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
+#             structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+#             fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+#             bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
+#             language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
+#             fuzziness=parameters_dict[PARAMETER_FUZZINESS],
+#             min_token_len_fuzziness=parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS],
+#             live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH],
+#             read_model_from_s3=parameters_dict[PARAMETER_READ_MODEL_FROM_S3],
+#             read_embeddings_from_remote_url=parameters_dict[PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL],
+#         )
+#         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+#     except TypeError as e:
+#         ner_logger.exception('Exception for text_synonym: %s ' % e)
+#         return HttpResponse(status=500)
+#     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
 def location(request):
