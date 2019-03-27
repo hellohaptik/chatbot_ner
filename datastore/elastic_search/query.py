@@ -12,7 +12,6 @@ from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 import json
-import time
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -284,12 +283,9 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    st = time.time()
     data = [
         _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
                                        language_script=search_language_script) for sentence in sentences]
-    print("time taken for generating queries = {}".format(time.time()-st))
-
     # kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
     query_data = []
     index_for_each_query = {}
@@ -300,12 +296,8 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
         request += '%s \n' % json.dumps(each)
 
     kwargs = dict(kwargs, body=request, doc_type=doc_type, index=index_name)
-    st = time.time()
     results = _run_es_search(connection, **kwargs)
-    print("time taken by elasticsearch = {}".format(time.time() - st))
-    st = time.time()
     results = _parse_es_search_results(results.get("responses"))
-    print("time taken to parse elasticsearch results = {}".format(time.time() - st))
     return results
 
 

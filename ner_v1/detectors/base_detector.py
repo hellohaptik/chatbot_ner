@@ -10,7 +10,6 @@ from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-import time
 
 
 class BaseDetector(object):
@@ -211,7 +210,6 @@ class BaseDetector(object):
                 ]
             ]
         """
-        st = time.time()
         if detection_method_list is None:
             detection_method_list = []
         if entity_value_list is None:
@@ -235,7 +233,6 @@ class BaseDetector(object):
                     }
                 )
             bulk_detection_entity_list.append(entity_list)
-        print("extra time in base detector = {}".format(time.time()-st))
         return bulk_detection_entity_list
 
     @staticmethod
@@ -269,7 +266,6 @@ class BaseDetector(object):
                 }
             ]
         """
-        st = time.time()
         if detection_method_list is None:
             detection_method_list = []
         if entity_value_list is None:
@@ -290,5 +286,4 @@ class BaseDetector(object):
                     DETECTION_LANGUAGE: detection_language
                 }
             )
-        print("extra time in base detector = {}".format(time.time() - st))
         return entity_list

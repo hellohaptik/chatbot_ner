@@ -5,7 +5,6 @@ from models.crf_v2.crf_detect_entity import CrfDetection
 from ner_constants import ENTITY_VALUE_DICT_KEY
 from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-import time
 
 
 class TextModelDetector(TextDetector):
@@ -122,14 +121,12 @@ class TextModelDetector(TextDetector):
             crf_original_texts = crf_model.detect_entity(text=text)
 
         values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
-        st = time.time()
         if values and type(values[0]) is list:
             self.text_entity_values, self.original_texts = [], []
             for inner_values, inner_original_texts in zip(values, original_texts):
-                text_entity_verified_values, original_texts = self.combine_results(values=inner_values,
-                                                                                   original_texts=inner_original_texts,
-                                                                                   crf_original_texts=crf_original_texts
-                                                                                   )
+                text_entity_verified_values, original_texts = \
+                    self.combine_results(values=inner_values, original_texts=inner_original_texts,
+                                         crf_original_texts=crf_original_texts)
                 self.text_entity_values.append(text_entity_verified_values)
                 self.original_texts.append(original_texts)
         else:
@@ -137,7 +134,6 @@ class TextModelDetector(TextDetector):
                                                                                original_texts=original_texts,
                                                                                crf_original_texts=crf_original_texts)
             self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
-        print("time taken by detect_entity in text_model_detection = {}".format(time.time() - st))
 
         return self.text_entity_values, self.original_texts
 

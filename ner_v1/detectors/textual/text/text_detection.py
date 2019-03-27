@@ -9,7 +9,6 @@ from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
-import time
 
 
 class TextDetector(BaseDetector):
@@ -325,7 +324,6 @@ class TextDetector(BaseDetector):
         Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        st = time.time()
         bulk_query = False
         if type(texts) is list:
             bulk_query = True
@@ -333,7 +331,6 @@ class TextDetector(BaseDetector):
             texts = [texts]
 
         self._process_text(texts)
-        print("time by process_text in text detection = {}".format(time.time()-st))
         values, original_texts = self._text_detection_with_variants()
 
         self.text_entity_values, self.original_texts = values, original_texts
@@ -365,7 +362,6 @@ class TextDetector(BaseDetector):
                                                                   text=text,
                                                                   fuzziness_threshold=self._fuzziness,
                                                                   search_language_script=self._target_language_script)
-        st = time.time()
         for index, _variants_to_values in enumerate(_variants_to_values_list):
             original_final_list = []
             value_final_list = []
@@ -405,7 +401,6 @@ class TextDetector(BaseDetector):
                     self.processed_text[index] = _pattern.sub(self.tag, self.processed_text[index])
             value_final_list_.append(value_final_list)
             original_final_list_.append(original_final_list)
-        print("time taken to process in _text_detection_with_variants = {}".format(time.time()-st))
 
         return value_final_list_, original_final_list_
 
