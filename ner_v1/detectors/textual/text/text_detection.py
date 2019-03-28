@@ -197,7 +197,7 @@ class TextDetector(BaseDetector):
         def _get_tokens_and_indices(txt):
             """
             Args:
-                text (str or unicode): text to get tokens from and indicies of those tokens in the given text
+                txt (str or unicode): text to get tokens from and indicies of those tokens in the given text
 
             Returns:
                 tuple:
@@ -423,7 +423,7 @@ class TextDetector(BaseDetector):
 
         Args:
             variant(str or unicode): string, ngram of variant to fuzzy detect in the text using Levenshtein distance
-            sentence(str or unicode): sentence from self.processed on which detection is being done
+            text(str or unicode): sentence from self.processed on which detection is being done
 
         Returns:
             str or unicode or None: part of the given text that was detected as entity given the variant,
