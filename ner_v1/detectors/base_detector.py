@@ -92,6 +92,8 @@ class BaseDetector(object):
                     {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
                     'entity_value': {'value': u"Domino's Pizza"}}]
         """
+        if messages is None:
+            messages = []
         if self._source_language_script != self._target_language_script and self._translation_enabled:
             translation_output_list = [
                 translate_text(message_, self._source_language_script, self._target_language_script)
