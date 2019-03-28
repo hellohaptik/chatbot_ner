@@ -21,10 +21,8 @@ class TextDetector(BaseDetector):
 
 
     Attributes:
-        text (str): string to extract entities from
         entity_name (str): string by which the detected time entities would
                            be replaced with on calling detect_entity()
-        text_dict (dict): dictionary to store lemmas, stems, ngrams used during detection process
         _fuzziness (str or int): If this parameter is str, elasticsearch's
                                  auto is used with low and high term distances. Default low and high term distances
                                  are 3 and 6 for elasticsearch. For this module they are set to 4 and 7 respectively.
@@ -34,8 +32,6 @@ class TextDetector(BaseDetector):
         _min_token_size_for_fuzziness (int): minimum number of letters a word must have to be considered
                                              for calculating edit distance with similar ngrams from the datastore
         tagged_text (str): string with time entities replaced with tag defined by entity_name
-        text_entity_values (list): list to store detected entities from the text
-        original_texts (list): list of substrings of the text detected as entities
         processed_text (str): string with detected text entities removed
         tag (str): entity_name prepended and appended with '__'
     """
@@ -58,13 +54,12 @@ class TextDetector(BaseDetector):
             lang_constant.GUJARATI_LANG,  # Added temporarily till text detection is ported to v2 api
         ]
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
-
-        self.text = None
-        self.text_dict = {}
         self.tagged_text = None
-        self.text_entity_values = []
-        self.original_texts = []
         self.processed_text = None
+        self.__texts = []
+        self.__tagged_texts = []
+        self.__processed_texts = []
+
         self.entity_name = entity_name
         self.tag = '__' + self.entity_name + '__'
 
@@ -156,22 +151,22 @@ class TextDetector(BaseDetector):
 
     def _process_text(self, texts):
         text_lowercase = [text.lower() for text in texts]
-        self.text = []
+
         for text in text_lowercase:
             if isinstance(text, bytes):
-                self.text.append(text.decode('utf-8'))
+                self.__texts.append(text.decode('utf-8'))
             else:
-                self.text.append(text)
+                self.__texts.append(text)
 
-        self.processed_text = self.text
+        self.__processed_texts = self.__texts
 
         # Note: following rules have been disabled because cause problem with generating original text
         # regex_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
         # self.processed_text = self.regx_to_process.text_substitute(self.processed_text)
-        self.processed_text = [u' ' + processed_text + u' ' for processed_text in self.processed_text]
-        self.tagged_text = self.processed_text
+        self.__processed_texts = [u' ' + processed_text + u' ' for processed_text in self.__processed_texts]
+        self.__tagged_texts = self.__processed_texts
 
-    def _get_substring_from_processed_text(self, matched_tokens, sentence):
+    def _get_substring_from_processed_text(self, text, matched_tokens):
         """
         Get part of original text that was detected as some entity value.
 
@@ -182,7 +177,7 @@ class TextDetector(BaseDetector):
             matched_tokens (list): list of tokens (usually tokens from fuzzy match results from ES)
                                    to find as a contiguous substring in the processed sentence considering the effects
                                    of tokenizer
-            sentence (string or unicode): sentence from self.processed_text  from where indices of given token will be
+            text (string or unicode): sentence from self.processed_text  from where indices of given token will be
                                             given
 
         Returns:
@@ -199,7 +194,7 @@ class TextDetector(BaseDetector):
         Notice that & is dropped during tokenization but when finding original text, we recover it from processed text
         """
 
-        def _get_tokens_and_indices(text):
+        def _get_tokens_and_indices(txt):
             """
             Args:
                 text (str or unicode): text to get tokens from and indicies of those tokens in the given text
@@ -216,7 +211,7 @@ class TextDetector(BaseDetector):
                   [(1, 2), (3, 7), (8, 10), (11, 16), (17, 18), (19, 21), (22, 25), (28, 34)])
 
             """
-            txt = text.rstrip() + ' __eos__'
+            txt = txt.rstrip() + ' __eos__'
             processed_text_tokens = TOKENIZER.tokenize(txt)
             processed_text_tokens_indices = []
 
@@ -248,14 +243,14 @@ class TextDetector(BaseDetector):
 
         try:
             n = len(matched_tokens)
-            tokens, indices = _get_tokens_and_indices(sentence)
+            tokens, indices = _get_tokens_and_indices(text)
             for i in range(len(tokens) - n + 1):
                 if tokens[i:i + n] == matched_tokens:
                     start = indices[i][0]
                     end = indices[i + n - 1][1]
-                    return sentence[start:end]
+                    return text[start:end]
         except (ValueError, IndexError):
-            ner_logger.exception('Error getting original text (%s, %s)' % (matched_tokens, sentence))
+            ner_logger.exception('Error getting original text (%s, %s)' % (matched_tokens, text))
 
         return u' '.join(matched_tokens)
 
@@ -310,14 +305,10 @@ class TextDetector(BaseDetector):
                             ' i live in __city__ '
                         ]
 
-        Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
-        respectively.
         """
         self._process_text(texts)
-        values, original_texts = self._text_detection_with_variants()
-
-        self.text_entity_values, self.original_texts = values, original_texts
-        return self.text_entity_values, self.original_texts
+        text_entity_values, original_texts = self._text_detection_with_variants()
+        return text_entity_values, original_texts
 
     def detect_entity(self, text, **kwargs):
         """
@@ -351,17 +342,15 @@ class TextDetector(BaseDetector):
             text_detection.tagged_text
                 Output:
                     ' come to __city__, __city__,  i will visit __city__ next year '
-        Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
-        respectively.
         """
-        text = [text]
-        self._process_text(text)
+        texts = [text]
+        self._process_text(texts)
+        text_entity_values, original_texts = self._text_detection_with_variants()
 
-        values, original_texts = self._text_detection_with_variants()
-
-        self.text_entity_values, self.original_texts = values, original_texts
-        if len(self.text_entity_values) > 0 and len(self.original_texts) > 0:
-            return self.text_entity_values[0], self.original_texts[0]
+        if len(text_entity_values) > 0 and len(original_texts) > 0:
+            self.tagged_text = self.__tagged_texts[0]
+            self.processed_text = self.__processed_texts[0]
+            return text_entity_values[0], original_texts[0]
         return [], []
 
     def _text_detection_with_variants(self):
@@ -379,7 +368,7 @@ class TextDetector(BaseDetector):
 
         original_final_list_ = []
         value_final_list_ = []
-        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.processed_text]
+        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.__processed_texts]
 
         _variants_to_values_list = self.db.get_similar_dictionary(entity_name=self.entity_name,
                                                                   texts=texts,
@@ -413,21 +402,21 @@ class TextDetector(BaseDetector):
 
             for variant in variants_list:
 
-                original_text = self._get_entity_substring_from_text(variant, self.processed_text[index])
+                original_text = self._get_entity_substring_from_text(self.__processed_texts[index], variant)
                 if original_text:
                     value_final_list.append(variants_to_values[variant])
                     original_final_list.append(original_text)
                     _pattern = re.compile(r'\b%s\b' % re.escape(original_text), re.UNICODE)
-                    self.tagged_text[index] = _pattern.sub(self.tag, self.tagged_text[index])
+                    self.__tagged_texts[index] = _pattern.sub(self.tag, self.__tagged_texts[index])
                     # Instead of dropping completely like in other entities,
                     # we replace with tag to avoid matching non contiguous segments
-                    self.processed_text[index] = _pattern.sub(self.tag, self.processed_text[index])
+                    self.__processed_texts[index] = _pattern.sub(self.tag, self.__processed_texts[index])
             value_final_list_.append(value_final_list)
             original_final_list_.append(original_final_list)
 
         return value_final_list_, original_final_list_
 
-    def _get_entity_substring_from_text(self, variant, sentence):
+    def _get_entity_substring_from_text(self, text, variant):
         """
         Check ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
         and return the closest substring in the text that matches the variant
@@ -450,7 +439,6 @@ class TextDetector(BaseDetector):
             'delehi'
 
         """
-        text = sentence
         variant_tokens = TOKENIZER.tokenize(variant)
         text_tokens = TOKENIZER.tokenize(text)
         original_text_tokens = []
@@ -466,7 +454,7 @@ class TextDetector(BaseDetector):
                 original_text_tokens.append(text_token)
                 variant_token_i += 1
                 if variant_token_i == len(variant_tokens):
-                    return self._get_substring_from_processed_text(original_text_tokens, sentence)
+                    return self._get_substring_from_processed_text(text, original_text_tokens)
             else:
                 original_text_tokens = []
                 variant_token_i = 0
