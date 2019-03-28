@@ -259,16 +259,17 @@ class TextDetector(BaseDetector):
 
         return u' '.join(matched_tokens)
 
-    def detect_entity(self, text, **kwargs):
+    def detect_entity_bulk(self, texts, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
-        returns two lists of detected text entities and their corresponding original substrings in text respectively.
+        returns two lists of list of detected text entities  and their corresponding original substrings
+        for each sentence in text respectively.
         Note that datastore stores number of values under a entity_name and each entity_value has its own list of
         variants, whenever a variant is matched sucessfully, the entity_value whose list the variant belongs to,
         is returned. For more information on how data is stored, see Datastore docs.
 
         Args:
-            text (unicode or list): string or list of strings(bulk detect) to extract textual entities from
+            texts (list): list of strings(bulk detect) to extract textual entities from
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -286,60 +287,82 @@ class TextDetector(BaseDetector):
                         u'hyderabad': [u'hyderabad'],
                         u'koramangala': [u'koramangala']
                     }
-            -- Single message
-                    text_detection = TextDetector('city')
-                    text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
+                text_detection = TextDetector('city')
+                list_of_sentences = ['Come to Chennai, TamilNadu,  I will visit Delhi next year',
+                                    'I live in Delhi]
 
-                        Output:
-                            ([u'Chennai', u'New Delhi', u'chennai'], ['chennai', 'delhi', 'tamilnadu'])
-
-                    text_detection.tagged_text
-
-                        Output:
-                            [' come to __city__, __city__,  i will visit __city__ next year ']
-            --Bulk detection
-                    text_detection = TextDetector('city')
-                    list_of_sentences = ['Come to Chennai, TamilNadu,  I will visit Delhi next year',
-                                        'I live in Delhi]
-
-                    text_detection.detect_entity(list_of_sentences)
-                        Output:
-                            (   [
-                                    [u'Chennai', u'New Delhi', u'chennai'],
-                                    [u'New Delhi']
-                                ],
-                                [
-                                    ['chennai', 'delhi', 'tamilnadu'],
-                                    [delhi]
-                                ]
-                            )
-
-                    text_detection.tagged_text
-                        Output:
+                text_detection.detect_entity(list_of_sentences)
+                    Output:
+                        (   [
+                                [u'Chennai', u'New Delhi', u'chennai'],
+                                [u'New Delhi']
+                            ],
                             [
-                                ' come to __city__, __city__,  i will visit __city__ next year ',
-                                ' i live in __city__ '
+                                ['chennai', 'delhi', 'tamilnadu'],
+                                [delhi]
                             ]
+                        )
+
+                text_detection.tagged_text
+                    Output:
+                        [
+                            ' come to __city__, __city__,  i will visit __city__ next year ',
+                            ' i live in __city__ '
+                        ]
 
         Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
         respectively.
         """
-        bulk_query = False
-        if type(text) is list:
-            bulk_query = True
-        else:
-            text = [text]
-
-        self._process_text(text)
+        self._process_text(texts)
         values, original_texts = self._text_detection_with_variants()
 
         self.text_entity_values, self.original_texts = values, original_texts
-        if bulk_query is True:
-            return self.text_entity_values, self.original_texts
-        else:
-            if len(self.text_entity_values) > 0 and len(self.original_texts) > 0:
-                return self.text_entity_values[0], self.original_texts[0]
-            return [], []
+        return self.text_entity_values, self.original_texts
+
+    def detect_entity(self, text, **kwargs):
+        """
+        Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
+        returns two lists of detected text entities and their corresponding original substrings in text respectively.
+        Note that datastore stores number of values under a entity_name and each entity_value has its own list of
+        variants, whenever a variant is matched sucessfully, the entity_value whose list the variant belongs to,
+        is returned. For more information on how data is stored, see Datastore docs.
+        Args:
+            text (unicode): string to extract textual entities from
+            **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
+        Returns:
+            tuple:
+                list: containing entity value as defined into datastore
+                list: containing corresponding original substrings in text
+        Example:
+            DataStore().get_entity_dictionary('city')
+                Output:
+                    {
+                        u'Agartala': [u'', u'Agartala'],
+                        u'Barnala': [u'', u'Barnala'],
+                        ...
+                        u'chennai': [u'', u'chennai', u'tamilnadu', u'madras'],
+                        u'hyderabad': [u'hyderabad'],
+                        u'koramangala': [u'koramangala']
+                    }
+            text_detection = TextDetector('city')
+            text_detection.detect_entity('Come to Chennai, TamilNadu,  I will visit Delhi next year')
+                Output:
+                    ([u'Chennai', u'New Delhi', u'chennai'], ['chennai', 'delhi', 'tamilnadu'])
+            text_detection.tagged_text
+                Output:
+                    ' come to __city__, __city__,  i will visit __city__ next year '
+        Additionally this function assigns these lists to self.text_entity_values and self.original_texts attributes
+        respectively.
+        """
+        text = [text]
+        self._process_text(text)
+
+        values, original_texts = self._text_detection_with_variants()
+
+        self.text_entity_values, self.original_texts = values, original_texts
+        if len(self.text_entity_values) > 0 and len(self.original_texts) > 0:
+            return self.text_entity_values[0], self.original_texts[0]
+        return [], []
 
     def _text_detection_with_variants(self):
         """
@@ -356,10 +379,10 @@ class TextDetector(BaseDetector):
 
         original_final_list_ = []
         value_final_list_ = []
-        text = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.processed_text]
+        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.processed_text]
 
         _variants_to_values_list = self.db.get_similar_dictionary(entity_name=self.entity_name,
-                                                                  text=text,
+                                                                  texts=texts,
                                                                   fuzziness_threshold=self._fuzziness,
                                                                   search_language_script=self._target_language_script)
         for index, _variants_to_values in enumerate(_variants_to_values_list):
@@ -378,7 +401,7 @@ class TextDetector(BaseDetector):
             # that are already sorted by some relevance scoring
 
             exact_matches, fuzzy_variants = [], []
-            _text = text
+            _text = texts
             for variant in variants_list:
                 if u' '.join(TOKENIZER.tokenize(variant)) in _text[index]:
                     exact_matches.append(variant)

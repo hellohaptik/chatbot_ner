@@ -230,12 +230,12 @@ class DataStore(object):
 
         return results_dictionary
 
-    def get_similar_dictionary(self, entity_name, text, fuzziness_threshold="auto:4,7",
+    def get_similar_dictionary(self, entity_name, texts, fuzziness_threshold="auto:4,7",
                                search_language_script=None, **kwargs):
         """
         Args:
             entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
-            text(list of strings): the text for which variants need to be find out
+            texts(list of strings): the text for which variants need to be find out
             fuzziness_threshold: fuzziness allowed for search results on entity value variants
             search_language_script: language of elasticsearch documents which are eligible for match
             kwargs:
@@ -275,7 +275,7 @@ class DataStore(object):
                                                                 doc_type=self._connection_settings[
                                                                     ELASTICSEARCH_DOC_TYPE],
                                                                 entity_name=entity_name,
-                                                                sentence=text,
+                                                                sentences=texts,
                                                                 fuzziness_threshold=fuzziness_threshold,
                                                                 search_language_script=search_language_script,
                                                                 request_timeout=request_timeout,

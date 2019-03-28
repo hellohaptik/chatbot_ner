@@ -9,7 +9,7 @@ from external_api import api as external_api
 
 
 urlpatterns = [
-    url(r'v1/text_bulk_detection/$', api_v1.text),
+    url(r'v1/text_bulk/$', api_v1.text),
     url(r'^v1/text/$', api_v1.text),
     url(r'^v1/location/$', api_v1.location),
     url(r'^v1/phone_number/$', api_v1.phone_number),

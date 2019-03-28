@@ -239,7 +239,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     return values
 
 
-def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
+def full_text_query(connection, index_name, doc_type, entity_name, sentences, fuzziness_threshold,
                     search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given sentence . The query
@@ -250,7 +250,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
-        sentence(list of strings): sentences in which entity has to be searched
+        sentences(list of strings): sentences in which entity has to be searched
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
@@ -283,25 +283,21 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    data = [
-        _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
-                                       language_script=search_language_script) for sentence_ in sentence]
-    # kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
-    query_data = []
-    index_for_each_query = {}
-    for query in data:
-        query_data.extend([index_for_each_query, query])
-    request = ''
-    for each in query_data:
-        request += '%s \n' % json.dumps(each)
+    index_ = {'index': index_name, 'type': doc_type}
+    data = []
+    for sentence_ in sentences:
+        query = _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
+                                               language_script=search_language_script)
+        data.extend([json.dumps(index_), json.dumps(query)])
+    data = '\n'.join(data)
 
-    kwargs = dict(kwargs, body=request, doc_type=doc_type, index=index_name)
-    results = _run_es_search(connection, **kwargs)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
+    results = _run_es_search(connection, _msearch=True, **kwargs)
     results = _parse_es_search_results(results.get("responses"))
     return results
 
 
-def _run_es_search(connection, **kwargs):
+def _run_es_search(connection, _msearch=False, **kwargs):
     """
     Execute the elasticsearch.ElasticSearch.msearch() method and return all results using
     elasticsearch.ElasticSearch.scroll() method if and only if scroll is passed in kwargs.
@@ -316,7 +312,13 @@ def _run_es_search(connection, **kwargs):
     """
     scroll = kwargs.pop('scroll', False)
     if not scroll:
-        return connection.msearch(**kwargs)
+        if _msearch is True:
+            return connection.msearch(**kwargs)
+        else:
+            return connection.search(**kwargs)
+
+    if scroll and _msearch is True:
+        raise ValueError('Scrolling is not supported in msearch mode')
 
     result = connection.search(scroll=scroll, **kwargs)
     scroll_id = result['_scroll_id']
@@ -399,7 +401,7 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
                 'should': [],
                 'minimum_should_match': 1
             }
-        }, 'from': 0, 'size': constants.ELASTICSEARCH_SEARCH_SIZE
+        }, 'size': constants.ELASTICSEARCH_SEARCH_SIZE
     }
     query_should_data = []
     query = {
