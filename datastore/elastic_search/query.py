@@ -283,21 +283,21 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    index_ = {'index': index_name, 'type': doc_type}
+    index = {'index': index_name, 'type': doc_type}
     data = []
     for sentence_ in sentences:
         query = _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
                                                language_script=search_language_script)
-        data.extend([json.dumps(index_), json.dumps(query)])
+        data.extend([json.dumps(index), json.dumps(query)])
     data = '\n'.join(data)
 
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
-    results = _run_es_search(connection, _msearch=True, **kwargs)
+    results = _run_es_search(connection, msearch=True, **kwargs)
     results = _parse_es_search_results(results.get("responses"))
     return results
 
 
-def _run_es_search(connection, _msearch=False, **kwargs):
+def _run_es_search(connection, msearch=False, **kwargs):
     """
     Execute the elasticsearch.ElasticSearch.msearch() method and return all results using
     elasticsearch.ElasticSearch.scroll() method if and only if scroll is passed in kwargs.
@@ -312,12 +312,12 @@ def _run_es_search(connection, _msearch=False, **kwargs):
     """
     scroll = kwargs.pop('scroll', False)
     if not scroll:
-        if _msearch is True:
+        if msearch:
             return connection.msearch(**kwargs)
         else:
             return connection.search(**kwargs)
 
-    if scroll and _msearch is True:
+    if scroll and msearch:
         raise ValueError('Scrolling is not supported in msearch mode')
 
     result = connection.search(scroll=scroll, **kwargs)

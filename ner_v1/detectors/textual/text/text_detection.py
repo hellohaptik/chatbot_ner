@@ -307,8 +307,8 @@ class TextDetector(BaseDetector):
 
         """
         self._process_text(texts)
-        text_entity_values, original_texts = self._text_detection_with_variants()
-        return text_entity_values, original_texts
+        text_entity_values_list, original_texts_list = self._text_detection_with_variants()
+        return text_entity_values_list, original_texts_list
 
     def detect_entity(self, text, **kwargs):
         """

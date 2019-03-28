@@ -17,6 +17,7 @@ from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
+import six
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -213,94 +214,13 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-    entity_output = text_model_detector.detect(message=message,
-                                               structured_value=structured_value,
-                                               fallback_value=fallback_value,
-                                               bot_message=bot_message)
-
-    return entity_output
-
-
-def get_text_bulk(messages, entity_name, language=ENGLISH_LANG, **kwargs):
-    """Use TextDetector (datastore/elasticsearch) to detect textual entities for a list of messages
-
-    Args:
-        messages (list): natural language text on which detection logic is to be run.
-                                          Note if structured value is passed detection is run on
-                                          structured value instead of message
-        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
-                           if entity uses elastic-search lookup
-        structured_value (str or unicode or None): Value obtained from any structured elements.
-                                                   Note if structured value is detection is run on
-                                                   structured value instead of message
-                                                   (For example, UI elements like form, payload, etc)
-        fallback_value (str or unicode or None): If the detection logic fails to detect any value
-                                                 either from structured_value or message then
-                                                 we return a fallback_value as an output.
-        bot_message (str or unicode or None): previous message from a bot/agent.
-        language (str): ISO 639-1 code of language of message
-        **kwargs: extra configuration arguments for TextDetector
-            fuzziness (str or int or None): fuzziness to apply while detecting text entities
-            min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
-            live_crf_model_path (str) : path to the CRF model to use to detect entites. Defaults to None
-            read_model_from_s3 (bool): If True read CRF model from S3. Defaults to False
-            read_embeddings_from_remote_url (bool): if True read word embeddings from configured remote url. Defaults
-                                                    to False
-
-
-
-
-    Returns:
-        list or None: containing lists of dictionaries which contain entity_value, original_text and detection;
-                      entity_value is in itself a dict with its keys varying from entity to entity
-
-    Example:
-
-        >>> messages = [u'i want to order chinese from  mainland china and pizza from domminos']
-        >>> entity_name = 'restaurant'
-        >>> structured_value = None
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text_bulk(messages=messages,
-        >>>                   entity_name=entity_name)
-        >>> print(output)
-
-        [
-            [
-                {
-                    'detection': 'message',
-                    'original_text': 'mainland china',
-                    'entity_value': {'value': u'Mainland China'}
-                },
-                {
-                    'detection': 'message',
-                    'original_text': 'domminos',
-                    'entity_value': {'value': u"Domino's Pizza"}
-                }
-            ]
-        ]
-    """
-    fuzziness = kwargs.get('fuzziness', None)
-    min_token_len_fuzziness = kwargs.get('min_token_len_fuzziness', None)
-    live_crf_model_path = kwargs.get('live_crf_model_path', None)
-    read_model_from_s3 = kwargs.get('read_model_from_s3', False)
-    read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
-
-    text_model_detector = TextModelDetector(entity_name=entity_name,
-                                            language=language,
-                                            live_crf_model_path=live_crf_model_path,
-                                            read_model_from_s3=read_model_from_s3,
-                                            read_embeddings_from_remote_url=read_embeddings_from_remote_url)
-
-    if fuzziness:
-        fuzziness = parse_fuzziness_parameter(fuzziness)
-        text_model_detector.set_fuzziness_threshold(fuzziness)
-
-    if min_token_len_fuzziness:
-        min_token_len_fuzziness = int(min_token_len_fuzziness)
-        text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
-
-    entity_output = text_model_detector.detect_bulk(messages=messages)
+    if isinstance(message, six.string_types):
+        entity_output = text_model_detector.detect(message=message,
+                                                   structured_value=structured_value,
+                                                   fallback_value=fallback_value,
+                                                   bot_message=bot_message)
+    elif isinstance(message, (list, tuple)):
+        entity_output = text_model_detector.detect_bulk(messages=message)
 
     return entity_output
 

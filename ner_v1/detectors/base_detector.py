@@ -102,14 +102,14 @@ class BaseDetector(object):
                 messages.append(translation_output[TRANSLATED_TEXT] if translation_output['status'] else '')
 
         texts = messages
-        entity_list, original_text_list = self.detect_entity_bulk(texts=texts)
+        entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
 
-        if entity_list:
-            value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
+        if entities_list:
+            values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
         else:
             return None
 
-        return self.output_entity_bulk(entity_value_list=value, original_text_list=original_text,
+        return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
                                        detection_method=method,
                                        detection_language=self._target_language_script)
 
@@ -196,14 +196,14 @@ class BaseDetector(object):
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
                                             detection_method=method, detection_language=self._target_language_script)
 
-    def output_entity_bulk(self, entity_value_list, original_text_list, detection_method=None,
+    def output_entity_bulk(self, entity_values_list, original_texts_list, detection_method=None,
                            detection_method_list=None, detection_language=ENGLISH_LANG):
         """
         Format detected entity values for bulk detection
         Args:
-            entity_value_list (list of lists): containing list of entity values which are identified from given
+            entity_values_list (list of lists): containing list of entity values which are identified from given
                                                 detection logic
-            original_text_list (list of lists): containing list original values or actual values from
+            original_texts_list (list of lists): containing list original values or actual values from
                                                 messages which are identified
             detection_method (str, optional): how the entity was detected
                                               i.e. whether from message, structured_value
@@ -244,11 +244,11 @@ class BaseDetector(object):
         """
         if detection_method_list is None:
             detection_method_list = []
-        if entity_value_list is None:
-            entity_value_list = []
+        if entity_values_list is None:
+            entity_values_list = []
 
         bulk_detection_entity_list = []
-        for index, entity_values in enumerate(entity_value_list):
+        for index, entity_values in enumerate(entity_values_list):
             entity_list = []
             for i, entity_value in enumerate(entity_values):
                 if type(entity_value) in [str, six.text_type]:
@@ -260,7 +260,7 @@ class BaseDetector(object):
                     {
                         ENTITY_VALUE: entity_value,
                         DETECTION_METHOD: method,
-                        ORIGINAL_TEXT: original_text_list[index][i],
+                        ORIGINAL_TEXT: original_texts_list[index][i],
                         DETECTION_LANGUAGE: detection_language
                     }
                 )

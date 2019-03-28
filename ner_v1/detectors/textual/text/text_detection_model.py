@@ -161,15 +161,15 @@ class TextModelDetector(TextDetector):
 
         crf_original_texts = []
 
-        values, original_texts = super(TextModelDetector, self).detect_entity_bulk(texts, **kwargs)
-        text_entity_values, original_texts_detected = [], []
-        for inner_values, inner_original_texts in six.moves.zip(values, original_texts):
+        values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(texts, **kwargs)
+        text_entity_values_list, original_texts_detected_list = [], []
+        for inner_values, inner_original_texts in six.moves.zip(values_list, original_texts_list):
             text_entity_verified_values, original_texts = \
                 self.combine_results(values=inner_values, original_texts=inner_original_texts,
                                      crf_original_texts=crf_original_texts)
-            text_entity_values.append(text_entity_verified_values)
-            original_texts_detected.append(original_texts)
-        return text_entity_values, original_texts_detected
+            text_entity_values_list.append(text_entity_verified_values)
+            original_texts_detected_list.append(original_texts)
+        return text_entity_values_list, original_texts_detected_list
 
     def _add_verification_source(self, values, verification_source_dict):
         """
