@@ -11,6 +11,7 @@ from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
+import json
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -238,7 +239,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
     return values
 
 
-def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuzziness_threshold,
+def full_text_query(connection, index_name, doc_type, entity_name, sentences, fuzziness_threshold,
                     search_language_script=None, **kwargs):
     """
     Performs compound elasticsearch boolean search query with highlights for the given sentence . The query
@@ -249,16 +250,16 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
         index_name: The name of the index
         doc_type: The type of the documents that will be indexed
         entity_name: name of the entity to perform a 'term' query on
-        sentence: sentence in which entity has to be searched
+        sentences(list of strings): sentences in which entity has to be searched
         fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
         search_language_script: language of elasticsearch documents which are eligible for match
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
 
     Returns:
-        collections.OrderedDict: dictionary of the parsed results from highlighted search query results
-                                 on the sentence, mapping highlighted fuzzy entity variant to entity value ordered
-                                 by relevance order returned by elasticsearch
+        list of collections.OrderedDict: list of dictionaries of the parsed results from highlighted search query
+                            results on the sentence, mapping highlighted fuzzy entity variant to entity value ordered
+                            by relevance order returned by elasticsearch
 
     Example:
         # The following example is just for demonstration purpose. Normally we should call
@@ -282,17 +283,23 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentence, fuz
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    data = _generate_es_search_dictionary(entity_name, sentence, fuzziness_threshold,
-                                          language_script=search_language_script)
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name)
-    results = _run_es_search(connection, **kwargs)
-    results = _parse_es_search_results(results)
+    index = {'index': index_name, 'type': doc_type}
+    data = []
+    for sentence_ in sentences:
+        query = _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
+                                               language_script=search_language_script)
+        data.extend([json.dumps(index), json.dumps(query)])
+    data = '\n'.join(data)
+
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
+    results = _run_es_search(connection, msearch=True, **kwargs)
+    results = _parse_es_search_results(results.get("responses"))
     return results
 
 
-def _run_es_search(connection, **kwargs):
+def _run_es_search(connection, msearch=False, **kwargs):
     """
-    Execute the elasticsearch.ElasticSearch.search() method and return all results using
+    Execute the elasticsearch.ElasticSearch.msearch() method and return all results using
     elasticsearch.ElasticSearch.scroll() method if and only if scroll is passed in kwargs.
     Note that this is not recommended for large queries and can severly impact performance.
 
@@ -301,11 +308,17 @@ def _run_es_search(connection, **kwargs):
         kwargs:
             Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
     Returns:
-        dictionary, search results from elasticsearch.ElasticSearch.search
+        dictionary, search results from elasticsearch.ElasticSearch.msearch
     """
     scroll = kwargs.pop('scroll', False)
     if not scroll:
-        return connection.search(**kwargs)
+        if msearch:
+            return connection.msearch(**kwargs)
+        else:
+            return connection.search(**kwargs)
+
+    if scroll and msearch:
+        raise ValueError('Scrolling is not supported in msearch mode')
 
     result = connection.search(scroll=scroll, **kwargs)
     scroll_id = result['_scroll_id']
@@ -388,7 +401,7 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
                 'should': [],
                 'minimum_should_match': 1
             }
-        }
+        }, 'size': constants.ELASTICSEARCH_SEARCH_SIZE
     }
     query_should_data = []
     query = {
@@ -412,77 +425,86 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
     return data
 
 
-def _parse_es_search_results(results):
+def _parse_es_search_results(results_list):
     """
     Parse highlighted results returned from elasticsearch query and generate a variants to values dictionary
 
     Args:
-        results (dict): search results dictionary from elasticsearch including highlights and scores
+        results_list (list of dict): search results list of dictionaries from elasticsearch including highlights
+                                    and scores
 
     Returns:
-        collections.OrderedDict: dict mapping matching variants to their entity values based on the
-                                 parsed results from highlighted search query results
+        list of collections.OrderedDict: list containing dicts mapping matching variants to their entity values based
+                                  on the parsed results from highlighted search query results
 
     Example:
         Parameter ngram_results has highlighted search results as follows:
 
-        {u'_shards': {u'failed': 0, u'successful': 5, u'total': 5},
-        u'hits': {u'hits': [{u'_id': u'AVrW02UE9WNuMIY9vmWn',
-        u'_index': u'doc_type_name',
-        u'_score': 11.501145,
-        u'_source': {u'dict_type': u'variants',
-        u'entity_data': u'city',
-        u'value': u'goa',
-        u'variants': [u'', u'goa']},
-        u'_type': u'data_dictionary',
-        u'highlight': {u'variants': [u'<em>goa</em>']}},
-        {u'_id': u'AVrW02W99WNuMIY9vmcf',
-        u'_index': u'entity_data',
-        u'_score': 11.210829,
-        u'_source': {u'dict_type': u'variants',
-        u'entity_data': u'city',
-        u'value': u'Mumbai',
-        u'variants': [u'', u'Mumbai']},
-        u'_type': u'data_dictionary',
-        u'highlight': {u'variants': [u'<em>Mumbai</em>']}},
-        ...
-        u'max_score': 11.501145,
-        u'total': 17},
-        u'timed_out': False,
-        u'took': 96}
+        [
+            {u'_shards': {u'failed': 0, u'successful': 5, u'total': 5},
+            u'hits': {u'hits': [{u'_id': u'AVrW02UE9WNuMIY9vmWn',
+            u'_index': u'doc_type_name',
+            u'_score': 11.501145,
+            u'_source': {u'dict_type': u'variants',
+            u'entity_data': u'city',
+            u'value': u'goa',
+            u'variants': [u'', u'goa']},
+            u'_type': u'data_dictionary',
+            u'highlight': {u'variants': [u'<em>goa</em>']}},
+            {u'_id': u'AVrW02W99WNuMIY9vmcf',
+            u'_index': u'entity_data',
+            u'_score': 11.210829,
+            u'_source': {u'dict_type': u'variants',
+            u'entity_data': u'city',
+            u'value': u'Mumbai',
+            u'variants': [u'', u'Mumbai']},
+            u'_type': u'data_dictionary',
+            u'highlight': {u'variants': [u'<em>Mumbai</em>']}},
+            ...
+            u'max_score': 11.501145,
+            u'total': 17},
+            u'timed_out': False,
+            u'took': 96}
+        ]
 
         After parsing highlighted results, this function returns
 
-        {...
-         u'Mumbai': u'Mumbai',
-         ...
-         u'goa': u'goa',
-         u'mumbai': u'mumbai',
-         ...
-        }
+        [
+            {...
+             u'Mumbai': u'Mumbai',
+             ...
+             u'goa': u'goa',
+             u'mumbai': u'mumbai',
+             ...
+            }
+        ]
 
     """
-    entity_values, entity_variants = [], []
-    variants_to_values = collections.OrderedDict()
-    if results and results['hits']['total'] > 0:
-        for hit in results['hits']['hits']:
-            if 'highlight' not in hit:
-                continue
+    variants_to_values_list = []
+    if results_list:
+        for results in results_list:
+            entity_values, entity_variants = [], []
+            variants_to_values = collections.OrderedDict()
+            if results and results['hits']['total'] > 0:
+                for hit in results['hits']['hits']:
+                    if 'highlight' not in hit:
+                        continue
 
-            value = hit['_source']['value']
-            for variant in hit['highlight']['variants']:
-                entity_values.append(value)
-                entity_variants.append(variant)
+                    value = hit['_source']['value']
+                    for variant in hit['highlight']['variants']:
+                        entity_values.append(value)
+                        entity_variants.append(variant)
 
-    for value, variant in zip(entity_values, entity_variants):
-        variant = re.sub('\s+', ' ', variant.strip())
-        variant_no_highlight_tags = variant.replace('<em>', '').replace('</em>', '').strip()
-        if variant.count('<em>') == len(TOKENIZER.tokenize(variant_no_highlight_tags)):
-            variant = variant_no_highlight_tags
-            if variant not in variants_to_values:
-                variants_to_values[variant] = value
+                for value, variant in zip(entity_values, entity_variants):
+                    variant = re.sub('\s+', ' ', variant.strip())
+                    variant_no_highlight_tags = variant.replace('<em>', '').replace('</em>', '').strip()
+                    if variant.count('<em>') == len(TOKENIZER.tokenize(variant_no_highlight_tags)):
+                        variant = variant_no_highlight_tags
+                        if variant not in variants_to_values:
+                            variants_to_values[variant] = value
+            variants_to_values_list.append(variants_to_values)
 
-    return variants_to_values
+    return variants_to_values_list
 
 
 def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):

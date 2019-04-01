@@ -22,6 +22,7 @@ from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZIN
                              PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3,
                              PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
                              PARAMETER_LIVE_CRF_MODEL_PATH)
+from django.views.decorators.csrf import csrf_exempt
 
 
 def to_bool(value):
@@ -74,19 +75,166 @@ def get_parameters_dictionary(request):
     return parameters_dict
 
 
-def text(request):
+def parse_post_request(request):
+    # type: (django.http.HttpRequest) -> Dict[str, Any]
     """
-    Run text detector with crf model on the 'message' passed in the request
+    Extract POST request body from HTTP request
 
     Args:
         request (django.http.HttpRequest): HTTP response from url
 
     Returns:
-       dict: GET parameters from the request
+       dict: parameters from the request
+    """
+    request_data = json.loads(request.body)
+    parameters_dict = {
+        PARAMETER_MESSAGE: request_data.get('message'),
+        PARAMETER_ENTITY_NAME: request_data.get('entity_name'),
+        PARAMETER_STRUCTURED_VALUE: request_data.get('structured_value'),
+        PARAMETER_FALLBACK_VALUE: request_data.get('fallback_value'),
+        PARAMETER_BOT_MESSAGE: request_data.get('bot_message'),
+        PARAMETER_TIMEZONE: request_data.get('timezone'),
+        PARAMETER_REGEX: request_data.get('regex'),
+        PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
+        PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
+        PARAMETER_FUZZINESS: request_data.get('fuzziness'),
+        PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request_data.get('min_token_len_fuzziness'),
+        PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
+        PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
+        PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
+        PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
+        PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path')
+    }
+
+    return parameters_dict
+
+
+@csrf_exempt
+def text(request):
+    """
+    Run text detector with crf model on the 'message or list of messages' passed in the request
+
+    Args:
+        request (django.http.HttpRequest): HTTP response from url
+
+    Returns:
+        response (django.http.HttpResponse): HttpResponse object containing "entity_output"
+
+        where "entity_output" is :
+            list of dict: containing dict of detected entities with their original texts for a message
+                OR
+            list of lists: containing dict of detected entities with their original texts for each message in the list
+
+        EXAMPLES:
+        --- Single message
+            >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
+            >>> entity_name = 'restaurant'
+            >>> structured_value = None
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'mainland china',
+                    'entity_value': {'value': u'Mainland China'}
+                },
+                {
+                    'detection': 'message',
+                    'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}
+                }
+            ]
+
+
+
+            >>> message = u'i wanted to watch movie'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'inferno'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'structure_value_verified',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+            >>> message = u'i wanted to watch inferno'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'delhi'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+        --- Bulk detection
+            >>> message = [u'book a flight to mumbai',
+                            u'i want to go to delhi from mumbai']
+            >>> entity_name = u'city'
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ],
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'New Delhi'},
+                        'original_text': u'delhi'
+                    },
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ]
+            ]
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_text(
             message=parameters_dict[PARAMETER_MESSAGE],
             entity_name=parameters_dict[PARAMETER_ENTITY_NAME],

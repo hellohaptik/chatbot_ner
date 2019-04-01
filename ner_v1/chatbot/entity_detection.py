@@ -17,6 +17,7 @@ from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
+import six
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -94,7 +95,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
-        message (str or unicode or None): natural language text on which detection logic is to be run.
+        message (str or unicode or None or list(bulk)): natural language text(s) on which detection logic is to be run.
                                           Note if structured value is passed detection is run on
                                           structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
@@ -109,7 +110,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         bot_message (str or unicode or None): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
         **kwargs: extra configuration arguments for TextDetector
-            fuzziness (str or int or None): fuziness to apply while detecting text entities
+            fuzziness (str or int or None): fuzziness to apply while detecting text entities
             min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
             live_crf_model_path (str) : path to the CRF model to use to detect entites. Defaults to None
             read_model_from_s3 (bool): If True read CRF model from S3. Defaults to False
@@ -124,73 +125,106 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
                       entity_value is in itself a dict with its keys varying from entity to entity
 
     Example:
+        --- Single message
+            >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
+            >>> entity_name = 'restaurant'
+            >>> structured_value = None
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
-        >>> entity_name = 'restaurant'
-        >>> structured_value = None
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
-
-        [
-            {
-                'detection': 'message',
-                'original_text': 'mainland china',
-                'entity_value': {'value': u'Mainland China'}
-            },
-            {
-                'detection': 'message',
-                'original_text': 'domminos',
-                'entity_value': {'value': u"Domino's Pizza"}
-            }
-        ]
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'mainland china',
+                    'entity_value': {'value': u'Mainland China'}
+                },
+                {
+                    'detection': 'message',
+                    'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}
+                }
+            ]
 
 
 
-        >>> message = u'i wanted to watch movie'
-        >>> entity_name = 'movie'
-        >>> structured_value = u'inferno'
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
+            >>> message = u'i wanted to watch movie'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'inferno'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        [
-            {
-                'detection': 'structure_value_verified',
-                'original_text': 'inferno',
-                'entity_value': {'value': u'Inferno'}
-            }
-        ]
+            [
+                {
+                    'detection': 'structure_value_verified',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
 
-        >>> message = u'i wanted to watch inferno'
-        >>> entity_name = 'movie'
-        >>> structured_value = u'delhi'
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
+            >>> message = u'i wanted to watch inferno'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'delhi'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        [
-            {
-                'detection': 'message',
-                'original_text': 'inferno',
-                'entity_value': {'value': u'Inferno'}
-            }
-        ]
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+        --- Bulk detection
+            >>> message = [u'book a flight to mumbai',
+                            u'i want to go to delhi from mumbai']
+            >>> entity_name = 'city'
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
+
+            [
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ],
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'New Delhi'},
+                        'original_text': u'delhi'
+                    },
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ]
+            ]
 
     """
     fuzziness = kwargs.get('fuzziness', None)
@@ -213,10 +247,13 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-    entity_output = text_model_detector.detect(message=message,
-                                               structured_value=structured_value,
-                                               fallback_value=fallback_value,
-                                               bot_message=bot_message)
+    if isinstance(message, six.string_types):
+        entity_output = text_model_detector.detect(message=message,
+                                                   structured_value=structured_value,
+                                                   fallback_value=fallback_value,
+                                                   bot_message=bot_message)
+    elif isinstance(message, (list, tuple)):
+        entity_output = text_model_detector.detect_bulk(messages=message)
 
     return entity_output
 
