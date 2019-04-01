@@ -195,9 +195,9 @@ def text(request):
             ]
 
         --- Bulk detection
-            >>> message = [u'i want to order chinese from  mainland china and pizza from domminos',
+            >>> message = [u'book a flight to mumbai',
                             u'i want to go to delhi from mumbai']
-            >>> entity_name = 'restaurant'
+            >>> entity_name = u'city'
             >>> entity_output = get_text(message=message,
             >>>                   entity_name=entity_name,
             >>>                   structured_value=structured_value,
@@ -209,13 +209,8 @@ def text(request):
                 [
                     {
                         'detection': 'message',
-                        'original_text': 'mainland china',
-                        'entity_value': {'value': u'Mainland China'}
-                    },
-                    {
-                        'detection': 'message',
-                        'original_text': 'domminos',
-                        'entity_value': {'value': u"Domino's Pizza"}
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
                     }
                 ],
                 [

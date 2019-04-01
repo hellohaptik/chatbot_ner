@@ -88,9 +88,9 @@ class BaseDetector(object):
                 messages = ['i want to order chinese from  mainland china and pizza from domminos']
                 output = detect(message=message)
                 print output
-                    >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
+                    >> [[{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
                     {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
-                    'entity_value': {'value': u"Domino's Pizza"}}]
+                    'entity_value': {'value': u"Domino's Pizza"}}]]
         """
         if messages is None:
             messages = []
