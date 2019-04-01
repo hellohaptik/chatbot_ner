@@ -112,13 +112,125 @@ def parse_post_request(request):
 @csrf_exempt
 def text(request):
     """
-    Run text detector with crf model on the 'message' passed in the request
+    Run text detector with crf model on the 'message or list of messages' passed in the request
 
     Args:
         request (django.http.HttpRequest): HTTP response from url
 
     Returns:
-       dict: GET parameters from the request
+        response (django.http.HttpResponse): HttpResponse object containing "entity_output"
+
+        where "entity_output" is :
+            list of dict: containing dict of detected entities with their original texts for a message
+                OR
+            list of lists: containing dict of detected entities with their original texts for each message in the list
+
+        EXAMPLES:
+        --- Single message
+            >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
+            >>> entity_name = 'restaurant'
+            >>> structured_value = None
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'mainland china',
+                    'entity_value': {'value': u'Mainland China'}
+                },
+                {
+                    'detection': 'message',
+                    'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}
+                }
+            ]
+
+
+
+            >>> message = u'i wanted to watch movie'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'inferno'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'structure_value_verified',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+            >>> message = u'i wanted to watch inferno'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'delhi'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+        --- Bulk detection
+            >>> message = [u'i want to order chinese from  mainland china and pizza from domminos',
+                            u'i want to go to delhi from mumbai']
+            >>> entity_name = 'restaurant'
+            >>> entity_output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(entity_output)
+
+            [
+                [
+                    {
+                        'detection': 'message',
+                        'original_text': 'mainland china',
+                        'entity_value': {'value': u'Mainland China'}
+                    },
+                    {
+                        'detection': 'message',
+                        'original_text': 'domminos',
+                        'entity_value': {'value': u"Domino's Pizza"}
+                    }
+                ],
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'New Delhi'},
+                        'original_text': u'delhi'
+                    },
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ]
+            ]
     """
     try:
         parameters_dict = {}

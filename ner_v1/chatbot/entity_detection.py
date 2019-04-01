@@ -95,7 +95,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
-        message (str or unicode or None): natural language text on which detection logic is to be run.
+        message (str or unicode or None or list(bulk)): natural language text(s) on which detection logic is to be run.
                                           Note if structured value is passed detection is run on
                                           structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
@@ -125,73 +125,111 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
                       entity_value is in itself a dict with its keys varying from entity to entity
 
     Example:
+        --- Single message
+            >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
+            >>> entity_name = 'restaurant'
+            >>> structured_value = None
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        >>> message = u'i want to order chinese from  mainland china and pizza from domminos'
-        >>> entity_name = 'restaurant'
-        >>> structured_value = None
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
-
-        [
-            {
-                'detection': 'message',
-                'original_text': 'mainland china',
-                'entity_value': {'value': u'Mainland China'}
-            },
-            {
-                'detection': 'message',
-                'original_text': 'domminos',
-                'entity_value': {'value': u"Domino's Pizza"}
-            }
-        ]
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'mainland china',
+                    'entity_value': {'value': u'Mainland China'}
+                },
+                {
+                    'detection': 'message',
+                    'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}
+                }
+            ]
 
 
 
-        >>> message = u'i wanted to watch movie'
-        >>> entity_name = 'movie'
-        >>> structured_value = u'inferno'
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
+            >>> message = u'i wanted to watch movie'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'inferno'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        [
-            {
-                'detection': 'structure_value_verified',
-                'original_text': 'inferno',
-                'entity_value': {'value': u'Inferno'}
-            }
-        ]
+            [
+                {
+                    'detection': 'structure_value_verified',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
 
-        >>> message = u'i wanted to watch inferno'
-        >>> entity_name = 'movie'
-        >>> structured_value = u'delhi'
-        >>> fallback_value = None
-        >>> bot_message = None
-        >>> output = get_text(message=message,
-        >>>                   entity_name=entity_name,
-        >>>                   structured_value=structured_value,
-        >>>                   fallback_value=fallback_value,
-        >>>                   bot_message=bot_message)
-        >>> print(output)
+            >>> message = u'i wanted to watch inferno'
+            >>> entity_name = 'movie'
+            >>> structured_value = u'delhi'
+            >>> fallback_value = None
+            >>> bot_message = None
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
 
-        [
-            {
-                'detection': 'message',
-                'original_text': 'inferno',
-                'entity_value': {'value': u'Inferno'}
-            }
-        ]
+            [
+                {
+                    'detection': 'message',
+                    'original_text': 'inferno',
+                    'entity_value': {'value': u'Inferno'}
+                }
+            ]
+
+        --- Bulk detection
+            >>> message = [u'i want to order chinese from  mainland china and pizza from domminos',
+                            u'i want to go to delhi from mumbai']
+            >>> entity_name = 'restaurant'
+            >>> output = get_text(message=message,
+            >>>                   entity_name=entity_name,
+            >>>                   structured_value=structured_value,
+            >>>                   fallback_value=fallback_value,
+            >>>                   bot_message=bot_message)
+            >>> print(output)
+
+            [
+                [
+                    {
+                        'detection': 'message',
+                        'original_text': 'mainland china',
+                        'entity_value': {'value': u'Mainland China'}
+                    },
+                    {
+                        'detection': 'message',
+                        'original_text': 'domminos',
+                        'entity_value': {'value': u"Domino's Pizza"}
+                    }
+                ],
+                [
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'New Delhi'},
+                        'original_text': u'delhi'
+                    },
+                    {
+                        'detection': 'message',
+                        'entity_value': {'value': u'mumbai'},
+                        'original_text': u'mumbai'
+                    }
+                ]
+            ]
 
     """
     fuzziness = kwargs.get('fuzziness', None)
