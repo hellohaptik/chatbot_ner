@@ -147,10 +147,13 @@ class BaseNumberDetector(object):
         if not self.units_map:
             return unit, original_text
 
+        processed_text = " " + processed_text.strip() + " "
+
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
-        unit_matches = re.search(r'((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')|(' +
-                                 detected_original + r'\s*(' + self.unit_choices + r'))', processed_text, re.UNICODE)
+        unit_matches = re.search(r'\W+((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')|(' +
+                                 detected_original + r'\s*(' + self.unit_choices + r'))\W+', processed_text,
+                                 re.UNICODE)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
             if unit_suffix:
