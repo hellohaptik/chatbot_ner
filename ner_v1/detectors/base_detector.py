@@ -72,10 +72,52 @@ class BaseDetector(object):
             raise NotImplementedError('Please enable translation or extend language support'
                                       'for %s' % self._source_language_script)
 
-    def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
+    def detect_bulk(self, messages=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
 
+        Args:
+            messages (list of strings): list of natural text(s) on which detection logic is to be run.
+        Returns:
+            dict or None: dictionary containing entity_value, original_text and detection;
+                          entity_value is in itself a dict with its keys varying from entity to entity
+
+        Example:
+            1) Consider an example of restaurant detection from a message
+
+                messages = ['i want to order chinese from  mainland china and pizza from domminos']
+                output = detect(message=message)
+                print output
+                    >> [[{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
+                    {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}}]]
+        """
+        if messages is None:
+            messages = []
+        if self._source_language_script != self._target_language_script and self._translation_enabled:
+            translation_output_list = [
+                translate_text(message_, self._source_language_script, self._target_language_script)
+                for message_ in messages]
+
+            messages = []
+            for translation_output in translation_output_list:
+                messages.append(translation_output[TRANSLATED_TEXT] if translation_output['status'] else '')
+
+        texts = messages
+        entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
+
+        if entities_list:
+            values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
+        else:
+            return None
+
+        return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
+                                       detection_method=method,
+                                       detection_language=self._target_language_script)
+
+    def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
+        """
+        Use detector to detect entities from text. It also translates query to language compatible to detector
         Args:
             message (str): natural text on which detection logic is to be run. Note if structured value is
                                     detection is run on structured value instead of message
@@ -85,14 +127,11 @@ class BaseDetector(object):
             fallback_value (str): If the detection logic fails to detect any value either from structured_value
                               or message then we return a fallback_value as an output.
             bot_message (str): previous message from a bot/agent.
-
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
                           entity_value is in itself a dict with its keys varying from entity to entity
-
         Example:
             1) Consider an example of restaurant detection from a message
-
                 message = 'i want to order chinese from  mainland china and pizza from domminos'
                 structured_value = None
                 fallback_value = None
@@ -100,13 +139,12 @@ class BaseDetector(object):
                 output = detect(message=message, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
                     {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
                     'entity_value': {'value': u"Domino's Pizza"}}]
-
             2) Consider an example of movie name detection from a structured value
-            
+
                 message = 'i wanted to watch movie'
                 entity_name = 'movie'
                 structured_value = 'inferno'
@@ -115,10 +153,9 @@ class BaseDetector(object):
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
                     {'value': u'Inferno'}}]
-
             3) Consider an example of movie name detection from  a message
                 message = 'i wanted to watch inferno'
                 entity_name = 'movie'
@@ -128,9 +165,9 @@ class BaseDetector(object):
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
                                   fallback_value=fallback_value, bot_message=bot_message)
                 print output
-    
+
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
-                    
+
         """
         if self._source_language_script != self._target_language_script and self._translation_enabled:
             if structured_value:
@@ -161,6 +198,77 @@ class BaseDetector(object):
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
                                             detection_method=method, detection_language=self._target_language_script)
 
+    def output_entity_bulk(self, entity_values_list, original_texts_list, detection_method=None,
+                           detection_method_list=None, detection_language=ENGLISH_LANG):
+        """
+        Format detected entity values for bulk detection
+        Args:
+            entity_values_list (list of lists): containing list of entity values which are identified from given
+                                                detection logic
+            original_texts_list (list of lists): containing list original values or actual values from
+                                                messages which are identified
+            detection_method (str, optional): how the entity was detected
+                                              i.e. whether from message, structured_value
+                                                   or fallback, verified from model or not.
+                                              defaults to None
+            detection_method_list(list, optional): list containing how each entity was detected in the entity_value
+                                                list.If provided, this argument will be used over detection method
+                                                defaults to None
+            detection_language(str): ISO 639 code for language in which entity is detected
+
+        Returns:
+            list of lists of dict: list of lists containing dictionaries, each containing entity_value,
+                                    original_text and detection;
+                                    entity_value is in itself a dict with its keys varying from entity to entity
+        Example Output:
+            [
+                [
+                    {
+                        "entity_value": entity_value_1,
+                        "detection": detection_method,
+                        "original_text": original_text_1
+                    },
+                    {
+                        "entity_value": entity_value_2,
+                        "detection": detection_method,
+                        "original_text": original_text_2
+                    }
+
+                ],
+                [
+                    {
+                        "entity_value": entity_value,
+                        "detection": detection_method,
+                        "original_text": original_text
+                    }
+                ]
+            ]
+        """
+        if detection_method_list is None:
+            detection_method_list = []
+        if entity_values_list is None:
+            entity_values_list = []
+
+        bulk_detection_entity_list = []
+        for index, entity_values in enumerate(entity_values_list):
+            entity_list = []
+            for i, entity_value in enumerate(entity_values):
+                if type(entity_value) in [str, six.text_type]:
+                    entity_value = {
+                        ENTITY_VALUE_DICT_KEY: entity_value
+                    }
+                method = detection_method_list[i] if detection_method_list else detection_method
+                entity_list.append(
+                    {
+                        ENTITY_VALUE: entity_value,
+                        DETECTION_METHOD: method,
+                        ORIGINAL_TEXT: original_texts_list[index][i],
+                        DETECTION_LANGUAGE: detection_language
+                    }
+                )
+            bulk_detection_entity_list.append(entity_list)
+        return bulk_detection_entity_list
+
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
                                 detection_method_list=None, detection_language=ENGLISH_LANG):
@@ -174,7 +282,7 @@ class BaseDetector(object):
                                               i.e. whether from message, structured_value
                                                    or fallback, verified from model or not.
                                               defaults to None
-            detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
+            detection_method_list(list, optional): list containing detection method of entity the entity_value list.
                                                    if provided, this argument will be used over detection method
                                                    defaults to None
             detection_language(str): ISO 639 code for language in which entity is detected                                        

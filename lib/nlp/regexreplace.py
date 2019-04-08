@@ -52,16 +52,3 @@ class RegexReplace(object):
         for i, compiled_pattern in enumerate(self.pattern_compile):
             processed_text = compiled_pattern.sub(self.pattern_list[i][1], processed_text)
         return processed_text
-
-    def unit_substitute(self, text):
-        processed_text = text
-        count = 0
-        while count < len(self.pattern_list):
-            d = self.pattern_compile[count].findall(processed_text)
-            if d:
-                try:
-                    processed_text = str(int(float(d[0]) * self.pattern_list[count][1]))
-                except (IndexError, ValueError):
-                    pass
-            count += 1
-        return processed_text

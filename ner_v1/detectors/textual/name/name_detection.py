@@ -1,5 +1,7 @@
 # coding=utf-8
 import re
+import string
+
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
@@ -8,7 +10,7 @@ from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUE
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-import string
+
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
 # TODO: Make this module python 3 compatible
@@ -112,7 +114,8 @@ class NameDetector(object):
         pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
-        name_tokens = text.split(' ')
+        name_tokens = text.split()
+        # Passing empty tokens to tag will cause IndexError
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
