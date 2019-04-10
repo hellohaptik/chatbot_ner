@@ -79,6 +79,13 @@ class TextDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
+    def _reset_state(self):
+        self.tagged_text = None
+        self.processed_text = None
+        self.__texts = []
+        self.__tagged_texts = []
+        self.__processed_texts = []
+
     def set_fuzziness_threshold(self, fuzziness):
         """
         Sets the fuzziness thresholds for similarity searches. The fuzziness threshold corresponds to the
@@ -306,6 +313,7 @@ class TextDetector(BaseDetector):
                         ]
 
         """
+        self._reset_state()
         self._process_text(texts)
         text_entity_values_list, original_texts_list = self._text_detection_with_variants()
         return text_entity_values_list, original_texts_list
@@ -343,6 +351,7 @@ class TextDetector(BaseDetector):
                 Output:
                     ' come to __city__, __city__,  i will visit __city__ next year '
         """
+        self._reset_state()
         texts = [text]
         self._process_text(texts)
         text_entity_values, original_texts = self._text_detection_with_variants()
