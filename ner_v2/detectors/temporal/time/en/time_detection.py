@@ -4,6 +4,7 @@ from datetime import datetime
 import pytz
 
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
+from ner_v2.detectors.temporal.utils import get_timezone
 
 
 class TimeDetector(object):
@@ -79,7 +80,7 @@ class TimeDetector(object):
         self.original_time_text = []
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
-        self.timezone = timezone or 'UTC'
+        self.timezone = get_timezone(timezone)
 
     def set_bot_message(self, bot_message):
         """
