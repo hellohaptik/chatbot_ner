@@ -1,9 +1,7 @@
 import re
-from datetime import datetime
-
-import pytz
-
+import datetime
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
+from ner_v2.detectors.temporal.utils import get_timezone
 
 
 class TimeDetector(object):
@@ -79,7 +77,8 @@ class TimeDetector(object):
         self.original_time_text = []
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
-        self.timezone = timezone or 'UTC'
+        self.timezone = get_timezone(timezone)
+        self.now_date = datetime.datetime.now(self.timezone)
 
     def set_bot_message(self, bot_message):
         """
@@ -1134,7 +1133,7 @@ class TimeDetector(object):
         Returns
             meridiem type (str): returns the meridiem type whether its am and pm
         """
-        current_datetime = datetime.now(pytz.timezone(self.timezone))
+        current_datetime = self.now_date
         current_hour = current_datetime.hour
         current_min = current_datetime.minute
         if hours == 0 or hours >= TWELVE_HOUR:

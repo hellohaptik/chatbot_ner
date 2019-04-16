@@ -1,8 +1,11 @@
 import calendar
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, tzinfo  # FIXME: Change import to `import datetime`
 
 import pandas as pd
+import pytz
+import six
 
+from chatbot_ner.config import ner_logger
 from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF, CONSTANT_FILE_KEY
 
 
@@ -260,3 +263,36 @@ def get_next_date_with_dd(dd, after_datetime):
         mm, yy = get_next_month_number(mm=mm, yy=yy)
 
     return None, None, None
+
+
+def get_timezone(timezone, ignore_errors=True):
+    # type: (Union[datetime.tzinfo, str, unicode], bool) -> datetime.tzinfo
+    """
+    Return a datetime.tzinfo (pytz timezone object). If `timezone` is a str, try constructing a pytz
+    timezone object with it. If an invalid timezone is mentioned and `ignore_errors` is True, an UTC timezone object
+    will be returned. If `timezone` is already a datetime.tzinfo object it will be returned as is
+
+    Args:
+        timezone (str or datetime.tzinfo): Either a valid timezone string or datetime.tzinfo object
+        ignore_errors (bool, optional): when set to True, ignore errors and return a pytz.UTC when error occurs. When
+            set to False, raise exception when invalid timezone is given. Defaults to True.
+
+    Returns:
+        datetime.tzinfo: A pytz timezone object
+
+    """
+    if (not isinstance(timezone, six.string_types) and
+            isinstance(timezone, tzinfo) and
+            hasattr(timezone, 'localize')):
+        return timezone
+
+    try:
+        timezone = pytz.timezone(timezone)
+    except Exception as e:
+        if ignore_errors:
+            ner_logger.debug('Timezone error: %s ' % e)
+            timezone = pytz.timezone('UTC')
+            ner_logger.debug('Using "UTC" as default timezone')
+        else:
+            raise
+    return timezone
