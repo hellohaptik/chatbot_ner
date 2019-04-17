@@ -4,6 +4,7 @@ import os
 
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
+from ner_v2.detectors.temporal.utils import get_timezone
 from ner_v2.detectors.utils import get_lang_data_path
 
 
@@ -60,7 +61,7 @@ class TimeDetector(BaseDetector):
         self.time = []
         self.original_time_text = []
         self.tag = '__' + entity_name + '__'
-        self.timezone = timezone or 'UTC'
+        self.timezone = get_timezone(timezone)
         self.language = language
 
         try:
