@@ -1,4 +1,5 @@
 # coding=utf-8
+import six
 import copy
 import datetime
 import importlib
@@ -215,9 +216,13 @@ class DateAdvancedDetector(BaseDetector):
                     date_dicts[1][temporal_constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
         else:
-            parts = iter(re.split(r'\s+(?:\-|to|till|se)\s+', self.processed_text))
+            parts = re.split(r'\s+(?:\-|to|till|se)\s+', self.processed_text)
+            skip_next_pair = False
             _day_of_week_types = [temporal_constant.TYPE_THIS_DAY, temporal_constant.TYPE_NEXT_DAY]
-            for start_part, end_part in zip(parts, parts):  # Consumes 2 items at a time from parts
+            for start_part, end_part in six.moves.zip(parts, parts[1:]):
+                if skip_next_pair:
+                    continue
+                skip_next_pair = False
                 start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
                 end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
                 if start_date_list and end_date_list:
@@ -235,6 +240,7 @@ class DateAdvancedDetector(BaseDetector):
                         end_date_list = [possible_end_date]
                     date_dict_list.extend(start_date_list)
                     date_dict_list.extend(end_date_list)
+                    skip_next_pair = True
         return date_dict_list
 
     def _fix_day_range(self, start_date_dict, end_date_dict):
