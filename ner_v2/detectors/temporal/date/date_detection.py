@@ -1,12 +1,13 @@
 # coding=utf-8
-import itertools
+from __future__ import absolute_import
 
-import six
 import copy
 import datetime
 import importlib
 import os
 import re
+
+import six
 
 import models.crf.constant as model_constant
 import ner_v2.detectors.temporal.constant as temporal_constant
