@@ -1,9 +1,13 @@
 # coding=utf-8
+from __future__ import absolute_import
+
 import copy
 import datetime
 import importlib
 import os
 import re
+
+import six
 
 import models.crf.constant as model_constant
 import ner_v2.detectors.temporal.constant as temporal_constant
@@ -215,26 +219,32 @@ class DateAdvancedDetector(BaseDetector):
                     date_dicts[1][temporal_constant.DATE_END_RANGE_PROPERTY] = True
                     date_dict_list.extend(date_dicts)
         else:
-            parts = iter(re.split(r'\s+(?:\-|to|till|se)\s+', self.processed_text))
-            _day_of_week_types = [temporal_constant.TYPE_THIS_DAY, temporal_constant.TYPE_NEXT_DAY]
-            for start_part, end_part in zip(parts, parts):  # Consumes 2 items at a time from parts
-                start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
-                end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
-                if start_date_list and end_date_list:
-                    possible_start_date = start_date_list[0]
-                    possible_end_date = end_date_list[-1]
-                    start_date_type = possible_start_date[temporal_constant.DATE_VALUE]['type']
-                    end_date_type = possible_end_date[temporal_constant.DATE_VALUE]['type']
-                    if start_date_type in _day_of_week_types and end_date_type in _day_of_week_types:
-                        start_date_list, end_date_list = self._fix_day_range(start_date_dict=possible_start_date,
-                                                                             end_date_dict=possible_end_date)
-                    else:
-                        # FIXME: Assumes end_date > start_date. Also can return dates in past when date detector
-                        # returns dates in the past
-                        start_date_list = [possible_start_date]
-                        end_date_list = [possible_end_date]
-                    date_dict_list.extend(start_date_list)
-                    date_dict_list.extend(end_date_list)
+            for sentence_part in re.split(r'\s+(?:and|aur|&|or)\s+', self.processed_text):
+                parts = re.split(r'\s+(?:\-|to|till|se)\s+', sentence_part)
+                skip_next_pair = False
+                _day_of_week_types = [temporal_constant.TYPE_THIS_DAY, temporal_constant.TYPE_NEXT_DAY]
+                for start_part, end_part in six.moves.zip(parts, parts[1:]):
+                    if skip_next_pair:
+                        skip_next_pair = False
+                        continue
+                    start_date_list = self._date_dict_from_text(text=start_part, start_range_property=True)
+                    end_date_list = self._date_dict_from_text(text=end_part, end_range_property=True)
+                    if start_date_list and end_date_list:
+                        possible_start_date = start_date_list[0]
+                        possible_end_date = end_date_list[-1]
+                        start_date_type = possible_start_date[temporal_constant.DATE_VALUE]['type']
+                        end_date_type = possible_end_date[temporal_constant.DATE_VALUE]['type']
+                        if start_date_type in _day_of_week_types and end_date_type in _day_of_week_types:
+                            start_date_list, end_date_list = self._fix_day_range(start_date_dict=possible_start_date,
+                                                                                 end_date_dict=possible_end_date)
+                        else:
+                            # FIXME: Assumes end_date > start_date. Also can return dates in past when date detector
+                            # returns dates in the past
+                            start_date_list = [possible_start_date]
+                            end_date_list = [possible_end_date]
+                        date_dict_list.extend(start_date_list)
+                        date_dict_list.extend(end_date_list)
+                        skip_next_pair = True
         return date_dict_list
 
     def _fix_day_range(self, start_date_dict, end_date_dict):
