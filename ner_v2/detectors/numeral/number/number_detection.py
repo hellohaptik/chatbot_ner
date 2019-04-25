@@ -1,8 +1,9 @@
 import importlib
+import math
 import os
 
-from ner_v2.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
 
@@ -50,6 +51,7 @@ class NumberDetector(BaseDetector):
         max_digit: maximum digit that a number can take
 
     """
+
     @staticmethod
     def get_supported_languages():
         """
@@ -136,7 +138,7 @@ class NumberDetector(BaseDetector):
         for number_value_dict, original_text in zip(number_data[0], number_data[1]):
             number_value = number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]
             number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
-            if self.min_digit <= len(number_value) <= self.max_digit:
+            if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
                 if self.unit_type and (number_unit is None or
                                        self.language_number_detector.units_map[number_unit].type != self.unit_type):
                     continue
@@ -165,3 +167,20 @@ class NumberDetector(BaseDetector):
         """
         self.min_digit = min_digit
         self.max_digit = max_digit
+
+    @staticmethod
+    def _num_digits(value):
+        """
+        Calculate the number of digits in given number
+
+        Args:
+            value (str or float or int):
+
+        Returns:
+            int: number of digits in given number
+
+        Raises:
+            ValueError: if the given string cannot be cast to float
+        """
+        v = abs(float(value))
+        return 1 if int(v) == 0 else (1 + int(math.log10(v)))
