@@ -1,12 +1,15 @@
+from __future__ import absolute_import
+
 import warnings
 
-import elastic_search
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
+from datastore import elastic_search
+from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
+                                 ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
+                                 ELASTICSEARCH_CRF_DATA_DOC_TYPE)
+from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+                                  EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 from lib.singleton import Singleton
-from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE)
-from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 
 
 class DataStore(object):
