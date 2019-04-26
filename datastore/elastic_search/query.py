@@ -435,7 +435,9 @@ def _generate_es_search_dictionary(entity_name, text,
         },
         'highlight': {
             'fields': {
-                'variants': {}
+                'variants': {
+                    'type': 'unified'  # experimental in 5.x, default in 6.x and 7.x. Faster than 'plain'
+                }
             },
             'order': 'score',
             'number_of_fragments': 20
