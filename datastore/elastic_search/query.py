@@ -294,7 +294,8 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
                                                text=sentence,
                                                fuzziness_threshold=fuzziness_threshold,
                                                language_script=search_language_script)
-        data.extend([index_header, json.dumps(query)])
+        data.append(index_header)
+        data.append(json.dumps(query))
     data = '\n'.join(data)
 
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
@@ -431,13 +432,13 @@ def _generate_es_search_dictionary(entity_name, text,
                 'should': should_terms,
                 'minimum_should_match': 1
             },
-            'highlight': {
-                'fields': {
-                    'variants': {}
-                },
-                'order': 'score',
-                'number_of_fragments': 20
-            }
+        },
+        'highlight': {
+            'fields': {
+                'variants': {}
+            },
+            'order': 'score',
+            'number_of_fragments': 20
         },
         'size': size
     }
