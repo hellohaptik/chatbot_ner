@@ -1,10 +1,15 @@
-import elastic_search
+from __future__ import absolute_import
+
+import warnings
+
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
+from datastore import elastic_search
+from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
+                                 ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
+                                 ELASTICSEARCH_CRF_DATA_DOC_TYPE)
+from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
+                                  EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 from lib.singleton import Singleton
-from .constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
-                        ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE)
-from .exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
-                         EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 
 
 class DataStore(object):
@@ -120,6 +125,7 @@ class DataStore(object):
                     **kwargs
                 )
 
+    # FIXME: repopulate does not consider language of the variants
     def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
         Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and
@@ -181,6 +187,7 @@ class DataStore(object):
                                                ignore=[400, 404],
                                                **kwargs)
 
+    # FIXME: Deprecated, remove
     def get_entity_dictionary(self, entity_name, **kwargs):
         """
         Args:
@@ -214,6 +221,7 @@ class DataStore(object):
                 ...
                 u'koramangala': [u'koramangala']}
         """
+        warnings.warn("get_entity_dictionary() is deprecated; Please use get_entity_data()", DeprecationWarning)
         if self._client_or_connection is None:
             self._connect()
         results_dictionary = {}
@@ -308,6 +316,7 @@ class DataStore(object):
                                                           ignore=[400, 404],
                                                           **kwargs)
 
+    # FIXME: repopulate does not consider language of the variants
     def repopulate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
         """
         Deletes the existing data and repopulates it for entities from csv files stored in directory path indicated by
@@ -378,6 +387,7 @@ class DataStore(object):
 
         return False
 
+    # FIXME: Deprecated, remove
     def update_entity_data(self, entity_name, entity_data, language_script, **kwargs):
         """
         This method is used to populate the the entity dictionary
@@ -389,6 +399,7 @@ class DataStore(object):
                 For Elasticsearch:
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
         """
+        warnings.warn("update_entity_data() is deprecated; Please use add_entity_data()", DeprecationWarning)
         if self._client_or_connection is None:
             self._connect()
 

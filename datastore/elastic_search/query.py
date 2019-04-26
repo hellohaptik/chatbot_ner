@@ -1,21 +1,24 @@
 from __future__ import absolute_import
 
+import collections
 # std imports
 import copy
-from six import string_types
+import json
 import re
-import collections
+import warnings
+
+from six import string_types
 
 # Local imports
 from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
-import json
 
 log_prefix = 'datastore.elastic_search.query'
 
 
+# Deprecated
 def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
     """
     Get all variants data for a entity stored in the index as a dictionary
@@ -32,6 +35,7 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
         synonyms/variants of the key
     """
+    warnings.warn("dictionary_query() is deprecated; Please use get_entity_data()", DeprecationWarning)
     results_dictionary = {}
     data = {
         'query': {
@@ -197,7 +201,7 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
             "unique_values": {
                 "terms": {
                     "field": "value.keyword",
-                    "size": 300000
+                    "size": constants.ELASTICSEARCH_VALUES_SEARCH_SIZE,
                 }
             }
         },
@@ -283,12 +287,15 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    index = {'index': index_name, 'type': doc_type}
+    index_header = json.dumps({'index': index_name, 'type': doc_type})
     data = []
-    for sentence_ in sentences:
-        query = _generate_es_search_dictionary(entity_name, sentence_, fuzziness_threshold,
+    for sentence in sentences:
+        query = _generate_es_search_dictionary(entity_name=entity_name,
+                                               text=sentence,
+                                               fuzziness_threshold=fuzziness_threshold,
                                                language_script=search_language_script)
-        data.extend([json.dumps(index), json.dumps(query)])
+        data.append(index_header)
+        data.append(json.dumps(query))
     data = '\n'.join(data)
 
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
@@ -359,17 +366,25 @@ def _get_dynamic_fuzziness_threshold(fuzzy_setting):
     return fuzzy_setting
 
 
-def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, language_script=None):
+def _generate_es_search_dictionary(entity_name, text,
+                                   fuzziness_threshold=1,
+                                   language_script=ENGLISH_LANG,
+                                   size=constants.ELASTICSEARCH_SEARCH_SIZE,
+                                   as_json=False):
     """
     Generates compound elasticsearch boolean search query dictionary for the sentence. The query generated
     searches for entity_name in the index and returns search results for the matched word (of sentence)
      only if entity_name is found.
 
     Args:
-        entity_name: name of the entity to perform a 'term' query on
-        text: The text on which we need to identify the enitites.
-        fuzziness_threshold: fuzziness_threshold for elasticsearch match query 'fuzziness' parameter
-        language_script: language of documents to be searched, optional, defaults to None
+        entity_name (str): name of the entity to perform a 'term' query on
+        text (str): The text on which we need to identify the enitites.
+        fuzziness_threshold (int, optional): fuzziness_threshold for elasticsearch match query 'fuzziness' parameter.
+            Defaults to 1
+        language_script (str, optional): language of documents to be searched, optional, defaults to 'en'
+        size (int, optional): number of records to return, defaults to `ELASTICSEARCH_SEARCH_SIZE`
+        as_json (bool, optional): Return the generated query as json string. useful for debug purposes.
+            Defaults to False
 
     Returns:
         dictionary, the search query for the text
@@ -386,24 +401,18 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
     must_terms.append(term_dict_entity_name)
 
     # search on language_script, add english as default search
-    if language_script is not None:
-        term_dict_language = {
-            'terms': {
-                'language_script': [language_script, ENGLISH_LANG]
-            }
+    term_dict_language = {
+        'terms': {
+            'language_script': [ENGLISH_LANG]
         }
-        must_terms.append(term_dict_language)
-
-    data = {
-        'query': {
-            'bool': {
-                'must': must_terms,
-                'should': [],
-                'minimum_should_match': 1
-            }
-        }, 'size': constants.ELASTICSEARCH_SEARCH_SIZE
     }
-    query_should_data = []
+
+    if language_script != ENGLISH_LANG:
+        term_dict_language['terms']['language_script'].append(language_script)
+
+    must_terms.append(term_dict_language)
+
+    should_terms = []
     query = {
         'match': {
             'variants': {
@@ -413,15 +422,32 @@ def _generate_es_search_dictionary(entity_name, text, fuzziness_threshold, langu
             }
         }
     }
-    query_should_data.append(query)
-    data['query']['bool']['should'] = query_should_data
-    data['highlight'] = {
-        'fields': {
-            'variants': {}
+    should_terms.append(query)
+
+    data = {
+        '_source': ['value'],
+        'query': {
+            'bool': {
+                'must': must_terms,
+                'should': should_terms,
+                'minimum_should_match': 1
+            },
         },
-        'order': 'score',
-        'number_of_fragments': 20
+        'highlight': {
+            'fields': {
+                'variants': {
+                    'type': 'unified'  # experimental in 5.x, default in 6.x and 7.x. Faster than 'plain'
+                }
+            },
+            'order': 'score',
+            'number_of_fragments': 20
+        },
+        'size': size
     }
+
+    if as_json:
+        data = json.dumps(data)
+
     return data
 
 
