@@ -51,7 +51,19 @@ class TextDetector(BaseDetector):
         self._supported_languages = [
             lang_constant.ENGLISH_LANG,
             lang_constant.HINDI_LANG,
-            lang_constant.GUJARATI_LANG,  # Added temporarily till text detection is ported to v2 api
+            lang_constant.GUJARATI_LANG,
+            lang_constant.HINDI_LANG,
+            lang_constant.ENGLISH_LANG,
+            lang_constant.GUJARATI_LANG,
+            lang_constant.BENGALI_LANG,
+            lang_constant.MARATHI_LANG,
+            lang_constant.TELEGU_LANG,
+            lang_constant.TAMIL_LANG,
+            lang_constant.URDU_LANG,
+            lang_constant.KANNADA_LANG,
+            lang_constant.ORIYA_LANG,
+            lang_constant.MALAYALAM_LANG,
+            lang_constant.PUNJABI_LANG # Added temporarily till text detection is ported to v2 api
         ]
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
         self.tagged_text = None
