@@ -5,14 +5,12 @@ import datetime
 import os
 import re
 
-import pytz
-
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.temporal.constant import (DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE,
                                                 TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE,
                                                 MINUTE_TIME_TYPE, DAYTIME_MERIDIEM, AM_MERIDIEM, PM_MERIDIEM,
                                                 TWELVE_HOUR)
-from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff
+from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff, get_timezone
 
 
 class BaseRegexTime(object):
@@ -29,12 +27,7 @@ class BaseRegexTime(object):
         self.processed_text = ''
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        try:
-            self.timezone = pytz.timezone(timezone)
-        except Exception as e:
-            ner_logger.debug('Timezone error: %s ' % e)
-            self.timezone = pytz.timezone('UTC')
-            ner_logger.debug('Default timezone passed as "UTC"')
+        self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 

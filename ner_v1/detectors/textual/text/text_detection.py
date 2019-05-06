@@ -91,6 +91,13 @@ class TextDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
+    def _reset_state(self):
+        self.tagged_text = None
+        self.processed_text = None
+        self.__texts = []
+        self.__tagged_texts = []
+        self.__processed_texts = []
+
     def set_fuzziness_threshold(self, fuzziness):
         """
         Sets the fuzziness thresholds for similarity searches. The fuzziness threshold corresponds to the
@@ -162,21 +169,16 @@ class TextDetector(BaseDetector):
         self._min_token_size_for_fuzziness = min_size
 
     def _process_text(self, texts):
-        text_lowercase = [text.lower() for text in texts]
-
-        for text in text_lowercase:
-            if isinstance(text, bytes):
-                self.__texts.append(text.decode('utf-8'))
-            else:
-                self.__texts.append(text)
-
-        self.__processed_texts = self.__texts
-
-        # Note: following rules have been disabled because cause problem with generating original text
-        # regex_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
-        # self.processed_text = self.regx_to_process.text_substitute(self.processed_text)
-        self.__processed_texts = [u' ' + processed_text + u' ' for processed_text in self.__processed_texts]
-        self.__tagged_texts = self.__processed_texts
+        self._reset_state()
+        for text in texts:
+            text = text.lower()
+            text = text.decode('utf-8') if isinstance(text, bytes) else text
+            self.__texts.append(text)
+            # Note: following rules have been disabled because cause problem with generating original text
+            # regex_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
+            # processed_text = self.regx_to_process.text_substitute(processed_text)
+            self.__processed_texts.append(u' ' + text + u' ')
+            self.__tagged_texts.append(u' ' + text + u' ')
 
     def _get_substring_from_processed_text(self, text, matched_tokens):
         """
@@ -355,8 +357,7 @@ class TextDetector(BaseDetector):
                 Output:
                     ' come to __city__, __city__,  i will visit __city__ next year '
         """
-        texts = [text]
-        self._process_text(texts)
+        self._process_text([text])
         text_entity_values, original_texts = self._text_detection_with_variants()
 
         if len(text_entity_values) > 0 and len(original_texts) > 0:

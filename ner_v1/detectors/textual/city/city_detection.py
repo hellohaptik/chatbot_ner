@@ -3,6 +3,7 @@ import re
 
 import models.crf.constant as model_constant
 import ner_v1.constant as detector_constant
+import language_utilities.constant as lang_constant
 from models.crf.models import Models
 from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
@@ -25,7 +26,7 @@ class CityDetector(object):
         tag: entity_name prepended and appended with '__'
     """
 
-    def __init__(self, entity_name, language):
+    def __init__(self, entity_name, language=lang_constant.ENGLISH_LANG):
         """
         Initializes a CityDetector object with given entity_name
 
@@ -121,13 +122,6 @@ class CityDetector(object):
         self._update_processed_text(city_dict_list)
 
         return final_city_dict_list
-
-    def _detect_city_format(self):
-        """
-
-
-        """
-        return self._city_dict_from_text(text=self.processed_text, normal_property=True)
 
     def _detect_departure_arrival_city(self):
         """
