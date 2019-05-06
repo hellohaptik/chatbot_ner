@@ -63,7 +63,7 @@ class TextDetector(BaseDetector):
             lang_constant.KANNADA_LANG,
             lang_constant.ORIYA_LANG,
             lang_constant.MALAYALAM_LANG,
-            lang_constant.PUNJABI_LANG # Added temporarily till text detection is ported to v2 api
+            lang_constant.PUNJABI_LANG  # Added temporarily till text detection is ported to v2 api
         ]
         super(TextDetector, self).__init__(source_language_script, translation_enabled)
         self.tagged_text = None
