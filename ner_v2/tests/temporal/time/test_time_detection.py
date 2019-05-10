@@ -49,8 +49,9 @@ class TimeDetectionTestsMeta(type):
                         "time_type": expected_output["time_type"]
                 }
                 original_text = expected_output["original_text"].lower() if expected_output["original_text"] else None
-                time_dicts.append(time_dict)
-                original_texts.append(original_text)
+                if original_text:
+                    time_dicts.append(time_dict)
+                    original_texts.append(original_text)
             return time_dicts, original_texts
 
         failure_string_prefix = u"Test failed for\nText = {message}\nLanguage = {language}\n"
