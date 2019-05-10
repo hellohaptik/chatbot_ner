@@ -1,0 +1,663 @@
+tests:
+  en:
+  - _id_: en_1
+    message: I want more than 200 banana
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: more than 200
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_2
+    message: My monthly salary will be more than 2k per month
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: more than 2k
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_3
+    message: more than 2.5k people in the stadium
+    outputs:
+    - max_value: null
+      min_value: '2500'
+      original_text: more than 2.5k
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_4
+    message: 'more than 200 '
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_5
+    message: more than 2k
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_6
+    message: more than 2.5k
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_7
+    message: more than 200 rupees
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: more than 200 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_8
+    message: more than 2k rupees
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: more than 2k rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_9
+    message: more than 2.5k rupees
+    outputs:
+    - max_value: null
+      min_value: '2500'
+      original_text: more than 2.5k rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_10
+    message: 200 to 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 to 300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_11
+    message: 200 – 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 – 300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_12
+    message: 200-300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: en_13
+    message: 200 to 300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_14
+    message: 200 – 300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_15
+    message: 200-300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: en_16
+    message: 200 to 300 ruppes
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 to 300 ruppes
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_17
+    message: 200 – 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 – 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_18
+    message: 200-300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_19
+    message: 200 rupees to 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees to 300
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_20
+    message: 200 rupees to 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees to 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_21
+    message: 200 rupees – 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees – 300
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_22
+    message: 200 rupees – 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees – 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_23
+    message: 200-300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: en_24
+    message: 200k-300k men and around 400 women
+    outputs:
+    - max_value: '300000'
+      min_value: '200000'
+      original_text: 200k-300k
+      output_id: '1'
+      unit: NA|NA
+      unit_type: null
+    - max_value: '400'
+      min_value: NA
+      original_text: around 400
+      output_id: '2'
+      unit: NA|NA
+      unit_type: null
+  - _id_: en_25
+    message: 200k-300k men and around 300k women
+    outputs:
+    - max_value: '300000'
+      min_value: '200000'
+      original_text: 200k-300k
+      output_id: '1'
+      unit: NA|NA
+      unit_type: null
+    - max_value: '300000'
+      min_value: NA
+      original_text: ' around 300k'
+      output_id: '2'
+      unit: NA|NA
+      unit_type: null
+  - _id_: en_26
+    message: between 2000 and 3000
+    outputs:
+    - max_value: '3000'
+      min_value: '2000'
+      original_text: between 2000 and 3000
+      output_id: '1'
+      unit: null
+      unit_type: null
+  hi:
+  - _id_: hi_1
+    message: 200 se jyada
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: 200 se jyada
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_2
+    message: 2k se upar
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: 2k se upar
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_3
+    message: jada se jada 2500
+    outputs:
+    - max_value: '2500'
+      min_value: null
+      original_text: jada se jada 2500
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_4
+    message: 200 se jyada
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_5
+    message: 2k se upar
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_6
+    message: jada se jada 2500
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_7
+    message: '200 rupees se jyada '
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: '200 rupees se jyada '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_8
+    message: Rupees 2000 se upar
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: Rupees 2000 se upar
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_9
+    message: jada se jada 2500 rupees
+    outputs:
+    - max_value: '2500'
+      min_value: null
+      original_text: jada se jada 2500 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_10
+    message: 200 se 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 se 300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_11
+    message: 200 – 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 – 300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_12
+    message: 200-300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_13
+    message: 200 se 300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_14
+    message: 200 – 300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_15
+    message: 200-300
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_16
+    message: 200 se 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 se 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_17
+    message: 200 – 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 – 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_18
+    message: 200-300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_19
+    message: 200 rupees se 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees se 300
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_20
+    message: 200 rupees se 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees se 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_21
+    message: 200 rupees – 300
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees – 300
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_22
+    message: 200 rupees – 300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200 rupees – 300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_23
+    message: 200-300 rupees
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: 200-300 rupees
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_24
+    message: २०० से ज्यादा
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: २०० से ज्यादा
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_25
+    message: '२ हजार से ऊपर  '
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: '२ हजार से ऊपर  '
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_26
+    message: ज्यादा से ज्यादा २ हजार
+    outputs:
+    - max_value: '2000'
+      min_value: null
+      original_text: ज्यादा से ज्यादा २ हजार
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_27
+    message: २०० से ज्यादा
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_28
+    message: '२ हजार से ऊपर  '
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_29
+    message: ज्यादा से ज्यादा ५ हजार
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_30
+    message: २०० रूपीस से ज्यादा
+    outputs:
+    - max_value: null
+      min_value: '200'
+      original_text: २०० रूपीस से ज्यादा
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_31
+    message: 'रूपीस २ हजार से ऊपर  '
+    outputs:
+    - max_value: null
+      min_value: '2000'
+      original_text: 'रूपीस २ हजार से ऊपर  '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_32
+    message: ज्यादा से ज्यादा ५ हजार रुपया
+    outputs:
+    - max_value: '5000'
+      min_value: null
+      original_text: ज्यादा से ज्यादा ५ हजार रुपया
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_33
+    message: '२०० से  ३००  '
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: '२०० से  ३००  '
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_34
+    message: २०० – ३००
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २०० – ३००
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_35
+    message: २००-३००
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २००-३००
+      output_id: '1'
+      unit: null
+      unit_type: null
+  - _id_: hi_36
+    message: '२०० से  ३००  '
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_37
+    message: २०० – ३००
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_38
+    message: २००-३००
+    outputs:
+    - max_value: null
+      min_value: null
+      original_text: null
+      output_id: '1'
+      unit: null
+      unit_type: currency
+  - _id_: hi_39
+    message: २०० से  ३००  रुपया
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २०० से  ३००  रुपया
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_40
+    message: २००-३००  रुपया
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २००-३००  रुपया
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_41
+    message: '२०० रुपया से ३०० '
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: '२०० रुपया से ३०० '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_42
+    message: २०० रुपया से ३०० रुपया
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २०० रुपया से ३०० रुपया
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_43
+    message: २०० -  ३००  रुपया
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: २०० -  ३००  रुपया
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_44
+    message: '२०० रुपया -  ३००  '
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: '२०० रुपया -  ३००  '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_45
+    message: '२०० रुपया -  ३०० रुपया  '
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: '२०० रुपया -  ३०० रुपया  '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency
+  - _id_: hi_46
+    message: '२००-३०० रुपया  '
+    outputs:
+    - max_value: '300'
+      min_value: '200'
+      original_text: '२००-३०० रुपया  '
+      output_id: '1'
+      unit: rupees
+      unit_type: currency

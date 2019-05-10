@@ -283,7 +283,7 @@ tests:
     - hh: 12
       mm: 0
       nn: hrs
-      original_text: at 12
+      original_text: 12 hrs
       output_id: '1'
       range: null
       time_type: null
