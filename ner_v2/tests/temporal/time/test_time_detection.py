@@ -48,7 +48,8 @@ class TimeDetectionTestsMeta(type):
                         "range": expected_output["range"],
                         "time_type": expected_output["time_type"]
                 }
-                original_text = expected_output["original_text"].lower() if expected_output["original_text"] else None
+                original_text = expected_output["original_text"].lower().strip() if expected_output[
+                    "original_text"] else None
                 if original_text:
                     time_dicts.append(time_dict)
                     original_texts.append(original_text)
@@ -69,8 +70,8 @@ class TimeDetectionTestsMeta(type):
                 if "time_type" not in time_dict:
                     time_dict.update({"time_type": None})
 
-            expected_date_dicts, expected_spans = parse_expected_outputs(testcase["outputs"])
-            expected_outputs = list(six.moves.zip(expected_date_dicts, expected_spans))
+            expected_time_dicts, expected_spans = parse_expected_outputs(testcase["outputs"])
+            expected_outputs = list(six.moves.zip(expected_time_dicts, expected_spans))
 
             prefix = failure_string_prefix.format(message=message, language=language)
 
