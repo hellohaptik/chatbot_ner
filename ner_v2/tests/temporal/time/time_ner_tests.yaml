@@ -294,7 +294,7 @@ tests:
     - hh: 0
       mm: 0
       nn: hrs
-      original_text: at 0
+      original_text: 0 hrs
       output_id: '1'
       range: null
       time_type: null
