@@ -27,6 +27,7 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
     """
     connection = None
 
+    kwargs['es_scheme'] = es_scheme
     if es_scheme == 'http':
         kwargs['verify_certs'] = False
         kwargs['use_ssl'] = False
