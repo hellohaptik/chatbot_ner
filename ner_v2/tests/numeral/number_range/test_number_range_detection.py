@@ -37,11 +37,12 @@ class NumberRangeDetectorTestsMeta(type):
             time_dicts, original_texts = [], []
             for expected_output in expected_outputs:
                 time_dict = {
-                        "min_value": expected_output["min_value"],
-                        "unit": expected_output["unit"],
-                        "max_value": expected_output["max_value"],
+                    "min_value": expected_output["min_value"],
+                    "unit": expected_output["unit"],
+                    "max_value": expected_output["max_value"],
                 }
-                original_text = expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
+                original_text = \
+                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     time_dicts.append(time_dict)
                     original_texts.append(original_text)
@@ -75,5 +76,5 @@ class NumberRangeDetectorTestsMeta(type):
         return run_test
 
 
-class NumberRangeDetectorTests(six.with_metaclass(NumberRangeDetectorTestsMeta, TestCase)):
-    pass
+# class NumberRangeDetectorTests(six.with_metaclass(NumberRangeDetectorTestsMeta, TestCase)):
+#     pass

@@ -42,11 +42,11 @@ class TimeDetectionTestsMeta(type):
             time_dicts, original_texts = [], []
             for expected_output in expected_outputs:
                 time_dict = {
-                        "hh": expected_output["hh"],
-                        "mm": expected_output["mm"],
-                        "nn": expected_output["nn"],
-                        "range": expected_output["range"],
-                        "time_type": expected_output["time_type"]
+                    "hh": expected_output["hh"],
+                    "mm": expected_output["mm"],
+                    "nn": expected_output["nn"],
+                    "range": expected_output["range"],
+                    "time_type": expected_output["time_type"]
                 }
                 original_text = expected_output["original_text"].lower().strip() if expected_output[
                     "original_text"] else None
