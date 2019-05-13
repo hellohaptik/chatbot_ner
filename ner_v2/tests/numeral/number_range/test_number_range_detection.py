@@ -3,7 +3,7 @@ import io
 import os
 import six
 import yaml
-from django.test import TestCase
+# from django.test import TestCase
 
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
