@@ -12,7 +12,7 @@ en,the lecture starts at 15 am,NA,NA,NA,NA,NA,NA,NA
 en,let's all meet in 15mins and decide what to eat,NA,0,15,df,NA,NA,in 15mins
 en,let's all meet about 25 minutes and decide what to eat,NA,0,25,df,NA,NA,about 25 minutes
 en,let's all meet after 5 hrs and decide what to eat,NA,5,0,df,NA,NA,after 5 hrs
-en,let's all meet in around 13 hours and decide what to eat,NA,13,0,df,NA,NA,around 13 hours
+en,let's all meet in around 13 hours and decide what to eat,NA,13,0,df,NA,NA,in around 13 hours
 en,the train will depart 20 minutes later,NA,0,20,df,NA,NA,20 minutes later
 en,the train will depart 5mins latr,NA,0,5,df,NA,NA,5mins latr
 en,the train will depart 1 hour ltr,NA,1,0,df,NA,NA,1 hour ltr
@@ -24,8 +24,8 @@ en,you are supposed to take your medication once in 1 day,NA,24,0,ev,NA,NA,once 
 en,the time is 00:35,NA,0,35,hrs,NA,NA,00:35
 en,meet me at 22:33 hours at the cafe,NA,22,33,hrs,NA,NA,22:33
 en,meet me at 14 33 at the cafe,NA,14,33,hrs,NA,NA,14 33
-en,the lecture starts at 12 hrs,NA,12,0,hrs,NA,NA,at 12
-en,the lecture starts at 0 hours,NA,0,0,hrs,NA,NA,at 0
+en,the lecture starts at 12 hrs,NA,12,0,hrs,NA,NA,12 hrs
+en,the lecture starts at 0 hours,NA,0,0,hrs,NA,NA,0 hours
 en,the time is 16:62,NA,NA,NA,NA,NA,NA,NA
 en,meet me at 22:33 am at the cafe,NA,NA,NA,NA,NA,NA,NA
 en,meet me at 14 33 p.m. at the cafe,NA,NA,NA,NA,NA,NA,NA

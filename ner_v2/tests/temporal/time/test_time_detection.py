@@ -81,5 +81,8 @@ class TimeDetectorTest(TestCase):
                 detected_times, original_texts = time_detector.detect_entity(text=row[TimeDetectorTest.TEXT],
                                                                              range_enabled=range_enabled)
 
+                self.assertEqual(len(detected_times), len(expected_times))
+                self.assertEqual(len(original_texts), len(expected_original_texts))
+
                 for detected_output_pair in zip(detected_times, original_texts):
                     self.assertIn(detected_output_pair, expected_output)
