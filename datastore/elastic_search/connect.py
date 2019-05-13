@@ -4,7 +4,7 @@ from datastore.elastic_search.transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
 
-def connect(connection_url=None, host=None, port=None, user=None, password=None, **kwargs):
+def connect(connection_url=None, host=None, port=None, user=None, password=None, es_scheme='http', **kwargs):
     """
     Establishes connection to a single Elasticsearch Instance.
     if connection_url is not None, then host, port, user, password are not used
@@ -15,6 +15,7 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
         port: port for elasticsearch connection. Optional if connection_url is provided
         user: Optional, username for elasticsearch authentication
         password: Optional, password for elasticsearch authentication
+        es_scheme: Optional defaults to http. Decides the other ssl kwargs to pass to connect
         kwargs: any additional arguments will be passed on to the Transport class and, subsequently,
                 to the Connection instances.
 
@@ -25,8 +26,17 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
 
     """
     connection = None
+
+    if es_scheme == 'http':
+        kwargs['verify_certs'] = False
+        kwargs['use_ssl'] = False
+    elif es_scheme == 'https':
+        kwargs['verify_certs'] = True
+        kwargs['use_ssl'] = True
+
     if user and password:
         kwargs = dict(kwargs, http_auth=(user, password))
+
     if connection_url:
         connection = Elasticsearch(hosts=[connection_url], **kwargs)
     elif host and port:
