@@ -26,7 +26,7 @@ class NumberRangeDetectorTestsMeta(type):
             for language in test_data["tests"]:
                 for i, testcase in enumerate(test_data["tests"][language]):
                     yield (
-                        "test_yaml_{}_{}".format(language, i),
+                        "test_yaml_{}".format(testcase["_id_"]),
                         cls.get_yaml_test(testcase=testcase,
                                           language=language,)
                     )
