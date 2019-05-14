@@ -34,9 +34,9 @@ class NumberRangeDetectorTestsMeta(type):
     @classmethod
     def get_yaml_test(cls, testcase, language, **kwargs):
         def parse_expected_outputs(expected_outputs):
-            time_dicts, original_texts = [], []
+            num_range_dicts, original_texts = [], []
             for expected_output in expected_outputs:
-                time_dict = {
+                num_range_dict = {
                     "min_value": expected_output["min_value"],
                     "unit": expected_output["unit"],
                     "max_value": expected_output["max_value"],
@@ -44,9 +44,9 @@ class NumberRangeDetectorTestsMeta(type):
                 original_text = \
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
-                    time_dicts.append(time_dict)
+                    num_range_dicts.append(num_range_dict)
                     original_texts.append(original_text)
-            return time_dicts, original_texts
+            return num_range_dicts, original_texts
 
         failure_string_prefix = u"Test failed for\nText = {message}\nLanguage = {language}\n"
 
