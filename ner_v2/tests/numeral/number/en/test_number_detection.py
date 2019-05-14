@@ -139,8 +139,6 @@ class TestNumberFromWords(TestCase):
         self.assertIn((1102, 'one thousand   one   hundred two'), zipped)
 
 
-
-
 class TestNumberDetectorMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "number_ner_tests.yaml")
