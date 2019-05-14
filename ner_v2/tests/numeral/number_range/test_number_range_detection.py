@@ -3,7 +3,7 @@ import io
 import os
 import six
 import yaml
-# from django.test import TestCase
+from django.test import TestCase
 
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
@@ -37,9 +37,9 @@ class NumberRangeDetectorTestMeta(type):
             num_range_dicts, original_texts = [], []
             for expected_output in expected_outputs:
                 num_range_dict = {
-                    "min_value": str(expected_output["min_value"]),
-                    "unit": str(expected_output["unit"]),
-                    "max_value": str(expected_output["max_value"]),
+                    "min_value": str(expected_output["min_value"]) if expected_output["min_value"] else None,
+                    "unit": str(expected_output["unit"]) if expected_output["unit"] else None,
+                    "max_value": str(expected_output["max_value"]) if expected_output["max_value"] else None,
                 }
                 original_text = \
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
@@ -76,5 +76,5 @@ class NumberRangeDetectorTestMeta(type):
         return run_test
 
 
-# class NumberRangeDetectorTest(six.with_metaclass(NumberRangeDetectorTestMeta, TestCase)):
-#     pass
+class NumberRangeDetectorTest(six.with_metaclass(NumberRangeDetectorTestMeta, TestCase)):
+    pass
