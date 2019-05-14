@@ -8,7 +8,7 @@ from django.test import TestCase
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 
 
-class NumberDetectorTestsMeta(type):
+class TestNumberDetectorMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "number_ner_tests.yaml")
     ]
@@ -17,7 +17,7 @@ class NumberDetectorTestsMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(NumberDetectorTestsMeta, cls).__new__(cls, name, bases, attrs)
+        return super(TestNumberDetectorMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -26,7 +26,7 @@ class NumberDetectorTestsMeta(type):
             for language in test_data["tests"]:
                 for i, testcase in enumerate(test_data["tests"][language]):
                     yield (
-                        "test_yaml_{}".format(testcase["_id_"]),
+                        "test_yaml_{}".format(testcase["id"]),
                         cls.get_yaml_test(testcase=testcase,
                                           language=language,)
                     )
@@ -43,11 +43,11 @@ class NumberDetectorTestsMeta(type):
 
                 else:
                     num_dict = {
-                        "value": expected_output["value"],
+                        "value": str(expected_output["value"]),
                         "unit": expected_output["unit"],
                     }
                 original_text = \
-                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
+                    str(expected_output["original_text"]).lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     num_dicts.append(num_dict)
                     original_texts.append(original_text)
@@ -67,9 +67,9 @@ class NumberDetectorTestsMeta(type):
             prefix = failure_string_prefix.format(message=message, language=language)
 
             self.assertEqual(len(number_dicts), len(spans),
-                             prefix + u"Returned dates and original_texts have different lengths")
+                             prefix + u"Returned numbers and original_texts have different lengths")
             self.assertEqual(len(spans), len(expected_outputs),
-                             prefix + u"Returned dates and expected_outputs have different lengths")
+                             prefix + u"Returned numbers and expected_outputs have different lengths")
 
             for output in six.moves.zip(number_dicts, spans):
 
@@ -80,5 +80,5 @@ class NumberDetectorTestsMeta(type):
         return run_test
 
 
-class NumberDetectorTests(six.with_metaclass(NumberDetectorTestsMeta, TestCase)):
+class TestNumberDetector(six.with_metaclass(TestNumberDetectorMeta, TestCase)):
     pass

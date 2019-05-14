@@ -8,7 +8,7 @@ from django.test import TestCase
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 
-class PhoneNumberDetectorTestsMeta(type):
+class TestPhoneNumberDetectorMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "phone_number_ner_tests.yaml")
     ]
@@ -17,7 +17,7 @@ class PhoneNumberDetectorTestsMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(PhoneNumberDetectorTestsMeta, cls).__new__(cls, name, bases, attrs)
+        return super(TestPhoneNumberDetectorMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -26,7 +26,7 @@ class PhoneNumberDetectorTestsMeta(type):
             for language in test_data["tests"]:
                 for i, testcase in enumerate(test_data["tests"][language]):
                     yield (
-                        "test_yaml_{}".format(testcase["_id_"]),
+                        "test_yaml_{}".format(testcase["id"]),
                         cls.get_yaml_test(testcase=testcase,
                                           language=language,)
                     )
@@ -37,9 +37,9 @@ class PhoneNumberDetectorTestsMeta(type):
             phone_num_list, original_texts = [], []
             for expected_output in expected_outputs:
                 original_text = \
-                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
+                    str(expected_output["original_text"]).lower().strip() if expected_output["original_text"] else None
                 if original_text:
-                    phone_num_list.append(expected_output["value"])
+                    phone_num_list.append(str(expected_output["value"]))
                     original_texts.append(original_text)
             return phone_num_list, original_texts
 
@@ -57,9 +57,9 @@ class PhoneNumberDetectorTestsMeta(type):
             prefix = failure_string_prefix.format(message=message, language=language)
 
             self.assertEqual(len(phone_number_list), len(spans),
-                             prefix + u"Returned dates and original_texts have different lengths")
+                             prefix + u"Returned phone numbers and original_texts have different lengths")
             self.assertEqual(len(spans), len(expected_outputs),
-                             prefix + u"Returned dates and expected_outputs have different lengths")
+                             prefix + u"Returned phone numbers and expected_outputs have different lengths")
 
             for output in six.moves.zip(phone_number_list, spans):
 
@@ -70,5 +70,5 @@ class PhoneNumberDetectorTestsMeta(type):
         return run_test
 
 
-class PhoneNumberDetectorTests(six.with_metaclass(PhoneNumberDetectorTestsMeta, TestCase)):
+class TestPhoneNumberDetector(six.with_metaclass(TestPhoneNumberDetectorMeta, TestCase)):
     pass
