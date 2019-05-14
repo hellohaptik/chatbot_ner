@@ -8,7 +8,7 @@ from django.test import TestCase
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 
-class TestPhoneNumberDetectorMeta(type):
+class PhoneNumberDetectorTestMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "phone_number_ner_tests.yaml")
     ]
@@ -17,7 +17,7 @@ class TestPhoneNumberDetectorMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(TestPhoneNumberDetectorMeta, cls).__new__(cls, name, bases, attrs)
+        return super(PhoneNumberDetectorTestMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -37,7 +37,7 @@ class TestPhoneNumberDetectorMeta(type):
             phone_num_list, original_texts = [], []
             for expected_output in expected_outputs:
                 original_text = \
-                    str(expected_output["original_text"]).lower().strip() if expected_output["original_text"] else None
+                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     phone_num_list.append(str(expected_output["value"]))
                     original_texts.append(original_text)
@@ -70,5 +70,5 @@ class TestPhoneNumberDetectorMeta(type):
         return run_test
 
 
-class TestPhoneNumberDetector(six.with_metaclass(TestPhoneNumberDetectorMeta, TestCase)):
+class PhoneNumberDetectorTest(six.with_metaclass(PhoneNumberDetectorTestMeta, TestCase)):
     pass

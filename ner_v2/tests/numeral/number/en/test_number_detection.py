@@ -10,7 +10,7 @@ from ner_v2.detectors.numeral.number.standard_number_detector import NumberVaria
 from ner_v2.detectors.numeral.utils import get_number_from_number_word
 
 
-class TestNumberFromWords(TestCase):
+class NumberFromWordsTest(TestCase):
     def setUp(self):
         self.entity_name = 'number'
         self.number_words_map = {
@@ -139,7 +139,7 @@ class TestNumberFromWords(TestCase):
         self.assertIn((1102, 'one thousand   one   hundred two'), zipped)
 
 
-class TestNumberDetectorMeta(type):
+class NumberDetectorTestMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "number_ner_tests.yaml")
     ]
@@ -148,7 +148,7 @@ class TestNumberDetectorMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(TestNumberDetectorMeta, cls).__new__(cls, name, bases, attrs)
+        return super(NumberDetectorTestMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -174,11 +174,11 @@ class TestNumberDetectorMeta(type):
 
                 else:
                     num_dict = {
-                        "value": str(expected_output["value"]),
+                        "value": str(expected_output["value"]) if expected_output["value"] else None,
                         "unit": expected_output["unit"],
                     }
                 original_text = \
-                    str(expected_output["original_text"]).lower().strip() if expected_output["original_text"] else None
+                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     num_dicts.append(num_dict)
                     original_texts.append(original_text)
@@ -211,5 +211,5 @@ class TestNumberDetectorMeta(type):
         return run_test
 
 
-class TestNumberDetector(six.with_metaclass(TestNumberDetectorMeta, TestCase)):
+class NumberDetectorTest(six.with_metaclass(NumberDetectorTestMeta, TestCase)):
     pass

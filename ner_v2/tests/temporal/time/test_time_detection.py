@@ -11,7 +11,7 @@ from django.test import TestCase
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 
 
-class TestTimeDetectionTestsMeta(type):
+class TimeDetectionTestMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "time_ner_tests.yaml")
     ]
@@ -20,7 +20,7 @@ class TestTimeDetectionTestsMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(TestTimeDetectionTestsMeta, cls).__new__(cls, name, bases, attrs)
+        return super(TimeDetectionTestMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -48,7 +48,7 @@ class TestTimeDetectionTestsMeta(type):
                     "range": expected_output["range"],
                     "time_type": expected_output["time_type"]
                 }
-                original_text = str(expected_output["original_text"]).lower().strip() if expected_output[
+                original_text = expected_output["original_text"].lower().strip() if expected_output[
                     "original_text"] else None
                 if original_text:
                     time_dicts.append(time_dict)
@@ -89,5 +89,5 @@ class TestTimeDetectionTestsMeta(type):
         return run_test
 
 
-class TestTimeDetectionTests(six.with_metaclass(TestTimeDetectionTestsMeta, TestCase)):
+class TimeDetectionTest(six.with_metaclass(TimeDetectionTestMeta, TestCase)):
     pass

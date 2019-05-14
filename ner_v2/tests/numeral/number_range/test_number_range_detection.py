@@ -8,7 +8,7 @@ import yaml
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
 
-class TestNumberRangeDetectorMeta(type):
+class NumberRangeDetectorTestMeta(type):
     yaml_test_files = [
         os.path.join(os.path.dirname(os.path.abspath(__file__)), "number_range_ner_tests.yaml")
     ]
@@ -17,7 +17,7 @@ class TestNumberRangeDetectorMeta(type):
         for test_name, test_fn in cls.yaml_testsuite_generator():
             attrs[test_name] = test_fn
 
-        return super(TestNumberRangeDetectorMeta, cls).__new__(cls, name, bases, attrs)
+        return super(NumberRangeDetectorTestMeta, cls).__new__(cls, name, bases, attrs)
 
     @classmethod
     def yaml_testsuite_generator(cls):
@@ -42,7 +42,7 @@ class TestNumberRangeDetectorMeta(type):
                     "max_value": str(expected_output["max_value"]),
                 }
                 original_text = \
-                    str(expected_output["original_text"]).lower().strip() if expected_output["original_text"] else None
+                    expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     num_range_dicts.append(num_range_dict)
                     original_texts.append(original_text)
@@ -76,5 +76,5 @@ class TestNumberRangeDetectorMeta(type):
         return run_test
 
 
-# class TestNumberRangeDetector(six.with_metaclass(TestNumberRangeDetectorMeta, TestCase)):
+# class NumberRangeDetectorTest(six.with_metaclass(NumberRangeDetectorTestMeta, TestCase)):
 #     pass
