@@ -10,7 +10,7 @@ yaml.preserve_quotes = True
 double_quote = yaml.scalarstring.DoubleQuotedScalarString
 
 
-def match_output_to_text(yaml_tests, translated_data):
+def match_output_to_translated_test(yaml_tests, translated_data):
     """
     Function to map outputs to translated test cases if len(translated_data) == len(yaml_tests)
     Args:
@@ -44,7 +44,7 @@ def match_output_to_text(yaml_tests, translated_data):
                         }
                     ]
 
-    >> match_output_to_text(yaml_tests, translated_data)
+    >> match_output_to_translated_test(yaml_tests, translated_data)
     Output:
         [
                     {
@@ -133,7 +133,7 @@ for test_case_id, test_case_df in test_groups:
 if yaml_tests and translated_data:
     if len(yaml_tests) == len(translated_data):
         yaml_tests, translated_data = [sorted(l, key=itemgetter('id')) for l in (yaml_tests, translated_data)]
-        output_tests, language = match_output_to_text(yaml_tests, translated_data)
+        output_tests, language = match_output_to_translated_test(yaml_tests, translated_data)
         if language is not None:
             yaml.round_trip_dump({"args": args, "tests": output_tests},
                                  io.open("{file_name}_{language}.yaml".format(file_name=file_name,
