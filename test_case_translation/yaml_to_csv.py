@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import yaml
 import io
 import pandas as pd
@@ -10,12 +11,12 @@ Each test case is identified by a unique id.
 """
 
 yaml_filepath = sys.argv[1]
-file_name = yaml_filepath.split(".")[0]
-yaml_data = yaml.load(io.open(yaml_filepath, "r", encoding="utf-8"))
+file_name = yaml_filepath.split(".yaml")[0]
+yaml_data = yaml.load(io.open(yaml_filepath, "r", encoding="utf-8"), Loader=yaml.Loader)
 csv_data = []
 for language in yaml_data["tests"]:
     for i, testcase in enumerate(yaml_data["tests"][language]):
-        test_id = testcase["_id_"]
+        test_id = testcase["id"]
         message = testcase["message"]
         for output in testcase["outputs"]:
             output_id = output["output_id"]

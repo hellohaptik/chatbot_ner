@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import io
 import pandas as pd
 import sys
@@ -81,7 +82,7 @@ def match_output_to_text(yaml_tests, translated_data):
                 if yaml_test["outputs"][output_index]["output_id"] == translated_test["rows"][i]["output_id"]:
                     original_text = translated_test["rows"][i]["original_text"]
                     yaml_test["outputs"][output_index].update(
-                        {"original_text": double_quote(original_text) if str(original_text).lower() != "nan" else None})
+                        {"original_text": double_quote(original_text) if not pd.isna(original_text) else None})
 
         if language not in translated_tests:
             translated_tests.update({language: []})
@@ -110,7 +111,7 @@ yaml.RoundTripRepresenter.add_representer(type(None), my_represent_none)
 
 
 yaml_filepath = sys.argv[1]
-file_name = yaml_filepath.split(".")[0]
+file_name = yaml_filepath.split(".yaml")[0]
 yaml_data = yaml.load(io.open(yaml_filepath, "r", encoding="utf-8"), Loader=yaml.Loader)
 yaml_tests = []
 args = yaml_data.get("args", None)
