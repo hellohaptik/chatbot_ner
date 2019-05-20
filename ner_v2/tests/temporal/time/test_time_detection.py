@@ -1,85 +1,93 @@
 from __future__ import absolute_import
 
+import io
 import os
 
-import pandas as pd
+import pytz
 import six
+import yaml
 from django.test import TestCase
 
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 
 
-class TimeDetectorTest(TestCase):
-    LANGUAGE = 'language'
-    TEXT = 'text'
-    BOT_MESAGE = 'bot_message'
-    HH = 'hh'
-    MM = 'mm'
-    NN = 'nn'
-    RANGE = 'range'
-    TIME_TYPE = 'time_type'
-    ORIGINAL_TEXT = 'original_text'
-    NA_VALUES = ('NA', 'na', None,)
-    MULTI_SEPARATOR = '|'
+class TimeDetectionTestMeta(type):
+    yaml_test_files = [
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "time_ner_tests.yaml")
+    ]
 
-    def setUp(self):
-        self.csv_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'time_detection_tests.csv')
+    def __new__(cls, name, bases, attrs):
+        for test_name, test_fn in cls.yaml_testsuite_generator():
+            attrs[test_name] = test_fn
 
-    def is_nan(self, value):
-        # type: (Any) -> bool
-        return value in TimeDetectorTest.NA_VALUES
+        return super(TimeDetectionTestMeta, cls).__new__(cls, name, bases, attrs)
 
-    def _make_expected_output(self, row_dict, drop_na=True):
-        # type: (dict, bool) -> Tuple[List[Dict[str, Any]], List[Union[str, unicode]]]
-        # TODO: This function should be a part of time detection package
-        if self.is_nan(row_dict[TimeDetectorTest.ORIGINAL_TEXT]):
-            return [], []
+    @classmethod
+    def yaml_testsuite_generator(cls):
+        for filepath in cls.yaml_test_files:
+            test_data = yaml.load(io.open(filepath, "r", encoding="utf-8"))
+            timezone = pytz.timezone(test_data["args"].get("timezone", "UTC"))
+            for language in test_data["tests"]:
+                for i, testcase in enumerate(test_data["tests"][language]):
+                    yield (
+                        "test_yaml_{}".format(testcase["id"]),
+                        cls.get_yaml_test(testcase=testcase,
+                                          language=language,
+                                          timezone=timezone)
+                    )
 
-        hhs = [int(part) for part in row_dict[TimeDetectorTest.HH].split(TimeDetectorTest.MULTI_SEPARATOR)]
-        mms = [int(part) for part in row_dict[TimeDetectorTest.MM].split(TimeDetectorTest.MULTI_SEPARATOR)]
-        nns = row_dict[TimeDetectorTest.NN].split(TimeDetectorTest.MULTI_SEPARATOR)
-        ranges = row_dict[TimeDetectorTest.RANGE].split(TimeDetectorTest.MULTI_SEPARATOR)
-        time_types = row_dict[TimeDetectorTest.TIME_TYPE].split(TimeDetectorTest.MULTI_SEPARATOR)
-        original_texts = [part.lower()
-                          for part in row_dict[TimeDetectorTest.ORIGINAL_TEXT].split(TimeDetectorTest.MULTI_SEPARATOR)]
+    @classmethod
+    def get_yaml_test(cls, testcase, language, timezone, **kwargs):
+        def parse_expected_outputs(expected_outputs):
+            time_dicts, original_texts = [], []
+            for expected_output in expected_outputs:
+                time_dict = {
+                    "hh": expected_output["hh"],
+                    "mm": expected_output["mm"],
+                    "nn": expected_output["nn"],
+                    "range": expected_output["range"],
+                    "time_type": expected_output["time_type"]
+                }
+                original_text = expected_output["original_text"].lower().strip() if expected_output[
+                    "original_text"] else None
+                if original_text:
+                    time_dicts.append(time_dict)
+                    original_texts.append(original_text)
+            return time_dicts, original_texts
 
-        if not all(other_list_size == len(original_texts)
-                   for other_list_size in [len(hhs), len(mms), len(nns), len(ranges), len(time_types)]):
-            raise ValueError('Ill-formatted test case row, all output rows must have same number of parts separated by'
-                             '{}'.format(TimeDetectorTest.MULTI_SEPARATOR))
+        failure_string_prefix = u"Test failed for\nText = {message}\nLanguage = {language}\n"
 
-        expected_times = []
-        for (hh, mm, nn, range_, time_type) in zip(hhs, mms, nns, ranges, time_types):
-            output = {
-                'hh': hh,
-                'mm': mm,
-                'nn': nn,
-                'range': range_,
-                'time_type': time_type,
-            }
-            if drop_na:
-                output = {k: output[k] for k in output if not self.is_nan(output[k])}
-            expected_times.append(output)
-        return expected_times, original_texts
+        def run_test(self):
+            message = testcase["message"]
+            range_enabled = testcase.get("range_enabled")
+            time_detector = TimeDetector(entity_name='time', language=language, timezone=timezone)
 
-    def test_time_detection_from_csv(self):
-        """
-        Run time detection tests defined in the csv
-        """
-        # columns = ['language', 'text', 'bot_message', 'hh', 'mm', 'nn', 'range', 'time_type', 'original_text']
-        df = pd.read_csv(self.csv_path, encoding='utf-8', dtype=six.text_type, keep_default_na=False)
+            time_dicts, spans = time_detector.detect_entity(text=message, range_enabled=range_enabled, **kwargs)
 
-        for language, language_tests_df in df.groupby(by=[TimeDetectorTest.LANGUAGE]):
-            print('Running tests for language {}'.format(language))  # pylint: disable=E1601
-            time_detector = TimeDetector(language=language)
-            for index, row in language_tests_df.iterrows():
-                if not self.is_nan(row[TimeDetectorTest.BOT_MESAGE]):
-                    time_detector.set_bot_message(bot_message=row[TimeDetectorTest.BOT_MESAGE])
-                range_enabled = not self.is_nan(row[TimeDetectorTest.RANGE])
-                expected_times, expected_original_texts = self._make_expected_output(row_dict=row)
-                expected_output = list(zip(expected_times, expected_original_texts))
-                detected_times, original_texts = time_detector.detect_entity(text=row[TimeDetectorTest.TEXT],
-                                                                             range_enabled=range_enabled)
+            for time_dict in time_dicts:
+                if "range" not in time_dict:
+                    time_dict.update({"range": None})
+                if "time_type" not in time_dict:
+                    time_dict.update({"time_type": None})
 
-                for detected_output_pair in zip(detected_times, original_texts):
-                    self.assertIn(detected_output_pair, expected_output)
+            expected_time_dicts, expected_spans = parse_expected_outputs(testcase["outputs"])
+            expected_outputs = list(six.moves.zip(expected_time_dicts, expected_spans))
+
+            prefix = failure_string_prefix.format(message=message, language=language)
+
+            self.assertEqual(len(time_dicts), len(spans),
+                             prefix + u"Returned times and original_texts have different lengths")
+            self.assertEqual(len(spans), len(expected_outputs),
+                             prefix + u"Returned times and expected_outputs have different lengths")
+
+            for output in six.moves.zip(time_dicts, spans):
+
+                self.assertIn(output, expected_outputs,
+                              prefix + u"{got} not in {expected_outputs}".format(got=output,
+                                                                                 expected_outputs=expected_outputs))
+
+        return run_test
+
+
+class TimeDetectionTest(six.with_metaclass(TimeDetectionTestMeta, TestCase)):
+    pass
