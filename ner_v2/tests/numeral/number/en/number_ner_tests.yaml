@@ -1,0 +1,74 @@
+tests:
+  en:
+  - id: en_1
+    message: "100 got selected for interview"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: 100
+        unit: null
+        original_text: "100"
+  - id: en_2
+    message: "rs.100 is the application charger"
+    unit_type: currency
+    outputs:
+      - output_id: 1
+        value: 100
+        unit: rupees
+        original_text: "rs.100"
+  - id: en_3
+    message: "Todays temperature is 11.2 degree celsius"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: 11.2
+        unit: null
+        original_text: "11.2"
+  - id: en_4
+    message: "my monthly salary is 10.12k rupees"
+    unit_type: currency
+    outputs:
+      - output_id: 1
+        value: 10120
+        unit: rupees
+        original_text: "10.12k rupees"
+  - id: en_5
+    message: "1 thousand men were killed in war"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: 1000
+        unit: null
+        original_text: "1 thousand"
+  - id: en_6
+    message: "i need 1 thousand rupees"
+    unit_type: currency
+    outputs:
+      - output_id: 1
+        value: 1000
+        unit: rupees
+        original_text: "1 thousand rupees"
+  - id: en_7
+    message: "my monthly salary is 2.2k"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: 2200
+        unit: null
+        original_text: "2.2k"
+  - id: en_8
+    message: "I bought a car toy for 2.3k rupees"
+    unit_type: currency
+    outputs:
+      - output_id: 1
+        value: 2300
+        unit: rupees
+        original_text: "2.3k rupees"
+  - id: en_9
+    message: "I buys 2.3k kg mango"
+    unit_type: currency
+    outputs:
+      - output_id: 1
+        value: null
+        unit: null
+        original_text: null
