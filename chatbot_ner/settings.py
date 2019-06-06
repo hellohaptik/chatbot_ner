@@ -94,6 +94,19 @@ if 'test' in sys.argv:
 
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+NOSE_ARGS = [
+    '--nocapture',
+    '--nologcapture',
+    '--verbosity=3',
+    '--ignore-files=urls.py',
+    '--ignore-files=const.py',
+    '--ignore-files=constant.py',
+    '--ignore-files=constants.py',
+    '--ignore-files=start_server.sh',
+    '--ignore-files=settings.py',
+    '--exclude-dir=docs/',
+    '--exclude-dir=docker/',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
