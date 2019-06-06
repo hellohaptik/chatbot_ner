@@ -76,7 +76,7 @@ class CrfTrain(object):
             self.write_crf_model_to_s3()
             return self.model_dir
         else:
-            local_path = CRF_MODELS_PATH + self.entity_name
+            local_path = CRF_MODELS_PATH +'/'+self.entity_name
             trainer.train(local_path)
             ner_logger.debug('Training for entity %s completed' % self.entity_name)
             ner_logger.debug('Model locally saved at %s' % self.entity_name)
