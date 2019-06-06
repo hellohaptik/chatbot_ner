@@ -99,6 +99,10 @@ NOSE_ARGS = [
     '--nologcapture',
     '--verbosity=3',
     '--ignore-files=urls.py',
+    '--ignore-files=wsgi.py',
+    '--ignore-files=manage.py',
+    '--ignore-files=initial_setup.py',
+    '--ignore-files=__init__.py',
     '--ignore-files=const.py',
     '--ignore-files=constant.py',
     '--ignore-files=constants.py',
@@ -106,6 +110,7 @@ NOSE_ARGS = [
     '--ignore-files=settings.py',
     '--exclude-dir=docs/',
     '--exclude-dir=docker/',
+    '--exclude-dir=data/',
 ]
 
 # Internationalization
