@@ -12,7 +12,7 @@ from ner_v2.detectors.numeral.number_range.number_range_detection import NumberR
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
-
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
 import six
@@ -73,6 +73,7 @@ def parse_post_request(request):
     return parameters_dict
 
 
+@csrf_exempt
 def date(request):
     """This functionality use DateAdvanceDetector to detect date. It is called through api call
 
@@ -151,6 +152,7 @@ def date(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def time(request):
     """This functionality use TimeDetector to detect time. It is called through api call
 
@@ -227,6 +229,7 @@ def time(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def number(request):
     """Use NumberDetector to detect numerals
 
@@ -323,6 +326,7 @@ def number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def number_range(request):
     """Use NumberDetector to detect numerals
 
