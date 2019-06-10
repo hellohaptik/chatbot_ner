@@ -67,7 +67,8 @@ def parse_post_request(request):
         PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
         PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
         PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
-        PARAMETER_MAX_DIGITS: request_data.get('max_number_digits')
+        PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
+        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type')
     }
 
     return parameters_dict
@@ -318,7 +319,6 @@ def number(request):
             entity_output = number_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-
     except TypeError as e:
         ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
