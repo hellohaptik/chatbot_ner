@@ -4,14 +4,13 @@ import io
 import pandas as pd
 import sys
 from operator import itemgetter
-from ruamel import yaml
-
-
-yaml.preserve_quotes = True
-double_quote = yaml.scalarstring.DoubleQuotedScalarString
 
 
 def match_output_to_translated_test(yaml_tests, translated_data):
+    from ruamel import yaml
+    yaml.preserve_quotes = True
+    double_quote = yaml.scalarstring.DoubleQuotedScalarString
+
     """
     Function to map outputs to translated test cases if len(translated_data) == len(yaml_tests)
     Args:
@@ -108,48 +107,51 @@ def my_represent_none(self, data):
     return self.represent_scalar(u"tag:yaml.org,2002:null", u"null")
 
 
-yaml.RoundTripRepresenter.add_representer(type(None), my_represent_none)
+
+def main():
+    from ruamel import yaml
+    yaml.RoundTripRepresenter.add_representer(type(None), my_represent_none)
+    yaml_filepath = sys.argv[1]
+    file_name = yaml_filepath.split(".yaml")[0]
+    yaml_data = yaml.load(io.open(yaml_filepath, "r", encoding="utf-8"), Loader=yaml.Loader)
+    yaml_tests = []
+    args = yaml_data.get("args", None)
+    for language in yaml_data["tests"]:
+        yaml_tests.extend(yaml_data["tests"][language])
+
+    csv_filepath = sys.argv[2]
+    csv_data = pd.read_csv(csv_filepath, encoding="utf-8")
+    csv_rows = csv_data.to_dict(orient="records")
+    csv_data["id"] = csv_data["unique_id"].apply(lambda x: x.split("-")[0])
+    csv_data["output_id"] = csv_data["unique_id"].apply(lambda x: int(x.split("-")[1]))
 
 
-yaml_filepath = sys.argv[1]
-file_name = yaml_filepath.split(".yaml")[0]
-yaml_data = yaml.load(io.open(yaml_filepath, "r", encoding="utf-8"), Loader=yaml.Loader)
-yaml_tests = []
-args = yaml_data.get("args", None)
-for language in yaml_data["tests"]:
-    yaml_tests.extend(yaml_data["tests"][language])
+    translated_data = []
+    test_groups = csv_data.groupby("id")
+    for test_case_id, test_case_df in test_groups:
+        translated_data.append({"id": test_case_id, "rows": test_case_df.to_dict(orient="records")})
 
-csv_filepath = sys.argv[2]
-csv_data = pd.read_csv(csv_filepath, encoding="utf-8")
-csv_rows = csv_data.to_dict(orient="records")
-csv_data["id"] = csv_data["unique_id"].apply(lambda x: x.split("-")[0])
-csv_data["output_id"] = csv_data["unique_id"].apply(lambda x: int(x.split("-")[1]))
-
-
-translated_data = []
-test_groups = csv_data.groupby("id")
-for test_case_id, test_case_df in test_groups:
-    translated_data.append({"id": test_case_id, "rows": test_case_df.to_dict(orient="records")})
-
-if yaml_tests and translated_data:
-    if len(yaml_tests) == len(translated_data):
-        yaml_tests, translated_data = [sorted(l, key=itemgetter('id')) for l in (yaml_tests, translated_data)]
-        output_tests, language = match_output_to_translated_test(yaml_tests, translated_data)
-        if language is not None:
-            yaml.round_trip_dump({"args": args, "tests": output_tests},
-                                 io.open("{file_name}_{language}.yaml".format(file_name=file_name,
-                                                                              language=language), "w",
-                                         encoding="utf-8"),
-                                 default_flow_style=False,
-                                 allow_unicode="utf-8")
-        else:
-            raise Exception('No language found. Filename: {}'.format(csv_filepath))
-else:
-    if yaml_tests:
-        raise Exception(
-            "Empty translated data. {filename} might not be in proper format".format(filename=csv_filepath))
-    elif translated_data:
-        raise Exception("Empty yaml tests {filename} might not be in proper format".format(filename=yaml_filepath))
+    if yaml_tests and translated_data:
+        if len(yaml_tests) == len(translated_data):
+            yaml_tests, translated_data = [sorted(l, key=itemgetter('id')) for l in (yaml_tests, translated_data)]
+            output_tests, language = match_output_to_translated_test(yaml_tests, translated_data)
+            if language is not None:
+                yaml.round_trip_dump({"args": args, "tests": output_tests},
+                                     io.open("{file_name}_{language}.yaml".format(file_name=file_name,
+                                                                                  language=language), "w",
+                                             encoding="utf-8"),
+                                     default_flow_style=False,
+                                     allow_unicode="utf-8")
+            else:
+                raise Exception('No language found. Filename: {}'.format(csv_filepath))
     else:
-        raise Exception("{filename1} and {filename2} might not be proper format".format(filename1=yaml_filepath,
-                                                                                        filename2=csv_filepath))
+        if yaml_tests:
+            raise Exception(
+                "Empty translated data. {filename} might not be in proper format".format(filename=csv_filepath))
+        elif translated_data:
+            raise Exception("Empty yaml tests {filename} might not be in proper format".format(filename=yaml_filepath))
+        else:
+            raise Exception("{filename1} and {filename2} might not be proper format".format(filename1=yaml_filepath,
+                                                                                            filename2=csv_filepath))
+   
+main()
