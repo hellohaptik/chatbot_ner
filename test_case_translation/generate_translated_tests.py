@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import
 import io
 import pandas as pd
 import sys
@@ -10,7 +9,6 @@ def match_output_to_translated_test(yaml_tests, translated_data):
     from ruamel import yaml
     yaml.preserve_quotes = True
     double_quote = yaml.scalarstring.DoubleQuotedScalarString
-
     """
     Function to map outputs to translated test cases if len(translated_data) == len(yaml_tests)
     Args:
@@ -107,7 +105,6 @@ def my_represent_none(self, data):
     return self.represent_scalar(u"tag:yaml.org,2002:null", u"null")
 
 
-
 def main():
     from ruamel import yaml
     yaml.RoundTripRepresenter.add_representer(type(None), my_represent_none)
@@ -124,7 +121,6 @@ def main():
     csv_rows = csv_data.to_dict(orient="records")
     csv_data["id"] = csv_data["unique_id"].apply(lambda x: x.split("-")[0])
     csv_data["output_id"] = csv_data["unique_id"].apply(lambda x: int(x.split("-")[1]))
-
 
     translated_data = []
     test_groups = csv_data.groupby("id")
@@ -153,5 +149,6 @@ def main():
         else:
             raise Exception("{filename1} and {filename2} might not be proper format".format(filename1=yaml_filepath,
                                                                                             filename2=csv_filepath))
-   
+
+
 main()
