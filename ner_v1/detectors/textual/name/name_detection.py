@@ -191,11 +191,11 @@ class NameDetector(object):
         """
         if text is None:
             text = self.text
-        text_detection_result = self.text_detection_name(text)
-        replaced_text = self.replace_detected_text(text_detection_result, text=text)
-        entity_value, original_text = self.detect_person_name_entity(replaced_text)
+        entity_value, original_text = self.get_name_using_pos_tagger(text)
         if not entity_value:
-            entity_value, original_text = self.get_name_using_pos_tagger(text)
+            text_detection_result = self.text_detection_name(text)
+            replaced_text = self.replace_detected_text(text_detection_result, text=text)
+            entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         return entity_value, original_text
 

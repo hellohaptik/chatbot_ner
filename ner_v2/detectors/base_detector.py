@@ -160,6 +160,52 @@ class BaseDetector(object):
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,
                                             detection_method=method, detection_language=self._processing_language)
 
+    def detect_bulk(self, messages=None, **kwargs):
+        """
+        Use detector to detect entities from text. It also translates query to language compatible to detector
+
+        Args:
+            messages (list of strings): list of natural text(s) on which detection logic is to be run.
+        Returns:
+            dict or None: dictionary containing entity_value, original_text and detection;
+                          entity_value is in itself a dict with its keys varying from entity to entity
+
+        Example:
+            1) Consider an example of restaurant detection from a message
+
+                messages = ['i want to order chinese from  mainland china and pizza from domminos']
+                output = detect(message=message)
+                print output
+                    >> [[{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
+                    {'value': u'Mainland China'}}, {'detection': 'message', 'original_text': 'domminos',
+                    'entity_value': {'value': u"Domino's Pizza"}}]]
+        """
+        if messages is None:
+            messages = []
+        if self._language != self._processing_language and self._translation_enabled:
+            translation_output_list = [
+                translate_text(message_, self._language, self._processing_language)
+                for message_ in messages]
+
+            messages = []
+            for translation_output in translation_output_list:
+                messages.append(translation_output[TRANSLATED_TEXT] if translation_output['status'] else '')
+
+        texts = messages
+        bulk_entities_list, bulk_original_texts_list = [], []
+
+        for text in texts:
+            entities_list, original_texts_list = self.detect_entity(text=text, **kwargs)
+            bulk_entities_list.append(entities_list)
+            bulk_original_texts_list.append(original_texts_list)
+
+        values_list, method, original_texts_list = bulk_entities_list, FROM_MESSAGE, bulk_original_texts_list
+
+        return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
+                                       detection_method=method,
+                                       detection_language=self._processing_language)
+
+
     @staticmethod
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
                                 detection_method_list=None, detection_language=ENGLISH_LANG):
@@ -212,3 +258,75 @@ class BaseDetector(object):
                 }
             )
         return entity_list
+
+    @staticmethod
+    def output_entity_bulk(entity_values_list, original_texts_list, detection_method=None,
+                           detection_method_list=None, detection_language=ENGLISH_LANG):
+        """
+        Format detected entity values for bulk detection
+        Args:
+            entity_values_list (list of lists): containing list of entity values which are identified from given
+                                                detection logic
+            original_texts_list (list of lists): containing list original values or actual values from
+                                                messages which are identified
+            detection_method (str, optional): how the entity was detected
+                                              i.e. whether from message, structured_value
+                                                   or fallback, verified from model or not.
+                                              defaults to None
+            detection_method_list(list, optional): list containing how each entity was detected in the entity_value
+                                                list.If provided, this argument will be used over detection method
+                                                defaults to None
+            detection_language(str): ISO 639 code for language in which entity is detected
+
+        Returns:
+            list of lists of dict: list of lists containing dictionaries, each containing entity_value,
+                                    original_text and detection;
+                                    entity_value is in itself a dict with its keys varying from entity to entity
+        Example Output:
+            [
+                [
+                    {
+                        "entity_value": entity_value_1,
+                        "detection": detection_method,
+                        "original_text": original_text_1
+                    },
+                    {
+                        "entity_value": entity_value_2,
+                        "detection": detection_method,
+                        "original_text": original_text_2
+                    }
+
+                ],
+                [
+                    {
+                        "entity_value": entity_value,
+                        "detection": detection_method,
+                        "original_text": original_text
+                    }
+                ]
+            ]
+        """
+        if detection_method_list is None:
+            detection_method_list = []
+        if entity_values_list is None:
+            entity_values_list = []
+
+        bulk_detection_entity_list = []
+        for index, entity_values in enumerate(entity_values_list):
+            entity_list = []
+            for i, entity_value in enumerate(entity_values):
+                if type(entity_value) in [str, six.text_type]:
+                    entity_value = {
+                        ENTITY_VALUE_DICT_KEY: entity_value
+                    }
+                method = detection_method_list[i] if detection_method_list else detection_method
+                entity_list.append(
+                    {
+                        ENTITY_VALUE: entity_value,
+                        DETECTION_METHOD: method,
+                        ORIGINAL_TEXT: original_texts_list[index][i],
+                        DETECTION_LANGUAGE: detection_language
+                    }
+                )
+            bulk_detection_entity_list.append(entity_list)
+        return bulk_detection_entity_list
