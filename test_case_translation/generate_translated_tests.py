@@ -118,7 +118,6 @@ def main():
 
     csv_filepath = sys.argv[2]
     csv_data = pd.read_csv(csv_filepath, encoding="utf-8")
-    csv_rows = csv_data.to_dict(orient="records")
     csv_data["id"] = csv_data["unique_id"].apply(lambda x: x.split("-")[0])
     csv_data["output_id"] = csv_data["unique_id"].apply(lambda x: int(x.split("-")[1]))
 
@@ -152,3 +151,4 @@ def main():
 
 
 main()
+
