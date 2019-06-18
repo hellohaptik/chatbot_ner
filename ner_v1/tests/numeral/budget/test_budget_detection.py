@@ -119,6 +119,9 @@ class TestBudgetDetector(TestCase):
             self.assertEqual(original_texts, [])
 
     def test_budgets_without_scales(self):
+        """
+        Test budgets without scales
+        """
         tests = [
             ('I want to buy 5 liters of milk', 0, 5, '5'),
             ('the insect is 120 millimeters tall', 0, 120, '120'),
@@ -131,6 +134,9 @@ class TestBudgetDetector(TestCase):
             self.assertEqual(original_texts, [original_text])
 
     def test_all_budget_scales(self):
+        """
+        Test all supported budget scales
+        """
         tests = [
             ('2k', 0, 2000, '2k'),
             ('2 thousand', 0, 2000, '2 thousand'),
@@ -147,7 +153,6 @@ class TestBudgetDetector(TestCase):
             ('2 lakhs', 0, 200000, '2 lakhs'),
             ('2m', 0, 2000000, '2m'),
             ('2mn', 0, 2000000, '2mn'),
-            ('2 milion', 0, 2000000, '2 milion'),
             ('2 mil', 0, 2000000, '2 mil'),
             ('2 mill', 0, 2000000, '2 mill'),
             ('2 million', 0, 2000000, '2 million'),

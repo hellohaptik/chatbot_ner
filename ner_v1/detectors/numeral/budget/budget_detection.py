@@ -119,8 +119,8 @@ class BudgetDetector(BaseDetector):
         self.tag = '__' + self.entity_name + '__'
         self._use_text_detection = use_text_detection
 
-        scales, units = zip(*sorted(
-            list(BudgetDetector._scale_patterns.items()), key=lambda scale_pattern: len(scale_pattern[1]), reverse=True
+        units, scales = zip(*sorted(
+            list(BudgetDetector._scale_patterns.items()), key=lambda pattern_scale: len(pattern_scale[0]), reverse=True
         ))
         self._scale_compiled_patterns = [(scale, re.compile(unit)) for scale, unit in zip(scales, units)]
         digits_pattern = r'((?:\d+(?:\,\d+)*(?:\.\d+)?)|(?:(?:\d+(?:\,\d+)*)?(?:\.\d+)))'
