@@ -77,6 +77,24 @@ class BudgetDetector(BaseDetector):
 
     """
 
+    _scale_patterns = {
+        'k': 1000,
+        'ha?zaa?r': 1000,
+        'ha?ja?ar': 1000,
+        'thousa?nd': 1000,
+        'l': 100000,
+        'lacs?': 100000,
+        'lakh?s?': 100000,
+        'lakhs': 100000,
+        'm': 1000000,
+        'mn': 1000000,
+        'million': 1000000,
+        'mill?': 1000000,
+        'c': 10000000,
+        'cro?': 10000000,
+        'crore?s?': 10000000,
+    }
+
     def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False,
                  use_text_detection=False):
         """Initializes a BudgetDetector object
@@ -101,18 +119,10 @@ class BudgetDetector(BaseDetector):
         self.tag = '__' + self.entity_name + '__'
         self._use_text_detection = use_text_detection
 
-        self._allowed_units = [
-            (['k', 'ha?zaa?r', 'ha?ja?ar', 'thousa?nd'], 1000),
-            (['l', 'lacs?', 'lakh?s?', 'lakhs'], 100000),
-            (['m', 'mn', 'million', 'mill?'], 1000000),
-            (['c', 'cro?', 'crore?s?'], 10000000),
-        ]
-
-        units = []
-        for _units, scale in self._allowed_units:
-            units.extend(_units)
-        units.sort(key=lambda unit: len(unit), reverse=True)
-
+        units, scales = zip(*sorted(
+            list(BudgetDetector._scale_patterns.items()), key=lambda pattern_scale: len(pattern_scale[0]), reverse=True
+        ))
+        self._scale_compiled_patterns = [(scale, re.compile(unit)) for scale, unit in zip(scales, units)]
         digits_pattern = r'((?:\d+(?:\,\d+)*(?:\.\d+)?)|(?:(?:\d+(?:\,\d+)*)?(?:\.\d+)))'
         units_pattern = r'({})?'.format('|'.join(units))
         self._budget_pattern = r'(?:rs\.|rs|rupees|rupee)?' \
@@ -121,8 +131,8 @@ class BudgetDetector(BaseDetector):
 
     def get_scale(self, unit):
         if unit:
-            for _units, scale in self._allowed_units:
-                if re.search('|'.join(_units), unit):
+            for scale, pattern in self._scale_compiled_patterns:
+                if pattern.search(unit):
                     return scale
 
         return 1
