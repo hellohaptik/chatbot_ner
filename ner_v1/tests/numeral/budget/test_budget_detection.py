@@ -10,7 +10,8 @@ class TestBudgetDetector(TestCase):
         self.budget_detector = BudgetDetector(entity_name='budget')
         self.budget_detector.set_min_max_digits(min_digit=1, max_digit=15)
 
-    def make_budget_dict(self, min_budget=0, max_budget=0):
+    @staticmethod
+    def make_budget_dict(min_budget=0, max_budget=0):
         return {'min_budget': min_budget, 'max_budget': max_budget, 'type': 'normal_budget'}
 
     def test_min_max_digits_limits(self):
@@ -124,6 +125,40 @@ class TestBudgetDetector(TestCase):
             ('hello, your coupon code is 50 Amazon', 0, 50, '50'),
             ('Your flight number is 9w 998', 0, 998, '998'),
         ]
+        for test, min_budget, max_budget, original_text in tests:
+            budget_dicts, original_texts = self.budget_detector.detect_entity(text=test)
+            self.assertEqual(budget_dicts, [self.make_budget_dict(max_budget=max_budget)])
+            self.assertEqual(original_texts, [original_text])
+
+    def test_all_budget_scales(self):
+        tests = [
+            ('2k', 0, 2000, '2k'),
+            ('2 thousand', 0, 2000, '2 thousand'),
+            ('2 hazar', 0, 2000, '2 hazar'),
+            ('2 hazaar', 0, 2000, '2 hazaar'),
+            ('2 hajar', 0, 2000, '2 hajar'),
+            ('2 hajaar', 0, 2000, '2 hajaar'),
+            ('2l', 0, 200000, '2l'),
+            ('2 lac', 0, 200000, '2 lac'),
+            ('2 lacs', 0, 200000, '2 lacs'),
+            ('2 lak', 0, 200000, '2 lak'),
+            ('2 laks', 0, 200000, '2 laks'),
+            ('2 lakh', 0, 200000, '2 lakh'),
+            ('2 lakhs', 0, 200000, '2 lakhs'),
+            ('2m', 0, 2000000, '2m'),
+            ('2mn', 0, 2000000, '2mn'),
+            ('2 milion', 0, 2000000, '2 milion'),
+            ('2 mil', 0, 2000000, '2 mil'),
+            ('2 mill', 0, 2000000, '2 mill'),
+            ('2 million', 0, 2000000, '2 million'),
+            ('2c', 0, 20000000, '2c'),
+            ('2 cr', 0, 20000000, '2 cr'),
+            ('2 cro', 0, 20000000, '2 cro'),
+            ('2 cror', 0, 20000000, '2 cror'),
+            ('2 crore', 0, 20000000, '2 crore'),
+            ('2 crores', 0, 20000000, '2 crores'),
+        ]
+
         for test, min_budget, max_budget, original_text in tests:
             budget_dicts, original_texts = self.budget_detector.detect_entity(text=test)
             self.assertEqual(budget_dicts, [self.make_budget_dict(max_budget=max_budget)])
