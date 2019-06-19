@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^v1/ner/$', api_v1.ner),
     url(r'^v1/combine_output/$', api_v1.combine_output),
     url(r'^v1/person_name/$', api_v1.person_name),
+    url(r'^v1/person_name_bulk/$', api_v1.person_name),
     url(r'^v1/regex/$', api_v1.regex),
 
     # V2 detectors

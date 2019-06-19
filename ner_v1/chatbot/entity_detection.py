@@ -523,7 +523,8 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
     """Use NameDetector to detect names
 
     Args:
-        message (str): natural text on which detection logic is to be run. Note if structured value is
+        message (str or unicode or None or list(bulk)): natural text on which detection logic is to be run.
+                                Note if structured value is
                                 detection is run on structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
@@ -564,15 +565,16 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
                                                                   FROM_FALLBACK_VALUE)
     entity_list, original_text_list = [], []
 
-    if text:
+    if isinstance(text, six.string_types):
         entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message)
+        if not entity_list and fallback_text:
+            entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
+            detection_method = fallback_method
 
-    if not entity_list and fallback_text:
-        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
-        detection_method = fallback_method
-
-    if entity_list and original_text_list:
-        return output_entity_dict_list(entity_list, original_text_list, detection_method)
+        if entity_list and original_text_list:
+            return output_entity_dict_list(entity_list, original_text_list, detection_method)
+    elif isinstance(message, (list, tuple)):
+        return name_detection.detect_bulk(messages=message)
 
     return None
 

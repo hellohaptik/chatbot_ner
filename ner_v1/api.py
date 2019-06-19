@@ -354,7 +354,12 @@ def person_name(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_output = get_person_name(message=parameters_dict[PARAMETER_MESSAGE],
                                         entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
