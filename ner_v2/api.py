@@ -472,11 +472,14 @@ def phone_number(request):
         ner_logger.debug('Source Language %s' % language)
 
         phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
-
-        entity_output = phone_number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        message = parameters_dict[PARAMETER_MESSAGE]
+        if isinstance(message, six.string_types):
+            entity_output = phone_number_detection.detect(message=message,
+                                                          structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                          fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                          bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        elif isinstance(message, (list, tuple)):
+            entity_output = phone_number_detection.detect_bulk(messages=message)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for phone_number: %s ' % e)
