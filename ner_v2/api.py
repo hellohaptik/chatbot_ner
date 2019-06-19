@@ -397,6 +397,7 @@ def number_range(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def phone_number(request):
     """Uses PhoneDetector to detect phone numbers
 
@@ -463,8 +464,12 @@ def phone_number(request):
 
         """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_name = parameters_dict[PARAMETER_ENTITY_NAME]
         language = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
 
