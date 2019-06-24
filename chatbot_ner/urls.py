@@ -35,6 +35,13 @@ urlpatterns = [
     url(r'^v2/phone_number/$', api_v2.phone_number),
     url(r'^v2/number_range/$', api_v2.number_range),
 
+    # V2 bulk detectors
+    url(r'^v2/date_bulk/$', api_v2.date),
+    url(r'^v2/time_bulk/$', api_v2.time),
+    url(r'^v2/number_bulk/$', api_v2.number),
+    url(r'^v2/number_range_bulk/$', api_v2.number_range),
+    url(r'^v2/phone_number_bulk/$', api_v2.phone_number),
+
     # Dictionary Read Write
     url(r'^entities/get_entity_word_variants', external_api.get_entity_word_variants),
     url(r'^entities/update_dictionary', external_api.update_dictionary),

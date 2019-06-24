@@ -12,9 +12,10 @@ from ner_v2.detectors.numeral.number_range.number_range_detection import NumberR
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
-
+from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
+import six
 
 
 def get_parameters_dictionary(request):
@@ -44,6 +45,36 @@ def get_parameters_dictionary(request):
     return parameters_dict
 
 
+def parse_post_request(request):
+    # type: (django.http.HttpRequest) -> Dict[str, Any]
+    """
+    Extract POST request body from HTTP request
+
+    Args:
+        request (django.http.HttpRequest): HTTP response from url
+
+    Returns:
+       dict: parameters from the request
+    """
+    request_data = json.loads(request.body)
+    parameters_dict = {
+        PARAMETER_MESSAGE: request_data.get('message'),
+        PARAMETER_ENTITY_NAME: request_data.get('entity_name'),
+        PARAMETER_STRUCTURED_VALUE: request_data.get('structured_value'),
+        PARAMETER_FALLBACK_VALUE: request_data.get('fallback_value'),
+        PARAMETER_BOT_MESSAGE: request_data.get('bot_message'),
+        PARAMETER_TIMEZONE: request_data.get('timezone'),
+        PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
+        PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
+        PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
+        PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
+        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type')
+    }
+
+    return parameters_dict
+
+
+@csrf_exempt
 def date(request):
     """This functionality use DateAdvanceDetector to detect date. It is called through api call
 
@@ -85,9 +116,15 @@ def date(request):
                  'entity_value': {'value': {'mm': 12, 'yy': 2018, 'dd': 5, 'type': 'date'}}}]
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+
         timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         date_past_reference = parameters_dict.get(PARAMETER_PAST_DATE_REFERENCED, "false")
         past_date_referenced = date_past_reference == 'true' or date_past_reference == 'True'
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
@@ -97,9 +134,16 @@ def date(request):
 
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
-        entity_output = date_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE])
+        message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
+
+        if isinstance(message, six.string_types):
+            entity_output = date_detection.detect(message=message,
+                                                  structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                  fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE]
+                                                  )
+        elif isinstance(message, (list, tuple)):
+            entity_output = date_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
@@ -109,6 +153,7 @@ def date(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def time(request):
     """This functionality use TimeDetector to detect time. It is called through api call
 
@@ -150,19 +195,32 @@ def time(request):
                 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}}]
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+
         timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
         form_check = True if parameters_dict[PARAMETER_STRUCTURED_VALUE] else False
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         time_detection = TimeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                       language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                       timezone=timezone)
 
         time_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
-        entity_output = time_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                              structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                              fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                              form_check=form_check)
+
+        message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
+
+        if isinstance(message, six.string_types):
+            entity_output = time_detection.detect(message=message,
+                                                  structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                  fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                  form_check=form_check)
+        elif isinstance(message, (list, tuple)):
+            entity_output = time_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
@@ -172,6 +230,7 @@ def time(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def number(request):
     """Use NumberDetector to detect numerals
 
@@ -231,8 +290,13 @@ def number(request):
 
        """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
         number_detection = NumberDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                           language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
@@ -243,12 +307,18 @@ def number(request):
             max_digit = int(parameters_dict[PARAMETER_MAX_DIGITS])
             number_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
 
-        entity_output = number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
-        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+        message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
 
+        if isinstance(message, six.string_types):
+            entity_output = number_detection.detect(message=message,
+                                                    structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                    fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                    bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        elif isinstance(message, (list, tuple)):
+            entity_output = number_detection.detect_bulk(messages=message)
+
+        ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
@@ -256,6 +326,7 @@ def number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def number_range(request):
     """Use NumberDetector to detect numerals
 
@@ -294,17 +365,28 @@ def number_range(request):
                 'max_value': '300', 'unit': None}}]
        """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = {}
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
         number_range_detector = NumberRangeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                                     language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                                     unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
 
-        entity_output = number_range_detector.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                     structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                     fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                     bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
+
+        if isinstance(message, six.string_types):
+            entity_output = number_range_detector.detect(message=message,
+                                                         structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                         fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                         bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        elif isinstance(message, (list, tuple)):
+            entity_output = number_range_detector.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
 
@@ -315,12 +397,13 @@ def number_range(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def phone_number(request):
     """Uses PhoneDetector to detect phone numbers
 
         request params:
-            message (str): natural text on which detection logic is to be run. Note if structured value is
-                                   detection is run on structured value instead of message
+            message (list or str): string for get request and list of text for bulk call through
+                                   post request on which detection logic is to be run
             entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                               if entity uses elastic-search lookup
             structured_value (str): Value obtained from any structured elements. Note if structured value is
@@ -377,12 +460,61 @@ def phone_number(request):
             },
             "language": "en"
         }
-    ]
+        ]
+        message = ["Call 02226129857' , 'message +1(408) 92-124' ,'send 100rs to 91 9820334416 9920441344']
+        entity_name = 'phone_number'
+        source_language = 'en'
 
+        entity_output:
+        [
+           [{
+                    "detection": "message",
+                    "original_text": "02226129857",
+                    "entity_value": {
+                        "value": "02226129857"
+                    },
+                    "language": "en"
+                }
+
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "+1(408) 92-124",
+                    "entity_value": {
+                        "value": "140892124"
+                    },
+                    "language": "en"
+                }
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "91 9820334416",
+                    "entity_value": {
+                        "value": "919820334416"
+                    },
+                    "language": "en"
+                },
+                {
+                    "detection": "message",
+                    "original_text": "9920441344",
+                    "entity_value": {
+                        "value": "9920441344"
+                    },
+                    "language": "en"
+                }
+
+            ]
+        ]
         """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_name = parameters_dict[PARAMETER_ENTITY_NAME]
         language = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
 
@@ -390,11 +522,14 @@ def phone_number(request):
         ner_logger.debug('Source Language %s' % language)
 
         phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
-
-        entity_output = phone_number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        message = parameters_dict[PARAMETER_MESSAGE]
+        if isinstance(message, six.string_types):
+            entity_output = phone_number_detection.detect(message=message,
+                                                          structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                          fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                          bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        elif isinstance(message, (list, tuple)):
+            entity_output = phone_number_detection.detect_bulk(messages=message)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for phone_number: %s ' % e)

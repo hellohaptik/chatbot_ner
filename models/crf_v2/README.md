@@ -53,7 +53,7 @@ file_handler = open('glove_vectors', 'wb')
 pickle.dump(obj=word_vectors.wv.vectors, file=file_handler, protocol=2)
 
 if not os.path.exists('/app/models_crf/'):
-os.makedirs('/app/models_crf/')
+    os.makedirs('/app/models_crf/')
 
 ```
     
@@ -167,7 +167,7 @@ The module is used to take input as the sentence_list and entity_list and conver
     ```python
     from models.crf_v2.crf_preprocess_data import CrfPreprocessData
     docs['word_embeddings'] = 
-    CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
+    [CrfPreprocessData.word_embeddings(processed_pos_tag_data=each,
     vocab=vocab, word_vectors=word_vectors) 
     for each in docs[SENTENCE_LIST]]
 	```
