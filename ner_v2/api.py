@@ -402,8 +402,8 @@ def phone_number(request):
     """Uses PhoneDetector to detect phone numbers
 
         request params:
-            message (list): list of text on which detection logic is to be run. Note if structured value is
-                                   detection is run on structured value instead of message
+            message (list or str): string for get request and list of text for bulk call through
+                                   post request on which detection logic is to be run
             entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                               if entity uses elastic-search lookup
             structured_value (str): Value obtained from any structured elements. Note if structured value is
