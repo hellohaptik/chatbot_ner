@@ -460,8 +460,53 @@ def phone_number(request):
             },
             "language": "en"
         }
-    ]
+        ]
+        message = ["Call 02226129857' , 'message +1(408) 92-124' ,'send 100rs to 91 9820334416 9920441344']
+        entity_name = 'phone_number'
+        source_language = 'en'
 
+        entity_output:
+        [
+           [{
+                    "detection": "message",
+                    "original_text": "02226129857",
+                    "entity_value": {
+                        "value": "02226129857"
+                    },
+                    "language": "en"
+                }
+
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "+1(408) 92-124",
+                    "entity_value": {
+                        "value": "140892124"
+                    },
+                    "language": "en"
+                }
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "91 9820334416",
+                    "entity_value": {
+                        "value": "919820334416"
+                    },
+                    "language": "en"
+                },
+                {
+                    "detection": "message",
+                    "original_text": "9920441344",
+                    "entity_value": {
+                        "value": "9920441344"
+                    },
+                    "language": "en"
+                }
+
+            ]
+        ]
         """
     try:
         if request.method == "POST":
