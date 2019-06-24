@@ -40,6 +40,7 @@ urlpatterns = [
     url(r'^v2/time_bulk/$', api_v2.time),
     url(r'^v2/number_bulk/$', api_v2.number),
     url(r'^v2/number_range_bulk/$', api_v2.number_range),
+    url(r'^v2/phone_number_bulk/$', api_v2.phone_number),
 
     # Dictionary Read Write
     url(r'^entities/get_entity_word_variants', external_api.get_entity_word_variants),
