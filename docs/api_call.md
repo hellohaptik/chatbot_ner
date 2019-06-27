@@ -182,9 +182,9 @@ Currently time detection support has been provided in different languages - `Eng
         --data-urlencode "fallback_value=" \
         --data-urlencode "bot_message=" \
         --data-urlencode "message=John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. But the bus was scheduled for 12:30 pm"
-```
+    ```
     
-> **Output**:
+    > **Output**:
     
     ```json
     {
@@ -257,9 +257,9 @@ Currently time detection support has been provided in different languages - `Eng
         --data-urlencode "message=राजू का बस १३:५० को बस स्टॉप से निकला और १५ मिनट में यहाँ पहुंच जाएगा और गोवा को शाम में बारह बजकर ३० मिनट पैर पहुंचेगा"
     ```
     
-> **Output**:
+    > **Output**:
     
-```json
+    ```json
     {
       "data": [
         {
@@ -558,9 +558,9 @@ Currently number detection support has been provided for 6 different languages -
         --data-urlencode "fallback_value=" \
         --data-urlencode "bot_message=" \
         --data-urlencode "message=i want to purchase 30 units of mobile abd 40 units of television"
-  ```
+    ```
     
-  > **Output:**
+    > **Output:**
     
     ```json
     {
@@ -749,9 +749,9 @@ Currently number detection support has been provided for 6 different languages -
     print(output)
     ```
     
-- *CURL command:*
+  - *CURL command:*
   
-  ```bash
+    ```bash
     curl -G -i "http://localhost:8081/v2/number/?&entity_name=number_of_unit&min_number_digits=1&max_number_digits=6&unit_type=currency&source_language=en" \
         --data-urlencode "structured_value=" \
         --data-urlencode "fallback_value=" \
@@ -759,9 +759,9 @@ Currently number detection support has been provided for 6 different languages -
         --data-urlencode "message=i want more than Rupees 20k and 10 pendrive"
     ```
   
-  > **Output:**
+    > **Output:**
   
-  ```json
+    ```json
     {
       "data": [
         {
@@ -807,19 +807,19 @@ Currently number detection support has been provided for 6 different languages -
       print(output)
       ```
       
-  - *CURL command:*
+    - *CURL command:*
   
-    ```bash
-      curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=en" \
+       ```bash
+       curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=en" \
           --data-urlencode "structured_value=" \
           --data-urlencode "fallback_value=" \
           --data-urlencode "bot_message=" \
           --data-urlencode "message=send a message on 91 9820334455"
       ```
   
-    > **Output **:
+      > **Output: **
   
-    ```json
+      ```json
       {
         "data": [
           {
@@ -831,7 +831,7 @@ Currently number detection support has been provided for 6 different languages -
             "language": "en"
           }
         ]
-    }
+      }
       ```
 
   - **Example 2: *Detecting phone number (hindi) from message***
@@ -844,7 +844,7 @@ Currently number detection support has been provided for 6 different languages -
       structured_value = None
       fallback_value = None
       bot_message = None
-       source_langauge='hi'       # here language will be ISO 639-1 code
+      source_langauge='hi'       # here language will be ISO 639-1 code
       
       from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector      
       detector = PhoneDetector(language=source_langauge, entity_name=entity_name) 
@@ -853,9 +853,9 @@ Currently number detection support has been provided for 6 different languages -
                                fallback_value=fallback_value,
                                bot_message=bot_message,language=source_language)
       print(output)
-    ```
+      ```
       
-  - *CURL command:*
+    - *CURL command:*
   
       ```bash
       curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=hi" \
@@ -863,9 +863,9 @@ Currently number detection support has been provided for 6 different languages -
           --data-urlencode "fallback_value=" \
           --data-urlencode "bot_message=" \
           --data-urlencode "message=मेरा मोबाइल नंबर है ९८९१९८९८७१"
-    ```
+      ```
   
-    > **Output **:
+      > **Output **:
   
       ```json
       {
@@ -877,9 +877,9 @@ Currently number detection support has been provided for 6 different languages -
               "value": "9891989871"
             },
             "language": "hi"
-        }
+          }
         ]
-    }
+      }
       ```
 
   - Example 2:  *Detecting phone number from **fallback value***
@@ -901,21 +901,21 @@ Currently number detection support has been provided for 6 different languages -
                                fallback_value=fallback_value,
                              bot_message=bot_message,language=source_language)
       print(output)
-    ```
+      ```
       
-  - *CURL command:*
+    - *CURL command:*
     
-    ```bash
+      ```bash
       curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=en" \
           --data-urlencode "structured_value=" \
           --data-urlencode "fallback_value=9049961794" \
-        --data-urlencode "bot_message=" \
+          --data-urlencode "bot_message=" \
           --data-urlencode "message=Please call me"
-    ```
+      ```
     
-    > **Output **:
+      > **Output **:
     
-    ```json
+      ```json
       {
         "data": [
           {
@@ -925,9 +925,9 @@ Currently number detection support has been provided for 6 different languages -
               "value": "9049961794"
           },
             "language": "en"
-        }
+          }
         ]
-    }
+      }
       ```
 
   
@@ -950,9 +950,9 @@ Currently number detection support has been provided for 6 different languages -
       bot_message = None
       
       from ner_v1.chatbot.entity_detection import get_email
-    output = get_email(message=message,entity_name=entity_name,
+      output = get_email(message=message,entity_name=entity_name,
                          structured_value=structured_value,
-                       fallback_value=fallback_value, bot_message=bot_message)
+                         fallback_value=fallback_value, bot_message=bot_message)
       print(output)
       ```
       
@@ -991,7 +991,7 @@ Currently number detection support has been provided for 6 different languages -
       message = u'send this me to my email'
       entity_name = 'email'
       structured_value = None
-    fallback_value = 'hello@haptik.ai'
+      fallback_value = 'hello@haptik.ai'
       bot_message = None
     
       from ner_v1.chatbot.entity_detection import get_email
@@ -1001,9 +1001,9 @@ Currently number detection support has been provided for 6 different languages -
       print(output)
       ```
   
-  - *CURL command:*
+    - *CURL command:*
   
-    ```bash
+      ```bash
       curl -G -i "http://localhost:8081/v1/email/?&entity_name=email&source_language=en" \
           --data-urlencode "structured_value=" \
           --data-urlencode "fallback_value=hello@haptik.ai" \
@@ -1013,7 +1013,7 @@ Currently number detection support has been provided for 6 different languages -
   
       > **Output **
   
-    ```json
+      ```json
       {
         "data": [
           {
@@ -1058,9 +1058,9 @@ The Text Detector has the capability to detect custom text entity within the giv
     print(output)
     ```
   
-  *CURL command:*
+    *CURL command:*
   
-  ```bash
+    ```bash
     curl -G -i "http://localhost:8081/v1/text/?&entity_name=restaurant&source_language=en" \
       --data-urlencode "structured_value=" \
         --data-urlencode "fallback_value=" \
@@ -1068,9 +1068,9 @@ The Text Detector has the capability to detect custom text entity within the giv
         --data-urlencode "message=i want to order chinese from mainland china and pizza from dominos"
     ```
   
-    > **Output **:
+      > **Output **:
   
-  ```json
+    ```json
     {
     "data": [
         {
@@ -1203,9 +1203,9 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
         --data-urlencode "fallback_value=" \
         --data-urlencode "bot_message=" \
         --data-urlencode "message=check my pnr status for 2141215305"
-```
+    ```
     
-> **Output**:
+    > **Output**:
     
     ```json
     {
