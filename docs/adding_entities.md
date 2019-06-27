@@ -114,7 +114,7 @@ Now lets add the newly created csv file to the datastore.
   db.populate(entity_data_directory_path=csv_directory)
   ```
   
-  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available bot inside and outside the container
+  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available both inside and outside the container
   
 - Once done, you can exit the shell and then exit the container
 
@@ -178,7 +178,7 @@ After editing and saving your csv, you will need to update the datastore with ne
   db.repopulate(entity_data_directory_path=csv_directory)
   ```
 
-  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available bot inside and outside the container
+  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available both inside and outside the container
 
 ### Deleting entity data
 
