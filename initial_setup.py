@@ -5,25 +5,25 @@ import nltk
 
 BASE_DIR = os.path.dirname(__file__)
 
-print "Downloading nltk corpus: punkt ..."
+print("Downloading nltk corpus: punkt ...")
 status = nltk.download('punkt')
 if not status:
-    print "punkt Download was unsucessful"
+    print("punkt Download was unsucessful")
 
-print "Downloading nltk corpus: wordnet ..."
+print("Downloading nltk corpus: wordnet ...")
 status = nltk.download('wordnet')
 if not status:
-    print "wordnet Download was unsucessful"
+    print("wordnet Download was unsucessful")
 
-print "Downloading nltk corpus: MaxEnt POS ..."
+print("Downloading nltk corpus: MaxEnt POS ...")
 status = nltk.download('maxent_treebank_pos_tagger')
 if not status:
-    print "MaxEnt POS Download was unsucessful"
+    print("MaxEnt POS Download was unsucessful")
 
-print "Downloading nltk corpus: AP POS Tagger..."
+print("Downloading nltk corpus: AP POS Tagger...")
 status = nltk.download('averaged_perceptron_tagger')
 if not status:
-    print "AP POS Tagger Download was unsucessful"
+    print("AP POS Tagger Download was unsucessful")
 
 # Below needs to be committed if you want to use existing data in the Elasticsearch Setup
 
@@ -34,13 +34,14 @@ time.sleep(20)
 # POPULATING DATASTORE
 # Comment out entire section if you want to reuse existing data
 from datastore import DataStore
+from datastore.constants import DEFAULT_ENTITY_DATA_DIRECTORY
 
 db = DataStore()
-print "Setting up DataStore for Chatbot NER"
-print "Deleting any stale data ..."
+print("Setting up DataStore for Chatbot NER")
+print("Deleting any stale data ...")
 db.delete()
-print "Creating the structure ..."
+print("Creating the structure ...")
 db.create()
-print "Populating data from " + os.path.join(BASE_DIR, 'data', 'entity_data') + " ..."
-db.populate()
-print "Done!"
+print("Populating data from " + os.path.join(BASE_DIR, 'data', 'entity_data') + " ...")
+db.populate(entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY)
+print("Done!")
