@@ -1,5 +1,1 @@
-import connect
-import create
-import populate
-import query
-import transfer
+from . import connect, create, populate, query, transfer
