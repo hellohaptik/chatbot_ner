@@ -21,7 +21,7 @@ Following csv files are already included in the repository at `data/entity_data/
 
 -----------
 
-Chatbot ner reads data from these csv files and puts them into the datastore under a entity named after the filename of the csv file. 
+Chatbot NER reads data from these csv files and puts them into the datastore under a entity named after the filename of the csv file. 
 
 > *csv filename should contain only lowercase english alphabets and '_' (underscore) symbol*
 
@@ -62,24 +62,37 @@ video,mp4|mkv|mov
 
 Now lets add the newly created csv file to the datastore. 
 
-- Make sure to start the engine you configured with datastore( eg. elasticsearch)
+- Make sure our containers are running
 
   ```shell
-  $ ~/chatbot_ner_elasticsearch/elasticsearch-5.5.0/bin/elasticsearch -d
+  $ docker-compose ps
   ```
 
-- Activate chatbot_ner virtual environment
+  You should see output like following
+
+  ```
+           Name                       Command               State               Ports             
+  ------------------------------------------------------------------------------------------------
+  docker_chatbot-ner_1     /bin/sh -c /app/docker/cmd.sh    Up      0.0.0.0:8081->80/tcp, 8081/tcp
+  docker_elasticsearch_1   /docker-entrypoint.sh elas ...   Up      9200/tcp, 9300/tcp  
+  ```
+
+  > If the containers are not running, do the following
+  >
+  > ```shell
+  > $ cd chatbot_ner/docker
+  > $ docker-compose up -d
+  > ```
+
+- Enter the chatbot-ner container
 
   ```shell
-  $ source /usr/local/bin/virtualenvwrapper.sh
-  $ workon chatbotnervenv
+  $ docker exec -it docker_chatbot-ner_1 bash
   ```
 
 - Start a `manage.py shell` as follows
 
   ```bash
-  $ # change to your repository clone directory
-  $ cd ~/chatbot_ner/
   $ python manage.py shell
   ```
 
@@ -100,6 +113,10 @@ Now lets add the newly created csv file to the datastore.
   db = DataStore()
   db.populate(entity_data_directory_path=csv_directory)
   ```
+  
+  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available bot inside and outside the container
+  
+- Once done, you can exit the shell and then exit the container
 
 ### Updating the DataStore after editing a csv file
 
@@ -109,25 +126,59 @@ After editing and saving your csv, you will need to update the datastore with ne
 
 > **Note:** The filename needs to be same as it was before editing the file. If the new data is saved under a different filename it would be populated as a new entity with the name same as new file name.
 
-> Make sure you are working in chatbotnervenv virtual environment and datastore engine is running. See above section
+- Make sure our containers are running
 
-On a `manage.py shell` run
+  ```shell
+  $ docker-compose ps
+  ```
 
-```python
-from datastore import DataStore
-csv_file = '~/attachment_types.csv' # example file path to the csv file
-db = DataStore()
-db.repopulate(csv_file_paths=[csv_file,])
-```
+  You should see output like following
 
- In case, you want to update multiple csv files at once, you can pass the directory path to `entity_data_directory_path` parameter of `repopulate` method as follows:
+  ```
+           Name                       Command               State               Ports             
+  ------------------------------------------------------------------------------------------------
+  docker_chatbot-ner_1     /bin/sh -c /app/docker/cmd.sh    Up      0.0.0.0:8081->80/tcp, 8081/tcp
+  docker_elasticsearch_1   /docker-entrypoint.sh elas ...   Up      9200/tcp, 9300/tcp  
+  ```
 
-```python
-from datastore import DataStore
-csv_directory = '~/my_csv_files/' # example directory path containing csv files
-db = DataStore()
-db.repopulate(entity_data_directory_path=csv_directory)
-```
+  > If the containers are not running, do the following
+  >
+  > ```shell
+  > $ cd chatbot_ner/docker
+  > $ docker-compose up -d
+  > ```
+
+- Enter the chatbot-ner container
+
+  ```shell
+  $ docker exec -it docker_chatbot-ner_1 bash
+  ```
+
+- Start a `manage.py shell` as follows
+
+  ```bash
+  $ python manage.py shell
+  ```
+
+- Now run the following:
+
+  ```python
+  from datastore import DataStore
+  csv_file = '~/attachment_types.csv' # example file path to the csv file
+  db = DataStore()
+  db.repopulate(csv_file_paths=[csv_file,])
+  ```
+
+   In case, you want to update multiple csv files at once, you can pass the directory path to `entity_data_directory_path` parameter of `repopulate` method as follows:
+
+  ```python
+  from datastore import DataStore
+  csv_directory = '~/my_csv_files/' # example directory path containing csv files
+  db = DataStore()
+  db.repopulate(entity_data_directory_path=csv_directory)
+  ```
+
+  > Note: It is advised that you put the csv files inside some directory in the repo. (E.g. chatbot_ner/data/entity_data/) because the repo is mouted inside the container so the files will available bot inside and outside the container
 
 ### Deleting entity data
 
@@ -135,12 +186,44 @@ db.repopulate(entity_data_directory_path=csv_directory)
 
 To delete all data for entity, simply call `delete_entity()` on Datastore. It takes one argument- the name of the entity. This is the same as the name of the csv file used for this entity while populating its data.
 
-> Make sure you are working in chatbotnervenv virtual environment and datastore engine is running. See above section
+- Make sure our containers are running
 
-On a `manage.py shell` run
+  ```shell
+  $ docker-compose ps
+  ```
 
-```python
-from datastore import DataStore
-db = DataStore()
-db.delete_entity(entity_name='attachment_types')
-```
+  You should see output like following
+
+  ```
+           Name                       Command               State               Ports             
+  ------------------------------------------------------------------------------------------------
+  docker_chatbot-ner_1     /bin/sh -c /app/docker/cmd.sh    Up      0.0.0.0:8081->80/tcp, 8081/tcp
+  docker_elasticsearch_1   /docker-entrypoint.sh elas ...   Up      9200/tcp, 9300/tcp  
+  ```
+
+  > If the containers are not running, do the following
+  >
+  > ```shell
+  > $ cd chatbot_ner/docker
+  > $ docker-compose up -d
+  > ```
+
+- Enter the chatbot-ner container
+
+  ```shell
+  $ docker exec -it docker_chatbot-ner_1 bash
+  ```
+
+- Start a `manage.py shell` as follows
+
+  ```bash
+  $ python manage.py shell
+  ```
+
+- Now run the following
+
+  ```python
+  from datastore import DataStore
+  db = DataStore()
+  db.delete_entity(entity_name='attachment_types')
+  ```
