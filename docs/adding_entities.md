@@ -100,7 +100,7 @@ Now lets add the newly created csv file to the datastore.
 
   ```python
   from datastore import DataStore
-  csv_file = '~/attachment_types.csv' # example file path to the csv file
+  csv_file = 'data/entity_data/city.csv' # example file path to the csv file
   db = DataStore()
   db.populate(csv_file_paths=[csv_file,])
   ```
@@ -109,7 +109,7 @@ Now lets add the newly created csv file to the datastore.
 
   ```python
   from datastore import DataStore
-  csv_directory = '~/my_csv_files/' # example directory path containing csv files
+  csv_directory = 'data/entity_data/' # example directory path containing csv files
   db = DataStore()
   db.populate(entity_data_directory_path=csv_directory)
   ```
@@ -164,7 +164,7 @@ After editing and saving your csv, you will need to update the datastore with ne
 
   ```python
   from datastore import DataStore
-  csv_file = '~/attachment_types.csv' # example file path to the csv file
+  csv_file = 'data/entity_data/city.csv' # example file path to the csv file
   db = DataStore()
   db.repopulate(csv_file_paths=[csv_file,])
   ```
@@ -173,7 +173,7 @@ After editing and saving your csv, you will need to update the datastore with ne
 
   ```python
   from datastore import DataStore
-  csv_directory = '~/my_csv_files/' # example directory path containing csv files
+  csv_directory = 'data/entity_data/' # example directory path containing csv files
   db = DataStore()
   db.repopulate(entity_data_directory_path=csv_directory)
   ```
@@ -220,10 +220,10 @@ To delete all data for entity, simply call `delete_entity()` on Datastore. It ta
   $ python manage.py shell
   ```
 
-- Now run the following
+- Now run the following (E.g. to delete `city` entity)
 
   ```python
   from datastore import DataStore
   db = DataStore()
-  db.delete_entity(entity_name='attachment_types')
+  db.delete_entity(entity_name='city')
   ```

@@ -177,34 +177,50 @@ Currently time detection support has been provided in different languages - `Eng
   - *CURL command*
 
     ```bash
-    URL='localhost'
-    PORT=8081
+    curl -G -i "http://localhost:8081/v2/time/?&entity_name=time&timezone=UTC&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=John arrived at the bus stop at 13:50 hrs, expecting the bus to be there in 15 mins. But the bus was scheduled for 12:30 pm"
+```
     
-    curl -i 'http://'$URL':'$PORT'/v2/time/?message=John%20arrived%20at%20the%20bus%20stop%20at%2013%3A50%20hrs%2C%20expecting%20the%20bus%20to%20be%20there%20in%2015%20mins.%20But%20the%20bus%20was%20scheduled%20for%2012%3A30%20pm&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_language=en'
-    ```
-
-    > **Output**:
-
+> **Output**:
+    
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "12:30 pm",
-            "entity_value": { "mm": 30, "hh": 12, "nn": "pm"},
-            "language": "en"
+          "detection": "message",
+          "original_text": "12:30 pm",
+          "entity_value": {
+            "mm": 30,
+            "hh": 12,
+            "nn": "pm"
+          },
+          "language": "en"
         },
         {
-            "detection": "message",
-            "original_text": "in 15 mins",
-            "entity_value": { "mm": "15", "hh": 0, "nn": "df" },
-            "language": "en"
+          "detection": "message",
+          "original_text": "in 15 mins",
+          "entity_value": {
+            "mm": 15,
+            "hh": 0,
+            "nn": "df"
+          },
+          "language": "en"
         },
         {
-            "detection": "message",
-            "original_text": "13:50",
-            "entity_value": {"mm": 50, "hh": 13, "nn": "hrs"},
-            "language": "en"
-        }]}
+          "detection": "message",
+          "original_text": "13:50",
+          "entity_value": {
+            "mm": 50,
+            "hh": 13,
+            "nn": "hrs"
+          },
+          "language": "en"
+        }
+      ]
+    }
     ```
 
 
@@ -234,39 +250,53 @@ Currently time detection support has been provided in different languages - `Eng
   - *CURL command*
 
     ```bash
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v2/time/?message=राजू%20का%20बस%20१३:५०%20को%20बस%20स्टॉप%20से%20निकला%20और%20१५%20मिनट%20में%20यहाँ%20पहुंच%20जाएगा%20और%20गोवा%20को%20शाम%20में%20बारह%20बजकर%20३०%20मिनट%20पैर%20पहुंचेगा&entity_name=time&structured_value=&fallback_value=&bot_message=&timezone=UTC&source_language=en'
-    
+    curl -G -i "http://localhost:8081/v2/time/?&entity_name=time&timezone=UTC&source_language=hi" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=राजू का बस १३:५० को बस स्टॉप से निकला और १५ मिनट में यहाँ पहुंच जाएगा और गोवा को शाम में बारह बजकर ३० मिनट पैर पहुंचेगा"
     ```
-
-    > **Output**:
-
-    ```json
-    {"data": [
+    
+> **Output**:
+    
+```json
+    {
+      "data": [
         {
-           "detection": "message",
-           "original_text": "१३:५०",
-           "entity_value": { "mm": 1, "hh": 50,"nn": "hr"},
-            "language": "hi"
-        },
-        {
-            "detection": "message",
-            "original_text": "१५ मिनट में",
-            "entity_value": {"mm": "15", "hh": 0, "nn": "df"},
+          "detection": "message",
+          "original_text": "१३:५०",
+          "entity_value": {
+            "mm": 50,
+            "hh": 13,
+            "nn": "hrs",
+            "time_type": null
+          },
           "language": "hi"
         },
         {
-           "detection": "message",
-           "original_text": "शाम में बारह बजकर ३० मिनट",
-           "entity_value": { "mm": 30, "hh": 12, "nn": "pm"},
-            "language": "hi"
-        }]
+          "detection": "message",
+          "original_text": "१५ मिनट में",
+          "entity_value": {
+            "mm": 15,
+            "hh": 0,
+            "nn": "df"
+          },
+          "language": "hi"
+        },
+    {
+          "detection": "message",
+          "original_text": "बारह बजकर ३० मिनट",
+          "entity_value": {
+            "mm": 30,
+            "hh": 12,
+            "nn": "hrs"
+          },
+          "language": "hi"
+        }
+      ]
     }
-    
     ```
-
+    
     
 
 ### 2. Date
@@ -316,28 +346,38 @@ The Date detector module has the capability to detect various form of dates from
 
   - *CURL:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v1/date/?message=set%20me%20reminder%20on%2023rd%20december&entity_name=date&structured_value=&fallback_value=&bot_message=%timezone=UTC&source_language=en&past_date_referenced=false'
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v2/date/?&entity_name=date&timezone=UTC&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=set me reminder on 23rd december"
     ```
 
     > **Output:**
 
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
+          "detection": "message",
           "original_text": "23rd december",
-            "entity_value": { "end_range": false, "from": false, "normal": true, "to":
-                             false, "start_range": false,
-                             "value": {"mm": 12, "yy": 2017, "dd": 23, "type": "date"}
-                            },
-            "language": "en"
-        }]}
-    
+          "entity_value": {
+            "end_range": false,
+            "from": false,
+            "normal": true,
+            "value": {
+              "mm": 12,
+              "yy": 2019,
+              "dd": 23,
+              "type": "date"
+            },
+            "to": false,
+            "start_range": false
+          }
+        }
+      ]
+    }
     ```
 
 - ***Example 2: Detecting  referenced date [Hindi] from user message***
@@ -369,28 +409,40 @@ The Date detector module has the capability to detect various form of dates from
 
   - *CURL:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v2/date/?message=मुझे%20कल%20सुबह%20५%20बजे%20उठा%20देना&entity_name=date&structured_value=&fallback_value=&bot_message=%timezone=UTC&source_language=en&past_date_referenced=false'
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v2/date/?&entity_name=date&timezone=UTC&past_date_referenced=false&source_language=hi" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=मुझे कल सुबह ५ बजे उठा देना"
     ```
 
     > **Output:**
 
     ```json
-    /* Assuming today's date is 12th feb 2019*/
-    {"data": [
+    /* Assuming today's date is 27 June 2019*/
+    {
+      "data": [
         {
-            "detection": "message",
+          "detection": "message",
           "original_text": "कल",
-            "entity_value": { "end_range": false, "from": false, "normal": true, "to":
-                             false, "start_range": false,
-                             "value": {"mm": 02, "yy": 2019, "dd": 13, "type": "date"}
-                            },
-            "language": "en"
-        }]}
+          "entity_value": {
+            "end_range": false,
+            "from": false,
+            "normal": true,
+            "value": {
+              "mm": 6,
+              "yy": 2019,
+              "dd": 28,
+              "type": "date"
+            },
+            "to": false,
+            "start_range": false
+          },
+          "language": "hi"
+        }
+      ]
+    }
     
     ```
 
@@ -423,29 +475,40 @@ The Date detector module has the capability to detect various form of dates from
 
   - *CURL:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v2/date/?message=आने%20वाले%20सोमवार%20को%20मेरा%20मैथ्स%20का%20एग्जाम%20है&entity_name=date&structured_value=&fallback_value=&bot_message=%timezone=UTC&source_language=en&past_date_referenced=false'
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v2/date/?&entity_name=date&timezone=UTC&past_date_referenced=false&source_language=hi" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=आने वाले सोमवार को मेरा मैथ्स का एग्जाम है"
     ```
 
     > **Output:**
 
     ```json
-    /* Assuming today's date is 12th feb 2019*/
-    {"data": [
+    /* Assuming today's date is 27 June 2019*/
+    {
+      "data": [
         {
-            "detection": "message",
-          "original_text": "कल",
-            "entity_value": { "end_range": false, "from": false, "normal": true, "to":
-                             false, "start_range": false,
-                             "value": {"mm": 02, "yy": 2019, "dd": 18, "type": "date"}
-                            },
-            "language": "en"
-        }]}
-    
+          "detection": "message",
+          "original_text": "सोमवार",
+          "entity_value": {
+            "end_range": false,
+            "from": false,
+            "normal": true,
+            "value": {
+              "mm": 7,
+              "yy": 2019,
+              "dd": 1,
+              "type": "date"
+            },
+            "to": false,
+            "start_range": false
+          },
+          "language": "hi"
+        }
+      ]
+    }
     ```
 
 ### 3. Number
@@ -468,7 +531,7 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    message=u"i want to purchase 30 units of mobile abd 40 units of telivision"
+    message=u"i want to purchase 30 units of mobile abd 40 units of television"
     entity_name='number'
     structured_value=None
     fallback_value=None
@@ -489,29 +552,38 @@ Currently number detection support has been provided for 6 different languages -
 
   - *CURL command:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
+    ```bash
+    curl -G -i "http://localhost:8081/v2/number/?&entity_name=number_of_unit&min_number_digits=1&max_number_digits=6&unit_type=&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=i want to purchase 30 units of mobile abd 40 units of television"
+  ```
     
-    curl -i 'http://'$URL':'$PORT'/v2/number/?message=I%20want%20to%20purchase%2030%20units%20of%20mobile%20and%2040%20units%20of%20Television&entity_name=number_of_unit&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2&source_language=en&unit_type='
-    ```
-
-    > **Output:**
-
+  > **Output:**
+    
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "30", 
-            "entity_value": { "value": "30", "unit": null},
-            "language": "en"
+          "detection": "message",
+          "original_text": "30",
+          "entity_value": {
+            "unit": null,
+            "value": "30"
+          },
+          "language": "en"
         },
         {
           "detection": "message",
           "original_text": "40",
-          "entity_value": { "value": "40", "unit": null},
+          "entity_value": {
+            "unit": null,
+            "value": "40"
+          },
           "language": "en"
-        }]
+        }
+      ]
     }
     ```
 
@@ -521,7 +593,7 @@ Currently number detection support has been provided for 6 different languages -
 
     ```python
     # For a sample query with following parameters
-    message=u"मुझे ३० किलो आटा और दो हजार का चीनी देना "
+    message=u"मुझे ३० रूपए आटा का और ३ हजार का चीनी देना"
     entity_name='number'
     structured_value=None
     fallback_value=None
@@ -538,31 +610,43 @@ Currently number detection support has been provided for 6 different languages -
     output = detector.detect(message=message,structured_value=structured_value,
                              fallback_value=fallback_value, bot_message=bot_message)
     print(output)
-    
     ```
-
+    
   - *CURL command:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v2/number/?मुझे%20३०%20किलो%20आटा%20और%20दो%20हजार%20क%20%20चीनी%20देना &entity_name=number_of_unit&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2&source_language=en&unit_type='
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v2/number/?&entity_name=number_of_unit&min_number_digits=1&max_number_digits=6&unit_type=&source_language=hi" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=मुझे ३० रूपए आटा का और ३ हजार का चीनी देना"
     ```
 
     > **Output:**
 
     ```json
-    {"data": [
+    {
+      "data": [
         {
           "detection": "message",
-          "original_text": "३० किलो",
-          "entity_value": { "value": "३०", "unit": "kg"},
+          "original_text": "३०",
+          "entity_value": {
+            "unit": null,
+            "value": "30"
+          },
           "language": "hi"
-        }]
+        },
+        {
+          "detection": "message",
+          "original_text": "३ हजार",
+          "entity_value": {
+            "unit": null,
+            "value": "3000"
+          },
+          "language": "hi"
+        }
+      ]
     }
-    
     ```
 
 - ***Example 3: Detecting number[Hindi in latin script] without unit in message***
@@ -590,43 +674,52 @@ Currently number detection support has been provided for 6 different languages -
                              fallback_value=fallback_value,
                              bot_message=bot_message)
     print(output)
-    
     ```
-
+    
   - *CURL command:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v2/number/?mujhe%2030%20kilo%20aata%20aur%202%20hajaar%20ka%20chini%20dena%20aur%20 teen%20sau%20ka%20chawal&entity_name=number_of_unit&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2&source_language=en&unit_type='
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v2/number/?&entity_name=number_of_unit&min_number_digits=1&max_number_digits=6&unit_type=&source_language=hi" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=mujhe 30 kilo aata aur 2 hajaar ka chini dena aur teen sau ka chawal"
     ```
 
     > **Output:**
 
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "30",
-            "entity_value": { "value": "30", "unit": null},
-            "language": "hi"
+          "detection": "message",
+          "original_text": "30",
+          "entity_value": {
+            "unit": null,
+            "value": "30"
+          },
+          "language": "hi"
         },
         {
-            "detection": "message",
-            "original_text": "2 hajaar",
-            "entity_value": { "value": "2000", "unit": null},
-            "language": "hi"
+          "detection": "message",
+          "original_text": "2 hajaar",
+          "entity_value": {
+            "unit": null,
+            "value": "2000"
+          },
+          "language": "hi"
         },
         {
-            "detection": "message",
-            "original_text": "teen sau",
-            "entity_value": { "value": "300", "unit": null},
-            "language": "hi"
+          "detection": "message",
+          "original_text": "teen sau",
+          "entity_value": {
+            "unit": null,
+            "value": "300"
+          },
+          "language": "hi"
         }
-      ]}
-    
+      ]
+    }
     ```
 
   
@@ -654,35 +747,35 @@ Currently number detection support has been provided for 6 different languages -
     output = detector.detect(message=message,structured_value=structured_value,
                              fallback_value=fallback_value, bot_message=bot_message)
     print(output)
-    
     ```
-
-  - *CURL command:*
-
-    ```shell
-    URL='localhost'
-    PORT=8081
     
-    curl -i 'http://'$URL':'$PORT'/v2/number/?message=i%20want%20more%20than%20Rupees%2020k%20and%2010%20pendrive&entity_name=number_of_unit&structured_value=&fallback_value=&bot_message=&min_number_digits=1&max_number_digits=2&source_language=en&unit_type=currency'
-    
+- *CURL command:*
+  
+  ```bash
+    curl -G -i "http://localhost:8081/v2/number/?&entity_name=number_of_unit&min_number_digits=1&max_number_digits=6&unit_type=currency&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=i want more than Rupees 20k and 10 pendrive"
     ```
-
-    > **Output:**
-
-    ```json
-    {"data": [
+  
+  > **Output:**
+  
+  ```json
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "Rupees 20k",
-            "entity_value": {
-                "value": "20000",
-                "unit": "rupees"
-            },
-            "language": "en"
-        }]
+          "detection": "message",
+          "original_text": "rupees 20k",
+          "entity_value": {
+            "unit": "rupees",
+            "value": "20000"
+          },
+          "language": "en"
+        }
+      ]
     }
-    /* here 40 is not detected as unit_type is specified as currency, Hence it only detect numbers having currencies value in unit */ 
-    
+    /* here 40 is not detected as the unit_type specified is currency, Hence it will only detect numbers with currencies mentioned as unit */ 
     ```
 
   ### 4. Phone number
@@ -712,37 +805,39 @@ Currently number detection support has been provided for 6 different languages -
                                fallback_value=fallback_value,
                                bot_message=bot_message,language=source_language)
       print(output)
-      
       ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
       
-      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=my%20contact%20number%20is%209049961794&entity_name=phone_number&structured_value=&fallback_value=&bot_message=&source_language=en'
-      
+  - *CURL command:*
+  
+    ```bash
+      curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=en" \
+          --data-urlencode "structured_value=" \
+          --data-urlencode "fallback_value=" \
+          --data-urlencode "bot_message=" \
+          --data-urlencode "message=send a message on 91 9820334455"
       ```
-
-      > **Output **:
-
-      ```json
-      {"data": [
+  
+    > **Output **:
+  
+    ```json
+      {
+        "data": [
           {
-              "detection": "message",
-              "original_text": "9049961794",
-              "entity_value": { "value": "9049961794"},
-              "language": "en"
-          }]
-      }
-      
+            "detection": "message",
+            "original_text": "91 9820334455",
+            "entity_value": {
+              "value": "919820334455"
+            },
+            "language": "en"
+          }
+        ]
+    }
       ```
 
   - **Example 2: *Detecting phone number (hindi) from message***
 
     - *Django Shell:* 
-
+  
       ```python
       message = u'मेरा मोबाइल नंबर है ९८९१९८९८७१'
       entity_name = 'phone_number'
@@ -758,37 +853,39 @@ Currently number detection support has been provided for 6 different languages -
                                fallback_value=fallback_value,
                                bot_message=bot_message,language=source_language)
       print(output)
+    ```
       
-      ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      
-      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=मेरा%20मोबाइल%20नंबर%20है%20९८९१९८९८७१entity_name=phone_number&structured_value=&fallback_value=&bot_message=&source_language=en'
-      
-      ```
-
-      > **Output **:
-
+  - *CURL command:*
+  
+      ```bash
+      curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=hi" \
+          --data-urlencode "structured_value=" \
+          --data-urlencode "fallback_value=" \
+          --data-urlencode "bot_message=" \
+          --data-urlencode "message=मेरा मोबाइल नंबर है ९८९१९८९८७१"
+    ```
+  
+    > **Output **:
+  
       ```json
-      {"data": [
+      {
+        "data": [
           {
-              "detection": "message",
-              "original_text": "९८९१९८९८७१",
-              "entity_value": { "value": "981117971"},
-              "language": "hi"
-          }]
-      }
-      
+            "detection": "message",
+            "original_text": "९८९१९८९८७१",
+            "entity_value": {
+              "value": "9891989871"
+            },
+            "language": "hi"
+        }
+        ]
+    }
       ```
 
-  - Example 2:  *Detecting phone number from fallback value***
-
+  - Example 2:  *Detecting phone number from **fallback value***
+  
     - *Django Shell:* 
-
+  
       ```python
       message = u'Please call me'
       entity_name = 'phone_number'
@@ -802,33 +899,35 @@ Currently number detection support has been provided for 6 different languages -
       output = detector.detect(message=message, entity_name=entity_name,
                                structured_value=structured_value,
                                fallback_value=fallback_value,
-                               bot_message=bot_message,language=source_language)
+                             bot_message=bot_message,language=source_language)
       print(output)
+    ```
       
-      ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      
-      curl -i 'http://'$URL':'$PORT'/v2/phone_number/?message=Please%20call%20me&entity_name=phone_number&structured_value=&fallback_value=9049961794&bot_message=&source_language=en'
-      
-      ```
-
-      > **Output **:
-
-      ```json
-      {"data": [
+  - *CURL command:*
+    
+    ```bash
+      curl -G -i "http://localhost:8081/v2/phone_number/?&entity_name=phone_number&source_language=en" \
+          --data-urlencode "structured_value=" \
+          --data-urlencode "fallback_value=9049961794" \
+        --data-urlencode "bot_message=" \
+          --data-urlencode "message=Please call me"
+    ```
+    
+    > **Output **:
+    
+    ```json
+      {
+        "data": [
           {
-              "detection": "fallback_value",
-              "original_text": "9049961794",
-              "entity_value": {"value": "9049961794"},
-              "language": "en"
-          }]
-      }
-      
+            "detection": "fallback_value",
+            "original_text": "9049961794",
+            "entity_value": {
+              "value": "9049961794"
+          },
+            "language": "en"
+        }
+        ]
+    }
       ```
 
   
@@ -838,89 +937,97 @@ Currently number detection support has been provided for 6 different languages -
   The Email Detector has the capability to detect emails within the given text. 
 
   **API Example:**
-
+  
   - **Example 1:  *Detecting emails from message***
-
+  
     - *Django Shell:*
-
+  
       ```python
-      message = u'my email id is amans.rlx@gmail.com'
+      message = u'my email id is hello@haptik.ai'
       entity_name = 'email'
       structured_value = None
       fallback_value = None
       bot_message = None
       
       from ner_v1.chatbot.entity_detection import get_email
-      output = get_email(message=message,entity_name=entity_name,
+    output = get_email(message=message,entity_name=entity_name,
                          structured_value=structured_value,
-                         fallback_value=fallback_value, bot_message=bot_message)
+                       fallback_value=fallback_value, bot_message=bot_message)
       print(output)
-      
       ```
-
+      
     - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      
-      curl -i 'http://'$URL':'$PORT'/v1/email/?message=my%20email%20id%20is%20amans.rlx%40gmail.com&entity_name=email&structured_value=&fallback_value=&bot_message='
-      
+  
+      ```bash
+      curl -G -i "http://localhost:8081/v1/email/?&entity_name=email&source_language=en" \
+        --data-urlencode "structured_value=" \
+          --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+          --data-urlencode "message=my email id is hello@haptik.ai"
       ```
-
+  
       > **Output **
-
+  
       ```json
-      {"data": [
+      {
+        "data": [
           {
-              "detection": "message",
-              "original_text": "amans.rlx@gmail.com",
-              "entity_value": {"value": "amans.rlx@gmail.com"}
-          }]
+            "detection": "message",
+          "original_text": "hello@haptik.ai",
+            "entity_value": {
+            "value": "hello@haptik.ai"
+            },
+          "language": "en"
+          }
+        ]
       }
-      
       ```
-
+  
   - ***Example 2:  Detecting email from fallback value***
-
+  
     - *Django Shell:*
-
+  
       ```python
       message = u'send this me to my email'
       entity_name = 'email'
       structured_value = None
-      fallback_value = 'amans.rlx@gmail.com'
+    fallback_value = 'hello@haptik.ai'
       bot_message = None
-      
+    
       from ner_v1.chatbot.entity_detection import get_email
       output = get_email(message=message,entity_name=entity_name,
                          structured_value=structured_value,
                          fallback_value=fallback_value, bot_message=bot_message)
       print(output)
       ```
-
-    - *CURL command:*
-
-      ```shell
-      URL='localhost'
-      PORT=8081
-      
-      curl -i 'http://'$URL':'$PORT'/v1/email/?message=send%20me%20to%20my%20email&entity_name=email&structured_value=&fallback_value=amans.rlx@gmail.com&bot_message='
-      
+  
+  - *CURL command:*
+  
+    ```bash
+      curl -G -i "http://localhost:8081/v1/email/?&entity_name=email&source_language=en" \
+          --data-urlencode "structured_value=" \
+          --data-urlencode "fallback_value=hello@haptik.ai" \
+          --data-urlencode "bot_message=" \
+          --data-urlencode "message=send this me to my email"
       ```
-
+  
       > **Output **
-
-      ```json
-      {"data": [
+  
+    ```json
+      {
+        "data": [
           {
-              "detection": "fallback_value",
-              "original_text": "abc.123@gmail.com",
-              "entity_value": {"value": "abc.123@gmail.com"}
-          }]
+            "detection": "fallback_value",
+            "original_text": "hello@haptik.ai",
+            "entity_value": {
+              "value": "hello@haptik.ai"
+            },
+            "language": "en"
+          }
+        ]
       }
       ```
-
+  
   
 
 ### 6. Text
@@ -949,40 +1056,67 @@ The Text Detector has the capability to detect custom text entity within the giv
                       fallback_value=fallback_value,
                       bot_message=bot_message,language=source_language)
     print(output)
-    
     ```
-
-    The above can also be done from within the Docker container's shell. Setup is in docker.md file.
-
-  - *CURL command:*
-
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v1/text/?message=i%20want%20to%20order%20chinese%20from%20%20mainland%20china%20and%20pizza%20from%20domminos&entity_name=restaurant&structured_value=&fallback_value=&bot_message=&source_language=en'
-    
+  
+  *CURL command:*
+  
+  ```bash
+    curl -G -i "http://localhost:8081/v1/text/?&entity_name=restaurant&source_language=en" \
+      --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=i want to order chinese from mainland china and pizza from dominos"
     ```
-
+  
     > **Output **:
-
-    ```json
-    {"data": [
+  
+  ```json
+    {
+    "data": [
         {
-            "detection": "message",
-            "original_text": "mainland china",
-            "entity_value": {"value": "Mainland China"},
-            "language": "en"
+          "detection": "message",
+          "original_text": "mainland china",
+          "entity_value": {
+            "crf_model_verified": false,
+            "datastore_verified": true,
+            "value": "Mainland China"
+          },
+          "language": "en"
         },
         {
-            "detection": "message",
-            "original_text": "dominos",
-            "entity_value": { "value": "Domino's Pizza"},
-            "language": "en"
-        }]
+          "detection": "message",
+          "original_text": "dominos",
+          "entity_value": {
+            "crf_model_verified": false,
+            "datastore_verified": true,
+            "value": "Domino's Pizza"
+          },
+          "language": "en"
+        },
+        {
+          "detection": "message",
+          "original_text": "chinese",
+          "entity_value": {
+            "crf_model_verified": false,
+            "datastore_verified": true,
+            "value": "Yo! Chinese"
+          },
+          "language": "en"
+        },
+        {
+          "detection": "message",
+          "original_text": "pizza",
+          "entity_value": {
+            "crf_model_verified": false,
+            "datastore_verified": true,
+            "value": "U S  Pizza"
+          },
+          "language": "en"
+        }
+      ]
     }
-    
     ```
+  
 
 
 
@@ -1009,26 +1143,29 @@ The Text Detector has the capability to detect custom text entity within the giv
 
   - *CURL command:*
 
-    ```shell
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v1/text/?message=मेरे लिए कैब बुक कर दीजिये&entity_name=movie&structured_value=मुंबई&fallback_value=&bot_message=&source_language=en'
-    
+    ```bash
+    curl -G -i "http://localhost:8081/v1/text/?&entity_name=movie&source_language=hi" \
+        --data-urlencode "structured_value=मुंबई" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=मेरे लिए कैब बुक कर दीजिये"
     ```
 
     > **Output **:
 
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "structure_value_verified",
-            "original_text": "mumbai",
-            "entity_value": {"value": "Mumbai"},
-            "language":"hi"
-        }]
+          "detection": "structure_value_not_verified",
+          "original_text": "मुंबई",
+          "entity_value": {
+            "value": "मुंबई"
+          },
+          "language": "hi"
+        }
+      ]
     }
-    
     ```
 
 
@@ -1061,24 +1198,30 @@ The PNR Detector has the capability to detect Train/ Flight PNR number within th
   - *CURL command:*
 
     ```bash
-    URL='localhost'
-    PORT=8081
+    curl -G -i "http://localhost:8081/v1/pnr/?&entity_name=pnr&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "message=check my pnr status for 2141215305"
+```
     
-    curl -i 'http://'$URL':'$PORT'/v1/pnr/?message=check%20my%20pnr%20status%20for%202141215305.&entity_name=pnr&structured_value=&fallback_value=&bot_message='
-    ```
-
-    > **Output**:
-
+> **Output**:
+    
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "2141215305",
-            "entity_value": { "value": "2141215305"}
-        }]
+          "detection": "message",
+          "original_text": "2141215305",
+          "entity_value": {
+            "value": "2141215305"
+      },
+          "language": "en"
+        }
+      ]
     }
     ```
-
+    
     
 
 ### 8. Regex
@@ -1117,20 +1260,26 @@ Detect entities that match by the specified pattern. If you are not familiar wit
   - *CURL command:*
 
     ```bash
-    URL='localhost'
-    PORT=8081
-    
-    curl -i 'http://'$URL':'$PORT'/v1/regex/?message=please%20apply%20AMAZON30%20coupon%20code%20to my%20cart&entity_name=regex&structured_value=&fallback_value=&bot_message=enter%20the%otp%20&regex=\d{4,6}'
+    curl -G -i "http://localhost:8081/v1/regex/?&entity_name=regex_coupon_code&source_language=en" \
+        --data-urlencode "structured_value=" \
+        --data-urlencode "fallback_value=" \
+        --data-urlencode "bot_message=" \
+        --data-urlencode "regex=[A-Z]+\d{2,6}" \
+    --data-urlencode "message=please apply AMAZON30 coupon code to my cart"
     ```
 
     > **Output:**
-
+    
     ```json
-    {"data": [
+    {
+      "data": [
         {
-            "detection": "message",
-            "original_text": "AMAZON30",
-            "entity_value": "AMAZON30"
-        }]
+          "detection": "message",
+          "original_text": "AMAZON30",
+          "entity_value": {
+            "value": "AMAZON30"
+          }
+        }
+      ]
     }
     ```
