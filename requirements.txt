@@ -6,7 +6,7 @@ numpy==1.10.4
 elasticsearch==5.5.0
 requests==2.20.0
 requests-aws4auth==0.9
-django==1.11.18
+django==1.11.19
 django-dotenv==1.4.2
 weighted-levenshtein==0.1
 regex==2018.7.11
