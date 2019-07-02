@@ -1,1 +1,1 @@
-from datastore import DataStore
+from .datastore import DataStore

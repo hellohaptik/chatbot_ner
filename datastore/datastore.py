@@ -4,7 +4,7 @@ import warnings
 
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import elastic_search
-from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME, DEFAULT_ENTITY_DATA_DIRECTORY,
+from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME,
                                  ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
                                  ELASTICSEARCH_CRF_DATA_DOC_TYPE)
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
@@ -126,7 +126,7 @@ class DataStore(object):
                 )
 
     # FIXME: repopulate does not consider language of the variants
-    def populate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
+    def populate(self, entity_data_directory_path=None, csv_file_paths=None, **kwargs):
         """
         Populates the datastore from csv files stored in directory path indicated by entity_data_directory_path and
         from csv files at file paths in csv_file_paths list
@@ -143,6 +143,11 @@ class DataStore(object):
             All other exceptions raised by elasticsearch-py library
 
         """
+        if not (entity_data_directory_path or csv_file_paths):
+            raise ValueError('Both `entity_data_directory_path` and `csv_file_paths` arguments cannot be None.'
+                             'Either provide a path to directory containing csv files using '
+                             '`entity_data_directory_path` or a list of paths to csv files '
+                             'using `csv_file_paths`')
         if self._client_or_connection is None:
             self._connect()
 
@@ -317,7 +322,7 @@ class DataStore(object):
                                                           **kwargs)
 
     # FIXME: repopulate does not consider language of the variants
-    def repopulate(self, entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY, csv_file_paths=None, **kwargs):
+    def repopulate(self, entity_data_directory_path=None, csv_file_paths=None, **kwargs):
         """
         Deletes the existing data and repopulates it for entities from csv files stored in directory path indicated by
         entity_data_directory_path and from csv files at file paths in csv_file_paths list
@@ -334,6 +339,12 @@ class DataStore(object):
             DataStoreSettingsImproperlyConfiguredException if connection settings are invalid or missing
             All other exceptions raised by elasticsearch-py library
         """
+        if not (entity_data_directory_path or csv_file_paths):
+            raise ValueError('Both `entity_data_directory_path` and `csv_file_paths` arguments cannot be None.'
+                             'Either provide a path to directory containing csv files using '
+                             '`entity_data_directory_path` or a list of paths to csv files '
+                             'using `csv_file_paths`')
+
         if self._client_or_connection is None:
             self._connect()
 
