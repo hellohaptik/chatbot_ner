@@ -1,0 +1,27 @@
+key,numeric_representation,date_type
+இன்று|Inru|Indru|Innaki|Inaki,0,relative_date
+நாளை|Nalai|Nalaiki|Marunal,1,relative_date
+நாள் கழித்து|Nal kalittu|Nala Kalittu,2,relative_date
+Ceviliyarkal,3,relative_date
+மீது|வது|Mitu|vatu,NA,month_date_ref
+நாள்|நாட்களுக்கு|Nal|Natkalukku,NA,date_literal
+மதம்|Matam|Madham,NA,month_literal
+திங்கள்|திங்கட்கிழமை|ThingGal|tingal|tinkatkilamai,0,weekday
+செவ்வாய்|சனிக்கிழமை|செவ்வாயன்று|Sevvaai|Savai|Sevai|canikkilamai|cevvayanru,1,weekday
+புதன்|Budhan|Budan,2,weekday
+வியாழன்|புதன்கிழமை|Vyaalan|Vailan|putanilamai,3,weekday
+வெள்ளி|Velli|veli|,4,weekday
+சனி|Sani,5,weekday
+ஞாயிறு|ஞாயிறு|Nyaayiru|Nayiur|Nayiru,6,weekday
+ஜனவரி|Thai|Tai|January,1,month
+மாசி|Maasi|Masi|febuary,2,month
+பங்குனி|Panguni||Paungani|march,3,month
+சித்திரை|Chithirai|Chitrai|april,4,month
+வைகாசி|Vaikasi|may,5,month
+ஜூன்|Aani|Ani|june,6,month
+ஜூலை|Aadi|July,7,month
+ஆவணி|ஆகஸ்ட்|Aavani|Avavni|august|Akast,8,month
+செப்டம்பர்|Purattasi|Pratasi|september,9,month
+ஐப்பசி|Aippasi|Aipasi|october,10,month
+கார்த்திகை|Kaarthikai|Karthikai|november|Karttika,11,month
+மார்கழி|Margali|december,12,month
