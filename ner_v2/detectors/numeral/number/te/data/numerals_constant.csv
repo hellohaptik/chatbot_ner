@@ -2,7 +2,7 @@ number,name_variants,number_value,number_type
 ౦,సున్నా|సున్న|శూన్యం|సూన్యం|జీరో|sunna|shunyam|sunyam|zero,0,unit
 ౧.౫,ఒకటిన్నర|ఒక్కటి అర|ఒకటి అర|okatinnara|okkati ara|okati ara,1.5,unit
 ౨.౫,రెండున్నర|రెండు అర|rendunnara|rendu ara,2.5,unit
-౧,ఒక్కటి|ఒకటి|మొదటిది|ఒకటవ|ఒకటో|okkati|okati|modatidi|okatova|okato|okkato|okkatova,1,unit
+౧,ఒక్కటి|ఒకటి|మొదటిది|ఒకటవ|ఒకటో|ఒక|okkati|okati|modatidi|okatova|okato|okkato|okkatova|oka,1,unit
 ౨,రెండు|రొండు|రెండొవ|రెండో|రెండొవది|rendu|rondu|rendova|rendo|rendovadi,2,unit
 ౩,మూడు|మూడోవ|మూడోవ|మూడొవది|మూడో|mudu|muudu|mudova|muudova|mudovadi|mudo|muudo,3,unit
 ౪,నాలుగు|నాల్గు|నాల్గొవ|నాల్గొవది|నాల్గో|నాలగు|nalugu|naalugu|nalgu|nalgova|nalgovadi|nalgo|nalagu|nalagu|naalagu,4,unit
@@ -101,7 +101,7 @@ number,name_variants,number_value,number_type
 ౯౭,తొంభై ఏడు|తొంభై ఏడొవ|తొంభై ఏడొవది|తొంభై ఏడో|thombhai aedu|thombhai aedova|thombhai aedovadi|thombhai aedo|thombhai ado|thombhai adova|thombhai adovadi,97,unit
 ౯౮,తొంభై ఎనిమిది|తొంభై ఎనిమిదొవ|తొంభై ఎనిమిదిది|తొంభై ఎనిమిదో|thombhai enimidi|thombhai enimdova|thombhai enimididi|thombhai enimido,98,unit
 ౯౯,తొంభై తొమ్మిది|తొంభై తొమ్మిదిది|తొంభై తొమ్మిదో|thombhai tommidi|thombhai thommidi|thombhai thommididi|enabhai thommido|enabhai tomidi|enabhai thomido,99,unit
-౧౦౦,వంద|నూరు|నూట|క్వింటాల్|క్వింటా|కింటా|vanda|nuru|nooru|nuta|noota|quintal|quinta|kinta|quintaa,100,scale
-౧౦౦౦,వెయ్యి|టన్|టన్ను|వేయి|వేలు|వేల|veyyi|ton|tonne|tonnu|veelu|veela|veyla,1000,scale
+౧౦౦,వంద|నూరు|నూట|క్వింటాల్|క్వింటా|కింటా|వందల|vanda|nuru|nooru|nuta|noota|quintal|quinta|kinta|quintaa|vandala,100,scale
+౧౦౦౦,వెయ్యి|టన్|టన్ను|వేయి|వేలు|వేల|వెయ్యిల|వెయ్య|వేయ్యిలా|veyyi|ton|tonne|tonnu|veelu|veela|veyla|vela|veyyila|veyya|veyyila,1000,scale
 ౧౦౦౦౦౦,లక్ష|లక్షలు|లక్షల|laksha|lacha|lakshala|lakshalu,100000,scale
 ౧౦౦౦౦౦౦౦,కోటి|కోట్లు|కోట్ల|కరోడ్|koti|kotlu|kotla|korode|corode|carode,10000000,scale
