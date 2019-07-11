@@ -1,0 +1,34 @@
+key,numeric_representation
+౧|ఒక్కటి|ఒకటి|మొదటిది|ఒకటవ|ఒకటో|okkati|okati|modatidi|okatova|okato,1
+౨|రెండు|రొండు|రెండొవ|రెండో|రెండొవది|rendu|rondu|rendova|rendo|rendovadi,2
+౩|మూడు|మూడోవ|మూడోవ|మూడొవది|మూడో|mudu|muudu|mudova|muudova|mudovadi|mudo|muudo,3
+౪|నాలుగు|నాల్గు|నాల్గొవ|నాల్గొవది|నాల్గో|నాలగు|nalugu|nalagu|naalagu|naalugu|nalgu|nalgova|nalgovadi|nalgo,4
+౫|ఐదు|అయిదు|ఐదొవ|అయిదవది|ఐదో|idu|ayidu|iydu|iydova|ayidovadi|ayido|ido|aidu,5
+౬|ఆరు|ఆఱు|ఆరొవ|ఆరొవది|ఆరో|aru|aaru|aarova|aarovadi|aro|aaro,6
+౭|ఏడు|ఏడొవ|ఏడొవది|ఏడో|aedu|aedova|aedovadi|aedo|ado|adova|adovadi,7
+౮|ఎనిమిది|ఎనిమిదొవ|ఎనిమిదిది|ఎనిమిదో|enimidi|enimdova|enimididi|enimido,8
+౯|తొమ్మిది|తొమ్మిదిది|తొమ్మిదో|tommidi|thommidi|thommididi|thommido|tomidi|thomido,9
+౧౦|పది|పదొవ|పదొవది|పదో|padi|padhi|padova|padovadi|pado,10
+౧౧|పదకొండు|పదకొండొవ|పదకొండొవది|పదకొండో|padakondu|padakondova|padakondovadi|padakondo,11
+౧౨|పన్నెండు|పన్నెండవ|పన్నెండవది|పన్నెండో|పన్నెండొవ|పన్నెండొవది|పన్నెండొ|pannendu|pannendova|pannendovadi|pannendo,12
+౧౩|పదమూడు|పదమూడొవ|పదముండొవది|పదముండొ|padamudu|padamudova|padamundovadi|padamundo,13
+౧౪|పద్నాలుగు|పద్నలుగొవ|పద్నాలుగుది|పద్నాలుగో|padnalugu|padnalugova|padnalugudi|padnalugo|padinalugu|padinalagu,14
+౧౫|పదిహేను|పదిహేనోవా|పదిహేనోవాది|పదిహేనో|పదైదు|padihenu|padihenova|padihenovadi|padiheno|padaidu,15
+౧౬|పదహారు|పదహారోది|పదహారో|padahaaru|padhaharu|padaharodi|padaharo,16
+౧౭|పదిహేడు|పదిహేనొవ|పదిహేనోవాది|పదిహేనో|padihedu|padhihedu|padihenova|padihenovadi|padiheno,17
+౧౮|పద్దెనిమిది|పద్దెనిమిదొవ|పద్దెనిమిదిది|పద్దెనిమిదో|పద్దెనిమిదొవ|paddenimidi|padhenimidi|paddenimidova|paddenimididi|padhenimidho|padhenimidova,18
+౧౯|పంతొమ్మిది|పందొమ్మిదొవ|పంతొమ్మిదో|పంతొమ్మిదొవ|పందొమ్మిది|pantommidi|pandommidova|panthommido,19
+౨౦|ఇరవై|ఇరవై|ఇరవయ్యోవది|ఇరవయ్యో|iravay|iravai|iravayyovadi|iravayyo,20
+౨౧|ఇరవయ్యొక్కటి|ఇరవై ఒకటి |ఇరవై ఒక్కటి|ఇరవై ఒకటో|iravayyokkati|iravay okati|eravay okati|iravay okato,21
+౨౨|ఇరవై రెండు|ఇరవై రెండొవ|ఇరవై రెండొవది|ఇరవై రెండో|iravay rendu|iravay rendova|iravay rendovadi|iravay rendo,22
+౨౩|ఇరవై మూడు|ఇరవై మూడవా|ఇరవై మూడొవది|ఇరవై మూడో|iravay mudu|iravay mudova|iravay mudovadi|iravay mudo,23
+౨౪|ఇరవై నాలుగు|ఇరవై నాల్గొవ|ఇరవై నాల్గొవది|ఇరవై నాల్గో|iravay naalugu|iravay naalgova|iravay nalgovadi|iravay nalgo,24
+౨౫|ఇరవై ఐదు|ఇరవై ఐదొవ|ఇరవై ఐదొవది|ఇరవై ఐదో|iravay aidu|iravay aidu|iravay aidova|iravay aidovadi|iravay aido,25
+౨౬|ఇరవై ఆఱు|ఇరవై ఆరు|ఇరవై ఆరొవ|ఇరవై ఆరో|ఇరవై ఆరొవది|iravay aaru|iravay aaru|iravay arova|iravay aaro|iravay aarovadi,26
+౨౭|ఇరవయ్యేడు|ఇరవయ్యేడొవ|ఇరవయ్యేడొవది|ఇరవయ్యేడో|ఇరవై ఏడు|iravayeedu|iravayeedova|iravayeedovadi|iravayeedo|iravay aedu,27
+౨౮|ఇరవై ఎనిమిది|ఇరవై ఎనిమిదొవ| ఇరవై ఎనిమిదిది|ఇరవై ఎనిమిదో|iravay enimidi|iravay enimidova|iraavay enimididi|iravay enimido,28
+౨౯|ఇరవై తొమ్మిది|ఇరవై తొమ్మిదొవది|ఇరవై తొమ్మిదో|iravay tommidi|iravay thommidi|iravay thommidovadi|iravay thommido,29
+౩౦|ముప్పై|ముప్పైయొవది|ముప్పైయొవ|ముప్పైయో|muppai|muppaiovadi|muppaiova|muppaiyo,30
+౩౧|ముప్పై ఒక్కటి|ముప్పై ఒకటవ|ముప్పై ఒకటోవది|ముప్పై ఒకటో|muppai okkati|muppai okatova|muppai okatovadi|muppai okato,31
+౧.౫|ఒకటిన్నర|ఒక్కటి అర|ఒకటి అర|okatinnara|okkati ara|okati ara,1.5
+౨.౫|రెండున్నర|రెండు అర|rendunnara|rendu ara,2.5
