@@ -7,13 +7,13 @@ number,name_variants,number_value,number_type
 ౩,మూడు|మూడోవ|మూడోవ|మూడొవది|మూడో|mudu|muudu|mudova|muudova|mudovadi|mudo|muudo,3,unit
 ౪,నాలుగు|నాల్గు|నాల్గొవ|నాల్గొవది|నాల్గో|నాలగు|nalugu|naalugu|nalgu|nalgova|nalgovadi|nalgo|nalagu|nalagu|naalagu,4,unit
 ౫,ఐదు|అయిదు|ఐదొవ|అయిదవది|ఐదో|idu|ayidu|iydu|iydova|ayidovadi|ayido|ido|aidu,5,unit
-౬,ఆరు|ఆఱు|ఆరొవ|ఆరొవది|ఆరో|aru|aaru|aarova|aarovadi|aro|aaro,6,unit
+౬,ఆరు|ఆఱు|ఆరొవ|ఆరొవది|ఆరో|అర డజను|అర డజన్|aru|aaru|aarova|aarovadi|aro|aaro|ara dozen|ara dozenu|ara dajanu|ara dajan,6,unit
 ౭,ఏడు|ఏడొవ|ఏడొవది|ఏడో|aedu|aedova|aedovadi|aedo|ado|adova|adovadi,7,unit
 ౮,ఎనిమిది|ఎనిమిదొవ|ఎనిమిదిది|ఎనిమిదో|enimidi|enimdova|enimididi|enimido,8,unit
 ౯,తొమ్మిది|తొమ్మిదిది|తొమ్మిదో|tommidi|thommidi|thommididi|thommido|tomidi|thomido,9,unit
 ౧౦,పది|పదొవ|పదొవది|పదో|padi|padhi|padova|padovadi|pado,10,unit
 ౧౧,పదకొండు|పదకొండొవ|పదకొండొవది|పదకొండో|padakondu|padakondova|padakondovadi|padakondo,11,unit
-౧౨,పన్నెండు|పన్నెండవ|పన్నెండవది|పన్నెండో|పన్నెండొవ|పన్నెండొవది|పన్నెండొ|pannendu|pannendova|pannendovadi|pannendo,12,unit
+౧౨,పన్నెండు|పన్నెండవ|పన్నెండవది|పన్నెండో|పన్నెండొవ|పన్నెండొవది|పన్నెండొ|డజన్|డజను|dozenu|dojanu|dojan|dozen|pannendu|pannendova|pannendovadi|pannendo,12,unit
 ౧౩,పదమూడు|పదమూడొవ|పదముండొవది|పదముండొ|padamudu|padamudova|padamundovadi|padamundo,13,unit
 ౧౪,పద్నాలుగు|పద్నలుగొవ|పద్నాలుగుది|పద్నాలుగో|padnalugu|padnalugova|padnalugudi|padnalugo|padinalugu|padinalagu,14,unit
 ౧౫,పదిహేను|పదిహేనోవా|పదిహేనోవాది|పదిహేనో|పదైదు|padihenu|padihenova|padihenovadi|padiheno|padaidu,15,unit
@@ -26,7 +26,7 @@ number,name_variants,number_value,number_type
 ౨౨,ఇరవై రెండు|ఇరవై రెండొవ|ఇరవై రెండొవది|ఇరవై రెండో|iravay rendu|iravay rendova|iravay rendovadi|iravay rendo,22,unit
 ౨౩,ఇరవై మూడు|ఇరవై మూడవా|ఇరవై మూడొవది|ఇరవై మూడో|iravay mudu|iravay mudova|iravay mudovadi|iravay mudo,23,unit
 ౨౪,ఇరవై నాలుగు|ఇరవై నాల్గొవ|ఇరవై నాల్గొవది|ఇరవై నాల్గో|ఇరవై నాలగు|iravay naalugu|iravay naalgova|iravay nalgovadi|iravay nalgo|iravay nalagu|iaravay naalagu,24,unit
-౨౫,ఇరవై ఐదు|ఇరవై ఐదొవ|ఇరవై ఐదొవది|ఇరవై ఐదో|iravay aidu|iravay aidu|iravay aidova|iravay aidovadi|iravay aido,25,unit
+౨౫,ఇరవై ఐదు|ఇరవై ఐదొవ|ఇరవై ఐదొవది|ఇరవై ఐదో|పాతిక|pathika|patika|paathika|paatika|iravay aidu|iravay aidu|iravay aidova|iravay aidovadi|iravay aido,25,unit
 ౨౬,ఇరవై ఆఱు|ఇరవై ఆరు|ఇరవై ఆరొవ|ఇరవై ఆరో|ఇరవై ఆరొవది|iravay aaru|iravay aaru|iravay arova|iravay aaro|iravay aarovadi,26,unit
 ౨౭,ఇరవయ్యేడు|ఇరవయ్యేడొవ|ఇరవయ్యేడొవది|ఇరవయ్యేడో|ఇరవై ఏడు|iravayeedu|iravayeedova|iravayeedovadi|iravayeedo|iravay aedu,27,unit
 ౨౮,ఇరవై ఎనిమిది|ఇరవై ఎనిమిదొవ| ఇరవై ఎనిమిదిది|ఇరవై ఎనిమిదో|iravay enimidi|iravay enimidova|iraavay enimididi|iravay enimido,28,unit
@@ -72,36 +72,36 @@ number,name_variants,number_value,number_type
 ౬౮,అరవై ఎనిమిది|అరవై ఎనిమిదొవ|అరవై ఎనిమిదిది|అరవై ఎనిమిదో|aravai enimidi|aravai enimdova|aravai enimididi|aravai enimido,68,unit
 ౬౯,అరవై తొమ్మిది|అరవై తొమ్మిదిది|అరవై తొమ్మిదో|aravai tommidi|aravai thommidi|aravai thommididi|aravai thommido|aravai tomidi|aravai thomido,69,unit
 ౭౦,డెబ్బై|డెబ్బైయొవ|డెబ్బైయ్యొవది|డెబ్బైయ్యో|debhai|debhaiyyova|debhaiyovadi|debhaiyyo,70,unit
-७१,इकहत्तर|ikhatar|ikhattar|ekhatar|ekhattar,71,unit
-७२,बहत्तर| bahatar|bahattar,72,unit
-७३,तिहत्तर|tihatar|tihattar,73,unit
-७४,चौहत्तर|chauhatar|chauhattar,74,unit
-७५,पचहत्तर|pachhatar|pachhattar,75,unit
-७६,छिहत्तर|chhiyatar|chhiyattar|chhihatar|chhihattar,76,unit
-७७,सतहत्तर|sathatar|sathattar,77,unit
-७८,अठहत्तर|athhatar|athhattar,78,unit
-७९,उनासी|unasi|unashi|unnasi|unnashi,79,unit
-८०,अस्सी|assi|asshi|ashshi,80,unit
-८१,इक्यासी|ikyasi|ikyashi|ekyasi|ekyashi,81,unit
-८२,बयासी|bayasi|bayashi,82,unit
-८३,तिरासी|tirasi|tirashi,83,unit
-८४,चौरासी|chaurasi|chaurashi,84,unit
-८५,पचासी|pachasi|pachashi|pachchasi|pachchashi,85,unit
-८६,छियासी|chhiyasi|chhiyashi|chhiasi|chhiashi,86,unit
-८७,सतासी|सत्तासी|satasi|satashi|sattasi|sattashi,87,unit
-८८,अठासी|अठ्ठासी|aththasi|aththashi|athasi|athashi,88,unit
-८९,नवासी|navasi|navashi|nawasi|nawashi,89,unit
-९०,नब्बे|nabbe|nabbay|nabay,90,unit
-९१,इक्यानबे|ikyanabe|ikyanabay|ikyanbe|ikyanbay|ekyanabe|ekyanabay|ekyanbe|ekyanbay,91,unit
-९२,बानवे|बनाबे|banabe|banabay|banbe|banbay,92,unit
-९३,तिरानवे|tiranave|tiranawe|tirannave|tirannawe,93,unit
-९४,चौरानवे|chauranave|chauranawe|chauranve|chauranwe,94,unit
-९५,पचानवे|पंचानवे|pachanave|pachanawe|pachanve|pachanwe|panchanave|panchanawe|panchanve|panchanwe,95,unit
-९६,छियानवे|chhiyanave|chhiyanawe|chhiyanve|chhiyanwe|chhianave|chhianawe|chhianve|chhianwe,96,unit
-९७,सत्तानवे|सतानवे|satanve|satanwe|sattanve|sattanwe|satanave|satanawe|sattanave|sattanawe,97,unit
-९८,अट्ठानवे|aththanve|aththanwe|aththanave|aththanawe|athanve|athanwe|athanave|athanawe,98,unit
-९९,निन्यानवे|निन्यानबे|ninyanbe|ninyanabe|ninyanve|ninyanave|ninyanwe|ninyanawe,99,unit
-१००,सौ|sau|sao,100,scale
-१०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar,1000,scale
-१०००००,लाख|lakh|laakh|lac,100000,scale
-१०००००००,करोड़|crore|karor|caror,10000000,scale
+౭౧,డెబ్బై ఒక్కటి|డెబ్బై ఒకటి|డెబ్బై మొదటిది|డెబ్బై ఒకటవ|డెబ్బై ఒకటో|debhai okkati|debhai okati|debhai modatidi|debhai okatova|debhai okato|debhai okkato|debhai okkatova,71,unit
+౭౨,డెబ్బై రెండు|డెబ్బై రొండు|డెబ్బై రెండొవ|డెబ్బై రెండో|డెబ్బై రెండొవది|debhai rendu|debhai rondu|debhai rendova|debhai rendo|debhai rendovadi,72,unit
+౭౩,డెబ్బై మూడు|డెబ్బై మూడోవ|డెబ్బై మూడోవ|డెబ్బై మూడొవది|డెబ్బై మూడో|debhai mudu|debhai muudu|debhai mudova|debhai muudova|debhai mudovadi|debhai mudo|debhai muudo,73,unit
+౭౪,డెబ్బై నాలుగు|డెబ్బై నాల్గు|డెబ్బై నాల్గొవ|డెబ్బై నాల్గొవది|డెబ్బై నాల్గో|డెబ్బై నాలగు|debhai nalugu|debhai naalugu|debhai nalgu|debhai nalgova|debhai nalgovadi|debhai nalgo|debhai nalagu|debhai nalagu|debhai naalagu,74,unit
+౭౫,డెబ్బై ఐదు|డెబ్బై అయిదు|డెబ్బై ఐదొవ|డెబ్బై అయిదవది|డెబ్బై ఐదో|debhai idu|debhai ayidu|debhai iydu|debhai iydova|debhai ayidovadi|debhai ayido|debhai ido|debhai aidu,75,unit
+౭౬,డెబ్బై ఆరు|డెబ్బై ఆఱు|డెబ్బై ఆరొవ|డెబ్బై ఆరొవది|డెబ్బై ఆరో|debhai aru|debhai aaru|debhai aarova|debhai aarovadi|debhai aro|debhai aaro,76,unit
+౭౭,డెబ్బై ఏడు|డెబ్బై ఏడొవ|డెబ్బై ఏడొవది|డెబ్బై ఏడో|debhai aedu|debhai aedova|debhai aedovadi|debhai aedo|debhai ado|debhai adova|debhai adovadi,77,unit
+౭౮,డెబ్బై ఎనిమిది|డెబ్బై ఎనిమిదొవ|డెబ్బై ఎనిమిదిది|డెబ్బై ఎనిమిదో|debhai enimidi|debhai enimdova|debhai enimididi|debhai enimido,78,unit
+౭౯,డెబ్బై తొమ్మిది|డెబ్బై తొమ్మిదిది|డెబ్బై తొమ్మిదో|debhai tommidi|debhai thommidi|debhai thommididi|debhai thommido|debhai tomidi|debhai thomido,79,unit
+౮౦,ఎనభై|ఎనభైయొవ|ఎనభైయొవది|ఎనభైయ్యొవది|ఎనభైయ్యో|enabhai|enabai|enabhaiyova|enabhaiyovadi|enabhaiyyo,80,unit
+౮౧,ఎనభై ఒక్కటి|ఎనభై ఒకటి|ఎనభై మొదటిది|ఎనభై ఒకటవ|ఎనభై ఒకటో|enabhai okkati|enabhai okati|enabhai modatidi|enabhai okatova|enabhai okato|enabhai okkato|enabhai okkatova,81,unit
+౮౨,ఎనభై రెండు|ఎనభై రొండు|ఎనభై రెండొవ|ఎనభై రెండో|ఎనభై రెండొవది|enabhai rendu|enabhai rondu|enabhai rendova|enabhai rendo|enabhai rendovadi,82,unit
+౮౩,ఎనభై మూడు|ఎనభై మూడోవ|ఎనభై మూడోవ|ఎనభై మూడొవది|ఎనభై మూడో|enabhai mudu|enabhai muudu|enabhai mudova|enabhai muudova|enabhai mudovadi|enabhai mudo|enabhai muudo,83,unit
+౮౪,ఎనభై నాలుగు|ఎనభై నాల్గు|ఎనభై నాల్గొవ|ఎనభై నాల్గొవది|ఎనభై నాల్గో|ఎనభై నాలగు|enabhai nalugu|enabhai naalugu|enabhai nalgu|enabhai nalgova|enabhai nalgovadi|enabhai nalgo|enabhai nalagu|enabhai nalagu|enabhai naalagu,84,unit
+౮౫,ఎనభై ఐదు|ఎనభై అయిదు|ఎనభై ఐదొవ|ఎనభై అయిదవది|ఎనభై ఐదో|enabhai idu|enabhai ayidu|enabhai iydu|enabhai iydova|enabhai ayidovadi|enabhai ayido|enabhai ido|enabhai aidu,85,unit
+౮౬,ఎనభై ఆరు|ఎనభై ఆఱు|ఎనభై ఆరొవ|ఎనభై ఆరొవది|ఎనభై ఆరో|enabhai aru|enabhai aaru|enabhai aarova|enabhai aarovadi|enabhai aro|enabhai aaro,86,unit
+౮౭,ఎనభై ఏడు|ఎనభై ఏడొవ|ఎనభై ఏడొవది|ఎనభై ఏడో|enabhai aedu|enabhai aedova|enabhai aedovadi|enabhai aedo|enabhai ado|enabhai adova|enabhai adovadi,87,unit
+౮౮,ఎనభై ఎనిమిది|ఎనభై ఎనిమిదొవ|ఎనభై ఎనిమిదిది|ఎనభై ఎనిమిదో|enabhai enimidi|enabhai enimdova|enabhai enimididi|enabhai enimido,88,unit
+౮౯,ఎనభై తొమ్మిది|ఎనభై తొమ్మిదిది|ఎనభై తొమ్మిదో|enabhai tommidi|enabhai thommidi|enabhai thommididi|enabhai thommido|enabhai tomidi|enabhai thomido,89,unit
+౯౦,తొంభై|తొంభైయొవ|తొంభైయొవది|తొంభైయ్యొవది|తొంభైయ్యో|thombhai|tombai|thombai|thombhaiyyova|thombaiyyovadi|thombaiyyo,90,unit
+౯౧,తొంభై ఒక్కటి|తొంభై ఒకటి|తొంభై మొదటిది|తొంభై ఒకటవ|తొంభై ఒకటో|thombhai okkati|thombhai okati|thombhai modatidi|thombhai okatova|thombhai okato|thombhai okkato|thombhai okkatova,91,unit
+౯౨,తొంభై రెండు|తొంభై రొండు|తొంభై రెండొవ|తొంభై రెండో|తొంభై రెండొవది|thombhai rendu|thombhai rondu|thombhai rendova|thombhai rendo|thombhai rendovadi,92,unit
+౯౩,తొంభై మూడు|తొంభై మూడోవ|తొంభై మూడోవ|తొంభై మూడొవది|తొంభై మూడో|thombhai mudu|thombhai muudu|thombhai mudova|thombhai muudova|thombhai mudovadi|thombhai mudo|thombhai muudo,93,unit
+౯౪,తొంభై నాలుగు|తొంభై నాల్గు|తొంభై నాల్గొవ|తొంభై నాల్గొవది|తొంభై నాల్గో|తొంభై నాలగు|thombhai nalugu|thombhai naalugu|thombhai nalgu|thombhai nalgova|thombhai nalgovadi|thombhai nalgo|thombhai nalagu|thombhai nalagu|thombhai naalagu,94,unit
+౯౫,తొంభై ఐదు|తొంభై అయిదు|తొంభై ఐదొవ|తొంభై అయిదవది|తొంభై ఐదో|thombhai idu|thombhai ayidu|thombhai iydu|thombhai iydova|thombhai ayidovadi|thombhai ayido|thombhai ido|thombhai aidu,95,unit
+౯౬,తొంభై ఆరు|తొంభై ఆఱు|తొంభై ఆరొవ|తొంభై ఆరొవది|తొంభై ఆరో|thombhai aru|thombhai aaru|thombhai aarova|thombhai aarovadi|thombhai aro|thombhai aaro,96,unit
+౯౭,తొంభై ఏడు|తొంభై ఏడొవ|తొంభై ఏడొవది|తొంభై ఏడో|thombhai aedu|thombhai aedova|thombhai aedovadi|thombhai aedo|thombhai ado|thombhai adova|thombhai adovadi,97,unit
+౯౮,తొంభై ఎనిమిది|తొంభై ఎనిమిదొవ|తొంభై ఎనిమిదిది|తొంభై ఎనిమిదో|thombhai enimidi|thombhai enimdova|thombhai enimididi|thombhai enimido,98,unit
+౯౯,తొంభై తొమ్మిది|తొంభై తొమ్మిదిది|తొంభై తొమ్మిదో|thombhai tommidi|thombhai thommidi|thombhai thommididi|enabhai thommido|enabhai tomidi|enabhai thomido,99,unit
+౧౦౦,వంద|నూరు|నూట|క్వింటాల్|క్వింటా|కింటా|vanda|nuru|nooru|nuta|noota|quintal|quinta|kinta|quintaa,100,scale
+౧౦౦౦,వెయ్యి|టన్|టన్ను|వేయి|వేలు|వేల|veyyi|ton|tonne|tonnu|veelu|veela|veyla,1000,scale
+౧౦౦౦౦౦,లక్ష|లక్షలు|లక్షల|laksha|lacha|lakshala|lakshalu,100000,scale
+౧౦౦౦౦౦౦౦,కోటి|కోట్లు|కోట్ల|కరోడ్|koti|kotlu|kotla|korode|corode|carode,10000000,scale
