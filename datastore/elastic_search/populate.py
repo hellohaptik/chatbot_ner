@@ -285,14 +285,14 @@ def delete_entity_crf_data(connection: Elasticsearch, index_name: str,
                            doc_type: str, entity_name: str,
                            languages: List[str]):
     """Delete CRF data for the given entity and languages.
-    
+
     Args:
         connection (Elasticsearch): Elasticsearch client object
         index_name (str): name of the index
         doc_type (str): type of the documents being indexed
         entity_name (str):  ame of the entity for which the training data has to be deleted
         languages (List[str]): list of language codes for which data needs to be deleted
-    
+
     Returns:
         TYPE: Description
     """
@@ -346,11 +346,11 @@ def update_entity_crf_data_populate(connection: Elasticsearch,
 
     logger.debug(f'[{log_prefix}] Started: add_training_data_elastic_search()')
     add_crf_training_data_elastic_search(connection=connection,
-                                     index_name=index_name,
-                                     doc_type=doc_type,
-                                     entity_name=entity_name,
-                                     sentences=sentences,
-                                     logger=logger, **kwargs)
+                                         index_name=index_name,
+                                         doc_type=doc_type,
+                                         entity_name=entity_name,
+                                         sentences=sentences,
+                                         logger=logger, **kwargs)
     logger.debug(f'[{log_prefix}] Completed: add_training_data_elastic_search()')
 
     logger.debug(f'[{log_prefix}] Completed: external_api_training_data_entity_update()')
