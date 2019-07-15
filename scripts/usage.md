@@ -9,7 +9,8 @@ This command will create a new csv file at `/path/to/existing_file.csv`
 This new csv will contain `message` and `original_text` from existing test cases with a corresponding `unique_id` and `language`.
 
 ## Map outputs from old test cases to new translated test cases.
-
+`vim generate_translated_tests.py`  
+uncomment -  `#main()`   
 `python generate_translated_tests.py /path/to/existing_file.yaml /path/to/translated_csv.csv `
 
 This will create a new yaml file with translated test cases at path `/path/to/existing_file_<"language">.yaml`

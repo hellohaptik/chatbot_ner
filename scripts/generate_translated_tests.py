@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 import io
 import pandas as pd
 import sys
@@ -150,4 +151,4 @@ def main():
                                                                                             filename2=csv_filepath))
 
 
-main()
+# main()
