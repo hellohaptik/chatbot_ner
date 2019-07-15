@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import warnings
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import elastic_search
@@ -629,7 +629,8 @@ class DataStore(object):
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
-    def update_entity_crf_data(self, entity_name, sentences: Dict[str, List], **kwargs):
+    def update_entity_crf_data(self, entity_name,
+                               sentences: Dict[str, List[Dict[str, Union[str, List[str]]]]], **kwargs):
         """
         This method is used to populate the training data for a given entity
 

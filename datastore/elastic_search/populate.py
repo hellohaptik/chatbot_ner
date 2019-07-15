@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import os
 from collections import defaultdict
 # Local imports
-from typing import List, Dict
+from typing import List, Dict, Union
 
 # 3rd party imports
 from elasticsearch import helpers, Elasticsearch
@@ -359,7 +359,7 @@ def update_entity_crf_data_populate(connection: Elasticsearch,
 def add_crf_training_data_elastic_search(connection: Elasticsearch,
                                          index_name: str,
                                          doc_type: str, entity_name: str,
-                                         sentences: Dict[str, List[Dict[str, str]]],
+                                         sentences: Dict[str, List[Dict[str, Union[str, List[str]]]]],
                                          logger, **kwargs):
     """
     Adds all sentences and the corresponding entities to the specified index.
