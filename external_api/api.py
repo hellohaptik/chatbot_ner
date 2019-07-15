@@ -11,7 +11,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
     EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, \
-    LIVE_CRF_MODEL_PATH
+    LIVE_CRF_MODEL_PATH, SENTENCES
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -186,15 +186,10 @@ def update_crf_training_data(request):
     response = {"success": False, "error": "", "result": []}
     try:
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        sentences = external_api_data.get(SENTENCES)
         entity_name = external_api_data.get(ENTITY_NAME)
-        entity_list = external_api_data.get(ENTITY_LIST)
-        sentence_list = external_api_data.get(SENTENCE_LIST)
-        language_script = external_api_data.get(LANGUAGE_SCRIPT)
-        datastore_obj = DataStore()
-        datastore_obj.update_entity_crf_data(entity_name=entity_name,
-                                             entity_list=entity_list,
-                                             sentence_list=sentence_list,
-                                             language_script=language_script)
+        DataStore().update_entity_crf_data(entity_name=entity_name,
+                                           sentences=sentences)
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,
