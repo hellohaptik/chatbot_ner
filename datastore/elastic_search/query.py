@@ -6,10 +6,12 @@ import copy
 import json
 import re
 import warnings
+# Local imports
+from typing import List
 
+from elasticsearch import Elasticsearch
 from six import string_types
 
-# Local imports
 from datastore import constants
 from external_api.constants import SENTENCE_LIST, ENTITY_LIST
 from language_utilities.constant import ENGLISH_LANG
@@ -533,17 +535,18 @@ def _parse_es_search_results(results_list):
     return variants_to_values_list
 
 
-def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):
+def get_crf_data_for_entity_name(connection: Elasticsearch, index_name: str, doc_type: str, entity_name: str,
+                                 languages: List[str], **kwargs):
     """
     Get all sentence_list and entity_list for a entity stored in the index
 
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name: name of the entity to perform a 'term' query on
-        kwargs:
-            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+        connection (Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity to perform a 'term' query on
+        languages (List[str]): list of languages for which to fetch sentences
+        **kwargs: optional kwargs for es
 
     Returns:
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
@@ -564,15 +567,25 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
                 'Ajay'
             ]
                         ]
-            }
-
+            }    
     """
     results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
     data = {
-        'query': {
-            'term': {
-                'entity_data': {
-                    'value': entity_name
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "term": {
+                            "entity_data": {
+                                "value": entity_name
+                            }
+                        }
+                    }
+                ],
+                "filter": {
+                    "terms": {
+                        "language_script": languages
+                    }
                 }
             }
         }

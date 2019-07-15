@@ -11,7 +11,7 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
     EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, \
-    LIVE_CRF_MODEL_PATH, SENTENCES
+    LIVE_CRF_MODEL_PATH, SENTENCES, LANGUAGES
 
 from django.views.decorators.csrf import csrf_exempt
 from models.crf_v2.crf_train import CrfTrain
@@ -149,8 +149,9 @@ def get_crf_training_data(request):
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
+        languages = request.GET.get(LANGUAGES, [])
         datastore_obj = DataStore()
-        result = datastore_obj.get_crf_data_for_entity_name(entity_name=entity_name)
+        result = datastore_obj.get_crf_data_for_entity_name(entity_name=entity_name, languages=languages)
         response['result'] = result
         response['success'] = True
 

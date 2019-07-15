@@ -576,37 +576,40 @@ class DataStore(object):
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
-    def get_crf_data_for_entity_name(self, entity_name, **kwargs):
+    def get_crf_data_for_entity_name(self, entity_name: str, languages: List[str], **kwargs):
         """
         This method is used to obtain the sentences and entities from sentences given entity name
+
         Args:
             entity_name (str): Entity name for which training data needs to be obtained
-            kwargs:
-                For Elasticsearch:
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+            languages (List[str]): list of languges codes for which data is requested
+            **kwargs: For Elasticsearch:
+                Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
         Returns:
             results_dictionary(dict): Dictionary consisting of the training data for the the given entity.
 
         Raises:
-             IndexNotFoundException if es_training_index was not found in connection settings
+            IndexNotFoundException: Description
+            IndexNotFoundException if es_training_index was not found in connection settings
 
         Example:
             db = Datastore()
             db.get_entity_training_data(entity_name, **kwargs):
             >> {
-        'sentence_list': [
-            'My name is hardik',
-            'This is my friend Ajay'
+                'sentence_list': [
+                        'My name is hardik',
+                        'This is my friend Ajay'
                         ],
-        'entity_list': [
-            [
-                'hardik'
-            ],
-            [
-                'Ajay'
-            ]
+                'entity_list': [
+                        [
+                            'hardik'
+                        ],
+                        [
+                            'Ajay'
                         ]
-            }
+                    ]
+                }
         """
         ner_logger.debug('Datastore, get_entity_training_data, entity_name %s' % entity_name)
         if self._client_or_connection is None:
@@ -624,6 +627,7 @@ class DataStore(object):
                 index_name=es_training_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                 entity_name=entity_name,
+                languages=languages,
                 request_timeout=request_timeout,
                 **kwargs)
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
