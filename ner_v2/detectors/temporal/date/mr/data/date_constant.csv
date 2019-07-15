@@ -1,18 +1,18 @@
 key,key,date_type
 आज|Aaj,0,relative_date
-उद्या|काल|कल|Udya|udhya|kaal,1,relative_date
+उद्या|काल|कल|Udya|udhya|kaal|kal,1,relative_date
 परवा|पर्वा|Parava|parva,2,relative_date
 तिसऱ्या देवीशि|Tisrya Div shi,3,relative_date
 तारिक|तार्कीला|Tarik|Taarik|tarkila,NA,month_date_ref
 दिवस|दिवसं|Divas|divsan ,NA,date_literal
-महिना|महीने|महिन्याचा|months|month|mahina|mahine|mahinyacha|mahinyachi|mahinyacha,NA,month_literal
-सोमवार|monday|somvar|somwar,0,weekday
-मंगळवार|मंगळवारी|Mangalvari|tuesday|mangalvar|mangalwar,1,weekday
-बुधवार|बुधवारी|wednesday|budhvar|budhwar|budhvari|budhwari,2,weekday
-गुरुवार|गुरुवारी|thursday|guruvar|guruwar|guroovaar|guroowar|guroovar|guruvari|guruwari|guroovaari|guroowari,3,weekday
-शुक्रवार|शुक्रवारी|friday|shukravar|shukrawar|shukravari|shukrawari,4,weekday
-शनिवार|saturday|shanivar|shaniwar,5,weekday
-रविवार|रविवारी|sunday|ravivar|raviwar|ravivari|raviwari,6,weekday
+महिना|महीने|महिन्याचा|months|month|mahina|mahine|mahinyacha|mahinyachi|mahinyacha|mahinyancha,NA,month_literal
+सोमवार|सोमवारी|monday|somvar|somwar|somvaar|somvaari|somwari,0,weekday
+मंगळवार|मंगळवारी|Mangalvari|tuesday|mangalvar|mangalwar|mangalvaar,1,weekday
+बुधवार|बुधवारी|wednesday|budhvar|budhwar|budhvaar|budhvari|budhwari,2,weekday
+गुरुवार|गुरुवारी|thursday|guruvar|guruwar|guroovaar|guroowar|guroovar|gurvaar|guruvari|guruwari|guroovaari|guroowari,3,weekday
+शुक्रवार|शुक्रवारी|friday|shukravar|shukrawar|shukravaar|shukravari|shukrawari,4,weekday
+शनिवार|शनिवारी|saturday|shanivar|shaniwar|shanivaar|shanivaari|shaniwari,5,weekday
+रविवार|रविवारी|sunday|ravivar|raviwar|ravivari|raviwari|ravivaari,6,weekday
 जानेवारी|january|jan|Janevari,1,month
 फेब्रुवारी|Phebruvari|february|feb,2,month
 मार्च|march|mar,3,month
