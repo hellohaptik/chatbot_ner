@@ -6,7 +6,7 @@ This is the V2 version of date detector module that will detect date in multiple
 - Hindi
 - Marathi
 - Gujarati
-- Telgu
+- Telugu
 - Tamil
 
 ### Usage

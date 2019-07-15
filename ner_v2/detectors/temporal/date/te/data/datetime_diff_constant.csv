@@ -1,0 +1,10 @@
+key,present_in_start,adding_magnitude,datetime_type
+తర్వాత|పిమ్మట|అయినాక|ఐనాకా|అయ్యాక|తరువాత|తరవాత|tarvatha|tarvata|taruvatha|ainaka|ayinaka|ayyaka|pimmata,FALSE,1,add_diff_datetime
+ఈ|ee|e,TRUE,0,add_diff_datetime
+ముందు|పూర్వం|ముందఱ|మునుపు|పూర్వము|ముందర|mundu|purvam|poorvam|mundara|munupu|purvamu|mundara,FALSE,-1,add_diff_datetime
+ముందు|పూర్వం|ముందఱ|మునుపు|పూర్వము|ముందర|mundu|purvam|poorvam|mundara|munupu|purvamu|mundara,TRUE,-1,add_diff_datetime
+వచ్చే|రాబోయే|vache|raboye|rabooye,TRUE,1,add_diff_datetime
+లో|lo,FALSE,1,add_diff_datetime
+ఒకటింపావు|పావు|బావు|okatimpavu|pavu|paavu|bavu|baavu,TRUE,0.25,ref_datetime
+పావు తక్కువ|pavu takkuva|paavu takkuva,TRUE,-0.25,ref_datetime
+అర్థ|అర్ధ|artha|arda|adtha,TRUE,0.5,ref_datetime
