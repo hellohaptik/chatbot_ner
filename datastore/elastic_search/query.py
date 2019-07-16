@@ -10,7 +10,7 @@ import warnings
 from six import string_types
 
 from datastore import constants
-from external_api.constants import ENTITY_LIST, SENTENCE
+from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 
@@ -605,7 +605,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
         language_mapped_results[result['_source']['language_script']].append(
             {
                 SENTENCE: result['_source']['sentence'],
-                ENTITY_LIST: result['_source']['entities']
+                ENTITIES: result['_source']['entities']
             }
         )
 

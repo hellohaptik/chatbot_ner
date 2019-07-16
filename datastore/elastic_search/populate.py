@@ -11,6 +11,7 @@ from chatbot_ner.config import ner_logger
 from datastore import constants
 from datastore.elastic_search.query import get_entity_data
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
+from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import DICTIONARY_DATA_VARIANTS
 
@@ -376,8 +377,8 @@ def add_crf_training_data_elastic_search(connection, index_name, doc_type, entit
         for sentence in sentences:
             query_dict = {'_index': index_name,
                           'entity_data': entity_name,
-                          'sentence': sentence['sentence'],
-                          'entities': sentence['entities'],
+                          'sentence': sentence[SENTENCE],
+                          'entities': sentence[ENTITIES],
                           'language_script': language,
                           '_type': doc_type,
                           '_op_type': 'index'
