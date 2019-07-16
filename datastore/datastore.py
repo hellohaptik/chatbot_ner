@@ -575,37 +575,40 @@ class DataStore(object):
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
-    def get_crf_data_for_entity_name(self, entity_name, **kwargs):
+    def get_crf_data_for_entity_name(self, entity_name, languages, **kwargs):
         """
         This method is used to obtain the sentences and entities from sentences given entity name
+
         Args:
             entity_name (str): Entity name for which training data needs to be obtained
-            kwargs:
-                For Elasticsearch:
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+            languages (List[str]): list of languges codes for which data is requested
+            **kwargs: For Elasticsearch:
+                Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
         Returns:
             results_dictionary(dict): Dictionary consisting of the training data for the the given entity.
 
         Raises:
-             IndexNotFoundException if es_training_index was not found in connection settings
+            IndexNotFoundException: Description
+            IndexNotFoundException if es_training_index was not found in connection settings
 
         Example:
             db = Datastore()
             db.get_entity_training_data(entity_name, **kwargs):
             >> {
-        'sentence_list': [
-            'My name is hardik',
-            'This is my friend Ajay'
+                'sentence_list': [
+                        'My name is hardik',
+                        'This is my friend Ajay'
                         ],
-        'entity_list': [
-            [
-                'hardik'
-            ],
-            [
-                'Ajay'
-            ]
+                'entity_list': [
+                        [
+                            'hardik'
+                        ],
+                        [
+                            'Ajay'
                         ]
-            }
+                    ]
+                }
         """
         ner_logger.debug('Datastore, get_entity_training_data, entity_name %s' % entity_name)
         if self._client_or_connection is None:
@@ -623,24 +626,24 @@ class DataStore(object):
                 index_name=es_training_index,
                 doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                 entity_name=entity_name,
+                languages=languages,
                 request_timeout=request_timeout,
                 **kwargs)
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
-    def update_entity_crf_data(self, entity_name, entity_list, language_script, sentence_list, **kwargs):
+    def update_entity_crf_data(self, entity_name, sentences, **kwargs):
         """
         This method is used to populate the training data for a given entity
+
         Args:
             entity_name (str): Name of the entity for which the training data has to be populated
-            entity_list (list): List consisting of the entities corresponding to the sentence_list
-            sentence_list (list): List of sentences for training
-            language_script (str): Language code for the language script used.
-            **kwargs:
-                For Elasticsearch:
+            sentences (Dict[str, List[Dict[str, str]]]: sentences mapped against their languages
+            **kwargs: For Elasticsearch:
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
         Raises:
+            IndexNotFoundException: Description
             IndexNotFoundException if es_training_index was not found in connection settings
         """
         if self._client_or_connection is None:
@@ -654,13 +657,12 @@ class DataStore(object):
                 raise IndexNotFoundException('Index for ELASTICSEARCH_CRF_DATA_INDEX_NAME not found. '
                                              'Please configure the same')
 
-            elastic_search.populate.update_entity_crf_data_populate(connection=self._client_or_connection,
-                                                                    index_name=es_training_index,
-                                                                    doc_type=self._connection_settings
-                                                                    [ELASTICSEARCH_CRF_DATA_DOC_TYPE],
-                                                                    logger=ner_logger,
-                                                                    entity_list=entity_list,
-                                                                    sentence_list=sentence_list,
-                                                                    entity_name=entity_name,
-                                                                    language_script=language_script,
-                                                                    **kwargs)
+            elastic_search \
+                .populate \
+                .update_entity_crf_data_populate(connection=self._client_or_connection,
+                                                 index_name=es_training_index,
+                                                 doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                                                 logger=ner_logger,
+                                                 sentences=sentences,
+                                                 entity_name=entity_name,
+                                                 **kwargs)
