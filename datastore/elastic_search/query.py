@@ -565,8 +565,8 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             [
                 'Ajay'
             ]
-                        ]
-            }    
+            ]
+            }
     """
     results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
     data = {
