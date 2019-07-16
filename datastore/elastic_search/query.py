@@ -579,15 +579,18 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
                             }
                         }
                     }
-                ],
-                "filter": {
-                    "terms": {
-                        "language_script": languages
-                    }
-                }
+                ]
             }
         }
     }
+
+    if languages:
+        data['query']['bool']['filter'] = {
+            "terms": {
+                "language_script": languages
+            }
+        }
+
     kwargs = dict(kwargs,
                   body=data,
                   doc_type=doc_type,
