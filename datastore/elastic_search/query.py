@@ -7,7 +7,6 @@ import json
 import re
 import warnings
 
-from elasticsearch import Elasticsearch
 from six import string_types
 
 from datastore import constants

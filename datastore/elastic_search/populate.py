@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 
 # 3rd party imports
-from elasticsearch import helpers, Elasticsearch
+from elasticsearch import helpers
 
 from chatbot_ner.config import ner_logger
 from datastore import constants
