@@ -10,7 +10,7 @@ import warnings
 from six import string_types
 
 from datastore import constants
-from external_api.constants import SENTENCE_LIST, ENTITY_LIST
+from external_api.constants import SENTENCE_LIST, ENTITY_LIST, LANGUAGE_SCRIPT, SENTENCE
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 
@@ -567,7 +567,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             ]
             }
     """
-    results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
+
     data = {
         "query": {
             "bool": {
@@ -599,8 +599,14 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     # Parse hits
     results = search_results['hits']['hits']
 
-    for result in results:
-        results_dictionary[SENTENCE_LIST].append(result['_source']['sentence'])
-        results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
+    language_mapped_results = collections.defaultdict(list)
 
-    return results_dictionary
+    for result in results:
+        language_mapped_results[result['_source']['language_script']].append(
+            {
+                SENTENCE: result['_source']['sentence'],
+                ENTITY_LIST: result['_source']['entities']
+            }
+        )
+
+    return dict(language_mapped_results)

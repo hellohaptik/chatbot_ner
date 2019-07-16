@@ -7,6 +7,7 @@ LANGUAGES = 'languages'
 LANGUAGE_SCRIPT = 'language_script'
 ENTITY_LIST = 'entity_list'
 SENTENCE_LIST = 'sentence_list'
+SENTENCE = 'sentence'
 
 READ_MODEL_FROM_S3 = 'read_model_from_s3'
 ES_CONFIG = 'es_config'
