@@ -3,8 +3,6 @@ from __future__ import absolute_import
 # std imports
 import os
 from collections import defaultdict
-# Local imports
-from typing import List, Dict, Union
 
 # 3rd party imports
 from elasticsearch import helpers, Elasticsearch
@@ -15,6 +13,8 @@ from datastore.elastic_search.query import get_entity_data
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import DICTIONARY_DATA_VARIANTS
+
+# Local imports
 
 log_prefix = 'datastore.elastic_search.populate'
 
