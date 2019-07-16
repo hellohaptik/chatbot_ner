@@ -149,7 +149,8 @@ def get_crf_training_data(request):
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
-        languages = request.GET.get(LANGUAGES, []).split('')
+        languages = request.GET.get(LANGUAGES, []).split(',')
+
         result = DataStore().get_crf_data_for_entity_name(entity_name=entity_name, languages=languages)
 
         response['result'] = result
