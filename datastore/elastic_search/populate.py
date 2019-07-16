@@ -281,9 +281,7 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
-def delete_entity_crf_data(connection: Elasticsearch, index_name: str,
-                           doc_type: str, entity_name: str,
-                           languages: List[str]):
+def delete_entity_crf_data(connection, index_name, doc_type, entity_name, languages):
     """Delete CRF data for the given entity and languages.
 
     Args:
@@ -317,13 +315,7 @@ def delete_entity_crf_data(connection: Elasticsearch, index_name: str,
     return connection.delete_by_query(index=index_name, body=query, doc_type=doc_type)
 
 
-def update_entity_crf_data_populate(connection: Elasticsearch,
-                                    index_name: str,
-                                    doc_type: str,
-                                    entity_name: str,
-                                    sentences: Dict[str, List],
-                                    logger,
-                                    **kwargs):
+def update_entity_crf_data_populate(connection, index_name, doc_type, entity_name, sentences, logger, **kwargs):
     """
     This method is used to populate the elastic search training data.
 
@@ -332,35 +324,31 @@ def update_entity_crf_data_populate(connection: Elasticsearch,
         index_name (str): name of the index
         doc_type (str): type of the documents being indexed
         entity_name (str): name of the entity for which the training data has to be populated
-        sentences (List[Dict[str, List]]): sentences collected per language
+        sentences (Dict[str, List[Dict[str, str]]]): sentences collected per language
         logger: logging object
         **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
     """
-    logger.debug(f'[{log_prefix}] Started: external_api_training_data_entity_update()')
+    logger.debug('[{0}] Started: external_api_training_data_entity_update()'.format(log_prefix))
 
-    logger.debug(f'[{log_prefix}] Started: delete_entity_crf_data()')
+    logger.debug('[{0}] Started: delete_entity_crf_data()'.format(log_prefix))
     languages = list(sentences.keys())
     delete_entity_crf_data(connection=connection, index_name=index_name, doc_type=doc_type,
                            entity_name=entity_name, languages=languages)
-    logger.debug(f'[{log_prefix}] Completed: delete_entity_crf_data()')
+    logger.debug('[{0}] Completed: delete_entity_crf_data()'.format(log_prefix))
 
-    logger.debug(f'[{log_prefix}] Started: add_training_data_elastic_search()')
+    logger.debug('[{0}] Started: add_training_data_elastic_search()'.format(log_prefix))
     add_crf_training_data_elastic_search(connection=connection,
                                          index_name=index_name,
                                          doc_type=doc_type,
                                          entity_name=entity_name,
                                          sentences=sentences,
                                          logger=logger, **kwargs)
-    logger.debug(f'[{log_prefix}] Completed: add_training_data_elastic_search()')
+    logger.debug('[{0}] Completed: add_training_data_elastic_search()'.format(log_prefix))
 
-    logger.debug(f'[{log_prefix}] Completed: external_api_training_data_entity_update()')
+    logger.debug('[{0}] Completed: external_api_training_data_entity_update()'.format(log_prefix))
 
 
-def add_crf_training_data_elastic_search(connection: Elasticsearch,
-                                         index_name: str,
-                                         doc_type: str, entity_name: str,
-                                         sentences: Dict[str, List[Dict[str, Union[str, List[str]]]]],
-                                         logger, **kwargs):
+def add_crf_training_data_elastic_search(connection, index_name, doc_type, entity_name, sentences, logger, **kwargs):
     """
     Adds all sentences and the corresponding entities to the specified index.
     If the same named entity is found a delete followed by an update is triggered
@@ -397,11 +385,11 @@ def add_crf_training_data_elastic_search(connection: Elasticsearch,
             queries.append(query_dict)
         if len(queries) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
-            logger.debug(f'[{log_prefix}]  Insert: {entity_name} with status {result}')
+            logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
             queries = []
     if queries:
         result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
-        logger.debug(f'[{log_prefix}]  Insert: {entity_name} with status {result}')
+        logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
 
 
 def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):

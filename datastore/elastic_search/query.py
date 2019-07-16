@@ -535,8 +535,7 @@ def _parse_es_search_results(results_list):
     return variants_to_values_list
 
 
-def get_crf_data_for_entity_name(connection: Elasticsearch, index_name: str, doc_type: str, entity_name: str,
-                                 languages: List[str], **kwargs):
+def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, languages, **kwargs):
     """
     Get all sentence_list and entity_list for a entity stored in the index
 
@@ -590,7 +589,11 @@ def get_crf_data_for_entity_name(connection: Elasticsearch, index_name: str, doc
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+    kwargs = dict(kwargs,
+                  body=data,
+                  doc_type=doc_type,
+                  size=constants.ELASTICSEARCH_SEARCH_SIZE,
+                  index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 

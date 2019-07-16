@@ -576,7 +576,7 @@ class DataStore(object):
         es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=destination)
         es_object.transfer_specific_entities(list_of_entities=entity_list)
 
-    def get_crf_data_for_entity_name(self, entity_name: str, languages: List[str], **kwargs):
+    def get_crf_data_for_entity_name(self, entity_name, languages, **kwargs):
         """
         This method is used to obtain the sentences and entities from sentences given entity name
 
@@ -633,14 +633,13 @@ class DataStore(object):
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
-    def update_entity_crf_data(self, entity_name,
-                               sentences: Dict[str, List[Dict[str, Union[str, List[str]]]]], **kwargs):
+    def update_entity_crf_data(self, entity_name, sentences, **kwargs):
         """
         This method is used to populate the training data for a given entity
 
         Args:
             entity_name (str): Name of the entity for which the training data has to be populated
-            sentences (Dict[str, List]): sentences mapped against their languages
+            sentences (Dict[str, List[Dict[str, str]]]: sentences mapped against their languages
             **kwargs: For Elasticsearch:
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
