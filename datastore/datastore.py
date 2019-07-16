@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 import warnings
-from typing import Dict, List, Union
 
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import elastic_search
