@@ -176,7 +176,7 @@ def update_crf_training_data(request):
     """
     This function is used to update the training data
      Args:
-         request (HttpResponse): HTTP response from url
+         request (HttpRequest): HTTP response from url
      Returns:
          HttpResponse : HttpResponse with appropriate status and error message.
     Example for data present in
@@ -187,7 +187,7 @@ def update_crf_training_data(request):
     """
     response = {"success": False, "error": "", "result": []}
     try:
-        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
+        external_api_data = json.loads(request.body.get(EXTERNAL_API_DATA))
         sentences = external_api_data.get(SENTENCES)
         entity_name = external_api_data.get(ENTITY_NAME)
         DataStore().update_entity_crf_data(entity_name=entity_name,
