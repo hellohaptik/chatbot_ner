@@ -136,7 +136,7 @@ def get_crf_training_data(request):
     """
     This function is used obtain the training data given the entity_name.
      Args:
-         request (HttpResponse): HTTP response from url
+         request (HttpRequest): HTTP response from url
 
      Returns:
          HttpResponse : With data consisting of a dictionary consisting of sentence_list and entity_list
@@ -149,7 +149,9 @@ def get_crf_training_data(request):
     response = {"success": False, "error": "", "result": []}
     try:
         entity_name = request.GET.get(ENTITY_NAME)
-        languages = request.GET.get(LANGUAGES, '').split(',')
+        languages = request.GET.get(LANGUAGES, '')
+
+        languages = languages.split(',') if languages else []
 
         result = DataStore().get_crf_data_for_entity_name(entity_name=entity_name, languages=languages)
 
