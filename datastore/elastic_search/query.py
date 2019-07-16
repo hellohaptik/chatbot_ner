@@ -10,7 +10,7 @@ import warnings
 from six import string_types
 
 from datastore import constants
-from external_api.constants import SENTENCE_LIST, ENTITY_LIST, LANGUAGE_SCRIPT, SENTENCE
+from external_api.constants import ENTITY_LIST, SENTENCE
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 
