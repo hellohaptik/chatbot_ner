@@ -420,8 +420,10 @@ class TextDetector(BaseDetector):
                 if original_text:
                     value_final_list.append(variants_to_values[variant])
                     original_final_list.append(original_text)
+
                     boundary_punct_pattern = re.compile(r'(^[{0}]+)|([{0}]+$)'.format(re.escape(string.punctuation)))
-                    original_text_= boundary_punct_pattern.sub("", original_text)
+                    original_text_ = boundary_punct_pattern.sub("", original_text)
+
                     _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), re.UNICODE)
                     self.__tagged_texts[index] = _pattern.sub(self.tag, self.__tagged_texts[index])
                     # Instead of dropping completely like in other entities,
