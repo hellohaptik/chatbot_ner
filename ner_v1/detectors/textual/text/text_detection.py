@@ -1,5 +1,4 @@
 import collections
-import regex as re
 import string
 
 from six import iteritems
