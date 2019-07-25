@@ -59,6 +59,19 @@ class BaseDetector(object):
         """
         return [], []
 
+    @abc.abstractmethod
+    def detect_entity_bulk(self, texts, **kwargs):
+        """
+        This method runs the core entity detection logic defined inside entity detectors
+        Args:
+            texts: text snippet from which entities needs to be detected
+            **kwargs: values specific to different detectors such as 'last bot message', custom configs, etc.
+        Return:
+            tuple: Two lists of same length containing detected values and original substring from text which is used
+            to derive the detected value respectively
+        """
+        return [] * len(texts), [] * len(texts)
+
     def _set_language_processing_script(self):
         """
         This method is used to decide the language in which detector should run it's logic based on
@@ -106,8 +119,11 @@ class BaseDetector(object):
         texts = messages
         entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
 
+        fallback_value_list = kwargs.get('fallback_value')
         if entities_list:
             values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
+        elif fallback_value_list:
+            values_list, method, original_texts_list = fallback_value_list, FROM_MESSAGE, original_texts_list
         else:
             return None
 

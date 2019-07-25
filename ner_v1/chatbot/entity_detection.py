@@ -253,7 +253,8 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
                                                    fallback_value=fallback_value,
                                                    bot_message=bot_message)
     elif isinstance(message, (list, tuple)):
-        entity_output = text_model_detector.detect_bulk(messages=message)
+        entity_output = text_model_detector.detect_bulk(messages=message,
+                                                        fallback_value=fallback_value)
 
     return entity_output
 
