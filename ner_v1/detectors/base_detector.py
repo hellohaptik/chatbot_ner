@@ -123,7 +123,7 @@ class BaseDetector(object):
         if entities_list:
             values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
         elif fallback_value_list:
-            values_list, method, original_texts_list = fallback_value_list, FROM_MESSAGE, original_texts_list
+            values_list, method, original_texts_list = fallback_value_list, FROM_FALLBACK_VALUE, fallback_value_list
         else:
             return None
 
