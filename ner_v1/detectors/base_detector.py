@@ -106,18 +106,25 @@ class BaseDetector(object):
         texts = messages
         entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
 
-        fallback_value_list = kwargs.get('fallback_value')
-        if entities_list and not fallback_value_list:
-            values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
-        elif fallback_value_list:
-            values_list = [[fallback_value] for fallback_value in fallback_value_list]
-            original_texts_list = values_list
-            method = FROM_FALLBACK_VALUE
-        else:
-            return None
+        fallback_value_list = kwargs.get('fallback_values')
+        values_list, detection_method_list, original_list = [], [], []
+
+        for i in range(len(messages)):
+            if entities_list[i]:
+                values_list.append(entities_list[i])
+                detection_method_list.append(FROM_MESSAGE)
+                original_list.append(original_texts_list[i])
+            elif fallback_value_list[i]:
+                values_list.append([fallback_value_list[i]])
+                detection_method_list.append(FROM_FALLBACK_VALUE)
+                original_list.append([fallback_value_list[i]])
+            else:
+                values_list.append([])
+                detection_method_list.append([])
+                original_list.append([])
 
         return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
-                                       detection_method=method,
+                                       detection_method_list=detection_method_list,
                                        detection_language=self._target_language_script)
 
     def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
