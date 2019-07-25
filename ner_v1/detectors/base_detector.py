@@ -104,23 +104,25 @@ class BaseDetector(object):
                 messages.append(translation_output[TRANSLATED_TEXT] if translation_output['status'] else '')
 
         texts = messages
-        entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
+        entities_list, original_list = self.detect_entity_bulk(texts=texts)
 
-        fallback_value_list = kwargs.get('fallback_values')
-        values_list, detection_method_list, original_list = [], [], []
+        fallback_values = kwargs.get('fallback_values')
+        values_list, detection_method_list, original_texts_list = [], [], []
 
         for i in range(len(messages)):
             if entities_list[i]:
                 values_list.append(entities_list[i])
                 detection_method_list.append(FROM_MESSAGE)
                 original_list.append(original_texts_list[i])
-            elif fallback_value_list[i]:
-                values_list.append([fallback_value_list[i]])
+
+            elif fallback_values and fallback_values[i]:
+                values_list.append([fallback_values[i]])
                 detection_method_list.append(FROM_FALLBACK_VALUE)
-                original_list.append([fallback_value_list[i]])
+                original_list.append([fallback_values[i]])
+
             else:
                 values_list.append([])
-                detection_method_list.append([])
+                detection_method_list.append(None)
                 original_list.append([])
 
         return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
