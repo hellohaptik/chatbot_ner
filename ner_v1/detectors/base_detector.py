@@ -113,17 +113,17 @@ class BaseDetector(object):
             if entities_list[i]:
                 values_list.append(entities_list[i])
                 detection_method_list.append(FROM_MESSAGE)
-                original_list.append(original_texts_list[i])
+                original_texts_list.append(original_list[i])
 
             elif fallback_values and fallback_values[i]:
                 values_list.append([fallback_values[i]])
                 detection_method_list.append(FROM_FALLBACK_VALUE)
-                original_list.append([fallback_values[i]])
+                original_texts_list.append([fallback_values[i]])
 
             else:
                 values_list.append([])
                 detection_method_list.append(None)
-                original_list.append([])
+                original_texts_list.append([])
 
         return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
                                        detection_method_list=detection_method_list,
@@ -271,7 +271,7 @@ class BaseDetector(object):
                     entity_value = {
                         ENTITY_VALUE_DICT_KEY: entity_value
                     }
-                method = detection_method_list[i] if detection_method_list else detection_method
+                method = detection_method_list[index] if detection_method_list else detection_method
                 entity_list.append(
                     {
                         ENTITY_VALUE: entity_value,
