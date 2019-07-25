@@ -1,12 +1,4 @@
-
-TODO
-- [ ] Change Crf -> CRF
-
-
-
-
 ## CONDITIONAL RANDOM FIELDS
-
 
 
 ### A. INTRODUCTION
@@ -195,11 +187,11 @@ The module is used to take input as the sentence_list and entity_list and conver
 		
 		2. **isupper**  
 		
-	        Flag to check if the first letter of the token is capitalized
+	        Flag to check if the complete token is in upper case
 		
 		3. **istitle**
 		
-        	Flag to check if the complete token is in upper case
+            Flag to check if the first letter of the token is capitalized
 		
 		4. **isdigit**   
 		

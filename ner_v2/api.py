@@ -397,12 +397,13 @@ def number_range(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@csrf_exempt
 def phone_number(request):
     """Uses PhoneDetector to detect phone numbers
 
         request params:
-            message (str): natural text on which detection logic is to be run. Note if structured value is
-                                   detection is run on structured value instead of message
+            message (list or str): string for get request and list of text for bulk call through
+                                   post request on which detection logic is to be run
             entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                               if entity uses elastic-search lookup
             structured_value (str): Value obtained from any structured elements. Note if structured value is
@@ -459,12 +460,61 @@ def phone_number(request):
             },
             "language": "en"
         }
-    ]
+        ]
+        message = ["Call 02226129857' , 'message +1(408) 92-124' ,'send 100rs to 91 9820334416 9920441344']
+        entity_name = 'phone_number'
+        source_language = 'en'
 
+        entity_output:
+        [
+           [{
+                    "detection": "message",
+                    "original_text": "02226129857",
+                    "entity_value": {
+                        "value": "02226129857"
+                    },
+                    "language": "en"
+                }
+
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "+1(408) 92-124",
+                    "entity_value": {
+                        "value": "140892124"
+                    },
+                    "language": "en"
+                }
+            ],
+            [
+                {
+                    "detection": "message",
+                    "original_text": "91 9820334416",
+                    "entity_value": {
+                        "value": "919820334416"
+                    },
+                    "language": "en"
+                },
+                {
+                    "detection": "message",
+                    "original_text": "9920441344",
+                    "entity_value": {
+                        "value": "9920441344"
+                    },
+                    "language": "en"
+                }
+
+            ]
+        ]
         """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        if request.method == "POST":
+            parameters_dict = parse_post_request(request)
+            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        elif request.method == "GET":
+            parameters_dict = get_parameters_dictionary(request)
+            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
         entity_name = parameters_dict[PARAMETER_ENTITY_NAME]
         language = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
 
@@ -472,11 +522,14 @@ def phone_number(request):
         ner_logger.debug('Source Language %s' % language)
 
         phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
-
-        entity_output = phone_number_detection.detect(message=parameters_dict[PARAMETER_MESSAGE],
-                                                      structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
-                                                      fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                      bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        message = parameters_dict[PARAMETER_MESSAGE]
+        if isinstance(message, six.string_types):
+            entity_output = phone_number_detection.detect(message=message,
+                                                          structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
+                                                          fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
+                                                          bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+        elif isinstance(message, (list, tuple)):
+            entity_output = phone_number_detection.detect_bulk(messages=message)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for phone_number: %s ' % e)
