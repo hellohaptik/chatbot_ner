@@ -7,4 +7,6 @@ package_metric_unit,kg,kilogram | kilograms | kg | kilo | kgs
 package_metric_unit,ml,ml | milliliter | millilitre | milliliters | millilitres
 package_metric_unit,ltr,ltr | litre | liter | litres | liters | l
 package_metric_unit,pcs,pcs | pc | pieces | piece
-channel_number,channel,channel |channel number | chanel | chanel number | open | go to
+TV,channel,channel |channel number | chanel | chanel number | open | go to
+TV,episode, episode
+TV,season, season
