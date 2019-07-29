@@ -11,8 +11,12 @@ def get_number_from_number_word(text, number_word_dict):
         detected_number_list (list): list of numeric value detected from text
         detected_original_text_list (list): list of original text for numeric value detected
     Examples:
-        [In]  >>  number_word_dict = {'one': (1, 1), 'two': (1, 2), 'three': (1, 3), 'thousand': (1000, 0),
-                                      'four': (1, 4), 'hundred': (100, 0)
+        [In]  >>  number_word_dict = {'one': NumberVariant(scale=1, increment=1),
+                                      'two': NumberVariant(scale=1, increment=2),
+                                      'three': NumberVariant(scale=1, increment=3),
+                                      'thousand': NumberVariant(scale=1000, increment=0),
+                                      'four': NumberVariant(scale=1, increment=4),
+                                      'hundred': NumberVariant(scale=100, increment=0)
                                       }
         [In]  >>  _get_number_from_numerals('one thousand two',  number_word_dict)
         [Out] >> (['1002'], ['one thousand two'])
@@ -24,6 +28,9 @@ def get_number_from_number_word(text, number_word_dict):
     detected_number_list = []
     detected_original_text_list = []
 
+    # exclude single char scales word from word number map dict
+    number_word_dict = {word: number_map for word, number_map in number_word_dict.items()
+                        if (len(word) > 1 and number_map.increment == 0) or number_map.scale == 1}
     text = text.strip()
     if not text:
         return detected_number_list, detected_original_text_list
