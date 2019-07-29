@@ -30,7 +30,7 @@ def get_number_from_number_word(text, number_word_dict):
 
     # exclude single char scales word from word number map dict
     number_word_dict = {word: number_map for word, number_map in number_word_dict.items()
-                        if len(word) > 1 and number_map.increment == 0}
+                        if (len(word) > 1 and number_map.scale == 0) or number_map.scale == 1}
     text = text.strip()
     if not text:
         return detected_number_list, detected_original_text_list
