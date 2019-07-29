@@ -24,6 +24,9 @@ def get_number_from_number_word(text, number_word_dict):
     detected_number_list = []
     detected_original_text_list = []
 
+    # exclude single char scales word from word number map dict
+    number_word_dict = {word: number_map for word, number_map in number_word_dict.items()
+                        if len(word) > 1 and number_map.unit == 0}
     text = text.strip()
     if not text:
         return detected_number_list, detected_original_text_list
@@ -72,7 +75,8 @@ def get_number_from_number_word(text, number_word_dict):
                 result = current = 0
                 result_text, current_text = '', ''
 
-            # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
+            # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100) and
+            # exclude cases like 'm' (for million) or 'k' (thousand)
             current = 1 if (scale > 0 and current == 0 and increment == 0) else current
             current = current * scale + increment
             current_text += part
