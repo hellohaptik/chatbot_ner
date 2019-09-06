@@ -217,6 +217,12 @@ class BaseNumberRangeDetector(object):
                 entity_unit is None or self.number_detector.get_unit_type(entity_unit) != self.unit_type):
             return number_range, original_text
 
+        if min_part_match and max_part_match:
+            if entity_value_min>entity_value_max:
+                temp = entity_value_max
+                entity_value_max = entity_value_min
+                entity_value_min = temp
+
         original_text = self._get_original_text_from_tagged_text(full_match)
         if (entity_value_min or entity_value_max) and original_text:
             self.processed_text = self.processed_text.replace(full_match.strip(), '', 1)
