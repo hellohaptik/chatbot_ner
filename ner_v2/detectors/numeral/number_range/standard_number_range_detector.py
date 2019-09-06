@@ -43,7 +43,8 @@ class BaseNumberRangeDetector(object):
         self.min_max_range_variants = None
         self.number_detected_map = {}
 
-        self.number_detector = NumberDetector(entity_name=entity_name, language=language, unit_type=unit_type, force=True)
+        self.number_detector = NumberDetector(entity_name=entity_name, language=language, unit_type=unit_type,
+                                              detect_without_unit=True)
         self.number_detector.set_min_max_digits(1, 100)
 
         # Method to initialise regex params
@@ -209,7 +210,8 @@ class BaseNumberRangeDetector(object):
         if max_part_match and max_part_match in self.number_detected_map:
             entity_dict = self.number_detected_map[max_part_match].entity_value
             entity_value_max = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_VALUE]
-            entity_unit = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
+            if not entity_unit:
+                entity_unit = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
 
         if self.unit_type and (
                 entity_unit is None or self.number_detector.get_unit_type(entity_unit) != self.unit_type):

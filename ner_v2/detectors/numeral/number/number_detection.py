@@ -67,7 +67,7 @@ class NumberDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, unit_type=None, force=False):
+    def __init__(self, entity_name, language=ENGLISH_LANG, unit_type=None, detect_without_unit=False):
         """Initializes a NumberDetector object
 
         Args:
@@ -90,7 +90,7 @@ class NumberDetector(BaseDetector):
         self.max_digit = 6
         self.language = language
         self.unit_type = unit_type
-        self.force = force
+        self.detect_without_unit = detect_without_unit
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
@@ -142,7 +142,7 @@ class NumberDetector(BaseDetector):
             if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
                 if self.unit_type and (number_unit is None or
                                        self.language_number_detector.units_map[number_unit].type != self.unit_type)\
-                        and not self.force:
+                        and not self.detect_without_unit:
                     continue
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)
