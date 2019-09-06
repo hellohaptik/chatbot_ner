@@ -7,13 +7,15 @@ from collections import defaultdict
 # 3rd party imports
 from elasticsearch import helpers
 
-# Local imports
 from chatbot_ner.config import ner_logger
 from datastore import constants
 from datastore.elastic_search.query import get_entity_data
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
+from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import DICTIONARY_DATA_VARIANTS
+
+# Local imports
 
 log_prefix = 'datastore.elastic_search.populate'
 
@@ -280,83 +282,115 @@ def entity_data_update(connection, index_name, doc_type, entity_data, entity_nam
         logger.debug('%s: +++ Completed: add_data_elastic_search() +++' % log_prefix)
 
 
-def update_entity_crf_data_populate(
-    connection, index_name, doc_type, entity_list, entity_name, sentence_list, language_script, logger, **kwargs
-):
-    """
-    This method is used to populate the elastic search traininf data.
+def delete_entity_crf_data(connection, index_name, doc_type, entity_name, languages):
+    """Delete CRF data for the given entity and languages.
+
     Args:
-        connection: Elasticsearch client object
-        index_name (str): The name of the index
-        doc_type (str): The type of the documents being indexed
-        entity_name (str): Name of the entity for which the training data has to be populated
-        entity_list (list): List consisting of the entities corresponding to the sentence_list
-        sentence_list (list): List of sentences for training
-        language_script (str): The code for the language script
-        logger: logging object to log at debug and exception levellogging object to log at debug and exception level
+        connection (Elasticsearch): Elasticsearch client object
+        index_name (str): name of the index
+        doc_type (str): type of the documents being indexed
+        entity_name (str):  ame of the entity for which the training data has to be deleted
+        languages (List[str]): list of language codes for which data needs to be deleted
+
+    Returns:
+        TYPE: Description
+    """
+    query = {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "match": {
+                            "entity_data": entity_name
+                        }
+                    }
+                ],
+                "filter": {
+                    "terms": {
+                        "language_script": languages
+                    }
+                }
+            }
+        }
+    }
+    return connection.delete_by_query(index=index_name, body=query, doc_type=doc_type)
+
+
+def update_entity_crf_data_populate(connection, index_name, doc_type, entity_name, sentences, logger, **kwargs):
+    """
+    This method is used to populate the elastic search training data.
+
+    Args:
+        connection (Elasticsearch): Elasticsearch client object
+        index_name (str): name of the index
+        doc_type (str): type of the documents being indexed
+        entity_name (str): name of the entity for which the training data has to be populated
+        sentences (Dict[str, List[Dict[str, str]]]): sentences collected per language
+        logger: logging object
         **kwargs: Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
     """
-    logger.debug('%s: +++ Started: external_api_training_data_entity_update() +++' % log_prefix)
-    logger.debug('%s: +++ Started: delete_entity_by_name() +++' % log_prefix)
-    delete_entity_by_name(connection=connection, index_name=index_name, doc_type=doc_type,
-                          entity_name=entity_name, logger=logger, **kwargs)
-    logger.debug('%s: +++ Completed: delete_entity_by_name() +++' % log_prefix)
+    logger.debug('[{0}] Started: external_api_training_data_entity_update()'.format(log_prefix))
 
-    logger.debug('%s: +++ Started: add_training_data_elastic_search() +++' % log_prefix)
-    add_training_data_elastic_search(connection=connection, index_name=index_name, doc_type=doc_type,
-                                     entity_name=entity_name,
-                                     entity_list=entity_list,
-                                     sentence_list=sentence_list,
-                                     language_script=language_script, logger=logger, **kwargs)
-    logger.debug('%s: +++ Completed: add_training_data_elastic_search() +++' % log_prefix)
+    logger.debug('[{0}] Started: delete_entity_crf_data()'.format(log_prefix))
+    languages = list(sentences.keys())
+    delete_entity_crf_data(connection=connection, index_name=index_name, doc_type=doc_type,
+                           entity_name=entity_name, languages=languages)
+    logger.debug('[{0}] Completed: delete_entity_crf_data()'.format(log_prefix))
+
+    logger.debug('[{0}] Started: add_training_data_elastic_search()'.format(log_prefix))
+    add_crf_training_data_elastic_search(connection=connection,
+                                         index_name=index_name,
+                                         doc_type=doc_type,
+                                         entity_name=entity_name,
+                                         sentences=sentences,
+                                         logger=logger, **kwargs)
+    logger.debug('[{0}] Completed: add_training_data_elastic_search()'.format(log_prefix))
+
+    logger.debug('[{0}] Completed: external_api_training_data_entity_update()'.format(log_prefix))
 
 
-def add_training_data_elastic_search(
-    connection, index_name, doc_type, entity_name, entity_list,
-    sentence_list, language_script, logger, **kwargs
-):
+def add_crf_training_data_elastic_search(connection, index_name, doc_type, entity_name, sentences, logger, **kwargs):
     """
     Adds all sentences and the corresponding entities to the specified index.
     If the same named entity is found a delete followed by an update is triggered
+
     Args:
-        connection: Elasticsearch client object
-        index_name (str): The name of the index
-        doc_type (str):  The type of the documents being indexed
-        entity_name (str): Name of the entity for which the training data has to be populated
-        entity_list (list): List consisting of the entities corresponding to the sentence_list
-        sentence_list (list): List of sentences for training
-        logger: logging object to log at debug and exception level
-        language_script (str): Language code of the entity script
-        kwargs:
-            Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
-    Example of underlying index query
-            {'_index': 'training_index',
-            'entity_data': 'name',
-            'sentence': ['My name is Ajay and this is my friend Hardik'],
-            'entities': ['Ajay', 'Hardik'],
-            'language_script': 'en',
-            '_type': 'training_index',
-            '_op_type': 'index'
-              }
+        connection (Elasticsearch): Description
+        index_name (str): Description
+        doc_type (str): Description
+        entity_name (str): Description
+        sentences (Dict[str, List[Dict[str, str]]]): Description
+        logger (TYPE): Description
+        **kwargs: Description
+        Example of underlying index query
+                {'_index': 'training_index',
+                'entity_data': 'name',
+                'sentence': ['My name is Ajay and this is my friend Hardik'],
+                'entities': ['Ajay', 'Hardik'],
+                'language_script': 'en',
+                '_type': 'training_index',
+                '_op_type': 'index'
+                  }
     """
-    str_query = []
-    for sentence, entities in zip(sentence_list, entity_list):
-        query_dict = {'_index': index_name,
-                      'entity_data': entity_name,
-                      'sentence': sentence,
-                      'entities': entities,
-                      'language_script': language_script,
-                      '_type': doc_type,
-                      '_op_type': 'index'
-                      }
-        str_query.append(query_dict)
-        if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
-            result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-            logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
-            str_query = []
-    if str_query:
-        result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
-        logger.debug('%s: \t++ %s status %s ++' % (log_prefix, entity_name, result))
+    queries = []
+    for language, sentences in sentences.items():
+        for sentence in sentences:
+            query_dict = {'_index': index_name,
+                          'entity_data': entity_name,
+                          'sentence': sentence[SENTENCE],
+                          'entities': sentence[ENTITIES],
+                          'language_script': language,
+                          '_type': doc_type,
+                          '_op_type': 'index'
+                          }
+            queries.append(query_dict)
+        if len(queries) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
+            logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
+            queries = []
+    if queries:
+        result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
+        logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
 
 
 def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):

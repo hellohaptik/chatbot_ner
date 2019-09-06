@@ -1,5 +1,5 @@
 import collections
-import re
+import string
 
 from six import iteritems
 
@@ -9,6 +9,15 @@ from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
+
+try:
+    import regex as re
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+
+    import re
+    _re_flags = re.UNICODE
 
 
 class TextDetector(BaseDetector):
@@ -419,7 +428,11 @@ class TextDetector(BaseDetector):
                 if original_text:
                     value_final_list.append(variants_to_values[variant])
                     original_final_list.append(original_text)
-                    _pattern = re.compile(r'\b%s\b' % re.escape(original_text), re.UNICODE)
+
+                    boundary_punct_pattern = re.compile(r'(^[{0}]+)|([{0}]+$)'.format(re.escape(string.punctuation)))
+                    original_text_ = boundary_punct_pattern.sub("", original_text)
+
+                    _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), flags=_re_flags)
                     self.__tagged_texts[index] = _pattern.sub(self.tag, self.__tagged_texts[index])
                     # Instead of dropping completely like in other entities,
                     # we replace with tag to avoid matching non contiguous segments

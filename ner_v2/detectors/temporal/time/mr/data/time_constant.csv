@@ -1,11 +1,13 @@
 key,time_type,meridiem
 आता|Ata|aata,relative_time,NA
 लगेच|Lagech,relative_time,NA
+नंतर|Nantar,relative_time,NA
 वाजले|वाजता|वाजुन|Vajle|Vajta|Vazta|Vazle|Vajun|Vazun,hour,NA
-तास|तासा|तासात|Tas|Taasaa|Tasa|Tasaa|Taasan|Taasat,hour,NA
+तास|तासा|तासात|Tas|Taas|Taasaa|Tasa|Tasaa|Taasan|Taasat,hour,NA
 मिनिट|मिनिटे|Minute|Minte,minute,NA
 सेकंड|seconds|sec|second,second,NA
-सकाळ|सकाळी|Sakal|Sakali,daytime_meridiem,am
-दुपार|दुपारी|Dupar|Dupari,daytime_meridiem,pm
-संध्याकाळी|संध्याकाळ|Sandhyakali|Sandhyakal,daytime_meridiem,pm
+सकाळ|सकाळी|Sakal|Sakaal|Sakali|Sakaali,daytime_meridiem,am
+दुपार|दुपारी|Dupar|Dupaar|Dupari,daytime_meridiem,pm
+संध्याकाळी|संध्याकाळ|सायंकाळी|Sandhyakali|Sandhyakal|Sayankali,daytime_meridiem,pm
 रात्री|रात्र|Ratri|Ratra,daytime_meridiem,pm
+पहाट|पहाटे|Pahaath|Pahaathe|Pahaates,daytime_meridiem,pm

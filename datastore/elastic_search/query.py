@@ -9,11 +9,12 @@ import warnings
 
 from six import string_types
 
-# Local imports
 from datastore import constants
-from external_api.constants import SENTENCE_LIST, ENTITY_LIST
+from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
+
+# Local imports
 
 log_prefix = 'datastore.elastic_search.query'
 
@@ -533,17 +534,17 @@ def _parse_es_search_results(results_list):
     return variants_to_values_list
 
 
-def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, **kwargs):
+def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, languages, **kwargs):
     """
     Get all sentence_list and entity_list for a entity stored in the index
 
     Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-        doc_type: The type of the documents that will be indexed
-        entity_name: name of the entity to perform a 'term' query on
-        kwargs:
-            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+        connection (Elasticsearch): Elasticsearch client object
+        index_name (str): The name of the index
+        doc_type (str): The type of the documents that will be indexed
+        entity_name (str): name of the entity to perform a 'term' query on
+        languages (List[str]): list of languages for which to fetch sentences
+        **kwargs: optional kwargs for es
 
     Returns:
         dictionary, search results of the 'term' query on entity_name, mapping keys to lists containing
@@ -563,29 +564,52 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             [
                 'Ajay'
             ]
-                        ]
+            ]
             }
-
     """
-    results_dictionary = {SENTENCE_LIST: [], ENTITY_LIST: []}
+
     data = {
-        'query': {
-            'term': {
-                'entity_data': {
-                    'value': entity_name
-                }
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "term": {
+                            "entity_data": {
+                                "value": entity_name
+                            }
+                        }
+                    }
+                ]
             }
         }
     }
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
+
+    if languages:
+        data['query']['bool']['filter'] = {
+            "terms": {
+                "language_script": languages
+            }
+        }
+
+    kwargs = dict(kwargs,
+                  body=data,
+                  doc_type=doc_type,
+                  size=constants.ELASTICSEARCH_SEARCH_SIZE,
+                  index=index_name,
                   scroll='1m')
     search_results = _run_es_search(connection, **kwargs)
 
     # Parse hits
     results = search_results['hits']['hits']
 
-    for result in results:
-        results_dictionary[SENTENCE_LIST].append(result['_source']['sentence'])
-        results_dictionary[ENTITY_LIST].append(result['_source']['entities'])
+    language_mapped_results = collections.defaultdict(list)
 
-    return results_dictionary
+    for result in results:
+        language_mapped_results[result['_source']['language_script']].append(
+            {
+                SENTENCE: result['_source']['sentence'],
+                ENTITIES: result['_source']['entities']
+            }
+        )
+
+    return dict(language_mapped_results)
