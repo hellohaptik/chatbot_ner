@@ -35,7 +35,7 @@ class BaseNumberRangeDetector(object):
         self.tag = '__' + entity_name + '__'
         self.range_variants_map = {}
         self.unit_type = unit_type
-        self.language=language
+        self.language = language
         self.min_range_prefix_variants = None
         self.min_range_suffix_variants = None
         self.max_range_prefix_variants = None
@@ -218,7 +218,7 @@ class BaseNumberRangeDetector(object):
             return number_range, original_text
 
         if min_part_match and max_part_match:
-            if entity_value_min>entity_value_max:
+            if entity_value_min > entity_value_max:
                 temp = entity_value_max
                 entity_value_max = entity_value_min
                 entity_value_min = temp
