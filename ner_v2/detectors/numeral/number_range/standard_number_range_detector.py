@@ -5,7 +5,6 @@ import pandas as pd
 import collections
 import os
 import re
-
 import ner_v2.detectors.numeral.constant as numeral_constant
 from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
@@ -36,7 +35,7 @@ class BaseNumberRangeDetector(object):
         self.tag = '__' + entity_name + '__'
         self.range_variants_map = {}
         self.unit_type = unit_type
-
+        self.language=language
         self.min_range_prefix_variants = None
         self.min_range_suffix_variants = None
         self.max_range_prefix_variants = None
@@ -44,7 +43,7 @@ class BaseNumberRangeDetector(object):
         self.min_max_range_variants = None
         self.number_detected_map = {}
 
-        self.number_detector = NumberDetector(entity_name=entity_name, language=language)
+        self.number_detector = NumberDetector(entity_name=entity_name, language=language, unit_type=unit_type, force=True)
         self.number_detector.set_min_max_digits(1, 100)
 
         # Method to initialise regex params
@@ -133,7 +132,7 @@ class BaseNumberRangeDetector(object):
         Examples:
             >>> text = 'I want 12 dozen banana'
             >>> self._get_number_tag_dict()
-            {'__number_1': ({'value': 12, 'unit': None}, '12')}
+            {'__dnumber_1': ({'value': 12, 'unit': None}, '12')}
         """
         detected_number_dict = {}
         entity_value_list, original_text_list = self.number_detector.detect_entity(self.processed_text)
