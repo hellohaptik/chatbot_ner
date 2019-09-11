@@ -35,6 +35,7 @@ class PhoneDetector(BaseDetector):
         self.phone = []
         self.original_phone_text = []
         self.tag = '__' + self.entity_name + '__'
+        self.country_code_dict = {'in': 91, 'us': 1, 'gb': 44}
 
     @property
     def supported_languages(self):
@@ -84,10 +85,12 @@ class PhoneDetector(BaseDetector):
         phone = [self.get_number(phone) for phone in clean_phone_list]
 
         self.phone, self.original_phone_text = [], []
-
         for phone_number, original_phone_number in zip(phone, original_phone_text):
-            if len(phone_number) >= 10:
-                self.phone.append(phone_number)
+            if len(phone_number) >= 12:
+                self.phone.append(self.check_for_country_code(phone_number))
+                self.original_phone_text.append(original_phone_number)
+            elif len(phone_number) >= 10:
+                self.phone.append({'countryCallingCode': None, 'phone': phone_number})
                 self.original_phone_text.append(original_phone_number)
         self.get_tagged_text()
 
@@ -137,6 +140,28 @@ class PhoneDetector(BaseDetector):
                 phone_number_list2.append(original_phone_text)
         phone_number_list_1.extend(phone_number_list2)
         return phone_number_list_1
+
+    def check_for_country_code(self, phone_num, country_code='in'):
+        """
+        :param country_code: country code. default('in')
+        :param phone_num: the number which is to be checked for country code
+        :return: dict with country_code if it's in phone_num and phone_number without country code
+        Examples:
+            phone_num = '919123456789'
+            countryCallingCode = 'IN'
+            {countryCallingCode:"91",phone_number:"9123456789"}
+        """
+        phone_dict = {}
+        check_country_regex = re.compile('^({country_code})'.format(country_code = self.country_code_dict[country_code.lower()]), re.U)
+        p = check_country_regex.findall(phone_num)
+        if len(p) == 1:
+            phone_dict['countryCallingCode'] = p[0]
+            phone_dict['phone'] = check_country_regex.sub(string=phone_num, repl='')
+        else:
+            phone_dict['countryCallingCode'] = None
+            phone_dict['phone'] = phone_num
+
+        return phone_dict
 
     def get_number(self, phone):
         """
