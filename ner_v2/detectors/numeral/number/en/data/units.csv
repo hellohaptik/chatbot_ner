@@ -3,8 +3,8 @@ currency,rupees,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | 
 currency,dollar,Dollar | dollars | usd | $
 currency,euro,Euro | euros | eur | 	€
 currency,pound sterling,Pound sterling | pound sterlings | quid | pounds | sterling | pound | gbp | £
-currency,cent,Cents | cent | c | ¢
-currency,pence,Pence | p
+currency,cent,Cents | cent | ¢
+currency,pence,Pence
 package_metric_unit,mg,mg | milligram | milligrams | mgs
 package_metric_unit,gms,gms | grams | gram | gm | g
 package_metric_unit,kg,kilogram | kilograms | kg | kilo | kgs
