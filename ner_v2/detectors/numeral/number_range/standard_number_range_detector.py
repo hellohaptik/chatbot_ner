@@ -5,7 +5,6 @@ import pandas as pd
 import collections
 import os
 import re
-
 import ner_v2.detectors.numeral.constant as numeral_constant
 from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
@@ -36,7 +35,7 @@ class BaseNumberRangeDetector(object):
         self.tag = '__' + entity_name + '__'
         self.range_variants_map = {}
         self.unit_type = unit_type
-
+        self.language = language
         self.min_range_prefix_variants = None
         self.min_range_suffix_variants = None
         self.max_range_prefix_variants = None
@@ -44,7 +43,8 @@ class BaseNumberRangeDetector(object):
         self.min_max_range_variants = None
         self.number_detected_map = {}
 
-        self.number_detector = NumberDetector(entity_name=entity_name, language=language)
+        self.number_detector = NumberDetector(entity_name=entity_name, language=language, unit_type=unit_type,
+                                              detect_without_unit=True)
         self.number_detector.set_min_max_digits(1, 100)
 
         # Method to initialise regex params
@@ -133,7 +133,7 @@ class BaseNumberRangeDetector(object):
         Examples:
             >>> text = 'I want 12 dozen banana'
             >>> self._get_number_tag_dict()
-            {'__number_1': ({'value': 12, 'unit': None}, '12')}
+            {'__dnumber_1': ({'value': 12, 'unit': None}, '12')}
         """
         detected_number_dict = {}
         entity_value_list, original_text_list = self.number_detector.detect_entity(self.processed_text)
@@ -210,11 +210,18 @@ class BaseNumberRangeDetector(object):
         if max_part_match and max_part_match in self.number_detected_map:
             entity_dict = self.number_detected_map[max_part_match].entity_value
             entity_value_max = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_VALUE]
-            entity_unit = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
+            if not entity_unit:
+                entity_unit = entity_dict[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
 
         if self.unit_type and (
                 entity_unit is None or self.number_detector.get_unit_type(entity_unit) != self.unit_type):
             return number_range, original_text
+
+        if min_part_match and max_part_match:
+            if entity_value_min > entity_value_max:
+                temp = entity_value_max
+                entity_value_max = entity_value_min
+                entity_value_min = temp
 
         original_text = self._get_original_text_from_tagged_text(full_match)
         if (entity_value_min or entity_value_max) and original_text:
