@@ -33,7 +33,7 @@ class PhoneDetector(BaseDetector):
         self.text = ''
         self.phone = []
         self.original_phone_text = []
-        self.country_code = country_code
+        self.country_code = country_code.upper()
 
     @property
     def supported_languages(self):
@@ -75,7 +75,8 @@ class PhoneDetector(BaseDetector):
         self.phone, self.original_phone_text = [], []
         for match in phonenumbers.PhoneNumberMatcher(text, self.country_code):
             self.phone.append({"country_calling_code": match.number.country_code,
-                               "phone_number": match.number.national_number})
+                               "phone_number": match.number.national_number[:-1]})
+            # [:-1] is to remove the letter 'L' which is coming along with the number in phonenumberslite library.
             self.original_phone_text.append(self.text[match.start:match.end])
 
         return self.phone, self.original_phone_text
