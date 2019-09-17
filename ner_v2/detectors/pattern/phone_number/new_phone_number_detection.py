@@ -74,9 +74,14 @@ class PhoneDetector(BaseDetector):
         self.text = text
         self.phone, self.original_phone_text = [], []
         for match in phonenumbers.PhoneNumberMatcher(text, self.country_code):
+            if match.number.national_number[-1:] == 'L':
+                phone_number = match.number.national_number[:-1]
+                # [:-1] is to remove the letter 'L' which is coming along with the number in phonenumberslite library.
+            else:
+                phone_number = match.number.national_number
+                # above L bug is not there in normal phonenumbers library.
             self.phone.append({"country_calling_code": match.number.country_code,
-                               "phone_number": match.number.national_number[:-1]})
-            # [:-1] is to remove the letter 'L' which is coming along with the number in phonenumberslite library.
+                               "phone_number": phone_number})
             self.original_phone_text.append(self.text[match.start:match.end])
 
         return self.phone, self.original_phone_text
