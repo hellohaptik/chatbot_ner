@@ -22,5 +22,5 @@ django-nose==1.4.5
 typing==3.6.2
 flake8==3.4.1
 pyaml==19.4.1
-coverage==4.5.3
+coverage==4.5.4
 nose-exclude==0.5.0
