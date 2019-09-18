@@ -179,10 +179,31 @@ class BaseNumberRangeDetector(object):
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
             self._update_tagged_text(original_list)
-        print(self.tagged_text)
-	print(self.processed_text)
+        number_list, original_list = self._add_absolute_numbers(number_list, original_list)
         return number_list, original_list
 
+    def _add_absolute_numbers(self, number_list, original_list):
+        number_abs_list = number_list or []
+        original_abs_list = original_list or []
+        abs_number_pattern = re.compile(ur'({number}\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
+                                        re.UNICODE)
+        abs_number_matches = abs_number_pattern.findall(self.processed_text)
+        for match in abs_number_matches :
+            if self.unit_type:
+                if self.number_detected_map[match[0]].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]==self.unit_type:
+                    number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE : None,
+                                            numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
+                                            numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
+                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match[0]].entity_value})
+                    original_abs_list.append(self.number_detected_map[match[0]].original_text)
+            else:
+                number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
+                                        numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
+                                        numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
+                                        numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[
+                                            match[0]].entity_value})
+                original_abs_list.append(self.number_detected_map[match[0]].original_text)
+        return number_abs_list, original_abs_list
     def _get_number_range(self, min_part_match, max_part_match, full_match):
         """
         Update number_range_list and original_list by finding entity value of number tag and original text from
@@ -232,6 +253,7 @@ class BaseNumberRangeDetector(object):
             number_range = {
                 numeral_constant.NUMBER_RANGE_MIN_VALUE: entity_value_min,
                 numeral_constant.NUMBER_RANGE_MAX_VALUE: entity_value_max,
+                numeral_constant.NUMBER_RANGE_ABS_VALUE: None,
                 numeral_constant.NUMBER_RANGE_VALUE_UNIT: entity_unit
             }
         return number_range, original_text
