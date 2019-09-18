@@ -190,18 +190,18 @@ class BaseNumberRangeDetector(object):
         abs_number_matches = abs_number_pattern.findall(self.processed_text)
         for match in abs_number_matches :
             if self.unit_type:
-                if self.number_detected_map[match[0]].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]==self.unit_type:
+                if self.number_detected_map[match].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]==self.unit_type:
                     number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE : None,
                                             numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                             numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
-                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match[0]].entity_value})
-                    original_abs_list.append(self.number_detected_map[match[0]].original_text)
+                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match].entity_value})
+                    original_abs_list.append(self.number_detected_map[match].original_text)
             else:
                 number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
                                         numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                         numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
                                         numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[
-                                            match[0]].entity_value})
+                                            match].entity_value})
                 original_abs_list.append(self.number_detected_map[match[0]].original_text)
         return number_abs_list, original_abs_list
     def _get_number_range(self, min_part_match, max_part_match, full_match):
