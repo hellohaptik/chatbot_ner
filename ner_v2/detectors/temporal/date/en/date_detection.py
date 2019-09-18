@@ -70,7 +70,7 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -95,6 +95,7 @@ class DateDetector(object):
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
         self.bot_message = None
+        self.locale = locale
 
     def detect_date(self, text):
         """
