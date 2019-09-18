@@ -180,6 +180,7 @@ class BaseNumberRangeDetector(object):
             number_list, original_list = detector(number_list, original_list)
             self._update_tagged_text(original_list)
         print(self.tagged_text)
+	print(self.processed_text)
         return number_list, original_list
 
     def _get_number_range(self, min_part_match, max_part_match, full_match):
