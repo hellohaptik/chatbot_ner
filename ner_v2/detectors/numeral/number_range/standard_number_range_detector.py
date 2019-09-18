@@ -179,6 +179,7 @@ class BaseNumberRangeDetector(object):
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
             self._update_tagged_text(original_list)
+        print(self.tagged_text)
         return number_list, original_list
 
     def _get_number_range(self, min_part_match, max_part_match, full_match):
