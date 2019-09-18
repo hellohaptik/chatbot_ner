@@ -3,7 +3,7 @@ gunicorn==19.6.0
 pytz==2014.2
 nltk==3.2.5
 numpy==1.10.4
-elasticsearch==5.5.0
+elasticsearch==7.0.4
 requests==2.20.0
 requests-aws4auth==0.9
 Django==1.11.22
