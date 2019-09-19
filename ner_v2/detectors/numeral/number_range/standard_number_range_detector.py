@@ -188,14 +188,15 @@ class BaseNumberRangeDetector(object):
         abs_number_pattern = re.compile(ur'({number}\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
                                         re.UNICODE)
         abs_number_matches = abs_number_pattern.findall(self.processed_text)
-        for match in abs_number_matches :
+        for match in abs_number_matches:
             if self.unit_type:
-                if \
-                self.number_detected_map[match].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT] is not None:
-                    number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE : None,
+                if self.number_detected_map[match].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT] \
+                        is not None:
+                    number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
                                             numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                             numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
-                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match].entity_value['value']})
+                                            numeral_constant.NUMBER_RANGE_ABS_VALUE:
+                                                self.number_detected_map[match].entity_value['value']})
                     original_abs_list.append(self.number_detected_map[match].original_text)
             else:
                 number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
