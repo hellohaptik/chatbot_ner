@@ -101,7 +101,7 @@ tests:
       abs_value: null
     unit_type: null
   - id: en_11
-    message: "200 – 300"
+    message: "200 - 300"
     outputs:
     - max_value: '300'
       min_value: '200'
