@@ -195,7 +195,7 @@ class BaseNumberRangeDetector(object):
                     number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE : None,
                                             numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                             numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
-                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match].entity_value})
+                                            numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[match].entity_value['value']})
                     original_abs_list.append(self.number_detected_map[match].original_text)
             else:
                 number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
