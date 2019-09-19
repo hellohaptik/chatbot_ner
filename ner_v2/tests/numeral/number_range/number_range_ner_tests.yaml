@@ -105,7 +105,7 @@ tests:
     outputs:
     - max_value: '300'
       min_value: '200'
-      original_text: "200 – 300"
+      original_text: "200 - 300"
       output_id: 1
       unit: null
       abs_value: null
