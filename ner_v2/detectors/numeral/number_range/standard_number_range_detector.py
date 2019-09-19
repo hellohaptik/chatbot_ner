@@ -204,7 +204,7 @@ class BaseNumberRangeDetector(object):
                                         numeral_constant.NUMBER_RANGE_VALUE_UNIT: self.unit_type,
                                         numeral_constant.NUMBER_RANGE_ABS_VALUE: self.number_detected_map[
                                             match].entity_value})
-                original_abs_list.append(self.number_detected_map[match[0]].original_text)
+                original_abs_list.append(self.number_detected_map[match].original_text)
         return number_abs_list, original_abs_list
     def _get_number_range(self, min_part_match, max_part_match, full_match):
         """
