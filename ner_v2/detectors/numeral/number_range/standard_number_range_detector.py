@@ -179,6 +179,8 @@ class BaseNumberRangeDetector(object):
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
             self._update_tagged_text(original_list)
+        print(self.processed_text)
+        print(self.number_detected_map)
         number_list, original_list = self._add_absolute_numbers(number_list, original_list)
         return number_list, original_list
 
@@ -189,6 +191,8 @@ class BaseNumberRangeDetector(object):
                                         re.UNICODE)
         abs_number_matches = abs_number_pattern.findall(self.processed_text)
         for match in abs_number_matches :
+            print(self.unit_type)
+            print(self.number_detected_map[match].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT])
             if self.unit_type:
                 if self.number_detected_map[match].entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]==self.unit_type:
                     number_abs_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE : None,
