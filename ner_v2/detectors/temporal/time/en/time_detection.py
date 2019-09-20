@@ -202,6 +202,8 @@ class TimeDetector(object):
         time_data = self._detect_time(range_enabled=range_enabled, form_check=form_check)
         self.time = time_data[0]
         self.original_time_text = time_data[1]
+        print('processed_text', self.processed_text)
+        print('tagged_text', self.tagged_text)
         return time_data
 
     def _detect_range_12_hour_format(self, time_list=None, original_list=None):
