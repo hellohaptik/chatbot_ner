@@ -81,11 +81,11 @@ class NewPhoneDetector(BaseDetector):
             pattern = re.compile(j[1], re.U)
             converted_sentence = pattern.sub(string=converted_sentence, repl=str(j[0]))
 
-        while re.search(r'(\d+)(\s+)(\d+)', converted_sentence):
-            converted_sentence = re.sub(r'(\d+)(\s+)(\d+)', r'\1\3', converted_sentence)
-
         converted_sentence = re.sub(r'(double)(\s+)(\d)', r'\3\3', converted_sentence)
         converted_sentence = re.sub(r'(triple)(\s+)(\d)', r'\3\3\3', converted_sentence)
+
+        while re.search(r'(\d+)(\s+)(\d+)', converted_sentence):
+            converted_sentence = re.sub(r'(\d+)(\s+)(\d+)', r'\1\3', converted_sentence)
         return converted_sentence
 
     def detect_entity(self, text, **kwargs):
