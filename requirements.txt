@@ -1,4 +1,4 @@
-phonenumbers
+phonenumberslite==8.10.18
 six==1.11.0
 gunicorn==19.6.0
 pytz==2014.2
