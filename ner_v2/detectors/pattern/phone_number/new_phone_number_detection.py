@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+from ner_v2.detectors.numeral.utils import get_number_from_number_word
 from language_utilities.constant import ENGLISH_LANG
+import collections
 import re
 import phonenumbers
+
+NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
 
 
 class NewPhoneDetector(BaseDetector):
@@ -34,6 +38,7 @@ class NewPhoneDetector(BaseDetector):
         self.phone = []
         self.original_phone_text = []
         self.country_code = country_code.upper()
+        self.number_word_dict = self.create_number_word_dict()
 
     @property
     def supported_languages(self):
@@ -43,6 +48,45 @@ class NewPhoneDetector(BaseDetector):
              list: List of ISO 639 codes of languages supported by subclass/detector
         """
         return self._supported_languages
+
+    def create_number_word_dict(self):
+        number_word_dictionary = {'one': NumberVariant(scale=1, increment=1),
+                                  'two': NumberVariant(scale=1, increment=2),
+                                  'three': NumberVariant(scale=1, increment=3),
+                                  'four': NumberVariant(scale=1, increment=4),
+                                  'five': NumberVariant(scale=1, increment=5),
+                                  'six': NumberVariant(scale=1, increment=6),
+                                  'seven': NumberVariant(scale=1, increment=7),
+                                  'eight': NumberVariant(scale=1, increment=8),
+                                  'nine': NumberVariant(scale=1, increment=9),
+                                  'zero': NumberVariant(scale=1, increment=0)}
+        return number_word_dictionary
+
+    def convert_words_to_numbers(self, text):
+        """
+        :param text: user message
+        :return: converted user message with words replaced with numbers
+        """
+        numbers_dict = get_number_from_number_word(text, self.number_word_dict)
+        val = numbers_dict[0]
+        word = numbers_dict[1]
+        converted_sentence = text
+        x = zip(val, word)
+        unique_x = []
+        for i in x:
+            if i not in unique_x:
+                unique_x.append(i)
+
+        for j in unique_x:
+            pattern = re.compile(j[1], re.U)
+            converted_sentence = pattern.sub(string=converted_sentence, repl=str(j[0]))
+
+        while re.search(r'(\d+)(\s+)(\d+)', converted_sentence):
+            converted_sentence = re.sub(r'(\d+)(\s+)(\d+)', r'\1\3', converted_sentence)
+
+        converted_sentence = re.sub(r'(double)(\s+)(\d)', r'\3\3', converted_sentence)
+        converted_sentence = re.sub(r'(triple)(\s+)(\d)', r'\3\3\3', converted_sentence)
+        return converted_sentence
 
     def detect_entity(self, text, **kwargs):
         """Detects phone numbers in the text string
@@ -71,9 +115,9 @@ class NewPhoneDetector(BaseDetector):
 
         """
 
-        self.text = text
+        self.text = self.convert_words_to_numbers(text)
         self.phone, self.original_phone_text = [], []
-        for match in phonenumbers.PhoneNumberMatcher(text, self.country_code):
+        for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
