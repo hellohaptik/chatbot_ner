@@ -756,7 +756,7 @@ class DateDetector(object):
         language: source language of text
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -777,13 +777,15 @@ class DateDetector(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.language = language
+        self.locale = locale
 
         try:
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
             self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
                                                                             past_date_referenced=past_date_referenced,
-                                                                            timezone=self.timezone)
+                                                                            timezone=self.timezone,
+                                                                            locale=self.locale)
         except ImportError:
             standard_date_regex = importlib.import_module(
                 'ner_v2.detectors.temporal.date.standard_date_regex'
@@ -793,7 +795,8 @@ class DateDetector(object):
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
                 timezone=self.timezone,
-                past_date_referenced=past_date_referenced
+                past_date_referenced=past_date_referenced,
+                locale=self.locale
             )
 
     def detect_entity(self, text, **kwargs):

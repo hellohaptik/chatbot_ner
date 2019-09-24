@@ -96,6 +96,12 @@ class DateDetector(object):
         self.day_dictionary = DAY_DICT
         self.bot_message = None
         self.locale = locale
+        self.country_code = ''
+
+    def get_country_code_from_locale(self):
+        regex_pattern = re.compile('[-_](.*$)', re.U)
+        match = regex_pattern.findall(self.locale)
+        self.country_code = match[0].upper()
 
     def detect_date(self, text):
         """
@@ -112,7 +118,7 @@ class DateDetector(object):
         self.text = " " + text.strip().lower() + " "
         self.processed_text = self.text
         self.tagged_text = self.text
-
+        self.get_country_code_from_locale()
         date_list = []
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
@@ -148,10 +154,16 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
-        date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
+        if self.country_code in ['US']:
+            date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+            self._update_processed_text(original_list)
+            date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
+            self._update_processed_text(original_list)
+        else:
+            date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
+            self._update_processed_text(original_list)
+            date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+            self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_year_month_day_format(date_list, original_list)
         self._update_processed_text(original_list)
         date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
