@@ -196,7 +196,8 @@ class BaseNumberRangeDetector(object):
                                     numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                     numeral_constant.NUMBER_RANGE_VALUE_UNIT: entity_unit,
                                     numeral_constant.NUMBER_RANGE_ABS_VALUE: self.
-                                   number_detected_map[match].entity_value.NUMBER_DETECTION_RETURN_DICT_VALUE})
+                                   number_detected_map[match].
+                                   entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_VALUE]})
                 original_list.append(self.number_detected_map[match].original_text)
         return number_list, original_list
 
