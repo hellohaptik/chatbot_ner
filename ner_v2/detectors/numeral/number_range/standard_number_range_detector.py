@@ -405,7 +405,6 @@ class BaseNumberRangeDetector(object):
     def _update_tagged_text(self, original_number_list):
         """
         Replaces detected date with tag generated from entity_name used to initialize the object with
-
         A final string with all dates replaced will be stored in object's tagged_text attribute
         A string with all dates removed will be stored in object's processed_text attribute
 
