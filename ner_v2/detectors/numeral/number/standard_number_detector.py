@@ -321,6 +321,7 @@ class BaseNumberDetector(object):
         for detected_text in original_number_list:
             _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
+            self.processed_text = _pattern.sub('', self.processed_text)
 
 
 class NumberDetector(BaseNumberDetector):
