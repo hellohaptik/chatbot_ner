@@ -4,10 +4,17 @@ from __future__ import absolute_import
 import pandas as pd
 import collections
 import os
-import re
 import ner_v2.detectors.numeral.constant as numeral_constant
 from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+try:
+    import regex as re
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+
+    import re
+    _re_flags = re.UNICODE
 
 NumberRangeVariant = collections.namedtuple('NumberRangeVariant', ['position', 'range_type'])
 ValueTextPair = collections.namedtuple('ValueTextPair', ['entity_value', 'original_text'])
@@ -414,7 +421,8 @@ class BaseNumberRangeDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 
 class NumberRangeDetector(BaseNumberRangeDetector):

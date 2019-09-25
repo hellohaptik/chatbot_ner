@@ -2,7 +2,15 @@
 import pandas as pd
 import collections
 import os
-import re
+try:
+    import regex as re
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+
+    import re
+    _re_flags = re.UNICODE
+
 
 from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
@@ -306,9 +314,13 @@ class BaseNumberDetector(object):
             original_number_list (list): list of substrings of original text to be replaced with tag
                                        created from entity_name
         """
+        # for detected_text in original_number_list:
+        #     self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+        #     self.processed_text = self.processed_text.replace(detected_text, '')
+
         for detected_text in original_number_list:
-            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
-            self.processed_text = self.processed_text.replace(detected_text, '')
+            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 
 class NumberDetector(BaseNumberDetector):
