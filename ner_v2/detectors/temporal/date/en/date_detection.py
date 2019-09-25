@@ -96,12 +96,12 @@ class DateDetector(object):
         self.day_dictionary = DAY_DICT
         self.bot_message = None
         self.locale = locale
-        self.country_code = ''
+        self.country_code = None
 
     def get_country_code_from_locale(self):
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
-        if match is not None:
+        if match:
             self.country_code = match[0].upper()
         else:
             self.country_code = None
@@ -121,7 +121,8 @@ class DateDetector(object):
         self.text = " " + text.strip().lower() + " "
         self.processed_text = self.text
         self.tagged_text = self.text
-        self.get_country_code_from_locale()
+        if self.locale:
+            self.get_country_code_from_locale()
         date_list = []
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
