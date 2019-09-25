@@ -2,15 +2,17 @@
 import pandas as pd
 import collections
 import os
+
 try:
     import regex as re
+
     _re_flags = re.UNICODE | re.V1 | re.WORD
 
 except ImportError:
 
     import re
-    _re_flags = re.UNICODE
 
+    _re_flags = re.UNICODE
 
 from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
@@ -159,8 +161,10 @@ class BaseNumberDetector(object):
 
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
-        unit_matches = re.search(r'\W+((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')\W+|(' +
-                                 detected_original + r'\s*(' + self.unit_choices + r'))\W+', processed_text,
+        unit_matches = re.search(r'(\W+|^)((' + self.unit_choices + r')[\.\,\s]*' + detected_original +
+                                 r')(?:\W+|$)|(\W+|^)(' + detected_original + r'\s*('
+                                 + self.unit_choices + r'))(?:\W+|$)',
+                                 processed_text,
                                  re.UNICODE)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
