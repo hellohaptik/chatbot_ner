@@ -765,6 +765,7 @@ class DateDetector(object):
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
+            locale(Optional, str): user locale default is None
         """
         self.text = ''
         self.tagged_text = ''

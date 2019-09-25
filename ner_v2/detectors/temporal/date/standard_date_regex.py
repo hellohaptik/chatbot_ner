@@ -19,9 +19,10 @@ class BaseRegexDate(object):
         This will create standard regex and their parser to detect date for given language.
         Args:
             data_directory_path (str): path of data folder for given language
-            timezone (str): user timezone default UTC
+            timezone (Optional, str): user timezone default UTC
             past_date_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
                                           'parso' to know if the reference is past or future.
+            locale (Optional, str): user locale default None
         """
         self.text = ''
         self.tagged_text = ''

@@ -28,6 +28,7 @@ class DateDetector(object):
         original_date_text: list to store substrings of the text detected as date entities
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+        locale: Optional, locale of the user for getting country code
         now_date: datetime object holding timestamp while DateDetector instantiation
         month_dictionary: dictonary mapping month indexes to month spellings and
                           fuzzy variants(spell errors, abbreviations)
@@ -79,6 +80,7 @@ class DateDetector(object):
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
+            locale (Optional, str): user locale for getting the country code.
 
         """
         self.text = ''
