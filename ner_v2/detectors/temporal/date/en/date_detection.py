@@ -70,7 +70,7 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, locale, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale=None, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -101,7 +101,10 @@ class DateDetector(object):
     def get_country_code_from_locale(self):
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
-        self.country_code = match[0].upper()
+        if match is not None:
+            self.country_code = match[0].upper()
+        else:
+            self.country_code = None
 
     def detect_date(self, text):
         """

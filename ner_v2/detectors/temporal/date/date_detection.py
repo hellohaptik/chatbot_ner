@@ -756,7 +756,7 @@ class DateDetector(object):
         language: source language of text
     """
 
-    def __init__(self, entity_name, locale, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale=None, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:

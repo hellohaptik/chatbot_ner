@@ -56,3 +56,7 @@ DICTIONARY_DATA_VARIANTS = 'variants'
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
+
+# Locale for Date and Phone Number detection
+PARAMETER_LOCALE = 'locale'
+
