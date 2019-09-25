@@ -300,7 +300,6 @@ class BaseNumberDetector(object):
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
                 _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
                 processed_text = _pattern.sub(self.tag, processed_text)
-                # processed_text = processed_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
@@ -320,10 +319,6 @@ class BaseNumberDetector(object):
             original_number_list (list): list of substrings of original text to be replaced with tag
                                        created from entity_name
         """
-        # for detected_text in original_number_list:
-        #     self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
-        #     self.processed_text = self.processed_text.replace(detected_text, '')
-
         for detected_text in original_number_list:
             _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
