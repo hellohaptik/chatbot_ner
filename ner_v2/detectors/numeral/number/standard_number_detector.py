@@ -161,11 +161,12 @@ class BaseNumberDetector(object):
 
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
-        unit_matches = re.search(r'(?:\W+|^)((' + self.unit_choices + r')[.,\s]*' + detected_original +
-                                 r')(?:\W+|$)|(?:\W+|^)(' + detected_original + r'\s*('
-                                 + self.unit_choices + r'))(?:\W+|$)',
+        unit_matches = re.search(r'\W+((' + self.unit_choices + r')[.,\s]*' + detected_original +
+                                 r')\W+|\W+(' + detected_original + r'\s*('
+                                 + self.unit_choices + r'))\W+',
                                  processed_text,
                                  re.UNICODE)
+        print('169 unit matches',unit_matches)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
             if unit_suffix:
@@ -297,6 +298,8 @@ class BaseNumberDetector(object):
                 number = int(number) if number.is_integer() else number
                 unit = None
                 if self.unit_type:
+                    print(original_text, 'before get unit', processed_text)
+                    print('the pattern which is', pattern)
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
                 processed_text = processed_text.replace(original_text, self.tag)
                 number_list.append({
@@ -323,6 +326,7 @@ class BaseNumberDetector(object):
         #     self.processed_text = self.processed_text.replace(detected_text, '')
 
         for detected_text in original_number_list:
+            print('in update processed 328 original num list:', original_number_list)
             _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
             self.processed_text = _pattern.sub('', self.processed_text)
