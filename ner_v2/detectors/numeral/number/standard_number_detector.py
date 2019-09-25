@@ -294,7 +294,8 @@ class BaseNumberDetector(object):
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
-                processed_text = processed_text.replace(original_text, self.tag)
+                # processed_text = processed_text.replace(original_text, self.tag)
+                processed_text = processed_text.replace(original_text, '')
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
