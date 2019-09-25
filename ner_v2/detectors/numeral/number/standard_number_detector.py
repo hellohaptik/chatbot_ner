@@ -301,7 +301,9 @@ class BaseNumberDetector(object):
                     print(original_text, 'before get unit', processed_text)
                     print('the pattern which is', pattern)
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
-                processed_text = processed_text.replace(original_text, self.tag)
+                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
+                processed_text = _pattern.sub(self.tag, processed_text)
+                # processed_text = processed_text.replace(original_text, self.tag)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
