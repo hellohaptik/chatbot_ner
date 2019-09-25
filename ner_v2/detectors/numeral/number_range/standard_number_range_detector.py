@@ -191,7 +191,7 @@ class BaseNumberRangeDetector(object):
         for match in abs_number_matches:
             entity_unit = self.number_detected_map[match].entity_value[
                 numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
-            if (self.unit_type and entity_unit == self.unit_type) or not self.unit_type:
+            if (self.unit_type and entity_unit) or not self.unit_type:
                 number_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
                                     numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
                                     numeral_constant.NUMBER_RANGE_VALUE_UNIT: entity_unit,
