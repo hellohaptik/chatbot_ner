@@ -135,7 +135,8 @@ def date(request):
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                               timezone=timezone,
-                                              past_date_referenced=past_date_referenced)
+                                              past_date_referenced=past_date_referenced,
+                                              locale=parameters_dict[PARAMETER_LOCALE])
 
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 

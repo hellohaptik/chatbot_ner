@@ -99,6 +99,29 @@ class DateDetector(object):
         self.bot_message = None
         self.locale = locale
         self.country_code = None
+        self.detector_preferences = [self._gregorian_day_month_year_format,
+                                     self._gregorian_month_day_year_format,
+                                     self._gregorian_year_month_day_format,
+                                     self._gregorian_advanced_day_month_year_format,
+                                     self._day_month_format_for_arrival_departure,
+                                     self._date_range_ddth_of_mmm_to_ddth,
+                                     self._date_range_ddth_to_ddth_of_next_month,
+                                     self._gregorian_day_with_ordinals_month_year_format,
+                                     self._gregorian_advanced_year_month_day_format,
+                                     self._gregorian_year_day_month_format,
+                                     self._gregorian_month_day_with_ordinals_year_format,
+                                     self._gregorian_day_month_format,
+                                     self._gregorian_month_day_format,
+                                     self._day_after_tomorrow,
+                                     self._date_days_after,
+                                     self._date_days_later,
+                                     self._day_before_yesterday,
+                                     self._todays_date,
+                                     self._tomorrows_date,
+                                     self._yesterdays_date,
+                                     self._day_in_next_week,
+                                     self._day_range_for_nth_week_month
+                                     ]
 
     def get_country_code_from_locale(self):
         regex_pattern = re.compile('[-_](.*$)', re.U)
