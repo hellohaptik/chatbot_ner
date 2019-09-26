@@ -132,7 +132,6 @@ def date(request):
         timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
         date_past_reference = parameters_dict.get(PARAMETER_PAST_DATE_REFERENCED, "false")
         past_date_referenced = date_past_reference == 'true' or date_past_reference == 'True'
-        locale =
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                               timezone=timezone,
