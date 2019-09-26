@@ -221,7 +221,9 @@ class BaseNumberDetector(object):
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
-            for number, original_text in zip(numbers, original_texts):
+            full_list = zip(numbers, original_texts)
+            sorted_full_list = sorted(full_list, key=lambda kv: len(kv[1]), reverse=True)
+            for number, original_text in sorted_full_list:
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, numeral_text)
