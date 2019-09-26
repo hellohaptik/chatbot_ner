@@ -221,7 +221,11 @@ class BaseNumberDetector(object):
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
-            full_list = zip(numbers, original_texts)
+            full_list = list(zip(numbers, original_texts))
+            """ 
+            list() is added to above zip as in python 3, zip() returns a zip object instead of zip function and 
+                our lint checker is matching it for python 3
+            """
             sorted_full_list = sorted(full_list, key=lambda kv: len(kv[1]), reverse=True)
             for number, original_text in sorted_full_list:
                 unit = None
