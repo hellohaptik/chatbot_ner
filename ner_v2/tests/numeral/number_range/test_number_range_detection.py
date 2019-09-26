@@ -40,6 +40,7 @@ class NumberRangeDetectorTestMeta(type):
                     "min_value": str(expected_output["min_value"]) if expected_output["min_value"] else None,
                     "unit": str(expected_output["unit"]) if expected_output["unit"] else None,
                     "max_value": str(expected_output["max_value"]) if expected_output["max_value"] else None,
+                    "abs_value": str(expected_output["abs_value"]) if expected_output["abs_value"] else None
                 }
                 original_text = \
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
