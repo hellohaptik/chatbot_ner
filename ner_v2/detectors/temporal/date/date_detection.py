@@ -58,7 +58,8 @@ class DateAdvancedDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name='date',locale=None, language=ENGLISH_LANG, timezone='UTC',
+                 past_date_referenced=False):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
@@ -70,6 +71,7 @@ class DateAdvancedDetector(BaseDetector):
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
         """
+        self.locale = locale
         self._supported_languages = self.get_supported_languages()
         super(DateAdvancedDetector, self).__init__(language=language)
         self.text = ''
@@ -82,7 +84,8 @@ class DateAdvancedDetector(BaseDetector):
         self.date_detector_object = DateDetector(entity_name=entity_name,
                                                  language=language,
                                                  timezone=timezone,
-                                                 past_date_referenced=past_date_referenced)
+                                                 past_date_referenced=past_date_referenced,
+                                                 locale=locale)
         self.bot_message = None
 
     @property
