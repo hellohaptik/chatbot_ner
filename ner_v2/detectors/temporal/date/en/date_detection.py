@@ -122,8 +122,17 @@ class DateDetector(object):
                                      self._day_in_next_week,
                                      self._day_range_for_nth_week_month
                                      ]
+        self.country_date_detector_preferences = {
+            'US': [self._gregorian_month_day_year_format],
+            'IN': [self._gregorian_day_month_year_format],
+        }
 
     def get_country_code_from_locale(self):
+        """
+        Extracts locale from country code.
+        Ex: locale:'en_us' sets,
+            self.country_code = 'US'
+        """
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
         if match:
@@ -183,57 +192,70 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
-        if self.country_code in ['US']:
-            date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
-            self._update_processed_text(original_list)
-            date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
-            self._update_processed_text(original_list)
+        if self.country_code in self.country_date_detector_preferences:
+            for preferred_detector in self.country_date_detector_preferences[self.country_code]:
+                date_list, original_list = preferred_detector(date_list, original_list)
+                self._update_processed_text(original_list)
+            for detector in self.detector_preferences:
+                if detector not in self.country_date_detector_preferences[self.country_code]:
+                    date_list, original_list = detector(date_list, original_list)
+                    self._update_processed_text(original_list)
         else:
-            date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
-            self._update_processed_text(original_list)
-            date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
-            self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_year_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_year_day_month_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_with_ordinals_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_day_month_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
+            for detector in self.detector_preferences:
+                date_list, original_list = detector(date_list, original_list)
+                self._update_processed_text(original_list)
 
-        date_list, original_list = self._day_after_tomorrow(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_days_after(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_days_later(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_before_yesterday(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._todays_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._tomorrows_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._yesterdays_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_in_next_week(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_range_for_nth_week_month(date_list, original_list)
-        self._update_processed_text(original_list)
+        # if self.country_code in ['US']:
+        #     date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+        #     self._update_processed_text(original_list)
+        #     date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
+        #     self._update_processed_text(original_list)
+        # else:
+        #     date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
+        #     self._update_processed_text(original_list)
+        #     date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
+        #     self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_year_month_day_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_year_day_month_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_month_day_with_ordinals_year_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_day_month_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._gregorian_month_day_format(date_list, original_list)
+        # self._update_processed_text(original_list)
+        #
+        # date_list, original_list = self._day_after_tomorrow(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._date_days_after(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._date_days_later(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._day_before_yesterday(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._todays_date(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._tomorrows_date(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._yesterdays_date(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._day_in_next_week(date_list, original_list)
+        # self._update_processed_text(original_list)
+        # date_list, original_list = self._day_range_for_nth_week_month(date_list, original_list)
+        # self._update_processed_text(original_list)
 
         return date_list, original_list
 
