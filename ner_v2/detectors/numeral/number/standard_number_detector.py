@@ -162,8 +162,8 @@ class BaseNumberDetector(object):
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
         unit_matches = re.search(r'\W+((' + self.unit_choices + r')[.,\s]*' + detected_original + r')\W+|\W+(' +
-                                 detected_original + r'\s*('
-                                 + self.unit_choices + r'))\W+',
+                                 detected_original + r'\s*(' +
+                                 self.unit_choices + r'))\W+',
                                  processed_text,
                                  re.UNICODE)
         if unit_matches:
