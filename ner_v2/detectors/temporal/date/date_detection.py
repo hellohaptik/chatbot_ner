@@ -58,7 +58,7 @@ class DateAdvancedDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name='date',locale=None, language=ENGLISH_LANG, timezone='UTC',
+    def __init__(self, entity_name='date', locale=None, language=ENGLISH_LANG, timezone='UTC',
                  past_date_referenced=False):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
