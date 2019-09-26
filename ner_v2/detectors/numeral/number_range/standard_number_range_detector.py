@@ -4,10 +4,17 @@ from __future__ import absolute_import
 import pandas as pd
 import collections
 import os
-import re
 import ner_v2.detectors.numeral.constant as numeral_constant
 from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+try:
+    import regex as re
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+
+    import re
+    _re_flags = re.UNICODE
 
 NumberRangeVariant = collections.namedtuple('NumberRangeVariant', ['position', 'range_type'])
 ValueTextPair = collections.namedtuple('ValueTextPair', ['entity_value', 'original_text'])
@@ -55,7 +62,8 @@ class BaseNumberRangeDetector(object):
                                      self._detect_min_num_range_with_prefix_variants,
                                      self._detect_min_num_range_with_suffix_variants,
                                      self._detect_max_num_range_with_prefix_variants,
-                                     self._detect_max_num_range_with_suffix_variants
+                                     self._detect_max_num_range_with_suffix_variants,
+                                     self._detect_absolute_number
                                      ]
 
     def _init_regex_for_range(self, data_directory_path):
@@ -181,6 +189,25 @@ class BaseNumberRangeDetector(object):
             self._update_tagged_text(original_list)
         return number_list, original_list
 
+    def _detect_absolute_number(self, number_list, original_list):
+        number_list = number_list or []
+        original_list = original_list or []
+        abs_number_pattern = re.compile(ur'({number}\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
+                                        re.UNICODE)
+        abs_number_matches = abs_number_pattern.findall(self.processed_text)
+        for match in abs_number_matches:
+            entity_unit = self.number_detected_map[match].entity_value[
+                numeral_constant.NUMBER_DETECTION_RETURN_DICT_UNIT]
+            if (self.unit_type and entity_unit) or not self.unit_type:
+                number_list.append({numeral_constant.NUMBER_RANGE_MAX_VALUE: None,
+                                    numeral_constant.NUMBER_RANGE_MIN_VALUE: None,
+                                    numeral_constant.NUMBER_RANGE_VALUE_UNIT: entity_unit,
+                                    numeral_constant.NUMBER_RANGE_ABS_VALUE: self.
+                                   number_detected_map[match].
+                                   entity_value[numeral_constant.NUMBER_DETECTION_RETURN_DICT_VALUE]})
+                original_list.append(self.number_detected_map[match].original_text)
+        return number_list, original_list
+
     def _get_number_range(self, min_part_match, max_part_match, full_match):
         """
         Update number_range_list and original_list by finding entity value of number tag and original text from
@@ -218,7 +245,7 @@ class BaseNumberRangeDetector(object):
             return number_range, original_text
 
         if min_part_match and max_part_match:
-            if entity_value_min > entity_value_max:
+            if int(entity_value_min) > int(entity_value_max):
                 temp = entity_value_max
                 entity_value_max = entity_value_min
                 entity_value_min = temp
@@ -230,6 +257,7 @@ class BaseNumberRangeDetector(object):
             number_range = {
                 numeral_constant.NUMBER_RANGE_MIN_VALUE: entity_value_min,
                 numeral_constant.NUMBER_RANGE_MAX_VALUE: entity_value_max,
+                numeral_constant.NUMBER_RANGE_ABS_VALUE: None,
                 numeral_constant.NUMBER_RANGE_VALUE_UNIT: entity_unit
             }
         return number_range, original_text
@@ -385,7 +413,6 @@ class BaseNumberRangeDetector(object):
     def _update_tagged_text(self, original_number_list):
         """
         Replaces detected date with tag generated from entity_name used to initialize the object with
-
         A final string with all dates replaced will be stored in object's tagged_text attribute
         A string with all dates removed will be stored in object's processed_text attribute
 
@@ -394,7 +421,8 @@ class BaseNumberRangeDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
+            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 
 class NumberRangeDetector(BaseNumberRangeDetector):
