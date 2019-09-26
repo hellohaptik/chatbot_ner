@@ -225,7 +225,9 @@ class BaseNumberDetector(object):
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, numeral_text)
-                numeral_text = numeral_text.replace(original_text, self.tag)
+                # numeral_text = numeral_text.replace(original_text, self.tag)
+                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
+                numeral_text = _pattern.sub(self.tag, numeral_text)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
