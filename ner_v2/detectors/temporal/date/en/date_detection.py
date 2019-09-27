@@ -122,6 +122,15 @@ class DateDetector(object):
                                      self._day_in_next_week,
                                      self._day_range_for_nth_week_month
                                      ]
+        """
+        Rules to add new country code preferences:
+        1. Create a new key with country code.
+        2. Add all the methods which should be given higher preference in a list with the
+           most preferred method first.
+        3. Warning: Be careful about the order in which you set your preferences.
+            For EX: If you set `self._gregorian_day_month_format` at a higher preference than
+            `self._gregorian_advanced_day_month_year_format`, only `22nd MAR` will be detected in  `22nd MAR 2034`.
+        """
         self.country_date_detector_preferences = {
             'US': [self._gregorian_month_day_year_format],
             'IN': [self._gregorian_day_month_year_format],
