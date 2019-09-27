@@ -79,6 +79,7 @@ class TimeDetector(object):
         self.bot_message = None
         self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(self.timezone)
+        self.timezone_choices = 'ist|utc|akst|akdt|pst|pdt|cst|est|hst|mst|mdt|cdt|edt'
 
     def set_bot_message(self, bot_message):
         """
@@ -224,10 +225,13 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(
-            r'\s((0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)[\s-]*?to[\s-]'
-            r'*?(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
-            self.processed_text.lower())
+        regex_patterns = re.compile(
+            r'(({timezone})?\s(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
+            r'[\s-]*?({timezone})?\s*to[\s-]*?(ist|utc)?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+            r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)'
+            .format(timezone=self.timezone_choices)
+        )
+        patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
             original2 = pattern[0]
@@ -237,26 +241,32 @@ class TimeDetector(object):
                 time_type = 'return'
             else:
                 time_type = None
-            t1 = pattern[1]
-            t2 = pattern[2]
-            ap1 = pattern[3]
+            t1 = pattern[2]
+            t2 = pattern[3]
+            ap1 = pattern[4]
+            tz1 = pattern[1]
+            tz2 = pattern[5]
             time1 = {
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
+                'tz': (tz1 or tz2 or self.timezone).upper(),
                 'range': 'start',
                 'time_type': time_type
             }
             time1['nn'] = 'am' if 'a' in time1['nn'] else time1['nn']
             time1['nn'] = 'pm' if 'p' in time1['nn'] else time1['nn']
 
-            t3 = pattern[4]
-            t4 = pattern[5]
-            ap2 = pattern[6]
+            t3 = pattern[7]
+            t4 = pattern[8]
+            ap2 = pattern[9]
+            tz3 = pattern[6]
+            tz4 = pattern[10]
             time2 = {
                 'hh': int(t3),
                 'mm': int(t4),
                 'nn': str(ap2).lower().strip('.'),
+                'tz': (tz3 or tz4 or self.timezone).upper(),
                 'range': 'end',
                 'time_type': time_type
             }
