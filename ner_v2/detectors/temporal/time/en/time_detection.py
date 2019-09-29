@@ -250,7 +250,8 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or self.timezone).upper(),
+                # 'tz': (tz1 or tz2 or self.timezone).upper(),
+                'tz': (tz1 or tz2).upper(),
                 'range': 'start',
                 'time_type': time_type
             }
