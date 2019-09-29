@@ -251,7 +251,7 @@ class TimeDetector(object):
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
                 # 'tz': (tz1 or tz2 or self.timezone).upper(),
-                'tz': (tz1 or tz2).upper(),
+                'tz': (tz1 or tz2 or 'nope').upper(),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -267,7 +267,8 @@ class TimeDetector(object):
                 'hh': int(t3),
                 'mm': int(t4),
                 'nn': str(ap2).lower().strip('.'),
-                'tz': (tz3 or tz4 or self.timezone).upper(),
+                # 'tz': (tz3 or tz4 or self.timezone).upper(),
+                'tz': (tz3 or tz4 or 'nope').upper(),
                 'range': 'end',
                 'time_type': time_type
             }
