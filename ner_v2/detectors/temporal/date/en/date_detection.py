@@ -1401,6 +1401,7 @@ class DateDetector(object):
             every_weekday_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)/s+'
                                                r'(week\s?days?|all\sweekdays))\b', re.IGNORECASE)
             is_everyday_result = every_weekday_pattern.findall(self.processed_text.lower())
+            print('printing is_everyday_result in except weekends', is_everyday_result)
         constant_type = WEEKDAYS
         if is_everyday_result:
             constant_type = REPEAT_WEEKDAYS
@@ -1483,6 +1484,7 @@ class DateDetector(object):
             every_weekend_pattern = re.compile(r'\b(every|daily|recur|always|continue|every\s*day|all)'
                                                r'\s+((week\s?ends?|all\sweekends))\b', re.IGNORECASE)
             is_everyday_result = every_weekend_pattern.findall(self.processed_text.lower())
+            print('printing is_everyday_result in except weekends', is_everyday_result)
 
         constant_type = WEEKENDS
         if is_everyday_result:
