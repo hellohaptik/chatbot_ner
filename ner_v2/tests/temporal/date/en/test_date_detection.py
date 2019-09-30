@@ -98,9 +98,9 @@ class DateDetectionTest(TestCase):
 
     def test_en_date_detection_date_ddth_of_mm_of_yy_with_locale(self):
         """
-        Date detection for pattern '2nd jan to 5th'
+        Date detection for pattern '2/3/19'
         """
-        message = 'The date is 2/3/19'
+        message = '2/3/19'
         locale = 'en-us'
         # If we run
         day1 = 3
@@ -115,7 +115,8 @@ class DateDetectionTest(TestCase):
             'start_range': False,
             'end_range': False,
             'from': False,
-            'to': False, 'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
         }, date_dicts)
 
         self.assertEqual(original_texts.count(message), 1)
