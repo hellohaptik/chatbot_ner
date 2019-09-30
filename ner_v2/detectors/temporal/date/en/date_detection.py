@@ -1398,10 +1398,9 @@ class DateDetector(object):
         if not patterns:
             weekday_regex_pattern = re.compile(r'\b((week\s?days?|all\sweekdays))\b')
             patterns = weekday_regex_pattern.findall(self.processed_text.lower())
-            every_weekday_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)/s+'
+            every_weekday_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)\s+'
                                                r'(week\s?days?|all\sweekdays))\b', re.IGNORECASE)
             is_everyday_result = every_weekday_pattern.findall(self.text)
-            print('printing is_everyday_result in except weekends', is_everyday_result)
         constant_type = WEEKDAYS
         if is_everyday_result:
             constant_type = REPEAT_WEEKDAYS
