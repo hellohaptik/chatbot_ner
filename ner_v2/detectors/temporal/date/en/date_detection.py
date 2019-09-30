@@ -245,15 +245,13 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_given_day(date_list, original_list)
         self._update_processed_text(original_list)
-        # FIXME: This call order causes everyday to be taken away from "everyday except <>" which means
-        # FIXME: successive calls for everyday_except_weekends and everyday_except_weekdays return wrong results
-        date_list, original_list = self._date_identification_everyday(date_list, original_list, n_days=15)
-        self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_everyday_except_weekends(date_list, original_list,
                                                                                       n_days=15)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_everyday_except_weekdays(date_list, original_list,
                                                                                       n_days=50)
+        self._update_processed_text(original_list)
+        date_list, original_list = self._date_identification_everyday(date_list, original_list, n_days=15)
         self._update_processed_text(original_list)
         date_list, original_list = self._day_within_one_week(date_list, original_list)
         self._update_processed_text(original_list)
