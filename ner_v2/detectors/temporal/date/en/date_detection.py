@@ -1396,10 +1396,13 @@ class DateDetector(object):
         patterns = regex_pattern.findall(self.processed_text.lower())
 
         if not patterns:
-            weekday_regex_pattern = re.compile(r'\b((week\s?days?|all\sweekdays))\b')
+            weekday_regex_pattern = re.compile(r'\b(week\s?days?|all\sweekdays)\b')
             patterns = weekday_regex_pattern.findall(self.processed_text.lower())
         constant_type = WEEKDAYS
-        if self._is_everyday_present(self.text):
+        every_weekday_pattern = re.compile(r'\b(every|daily|recur|always|continue|every\s*day|all)/s+'
+                                           r'(week\s?days?|all\sweekdays)\b', re.IGNORECASE)
+        is_everyday_result = every_weekday_pattern.findall(self.text)
+        if is_everyday_result:
             constant_type = REPEAT_WEEKDAYS
         today = now.weekday()
         count = 0
@@ -1473,12 +1476,14 @@ class DateDetector(object):
         regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekdays?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         if not patterns:
-            weekend_regex_pattern = re.compile(r'\b((week\s?ends?|all\sweekends))\b')
+            weekend_regex_pattern = re.compile(r'\b(week\s?ends?|all\sweekends)\b')
             patterns = weekend_regex_pattern.findall(self.processed_text.lower())
         constant_type = WEEKENDS
-        if self._is_everyday_present(self.text):
+        every_weekend_pattern = re.compile(r'\b(every|daily|recur|always|continue|every\s*day|all)'
+                                           r'\s+((week\s?ends?|all\sweekends))\b', re.IGNORECASE)
+        is_everyday_result = every_weekend_pattern.findall(self.text)
+        if is_everyday_result:
             constant_type = REPEAT_WEEKENDS
-
         today = now.weekday()
         count = 0
         weekend = []
