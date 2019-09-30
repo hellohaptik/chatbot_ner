@@ -1401,11 +1401,15 @@ class DateDetector(object):
             every_weekday_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)\s+'
                                                r'(week\s?days?|all\sweekdays))\b', re.IGNORECASE)
             is_everyday_result = every_weekday_pattern.findall(self.text)
-            print('printing is_everyday_result in except weekends', is_everyday_result)
         constant_type = WEEKDAYS
         if is_everyday_result:
             constant_type = REPEAT_WEEKDAYS
             patterns = is_everyday_result
+        # checks if phrase of the form everyday except weekdays is present in the sentence.
+        regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekdays?)\b')
+        check_patterns_for_except_weekdays = regex_pattern.findall(self.processed_text.lower())
+        if check_patterns_for_except_weekdays:
+            patterns = []
         today = now.weekday()
         count = 0
         weekend = []
@@ -1484,7 +1488,6 @@ class DateDetector(object):
             every_weekend_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)'
                                                r'\s+(week\s?ends?|all\sweekends))\b', re.IGNORECASE)
             is_everyday_result = every_weekend_pattern.findall(self.text)
-            print('printing is_everyday_result in except weekdays', is_everyday_result)
 
         constant_type = WEEKENDS
         if is_everyday_result:
