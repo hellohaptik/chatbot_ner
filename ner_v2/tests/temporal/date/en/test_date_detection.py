@@ -20,6 +20,7 @@ class DateDetectionTest(TestCase):
         Date detection for pattern '2nd jan to 5th'
         """
         message = '2nd jan to 5th'
+        locale = 'en-in'
         # If we run
         day1 = 2
         day2 = 5
@@ -30,7 +31,7 @@ class DateDetectionTest(TestCase):
             year1 += 1
             year2 += 1
 
-        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
         date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         self.assertIn({
@@ -58,6 +59,7 @@ class DateDetectionTest(TestCase):
         Date detection for pattern 'first week of jan'
         """
         message = 'first week of jan'
+        locale = 'en-in'
         day1 = 1
         day2 = 7
         month = 1
@@ -71,7 +73,7 @@ class DateDetectionTest(TestCase):
 
         mocked_get_weekdays_for_month.return_value = [day1, day2]
 
-        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en')
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
         date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         # TODO: functionality is incorrect, start_range should be True in 1st and end_range should be True in second
@@ -93,3 +95,28 @@ class DateDetectionTest(TestCase):
             'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}
         }, date_dicts)
         self.assertEqual(original_texts.count(message), 2)
+
+    def test_en_date_detection_date_ddth_of_mm_of_yy_with_locale(self):
+        """
+        Date detection for pattern '2/3/19'
+        """
+        message = '2/3/19'
+        locale = 'en-us'
+        # If we run
+        day1 = 3
+        month = 2
+        year1 = 2019
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message), 1)
