@@ -474,7 +474,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s((after|aftr)[\s-]*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))',
+        patterns = re.findall(r'\W((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+                              r'(am|pm|a\.m|p\.m)\s*({timezone})?)\W'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -486,10 +487,13 @@ class TimeDetector(object):
                 time_type = None
             t1 = pattern[2]
             ap1 = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
             time1 = {
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
+                'tz': (tz1 or tz2 or 'none').upper(),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -519,7 +523,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s((before|bfore)[\s-]*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))',
+        patterns = re.findall(r'\W((?:before|bfore)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
+                              r'[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\W'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -531,10 +536,14 @@ class TimeDetector(object):
                 time_type = None
             t1 = pattern[2]
             ap1 = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+
             time1 = {
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
+                'tz': (tz1 or tz2 or 'none').upper(),
                 'range': 'end',
                 'time_type': time_type
             }
