@@ -685,7 +685,7 @@ class DateDetector(object):
             yy1 = pattern[1]
             yy2 = pattern[4]
             dd = pattern[3]
-            yy = int(self.normalize_year(yy1 or yy2 or self.now_date.year))
+            yy = int(self.normalize_year(yy1 or yy2 or str(self.now_date.year)))
             probable_mm = pattern[2]
             mm = self.__get_month_index(probable_mm)
 
