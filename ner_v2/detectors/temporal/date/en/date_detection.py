@@ -305,7 +305,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'[^/\-\.\w](([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
-                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)(?:\s|$)')
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -362,7 +362,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'[^/\-\.\w]((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])'
-                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)(?:\s|$)')
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -419,7 +419,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?'
-                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -469,7 +469,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
-                                   r'((?:20|19)?[0-9]{2}))(\s|$)')
+                                   r'((?:20|19)?[0-9]{2}))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -523,7 +523,7 @@ class DateDetector(object):
         if original_list is None:
             original_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,\-]\s?'
-                                   r'([A-Za-z]+)[\s\,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
+                                   r'([A-Za-z]+)[\s\,\-]\s?((?:20|19)?[0-9]{2}))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -574,7 +574,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?'
-                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -676,14 +676,18 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,\-]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
-                                   r'[\ \,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)?[0-9]{2})?([A-Za-z]+)[\ \,\-]\s?([12][0-9]'
+                                   r'|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
+                                   r'(?:[\ \,\-]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            dd = pattern[2]
-            probable_mm = pattern[1]
-            yy = self.normalize_year(pattern[3])
+            yy1 = pattern[1]
+            yy2 = pattern[4]
+            dd = pattern[3]
+            yy = yy1 or yy2 or ''
+            probable_mm = pattern[2]
+            yy = self.normalize_year(yy)
             mm = self.__get_month_index(probable_mm)
 
             if mm:
