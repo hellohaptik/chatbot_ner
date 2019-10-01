@@ -676,7 +676,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(((?:20|19)?[0-9]{2})?([A-Za-z]+)[\ \,\-]\s?([12][0-9]'
+        regex_pattern = re.compile(r'\b(((?:20|19)?[0-9]{2})?\s?([A-Za-z]+)[\ \,\-]\s?([12][0-9]'
                                    r'|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
                                    r'(?:[\ \,\-]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
