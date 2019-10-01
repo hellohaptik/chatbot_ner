@@ -99,29 +99,29 @@ class DateDetector(object):
         self.bot_message = None
         self.locale = locale
         self.country_code = None
-        self.detector_preferences = [self._gregorian_day_month_year_format,
-                                     self._gregorian_month_day_year_format,
-                                     self._gregorian_year_month_day_format,
-                                     self._gregorian_advanced_day_month_year_format,
-                                     self._day_month_format_for_arrival_departure,
-                                     self._date_range_ddth_of_mmm_to_ddth,
-                                     self._date_range_ddth_to_ddth_of_next_month,
-                                     self._gregorian_day_with_ordinals_month_year_format,
-                                     self._gregorian_advanced_year_month_day_format,
-                                     self._gregorian_year_day_month_format,
-                                     self._gregorian_month_day_with_ordinals_year_format,
-                                     self._gregorian_day_month_format,
-                                     self._gregorian_month_day_format,
-                                     self._day_after_tomorrow,
-                                     self._date_days_after,
-                                     self._date_days_later,
-                                     self._day_before_yesterday,
-                                     self._todays_date,
-                                     self._tomorrows_date,
-                                     self._yesterdays_date,
-                                     self._day_in_next_week,
-                                     self._day_range_for_nth_week_month
-                                     ]
+        self.default_detector_preferences = [self._gregorian_day_month_year_format,
+                                             self._gregorian_month_day_year_format,
+                                             self._gregorian_year_month_day_format,
+                                             self._gregorian_advanced_day_month_year_format,
+                                             self._day_month_format_for_arrival_departure,
+                                             self._date_range_ddth_of_mmm_to_ddth,
+                                             self._date_range_ddth_to_ddth_of_next_month,
+                                             self._gregorian_day_with_ordinals_month_year_format,
+                                             self._gregorian_advanced_year_month_day_format,
+                                             self._gregorian_year_day_month_format,
+                                             self._gregorian_month_day_with_ordinals_year_format,
+                                             self._gregorian_day_month_format,
+                                             self._gregorian_month_day_format,
+                                             self._day_after_tomorrow,
+                                             self._date_days_after,
+                                             self._date_days_later,
+                                             self._day_before_yesterday,
+                                             self._todays_date,
+                                             self._tomorrows_date,
+                                             self._yesterdays_date,
+                                             self._day_in_next_week,
+                                             self._day_range_for_nth_week_month
+                                             ]
         """
         Rules to add new country code preferences:
         1. Create a new key with country code.
@@ -145,9 +145,9 @@ class DateDetector(object):
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
         if match:
-            self.country_code = match[0].upper()
+            return match[0].upper()
         else:
-            self.country_code = None
+            return None
 
     def detect_date(self, text):
         """
@@ -165,7 +165,7 @@ class DateDetector(object):
         self.processed_text = self.text
         self.tagged_text = self.text
         if self.locale:
-            self.get_country_code_from_locale()
+            self.country_code = self.get_country_code_from_locale()
         date_list = []
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
@@ -205,12 +205,12 @@ class DateDetector(object):
             for preferred_detector in self.country_date_detector_preferences[self.country_code]:
                 date_list, original_list = preferred_detector(date_list, original_list)
                 self._update_processed_text(original_list)
-            for detector in self.detector_preferences:
+            for detector in self.default_detector_preferences:
                 if detector not in self.country_date_detector_preferences[self.country_code]:
                     date_list, original_list = detector(date_list, original_list)
                     self._update_processed_text(original_list)
         else:
-            for detector in self.detector_preferences:
+            for detector in self.default_detector_preferences:
                 date_list, original_list = detector(date_list, original_list)
                 self._update_processed_text(original_list)
 
