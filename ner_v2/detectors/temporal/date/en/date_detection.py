@@ -685,12 +685,18 @@ class DateDetector(object):
             yy1 = pattern[1]
             yy2 = pattern[4]
             dd = pattern[3]
-            yy = yy1 or yy2 or ''
+            yy = int(self.normalize_year(yy1 or yy2)) or self.now_date.year
             probable_mm = pattern[2]
-            yy = self.normalize_year(yy)
             mm = self.__get_month_index(probable_mm)
 
             if mm:
+                try:
+                    # to catch dates which are not possible like "31/11" (october 31st)
+                    if not yy1 and not yy2 and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
+                            < self.now_date:
+                        yy += 1
+                except:
+                    return date_list, original_list
                 date = {
                     'dd': int(dd),
                     'mm': int(mm),
