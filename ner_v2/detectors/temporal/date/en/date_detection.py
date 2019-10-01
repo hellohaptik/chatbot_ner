@@ -201,7 +201,7 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
-        if not self.country_code and self.country_code in self.country_date_detector_preferences:
+        if self.country_code and self.country_code in self.country_date_detector_preferences:
             for preferred_detector in self.country_date_detector_preferences[self.country_code]:
                 date_list, original_list = preferred_detector(date_list, original_list)
                 self._update_processed_text(original_list)
