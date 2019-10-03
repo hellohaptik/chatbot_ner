@@ -1,0 +1,10 @@
+code,preferred,dict
+IST,Asia/Kolkata,Asia/Kolkata
+EST,America/New_York,America/New_York|America/Detroit|America/Kentucky/Louisville|America/Kentucky/Monticello|America/Indiana/Indianapolis|America/Indiana/Vincennes|America/Indiana/Winamac|America/Indiana/Marengo|America/Indiana/Petersburg|America/Indiana/Vevay
+CST,America/Chicago,America/Chicago|America/Indiana/Tell_City|America/Indiana/Knox|America/Menominee|America/North_Dakota/Center|America/North_Dakota/New_Salem|America/North_Dakota/Beulah
+MST,America/Denver,America/Denver|America/Boise|America/Phoenix
+PST,America/Los_Angeles,America/Los_Angeles
+AKST,America/Anchorage,America/Anchorage|America/Juneau|America/Sitka|America/Yakutat|America/Nome|America/Metlakatla
+HST,America/Adak,America/Adak|Pacific/Honolulu
+HAST,Pacific/Honolulu,Pacific/Honolulu
+UTC,UTC,UTC
