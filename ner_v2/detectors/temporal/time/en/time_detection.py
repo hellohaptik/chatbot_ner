@@ -104,6 +104,7 @@ class TimeDetector(object):
     def init_regex_and_parser(self, data_directory_path):
         timezone_variants_data_path = os.path.join(data_directory_path, TIMEZONE_VARIANTS_CONSTANT_FILE)
         if os.path.exists(timezone_variants_data_path):
+            print('the path exists')
             timezone_variants_df = pd.read_csv(timezone_variants_data_path, encoding='utf-8')
             for index, row in timezone_variants_df.iterrows():
                 tz_name_variants = get_list_from_pipe_sep_string(row[TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME])
