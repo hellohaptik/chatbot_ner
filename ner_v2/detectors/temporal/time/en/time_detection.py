@@ -1,7 +1,14 @@
 import re
 import datetime
-from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE
-from ner_v2.detectors.temporal.utils import get_timezone
+import collections
+import pandas as pd
+import os
+from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE, \
+    TIMEZONE_VARIANTS_CONSTANT_FILE, TIMEZONES_CONSTANT_FILE, TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, \
+    TIMEZONE_VARIANTS_VALUE_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME
+from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep_string
+
+TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value'])
 
 
 class TimeDetector(object):
@@ -79,7 +86,11 @@ class TimeDetector(object):
         self.bot_message = None
         self.timezone = get_timezone(timezone)
         self.now_date = datetime.datetime.now(self.timezone)
-        self.timezone_choices = 'ist|utc|akst|akdt|pst|pdt|cst|est|hst|mst|mdt|cdt|edt'
+        self.timezones_map = {}
+
+        self.init_regex_and_parser('./data/')
+        sorted_len_timezone_keys = sorted(self.timezones_map.keys(), key=len, reverse=True)
+        self.timezone_choices = "|".join([re.escape(x.lower()) for x in sorted_len_timezone_keys])
 
     def set_bot_message(self, bot_message):
         """
@@ -89,6 +100,34 @@ class TimeDetector(object):
             bot_message (str): previous message that is sent by the bot
         """
         self.bot_message = bot_message
+
+    def init_regex_and_parser(self, data_directory_path):
+        timezone_variants_data_path = os.path.join(data_directory_path, TIMEZONE_VARIANTS_CONSTANT_FILE)
+        if os.path.exists(timezone_variants_data_path):
+            timezone_variants_df = pd.read_csv(timezone_variants_data_path, encoding='utf-8')
+            for index, row in timezone_variants_df.iterrows():
+                tz_name_variants = get_list_from_pipe_sep_string(row[TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME])
+                value = row[TIMEZONE_VARIANTS_VALUE_COLUMN_NAME]
+                for tz_name in tz_name_variants:
+                    self.timezones_map[tz_name] = TimezoneVariants(value=value)
+
+    def convert_to_pytz_format(self, timezone_variant):
+        """
+        Converts informal TZ formats like EST, Eastern Time etc to Oslon format(America/New_York) supported by pytz.
+        :param timezone_variant: (str) Informal TZ variant
+        :return: Standard Oslon format for pytz.
+        """
+        timezone_code = self.timezones_map[timezone_variant].value
+        timezone_data_path = os.path.join('./data/', TIMEZONES_CONSTANT_FILE)
+        if os.path.exists(timezone_data_path):
+            timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
+            timezones_df.set_index(TIMEZONES_CODE_COLUMN_NAME, inplace=True)
+            if re.search(self.timezone.zone, timezones_df.loc[timezone_code].TIMEZONES_ALL_REGIONS_COLUMN_NAME):
+                return self.timezone.zone
+            else:
+                return timezones_df.loc[timezone_code].TIMEZONES_PREFERRED_REGION_COLUMN_NAME
+
+        return self.timezone.zone
 
     def _detect_time(self, range_enabled=False, form_check=False):
         """
@@ -246,12 +285,14 @@ class TimeDetector(object):
             ap1 = pattern[4]
             tz1 = pattern[1]
             tz2 = pattern[5]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time1 = {
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                # 'tz': (tz1 or tz2 or self.timezone).upper(),
-                'tz': (tz1 or tz2 or 'nope').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'start',
                 'time_type': time_type
             }
@@ -263,12 +304,14 @@ class TimeDetector(object):
             ap2 = pattern[9]
             tz3 = pattern[6]
             tz4 = pattern[10]
+            tz = None
+            if tz3 or tz4:
+                tz = self.convert_to_pytz_format(tz3 or tz4)
             time2 = {
                 'hh': int(t3),
                 'mm': int(t4),
                 'nn': str(ap2).lower().strip('.'),
-                # 'tz': (tz3 or tz4 or self.timezone).upper(),
-                'tz': (tz3 or tz4 or 'nope').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'end',
                 'time_type': time_type
             }
@@ -319,11 +362,14 @@ class TimeDetector(object):
             ap1 = pattern[3]
             tz1 = pattern[1]
             tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time1 = {
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'start',
                 'time_type': time_type
             }
@@ -334,11 +380,14 @@ class TimeDetector(object):
             ap2 = pattern[7]
             tz3 = pattern[5]
             tz4 = pattern[8]
+            tz = None
+            if tz3 or tz4:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time2 = {
                 'hh': int(t2),
                 'mm': 0,
                 'nn': str(ap2).lower().strip('.'),
-                'tz': (tz3 or tz4 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'end',
                 'time_type': time_type
             }
@@ -390,11 +439,14 @@ class TimeDetector(object):
             ap1 = pattern[4]
             tz1 = pattern[1]
             tz2 = pattern[5]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time1 = {
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'start',
                 'time_type': time_type
             }
@@ -441,11 +493,14 @@ class TimeDetector(object):
             ap1 = pattern[4]
             tz1 = pattern[1]
             tz2 = pattern[5]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time1 = {
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'end',
                 'time_type': time_type
             }
@@ -489,11 +544,14 @@ class TimeDetector(object):
             ap1 = pattern[3]
             tz1 = pattern[1]
             tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time1 = {
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'start',
                 'time_type': time_type
             }
@@ -538,12 +596,15 @@ class TimeDetector(object):
             ap1 = pattern[3]
             tz1 = pattern[1]
             tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
 
             time1 = {
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': (tz1 or tz2 or 'none').upper(),
+                'tz': tz or self.timezone.zone,
                 'range': 'end',
                 'time_type': time_type
             }

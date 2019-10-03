@@ -3,6 +3,17 @@ TIME_CONSTANT_FILE = 'time_constant.csv'
 DATETIME_CONSTANT_FILE = 'datetime_diff_constant.csv'
 NUMERALS_CONSTANT_FILE = 'numbers_constant.csv'
 
+# timezone variants data file and its columns
+TIMEZONE_VARIANTS_CONSTANT_FILE = 'timezone_variations.csv'
+TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME = 'timezone_variants'
+TIMEZONE_VARIANTS_VALUE_COLUMN_NAME = 'timezone_value'
+
+# timezones data file and its columns
+TIMEZONES_CONSTANT_FILE = 'timezones.csv'
+TIMEZONES_CODE_COLUMN_NAME = 'code'
+TIMEZONES_ALL_REGIONS_COLUMN_NAME = 'all_regions'
+TIMEZONES_PREFERRED_REGION_COLUMN_NAME = 'preferred'
+
 CONSTANT_FILE_KEY = 'key'
 
 # date type referring to date in month like "2 tarikh" (reference: hindi)
