@@ -88,7 +88,8 @@ class TimeDetector(object):
         self.now_date = datetime.datetime.now(self.timezone)
         self.timezones_map = {}
 
-        self.init_regex_and_parser('./data/')
+        self.init_regex_and_parser(os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
+                                                'data'))
         sorted_len_timezone_keys = sorted(self.timezones_map.keys(), key=len, reverse=True)
         self.timezone_choices = "|".join([re.escape(x.lower()) for x in sorted_len_timezone_keys])
 
@@ -119,7 +120,8 @@ class TimeDetector(object):
         :return: Standard Oslon format for pytz.
         """
         timezone_code = self.timezones_map[timezone_variant].value
-        timezone_data_path = os.path.join('./data/', TIMEZONES_CONSTANT_FILE)
+        data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)), 'data')
+        timezone_data_path = os.path.join(data_directory_path, TIMEZONES_CONSTANT_FILE)
         if os.path.exists(timezone_data_path):
             timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
             timezones_df.set_index(TIMEZONES_CODE_COLUMN_NAME, inplace=True)
