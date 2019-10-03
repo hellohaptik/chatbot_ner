@@ -229,7 +229,7 @@ class TimeDetector(object):
             r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
             r'[\s-]*?({timezone})?\s*to[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
             r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
-                .format(timezone=self.timezone_choices)
+            .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -303,7 +303,7 @@ class TimeDetector(object):
         regex_patterns = re.compile(
             r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?({timezone})?\s*to'
             r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\W'
-                .format(timezone=self.timezone_choices)
+            .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
