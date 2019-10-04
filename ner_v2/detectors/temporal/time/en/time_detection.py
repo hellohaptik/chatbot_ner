@@ -8,6 +8,7 @@ from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_
     TIMEZONE_VARIANTS_VALUE_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME, \
     TIMEZONES_PREFERRED_REGION_COLUMN_NAME
 from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep_string
+from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value'])
 
@@ -90,7 +91,7 @@ class TimeDetector(object):
         self.timezones_map = {}
 
         self.init_regex_and_parser(os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
-                                                'data'))
+                                                LANGUAGE_DATA_DIRECTORY))
         sorted_len_timezone_keys = sorted(self.timezones_map.keys(), key=len, reverse=True)
         self.timezone_choices = "|".join([re.escape(x.lower()) for x in sorted_len_timezone_keys])
 
@@ -120,7 +121,8 @@ class TimeDetector(object):
         :return: Standard Oslon format for pytz.
         """
         timezone_code = self.timezones_map[timezone_variant].value
-        data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)), 'data')
+        data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
+                                           LANGUAGE_DATA_DIRECTORY)
         timezone_data_path = os.path.join(data_directory_path, TIMEZONES_CONSTANT_FILE)
         if os.path.exists(timezone_data_path):
             timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
@@ -647,18 +649,24 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
-                              r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m))',
+        patterns = re.findall(r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])'
+                              r'[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
-            t2 = pattern[2]
-            ap = pattern[3]
+            t1 = pattern[2]
+            t2 = pattern[3]
+            ap = pattern[4]
+            tz1 = pattern[1]
+            tz2 = pattern[5]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time = {
                 'hh': int(t1),
                 'mm': int(t2),
-                'nn': str(ap).lower().strip('.')
+                'nn': str(ap).lower().strip('.'),
+                'tz': tz or self.timezone.zone
             }
 
             time['nn'] = 'am' if 'a' in time['nn'] else time['nn']
@@ -696,15 +704,22 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\s((0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m))', self.processed_text.lower())
+        patterns = re.findall(r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'
+                              .format(timezone=self.timezone_choices), self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
-            ap = pattern[2]
+            t1 = pattern[2]
+            ap = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time = {
                 'hh': int(t1),
                 'mm': 0,
-                'nn': str(ap).lower().strip('.')
+                'nn': str(ap).lower().strip('.'),
+                'tz': tz or self.timezone.zone
             }
             time['nn'] = 'am' if 'a' in time['nn'] else time['nn']
             time['nn'] = 'pm' if 'p' in time['nn'] else time['nn']
@@ -761,6 +776,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = 'df'
+            time['tz'] = self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -802,6 +818,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = 'df'
+            time['tz'] = self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -843,6 +860,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
+            time['tz'] = self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -875,6 +893,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
+            time['tz'] = self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -906,20 +925,28 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((00?|0?[2-9]|0?1[0-9]?|2[0-3])(?:[:.\s]([0-5][0-9]))?)'
-                              r'(?!\s?(?:am|pm|a\.m|p\.m|\d))',
+        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])?\s*'
+                              r'(?:h|hrs|hr)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m|p\.m|(?:{timezone})'
+                              r'|(?:h|hrs|hr)|\d))\b'
+                              .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             t2 = 0
-            t1 = pattern[1]
-            if pattern[2]:
-                t2 = pattern[2]
+            t1 = pattern[2]
+            if pattern[3]:
+                t2 = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
 
             time = {
                 'hh': int(t1),
                 'mm': int(t2),
-                'nn': 'hrs'
+                'nn': 'hrs',
+                'tz': tz or self.timezone.zone
             }
             time_list.append(time)
             original_list.append(original)
@@ -948,18 +975,26 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((00?|1[3-9]?|2[0-3])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
+        patterns = re.findall(r'\b(({timezone})?\s*(00?|1[3-9]?|2[0-3])[:.\s]([0-5][0-9])'
+                              r'\s*(?:h|hr|hrs)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m|p\.m|(?:h|hrs|hr)|'
+                              r'(?:{timezone})|\d))\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = pattern[1]
-            t2 = pattern[2]
+            t1 = pattern[2]
+            t2 = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             meridiem = self._get_meridiem(int(t1), int(t2))
 
             time = {
                 'hh': int(t1),
                 'mm': int(t2),
-                'nn': meridiem
+                'nn': meridiem,
+                'tz': tz or self.timezone.zone
             }
             time_list.append(time)
             original_list.append(original)
@@ -1005,13 +1040,17 @@ class TimeDetector(object):
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)\s', self.processed_text.lower())
         pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)\s', self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)\s', self.processed_text.lower())
+        pattern_tz = re.findall(r'(?:\b|[^a-zA-Z])({timezone})\b'.format(timezone=self.timezone_choices),
+                                self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             t1 = int(pattern[1])
             t2 = int(pattern[2])
+            tz = pattern_tz[0]
             time = {
                 'hh': t1,
                 'mm': t2,
+                'tz': tz or self.timezone.zone
             }
             if pattern_am:
                 time['nn'] = 'am'
@@ -1061,12 +1100,16 @@ class TimeDetector(object):
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)', self.processed_text.lower())
         pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)', self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)', self.processed_text.lower())
+        pattern_tz = re.findall(r'(?:\b|[^a-zA-Z])({timezone})\b'.format(timezone=self.timezone_choices),
+                                self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             t1 = int(pattern[1])
+            tz = pattern_tz[0]
             time = {
                 'hh': t1,
                 'mm': 0,
+                'tz': tz or self.timezone.zone
             }
             if pattern_am:
                 time['nn'] = 'am'
@@ -1103,7 +1146,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
+        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])\s*({timezone})?)'
+                              r'(?!\s*(?:am|pm|a\.m|p\.m|(?:{timezone})|\d))'.format(timezone = self.timezone_choices),
                               self.processed_text.lower())
         if not patterns:
             # Optional minutes but compulsory "hour" mention
@@ -1111,13 +1155,19 @@ class TimeDetector(object):
                                   self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            t1 = int(pattern[1])
-            t2 = int(pattern[2]) if pattern[2] else 0
+            t1 = int(pattern[2])
+            t2 = int(pattern[3]) if pattern[3] else 0
             meridiem = self._get_meridiem(t1, t2)
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
             time = {
                 'hh': t1,
                 'mm': t2,
-                'nn': meridiem
+                'nn': meridiem,
+                'tz': tz or self.timezone.zone
             }
             time_list.append(time)
             original_list.append(original)
