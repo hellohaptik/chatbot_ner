@@ -106,7 +106,6 @@ class TimeDetector(object):
     def init_regex_and_parser(self, data_directory_path):
         timezone_variants_data_path = os.path.join(data_directory_path, TIMEZONE_VARIANTS_CONSTANT_FILE)
         if os.path.exists(timezone_variants_data_path):
-            print('the path exists')
             timezone_variants_df = pd.read_csv(timezone_variants_data_path, encoding='utf-8')
             for index, row in timezone_variants_df.iterrows():
                 tz_name_variants = get_list_from_pipe_sep_string(row[TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME])
@@ -126,10 +125,10 @@ class TimeDetector(object):
         if os.path.exists(timezone_data_path):
             timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
             timezones_df.set_index(TIMEZONES_CODE_COLUMN_NAME, inplace=True)
-            if re.search(self.timezone.zone, timezones_df.loc[timezone_code].all_regions):
+            if re.search(self.timezone.zone, timezones_df.loc[timezone_code][TIMEZONES_ALL_REGIONS_COLUMN_NAME]):
                 return self.timezone.zone
             else:
-                return timezones_df.loc[timezone_code].preferred
+                return timezones_df.loc[timezone_code][TIMEZONES_PREFERRED_REGION_COLUMN_NAME]
 
         return self.timezone.zone
 
@@ -246,8 +245,6 @@ class TimeDetector(object):
         time_data = self._detect_time(range_enabled=range_enabled, form_check=form_check)
         self.time = time_data[0]
         self.original_time_text = time_data[1]
-        print('processed_text', self.processed_text)
-        print('tagged_text', self.tagged_text)
         return time_data
 
     def _detect_range_12_hour_format(self, time_list=None, original_list=None):
