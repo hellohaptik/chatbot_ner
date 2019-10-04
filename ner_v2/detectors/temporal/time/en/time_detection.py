@@ -5,7 +5,7 @@ import pandas as pd
 import os
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE, \
     TIMEZONE_VARIANTS_CONSTANT_FILE, TIMEZONES_CONSTANT_FILE, TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, \
-    TIMEZONE_VARIANTS_VALUE_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME
+    TIMEZONE_VARIANTS_VALUE_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME
 from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep_string
 
 TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value'])
@@ -125,7 +125,7 @@ class TimeDetector(object):
         if os.path.exists(timezone_data_path):
             timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
             timezones_df.set_index(TIMEZONES_CODE_COLUMN_NAME, inplace=True)
-            if re.search(self.timezone.zone, timezones_df.loc[timezone_code].TIMEZONES_ALL_REGIONS_COLUMN_NAME):
+            if re.search(self.timezone.zone, timezones_df.loc[timezone_code].all_regions):
                 return self.timezone.zone
             else:
                 return timezones_df.loc[timezone_code].TIMEZONES_PREFERRED_REGION_COLUMN_NAME
