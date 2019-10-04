@@ -51,7 +51,7 @@ class DateDetectionTest(TestCase):
             'value': {'dd': day2, 'mm': month, 'yy': year2, 'type': 'date'}
         }, date_dicts)
 
-        self.assertEqual(original_texts.count(message), 2)
+        self.assertEqual(original_texts.count(message.lower()), 2)
 
     @mock.patch('ner_v2.detectors.temporal.date.en.date_detection.get_weekdays_for_month')
     def test_en_date_detection_day_range_for_nth_week_month(self, mocked_get_weekdays_for_month):
@@ -94,7 +94,7 @@ class DateDetectionTest(TestCase):
             'to': False,
             'value': {'dd': day2, 'mm': month, 'type': 'date', 'yy': year}
         }, date_dicts)
-        self.assertEqual(original_texts.count(message), 2)
+        self.assertEqual(original_texts.count(message.lower()), 2)
 
     def test_en_date_detection_date_ddth_of_mm_of_yy_with_locale(self):
         """
@@ -119,4 +119,129 @@ class DateDetectionTest(TestCase):
             'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
         }, date_dicts)
 
-        self.assertEqual(original_texts.count(message), 1)
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_en_gregorian_day_month_year_format(self):
+        """
+        Date detection for pattern '2/3/17'
+        """
+        message = '2/3/17'
+        locale = 'en-in'
+        # If we run
+        day1 = 2
+        month = 3
+        year1 = 2017
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_en_gregorian_year_month_day_format(self):
+        """
+        Date detection for pattern '2017/12/01'
+        """
+        message = '2017/12/01'
+        locale = 'en-in'
+        # If we run
+        day1 = 1
+        month = 12
+        year1 = 2017
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_en_gregorian_advanced_day_month_year_format(self):
+        """
+        Date detection for pattern '02 january 1972'
+        """
+        message = '02 january 1972'
+        locale = 'en-in'
+        # If we run
+        day1 = 2
+        month = 1
+        year1 = 1972
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_en_gregorian_advanced_year_month_day_format(self):
+        """
+        Date detection for pattern '1972 january 2'
+        """
+        message = '1972 january 2'
+        locale = 'en-in'
+        # If we run
+        day1 = 2
+        month = 1
+        year1 = 1972
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_en_gregorian_year_day_month_format(self):
+        """
+        Date detection for pattern '2099 21st Nov'
+        """
+        message = '2099 21st Nov'
+        locale = 'en-in'
+        # If we run
+        day1 = 21
+        month = 11
+        year1 = 2099
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
