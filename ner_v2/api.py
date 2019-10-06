@@ -3,7 +3,8 @@ from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
-    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE
+    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE, \
+    PARAMETER_LOCALE
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -40,6 +41,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        PARAMETER_NUMBER_UNIT_TYPE: request.GET.get('unit_type'),
+                       PARAMETER_LOCALE: request.GET.get('locale'),
                        }
 
     return parameters_dict
@@ -68,7 +70,8 @@ def parse_post_request(request):
         PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
         PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
-        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type')
+        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type'),
+        PARAMETER_LOCALE: request_data.get('locale'),
     }
 
     return parameters_dict
@@ -95,6 +98,7 @@ def date(request):
             timezone (str): timezone of the user
             source_language (str): source language code (ISO 639-1)
             language_script (str): language code of script (ISO 639-1)
+            locale (str): locale of the user(ISO 639-1)
 
     Returns:
         response (django.http.response.HttpResponse): HttpResponse object
@@ -109,6 +113,7 @@ def date(request):
            timezone = 'UTC'
            source_language = 'hi'
            language_script = 'en'
+           locale = 'hi-in'
            output = date(request)
            print output
 
@@ -130,7 +135,8 @@ def date(request):
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                               timezone=timezone,
-                                              past_date_referenced=past_date_referenced)
+                                              past_date_referenced=past_date_referenced,
+                                              locale=parameters_dict[PARAMETER_LOCALE])
 
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
