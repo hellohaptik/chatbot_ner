@@ -8,6 +8,7 @@ tests:
     - hh: 12
       mm: 35
       nn: "am"
+      tz: "UTC"
       original_text: "12:35 am"
       output_id: 1
       range: null
@@ -19,6 +20,7 @@ tests:
     - hh: 10
       mm: 33
       nn: "pm"
+      tz: "UTC"
       original_text: "10:33 pm"
       output_id: 1
       range: null
@@ -30,6 +32,7 @@ tests:
     - hh: 2
       mm: 33
       nn: "pm"
+      tz: "UTC"
       original_text: "02 33 p.m"
       output_id: 1
       range: null
@@ -41,6 +44,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "12 am"
       output_id: 1
       range: null
@@ -52,6 +56,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "12-pm"
       output_id: 1
       range: null
@@ -63,6 +68,7 @@ tests:
     - hh: 1
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "1 am"
       output_id: 1
       range: null
@@ -74,6 +80,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: "UTC"
       original_text: null
       output_id: 1
       range: null
@@ -85,6 +92,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: "UTC"
       original_text: null
       output_id: 1
       range: null
