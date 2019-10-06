@@ -267,7 +267,8 @@ class BaseRegexTime(object):
             time = {
                 'hh': int(hh),
                 'mm': int(mm),
-                'nn': nn
+                'nn': nn,
+                'tz': self.timezone.zone
             }
 
             time_list.append(time)
@@ -316,6 +317,7 @@ class BaseRegexTime(object):
                 time = {
                     'hh': hh,
                     'mm': mm,
+                    'tz': self.timezone.zone,
                     'time_type': None
                 }
 

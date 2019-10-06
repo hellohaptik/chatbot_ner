@@ -1210,7 +1210,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b((?:by|before|after|at|dot|exactly|exact)[\s-]*((0?[1-9]|1[0-2])[:.\s]*'
-                              r'([0-5][0-9])?)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
+                              r'([0-5][0-9])?)\s*({timezone})?)\s'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
