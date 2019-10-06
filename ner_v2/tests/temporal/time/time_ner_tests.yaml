@@ -80,7 +80,7 @@ tests:
     - hh: null
       mm: null
       nn: null
-      tz: "UTC"
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -92,7 +92,7 @@ tests:
     - hh: null
       mm: null
       nn: null
-      tz: "UTC"
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -104,6 +104,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -115,6 +116,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -126,6 +128,7 @@ tests:
     - hh: 0
       mm: 15
       nn: "df"
+      tz: "UTC"
       original_text: "in 15mins"
       output_id: 1
       range: null
@@ -137,6 +140,7 @@ tests:
     - hh: 0
       mm: 25
       nn: "df"
+      tz: "UTC"
       original_text: "about 25 minutes"
       output_id: 1
       range: null
@@ -148,6 +152,7 @@ tests:
     - hh: 5
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "after 5 hrs"
       output_id: 1
       range: null
@@ -159,6 +164,7 @@ tests:
     - hh: 13
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "in around 13 hours"
       output_id: 1
       range: null
@@ -170,6 +176,7 @@ tests:
     - hh: 0
       mm: 20
       nn: "df"
+      tz: "UTC"
       original_text: "20 minutes later"
       output_id: 1
       range: null
@@ -181,6 +188,7 @@ tests:
     - hh: 0
       mm: 5
       nn: "df"
+      tz: "UTC"
       original_text: "5mins latr"
       output_id: 1
       range: null
@@ -192,6 +200,7 @@ tests:
     - hh: 1
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "1 hour ltr"
       output_id: 1
       range: null
@@ -203,6 +212,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "3 hrs later"
       output_id: 1
       range: null
@@ -214,6 +224,7 @@ tests:
     - hh: 0
       mm: 1440
       nn: "ev"
+      tz: "UTC"
       original_text: "every 1440 minutes"
       output_id: 1
       range: null
@@ -225,6 +236,7 @@ tests:
     - hh: 24
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "evry 24 hrs"
       output_id: 1
       range: null
@@ -236,6 +248,7 @@ tests:
     - hh: 72
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "once in 3 days"
       output_id: 1
       range: null
@@ -247,6 +260,7 @@ tests:
     - hh: 24
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "once in 1 day"
       output_id: 1
       range: null
@@ -258,6 +272,7 @@ tests:
     - hh: 0
       mm: 35
       nn: "hrs"
+      tz: "UTC"
       original_text: "00:35"
       output_id: 1
       range: null
@@ -269,6 +284,7 @@ tests:
     - hh: 22
       mm: 33
       nn: "hrs"
+      tz: "UTC"
       original_text: "22:33"
       output_id: 1
       range: null
@@ -280,6 +296,7 @@ tests:
     - hh: 14
       mm: 33
       nn: "hrs"
+      tz: "UTC"
       original_text: "14 33"
       output_id: 1
       range: null
@@ -291,6 +308,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "hrs"
+      tz: "UTC"
       original_text: "12 hrs"
       output_id: 1
       range: null
@@ -302,6 +320,7 @@ tests:
     - hh: 0
       mm: 0
       nn: "hrs"
+      tz: "UTC"
       original_text: "0 hours"
       output_id: 1
       range: null
@@ -313,6 +332,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -324,6 +344,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: "UTC"
       original_text: null
       output_id: 1
       range: null
@@ -335,6 +356,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -346,6 +368,7 @@ tests:
     - hh: 12
       mm: 30
       nn: "am"
+      tz: "UTC"
       original_text: "12:30"
       output_id: 1
       range: null
@@ -357,6 +380,7 @@ tests:
     - hh: 11
       mm: 30
       nn: "am"
+      tz: "UTC"
       original_text: "11:30"
       output_id: 1
       range: null
@@ -368,6 +392,7 @@ tests:
     - hh: 11
       mm: 30
       nn: "pm"
+      tz: "UTC"
       original_text: "11:30"
       output_id: 1
       range: null
@@ -379,6 +404,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "12:00"
       output_id: 1
       range: null
@@ -390,6 +416,7 @@ tests:
     - hh: 5
       mm: 29
       nn: "pm"
+      tz: "UTC"
       original_text: "5:29"
       output_id: 1
       range: null
@@ -401,6 +428,7 @@ tests:
     - hh: 3
       mm: 11
       nn: "pm"
+      tz: "UTC"
       original_text: "3:11"
       output_id: 1
       range: null
@@ -412,6 +440,7 @@ tests:
     - hh: 12
       mm: 22
       nn: "pm"
+      tz: "UTC"
       original_text: "12:22"
       output_id: 1
       range: null
@@ -423,6 +452,7 @@ tests:
     - hh: 3
       mm: 33
       nn: "am"
+      tz: "UTC"
       original_text: "3:33"
       output_id: 1
       range: null
@@ -434,6 +464,7 @@ tests:
     - hh: 4
       mm: 44
       nn: "am"
+      tz: "UTC"
       original_text: "4:44"
       output_id: 1
       range: null
@@ -445,6 +476,7 @@ tests:
     - hh: 5
       mm: 55
       nn: "pm"
+      tz: "UTC"
       original_text: "5:55"
       output_id: 1
       range: null
@@ -456,6 +488,7 @@ tests:
     - hh: 6
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "6:00"
       output_id: 1
       range: null
@@ -467,6 +500,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "at 3"
       output_id: 1
       range: null
@@ -478,6 +512,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "at 12"
       output_id: 1
       range: null
@@ -489,6 +524,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "after 3"
       output_id: 1
       range: null
@@ -500,6 +536,7 @@ tests:
     - hh: 4
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "by 4"
       output_id: 1
       range: null
@@ -511,6 +548,7 @@ tests:
     - hh: 5
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "before 5"
       output_id: 1
       range: null
@@ -522,6 +560,7 @@ tests:
     - hh: 6
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "exact 6"
       output_id: 1
       range: null
@@ -536,6 +575,7 @@ tests:
         hh: 12
         mm: 30
         nn: "am"
+        tz: "UTC"
         range: "start"
         time_type: null
         original_text: "12:30 am to 2:30 pm"
@@ -543,6 +583,7 @@ tests:
         hh: 2
         mm: 30
         nn: "pm"
+        tz: "UTC"
         range: "end"
         time_type: null
         original_text: "12:30 am to 2:30 pm"
@@ -553,6 +594,7 @@ tests:
     - hh: 10
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "सुबह 10 बजे"
       output_id: 1
       range: null
