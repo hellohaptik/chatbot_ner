@@ -1226,7 +1226,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': meridiem,
-                'tz':  tz or self.timezone.zone
+                'tz': tz or self.timezone.zone
             }
             time_list.append(time)
             original_list.append(original)
