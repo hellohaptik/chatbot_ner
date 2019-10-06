@@ -271,7 +271,7 @@ class TimeDetector(object):
             r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
             r'[\s-]*?({timezone})?\s*to[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
             r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
-                .format(timezone=self.timezone_choices)
+            .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -349,7 +349,7 @@ class TimeDetector(object):
         regex_patterns = re.compile(
             r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?({timezone})?\s*to'
             r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\W'
-                .format(timezone=self.timezone_choices)
+            .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -426,7 +426,7 @@ class TimeDetector(object):
         regex_patterns = re.compile(
             r'\W((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
             r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
-                .format(timezone=self.timezone_choices)
+            .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -1158,12 +1158,12 @@ class TimeDetector(object):
             original = pattern[0]
             t1 = int(pattern[2])
             t2 = int(pattern[3]) if pattern[3] else 0
-            meridiem = self._get_meridiem(t1, t2)
             tz1 = pattern[1]
             tz2 = pattern[4]
             tz = None
             if tz1 or tz2:
                 tz = self.convert_to_pytz_format(tz1 or tz2)
+            meridiem = self._get_meridiem(t1, t2, tz)
             time = {
                 'hh': t1,
                 'mm': t2,
