@@ -1046,7 +1046,9 @@ class TimeDetector(object):
             original = pattern[0]
             t1 = int(pattern[1])
             t2 = int(pattern[2])
-            tz = pattern_tz[0]
+            tz = None
+            if pattern_tz:
+                tz = pattern_tz[0]
             time = {
                 'hh': t1,
                 'mm': t2,
