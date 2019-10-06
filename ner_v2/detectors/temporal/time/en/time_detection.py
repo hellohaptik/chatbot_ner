@@ -268,9 +268,9 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
+            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
             r'[\s-]*?({timezone})?\s*to[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-            r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
+            r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -347,8 +347,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\W(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?({timezone})?\s*to'
-            r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\W'
+            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?({timezone})?\s*to'
+            r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -424,8 +424,8 @@ class TimeDetector(object):
             original_list = []
 
         regex_patterns = re.compile(
-            r'\W((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
-            r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
+            r'\b((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
+            r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -479,8 +479,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\W((?:before|bfre)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\W'
+        patterns = re.findall(r'\b((?:before|bfre)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
@@ -532,8 +532,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\W((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-                              r'(am|pm|a\.m|p\.m)\s*({timezone})?)\W'.format(timezone=self.timezone_choices),
+        patterns = re.findall(r'\b((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+                              r'(am|pm|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
@@ -584,8 +584,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\W((?:before|bfore)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
-                              r'[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\W'.format(timezone=self.timezone_choices),
+        patterns = re.findall(r'\b((?:before|bfore)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
+                              r'[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0]
