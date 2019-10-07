@@ -118,7 +118,7 @@ class TimeDetector(object):
         """
         Converts informal TZ formats like EST, Eastern Time etc to Oslon format(America/New_York) supported by pytz.
         :param timezone_variant: (str) Informal TZ variant
-        :return: Standard Oslon format for pytz.
+        :return: Standard Olson format for pytz.
         """
         timezone_code = self.timezones_map[timezone_variant].value
         data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),

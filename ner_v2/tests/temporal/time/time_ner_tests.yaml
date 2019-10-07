@@ -15,25 +15,25 @@ tests:
       time_type: null
     range_enabled: false
   - id: en_2
-    message: "meet me at 10:33 pm at the cafe"
+    message: "meet me at 10:33 pm AKST at the cafe"
     outputs:
     - hh: 10
       mm: 33
       nn: "pm"
-      tz: "UTC"
-      original_text: "10:33 pm"
+      tz: "America/Anchorage"
+      original_text: "10:33 pm akst"
       output_id: 1
       range: null
       time_type: null
     range_enabled: false
   - id: en_3
-    message: "meet me at 02 33 p.m. at the cafe"
+    message: "meet me at 02 33 p.m IST at the cafe"
     outputs:
     - hh: 2
       mm: 33
       nn: "pm"
-      tz: "UTC"
-      original_text: "02 33 p.m"
+      tz: "Asia/Kolkata"
+      original_text: "02 33 p.m ist"
       output_id: 1
       range: null
       time_type: null
