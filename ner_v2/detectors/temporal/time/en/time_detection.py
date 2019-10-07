@@ -1150,12 +1150,12 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])\s*({timezone})?)'
+        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])\s*({timezone})?)'
                               r'(?!\s*(?:am|pm|a\.m|p\.m|(?:{timezone})|\d))'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         if not patterns:
             # Optional minutes but compulsory "hour" mention
-            patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])(?:[:.\s]([0-5][0-9]))?\s+'
+            patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])(?:[:.\s]?([0-5][0-9]))?\s+'
                                   r'(?:hours?|hrs?)\s*({timezone})?\b)'.format(timezone=self.timezone_choices),
                                   self.processed_text.lower())
         for pattern in patterns:
