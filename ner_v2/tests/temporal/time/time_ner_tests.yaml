@@ -9,7 +9,7 @@ tests:
       mm: 35
       nn: "am"
       tz: "America/New_York"
-      original_text: "12:35 am"
+      original_text: "12:35 am est"
       output_id: 1
       range: null
       time_type: null
