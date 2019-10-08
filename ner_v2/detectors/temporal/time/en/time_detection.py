@@ -798,7 +798,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((\d+)\s?(min|mins|minutes|hour|hours|hrs|hr)\s?(later|ltr|latr|lter)s?)\b',
+        patterns = re.findall(r'\b((\d+)\s?(min|mins|minutes?|hour|hours|hrs|hr)\s?(later|ltr|latr|lter)s?)\b',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
