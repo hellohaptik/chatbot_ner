@@ -1356,11 +1356,11 @@ class TimeDetector(object):
         patterns = re.findall(r'\b((?:morning|early|subah|mrng|mrning|savere)\s*(?:in|of|at)?\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices), self.processed_text.lower())
 
-        if patterns:
-            original1 = patterns[0].strip()
+        for pattern in patterns:
+            original1 = pattern[0].strip()
             tz = None
-            if patterns[1]:
-                tz = self.convert_to_pytz_format(patterns[1])
+            if pattern[1]:
+                tz = self.convert_to_pytz_format(pattern[1])
             if self.departure_flag:
                 time_type = 'departure'
             elif self.return_flag:
@@ -1413,11 +1413,11 @@ class TimeDetector(object):
         patterns = re.findall(r'\b((?:noon|afternoon)\s*(?:in|of|at)?\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices), self.processed_text.lower())
 
-        if patterns:
-            original1 = patterns[0].strip()
+        for pattern in  patterns:
+            original1 = pattern[0].strip()
             tz = None
-            if patterns[1]:
-                tz = self.convert_to_pytz_format(patterns[1])
+            if pattern[1]:
+                tz = self.convert_to_pytz_format(pattern[1])
             if self.departure_flag:
                 time_type = 'departure'
             elif self.return_flag:
@@ -1470,11 +1470,11 @@ class TimeDetector(object):
         patterns = re.findall(r'\b((?:evening|evng|evning|sham)\s*(?:in|of|at)?\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices), self.processed_text.lower())
 
-        if patterns:
-            original1 = patterns[0].strip()
+        for pattern in patterns:
+            original1 = pattern[0].strip()
             tz = None
-            if patterns[1]:
-                tz = self.convert_to_pytz_format(patterns[1])
+            if pattern[1]:
+                tz = self.convert_to_pytz_format(pattern[1])
             if self.departure_flag:
                 time_type = 'departure'
             elif self.return_flag:
@@ -1527,11 +1527,11 @@ class TimeDetector(object):
         patterns = re.findall(r'\b((?:night|nite|tonight|latenight|tonit|nit|rat)\s*(?:in|of|at)?\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices), self.processed_text.lower())
 
-        if patterns:
-            original1 = patterns[0].strip()
+        for pattern in patterns:
+            original1 = pattern[0].strip()
             tz = None
-            if patterns[1]:
-                tz = self.convert_to_pytz_format(patterns[1])
+            if pattern[1]:
+                tz = self.convert_to_pytz_format(pattern[1])
             if self.departure_flag:
                 time_type = 'departure'
             elif self.return_flag:
@@ -1587,11 +1587,11 @@ class TimeDetector(object):
                                 .format(timezone=self.timezone_choices))
         patterns = preference.findall(self.processed_text.lower())
 
-        if patterns:
-            original1 = patterns[0].strip()
+        for pattern in patterns:
+            original1 = pattern[0].strip()
             tz = None
-            if patterns[1]:
-                tz = self.convert_to_pytz_format(patterns[1])
+            if pattern[1]:
+                tz = self.convert_to_pytz_format(pattern[1])
             if self.departure_flag:
                 time_type = 'departure'
             elif self.return_flag:
