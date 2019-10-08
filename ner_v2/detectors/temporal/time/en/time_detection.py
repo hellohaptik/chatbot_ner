@@ -805,7 +805,7 @@ class TimeDetector(object):
             t1 = int(pattern[1])
             td = pattern[2]
             hours = ['hour', 'hours', 'hrs', 'hr']
-            mins = ['min', 'mins', 'minutes']
+            mins = ['min', 'mins', 'minutes', 'minute']
             setter = ""
             antisetter = ""
             if td in hours:
