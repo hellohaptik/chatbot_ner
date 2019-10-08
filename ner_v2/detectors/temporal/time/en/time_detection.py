@@ -1581,7 +1581,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         # patterns
-        preference = re.compile(r'\b((?:No particular preference|No preference|No particular time|No time|'
+        preference = re.compile(r'\b((?:no particular preference|no preference|no particular time|no time|'
                                 r'anytime|any time|all day|full day|entire day|entireday)'
                                 r'\s*(?:in|of|at)?\s*({timezone})?)\b'
                                 .format(timezone=self.timezone_choices))

@@ -587,6 +587,111 @@ tests:
         range: "end"
         time_type: null
         original_text: "12:30 am to 2:30 pm"
+  - id: en_49
+    message: "Sessions begin at noon"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 11
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "noon"
+      - output_id: 2
+        hh: 5
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "noon"
+  - id: en_50
+    message: "Sessions begin at morning"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "morning"
+      - output_id: 2
+        hh: 11
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "morning"
+  - id: en_51
+    message: "Sessions begin at evening"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 5
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "evening"
+      - output_id: 2
+        hh: 9
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "evening"
+  - id: en_52
+    message: "Sessions begin at night"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 9
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "night"
+      - output_id: 2
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "night"
+  - id: en_53
+    message: "Sessions begin at no particular preference"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "no particular preference"
+      - output_id: 2
+        hh: 11
+        mm: 59
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "no particular preference"
   hi:
   - id: hi_1
     message: "सुबह 10 बजे"
