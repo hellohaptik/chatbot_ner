@@ -13,15 +13,16 @@ from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple
 
 
 class BaseRegexDate(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, data_directory_path, locale=None, timezone='UTC', past_date_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
         Args:
             data_directory_path (str): path of data folder for given language
-            timezone (str): user timezone default UTC
+            timezone (Optional, str): user timezone default UTC
             past_date_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
                                           'parso' to know if the reference is past or future.
+            locale (Optional, str): user locale default None
         """
         self.text = ''
         self.tagged_text = ''

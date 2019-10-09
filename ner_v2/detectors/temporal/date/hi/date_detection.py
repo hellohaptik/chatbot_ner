@@ -10,7 +10,7 @@ class DateDetector(BaseRegexDate):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
-    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale=None, timezone='UTC', past_date_referenced=False):
         super(DateDetector, self).__init__(entity_name,
                                            data_directory_path=DateDetector.data_directory_path,
                                            timezone=timezone,
