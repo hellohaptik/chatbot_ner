@@ -3,6 +3,7 @@ import datetime
 import collections
 import pandas as pd
 import os
+import pytz
 from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE,\
     TIMEZONES_CONSTANT_FILE, TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, \
     TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME, \
@@ -11,7 +12,6 @@ from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value', 'preferred'])
-# Timezone_for_none = collections.namedtuple('TZ_None_case', ['zone'])
 
 
 class TimeDetector(object):
@@ -91,7 +91,6 @@ class TimeDetector(object):
             self.timezone = get_timezone(timezone)
         else:
             self.timezone = None
-        self.now_date = datetime.datetime.now(self.timezone)
         self.timezones_map = {}
 
         self.init_regex_and_parser(os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
@@ -1404,7 +1403,9 @@ class TimeDetector(object):
         if timezone is not None:
             new_timezone = get_timezone(timezone)
         else:
-            new_timezone = self.timezone
+            # If no TZ(neither from api call not from the user message) is given, use 'UTC'
+            new_timezone = self.timezone or pytz.timezone('UTC')
+
         current_datetime = datetime.datetime.now(new_timezone)
         current_hour = current_datetime.hour
         current_min = current_datetime.minute

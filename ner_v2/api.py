@@ -211,7 +211,7 @@ def time(request):
             parameters_dict = get_parameters_dictionary(request)
             ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
-        timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
+        timezone = parameters_dict[PARAMETER_TIMEZONE] or None
         form_check = True if parameters_dict[PARAMETER_STRUCTURED_VALUE] else False
         range_enabled = True if parameters_dict[PARAMETER_RANGE_ENABLED] else False
         time_detection = TimeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
