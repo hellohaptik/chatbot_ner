@@ -11,6 +11,7 @@ from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
 TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value', 'preferred'])
+# Timezone_for_none = collections.namedtuple('TZ_None_case', ['zone'])
 
 
 class TimeDetector(object):
