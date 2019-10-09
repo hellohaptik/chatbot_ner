@@ -160,6 +160,8 @@ class TimeDetector(object):
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_end_range_12_hour_format_without_min(time_list, original_list)
         self._update_processed_text(original_list)
+        time_list, original_list = self._detect_range_24_hour_format(time_list, original_list)
+        self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_format(time_list, original_list)
         self._update_processed_text(original_list)
         time_list, original_list = self._detect_12_hour_without_min(time_list, original_list)
