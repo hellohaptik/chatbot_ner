@@ -245,7 +245,7 @@ class BaseNumberRangeDetector(object):
             return number_range, original_text
 
         if min_part_match and max_part_match:
-            if int(entity_value_min) > int(entity_value_max):
+            if float(entity_value_min) > float(entity_value_max):
                 temp = entity_value_max
                 entity_value_max = entity_value_min
                 entity_value_min = temp
