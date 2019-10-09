@@ -250,7 +250,7 @@ class BaseNumberRangeDetector(object):
                     temp = entity_value_max
                     entity_value_max = entity_value_min
                     entity_value_min = temp
-            except :
+            except:
                 if float(entity_value_min) > float(entity_value_max):
                     temp = entity_value_max
                     entity_value_max = entity_value_min
