@@ -67,7 +67,7 @@ class TimeDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC'):
+    def __init__(self, entity_name, timezone=None):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:
@@ -87,7 +87,10 @@ class TimeDetector(object):
         self.original_time_text = []
         self.tag = '__' + entity_name + '__'
         self.bot_message = None
-        self.timezone = get_timezone(timezone)
+        if timezone:
+            self.timezone = get_timezone(timezone)
+        else:
+            self.timezone = None
         self.now_date = datetime.datetime.now(self.timezone)
         self.timezones_map = {}
 
@@ -302,7 +305,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -321,7 +324,7 @@ class TimeDetector(object):
                 'hh': int(t3),
                 'mm': int(t4),
                 'nn': str(ap2).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -380,7 +383,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': 'hrs',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -398,7 +401,7 @@ class TimeDetector(object):
                 'hh': int(t3),
                 'mm': int(t4),
                 'nn': 'hrs',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -454,7 +457,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -472,7 +475,7 @@ class TimeDetector(object):
                 'hh': int(t2),
                 'mm': 0,
                 'nn': str(ap2).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -531,7 +534,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -585,7 +588,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -636,7 +639,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -690,7 +693,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap1).lower().strip('.'),
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -750,7 +753,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': str(ap).lower().strip('.'),
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
 
             time['nn'] = 'am' if 'a' in time['nn'] else time['nn']
@@ -803,7 +806,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': 0,
                 'nn': str(ap).lower().strip('.'),
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time['nn'] = 'am' if 'a' in time['nn'] else time['nn']
             time['nn'] = 'pm' if 'p' in time['nn'] else time['nn']
@@ -860,7 +863,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = 'df'
-            time['tz'] = self.timezone.zone
+            time['tz'] = None if not self.timezone else self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -902,7 +905,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = 'df'
-            time['tz'] = self.timezone.zone
+            time['tz'] = None if not self.timezone else self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -944,7 +947,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
-            time['tz'] = self.timezone.zone
+            time['tz'] = None if not self.timezone else self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -977,7 +980,7 @@ class TimeDetector(object):
             time[setter] = t1
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
-            time['tz'] = self.timezone.zone
+            time['tz'] = None if not self.timezone else self.timezone.zone
             time_list.append(time)
             original_list.append(original)
         return time_list, original_list
@@ -1030,7 +1033,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': 'hrs',
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time_list.append(time)
             original_list.append(original)
@@ -1078,7 +1081,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': meridiem,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time_list.append(time)
             original_list.append(original)
@@ -1136,7 +1139,7 @@ class TimeDetector(object):
             time = {
                 'hh': t1,
                 'mm': t2,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             if pattern_am:
                 time['nn'] = 'am'
@@ -1197,7 +1200,7 @@ class TimeDetector(object):
             time = {
                 'hh': t1,
                 'mm': 0,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             if pattern_am:
                 time['nn'] = 'am'
@@ -1257,7 +1260,7 @@ class TimeDetector(object):
                 'hh': t1,
                 'mm': t2,
                 'nn': meridiem,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time_list.append(time)
             original_list.append(original)
@@ -1311,7 +1314,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': meridiem,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time_list.append(time)
             original_list.append(original)
@@ -1373,7 +1376,7 @@ class TimeDetector(object):
                 'hh': int(t1),
                 'mm': int(t2),
                 'nn': meridiem,
-                'tz': tz or self.timezone.zone
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
             }
             time_list.append(time)
             original_list.append(original)
@@ -1456,7 +1459,7 @@ class TimeDetector(object):
                 'hh': 12,
                 'mm': 0,
                 'nn': 'am',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -1465,7 +1468,7 @@ class TimeDetector(object):
                 'hh': 11,
                 'mm': 0,
                 'nn': 'am',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -1513,7 +1516,7 @@ class TimeDetector(object):
                 'hh': 11,
                 'mm': 0,
                 'nn': 'am',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -1522,7 +1525,7 @@ class TimeDetector(object):
                 'hh': 5,
                 'mm': 0,
                 'nn': 'pm',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -1570,7 +1573,7 @@ class TimeDetector(object):
                 'hh': 5,
                 'mm': 0,
                 'nn': 'pm',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -1579,7 +1582,7 @@ class TimeDetector(object):
                 'hh': 9,
                 'mm': 0,
                 'nn': 'pm',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -1627,7 +1630,7 @@ class TimeDetector(object):
                 'hh': 9,
                 'mm': 0,
                 'nn': 'pm',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -1636,7 +1639,7 @@ class TimeDetector(object):
                 'hh': 12,
                 'mm': 0,
                 'nn': 'am',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
@@ -1687,7 +1690,7 @@ class TimeDetector(object):
                 'hh': 12,
                 'mm': 0,
                 'nn': 'am',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'start',
                 'time_type': time_type
             }
@@ -1696,7 +1699,7 @@ class TimeDetector(object):
                 'hh': 11,
                 'mm': 59,
                 'nn': 'pm',
-                'tz': tz or self.timezone.zone,
+                'tz': tz or (None if not self.timezone else self.timezone.zone),
                 'range': 'end',
                 'time_type': time_type
             }
