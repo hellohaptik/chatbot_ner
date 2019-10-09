@@ -692,6 +692,27 @@ tests:
         range: "end"
         time_type: null
         original_text: "no particular preference"
+  - id: en_54
+    message: "10:00 to 14:00"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 10
+        mm: 0
+        nn: "hrs"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "10:00 to 14:00"
+      - output_id: 2
+        hh: 14
+        mm: 0
+        nn: "hrs"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "10:00 to 14:00"
   hi:
   - id: hi_1
     message: "सुबह 10 बजे"

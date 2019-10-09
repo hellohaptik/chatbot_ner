@@ -3,14 +3,14 @@ import datetime
 import collections
 import pandas as pd
 import os
-from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE, \
-    TIMEZONE_VARIANTS_CONSTANT_FILE, TIMEZONES_CONSTANT_FILE, TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, \
-    TIMEZONE_VARIANTS_VALUE_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME, \
+from ner_v2.detectors.temporal.constant import AM_MERIDIEM, PM_MERIDIEM, TWELVE_HOUR, EVERY_TIME_TYPE,\
+    TIMEZONES_CONSTANT_FILE, TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, \
+    TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME, \
     TIMEZONES_PREFERRED_REGION_COLUMN_NAME
 from ner_v2.detectors.temporal.utils import get_timezone, get_list_from_pipe_sep_string
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 
-TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value'])
+TimezoneVariants = collections.namedtuple('TimezoneVariant', ['value', 'preferred'])
 
 
 class TimeDetector(object):
@@ -105,14 +105,17 @@ class TimeDetector(object):
         self.bot_message = bot_message
 
     def init_regex_and_parser(self, data_directory_path):
-        timezone_variants_data_path = os.path.join(data_directory_path, TIMEZONE_VARIANTS_CONSTANT_FILE)
+        timezone_variants_data_path = os.path.join(data_directory_path, TIMEZONES_CONSTANT_FILE)
+        columns = [TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME, TIMEZONES_CODE_COLUMN_NAME,
+                   TIMEZONES_PREFERRED_REGION_COLUMN_NAME]
         if os.path.exists(timezone_variants_data_path):
-            timezone_variants_df = pd.read_csv(timezone_variants_data_path, encoding='utf-8')
+            timezone_variants_df = pd.read_csv(timezone_variants_data_path, usecols=columns, encoding='utf-8')
             for index, row in timezone_variants_df.iterrows():
                 tz_name_variants = get_list_from_pipe_sep_string(row[TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME])
-                value = row[TIMEZONE_VARIANTS_VALUE_COLUMN_NAME]
+                value = row[TIMEZONES_CODE_COLUMN_NAME]
+                preferred = row[TIMEZONES_PREFERRED_REGION_COLUMN_NAME]
                 for tz_name in tz_name_variants:
-                    self.timezones_map[tz_name] = TimezoneVariants(value=value)
+                    self.timezones_map[tz_name] = TimezoneVariants(value=value, preferred=preferred)
 
     def convert_to_pytz_format(self, timezone_variant):
         """
@@ -124,13 +127,14 @@ class TimeDetector(object):
         data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                            LANGUAGE_DATA_DIRECTORY)
         timezone_data_path = os.path.join(data_directory_path, TIMEZONES_CONSTANT_FILE)
+        columns = [TIMEZONES_CODE_COLUMN_NAME, TIMEZONES_ALL_REGIONS_COLUMN_NAME]
         if os.path.exists(timezone_data_path):
-            timezones_df = pd.read_csv(timezone_data_path, encoding='utf-8')
-            timezones_df.set_index(TIMEZONES_CODE_COLUMN_NAME, inplace=True)
+            timezones_df = pd.read_csv(timezone_data_path, usecols=columns, index_col=TIMEZONES_CODE_COLUMN_NAME,
+                                       encoding='utf-8')
             if re.search(self.timezone.zone, timezones_df.loc[timezone_code][TIMEZONES_ALL_REGIONS_COLUMN_NAME]):
                 return self.timezone.zone
             else:
-                return timezones_df.loc[timezone_code][TIMEZONES_PREFERRED_REGION_COLUMN_NAME]
+                return self.timezones_map[timezone_variant].preferred
 
         return self.timezone.zone
 
@@ -273,7 +277,7 @@ class TimeDetector(object):
             r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?'
             r'(pm|am|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
             r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
-            .format(timezone=self.timezone_choices)
+                .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -352,7 +356,7 @@ class TimeDetector(object):
             r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
             r'[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
             r'[\s-]*?({timezone})?)(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})|\d))'
-            .format(timezone=self.timezone_choices)
+                .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -426,7 +430,7 @@ class TimeDetector(object):
         regex_patterns = re.compile(
             r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)'
             r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
-            .format(timezone=self.timezone_choices)
+                .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
@@ -503,7 +507,7 @@ class TimeDetector(object):
         regex_patterns = re.compile(
             r'\b((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
             r'([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
-            .format(timezone=self.timezone_choices)
+                .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
         for pattern in patterns:
