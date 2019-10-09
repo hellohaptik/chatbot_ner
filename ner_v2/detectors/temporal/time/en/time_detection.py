@@ -268,8 +268,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)'
-            r'[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?'
+            r'(pm|am|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
             r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
