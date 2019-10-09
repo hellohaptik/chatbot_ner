@@ -1,5 +1,5 @@
 unit_type,unit_value,unit_variants
-currency,rupees,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | paisa | paise | inr | re | ₹
+currency,rupees,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | paisa | paise | inr | ₹
 currency,dollar,Dollar | dollars | usd | $
 currency,euro,Euro | euros | eur | 	€
 currency,pound sterling,Pound sterling | pound sterlings | quid | pounds | sterling | pound | gbp | £
