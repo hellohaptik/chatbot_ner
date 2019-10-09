@@ -268,9 +268,9 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)'
-            r'[\s-]*?({timezone})?\s*to[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-            r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
+            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)'
+            r'[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+            r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -328,6 +328,81 @@ class TimeDetector(object):
             break
         return time_list, original_list
 
+    def _detect_range_24_hour_format(self, time_list=None, original_list=None):
+        """
+        Finds 24 hour range format time from text
+        CURRENTLY IT IS LIMITED ONLY TO ONE RANGE PER TEXT
+
+        Args:
+            time_list (list): Optional, list to store dictionaries of detected time entities
+            original_list (list): Optional, list to store corresponding substrings of given text which were detected as
+                            time entities
+
+        Returns:
+            A tuple of two lists with first list containing the detected time entities and second list containing their
+            corresponding substrings in the given text.
+        """
+        if time_list is None:
+            time_list = []
+        if original_list is None:
+            original_list = []
+        regex_patterns = re.compile(
+            r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
+            r'[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
+            r'[\s-]*?({timezone})?)(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})|\d))'
+            .format(timezone=self.timezone_choices)
+        )
+        patterns = regex_patterns.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original1 = pattern[0].strip()
+            original2 = pattern[0].strip()
+            if self.departure_flag:
+                time_type = 'departure'
+            elif self.return_flag:
+                time_type = 'return'
+            else:
+                time_type = None
+            t1 = pattern[2]
+            t2 = pattern[3]
+            tz1 = pattern[1]
+            tz2 = pattern[4]
+            tz = None
+            if tz1 or tz2:
+                tz = self.convert_to_pytz_format(tz1 or tz2)
+            time1 = {
+                'hh': int(t1),
+                'mm': int(t2),
+                'nn': 'hrs',
+                'tz': tz or self.timezone.zone,
+                'range': 'start',
+                'time_type': time_type
+            }
+            time1['nn'] = 'am' if 'a' in time1['nn'] else time1['nn']
+            time1['nn'] = 'pm' if 'p' in time1['nn'] else time1['nn']
+
+            t3 = pattern[6]
+            t4 = pattern[7]
+            tz3 = pattern[5]
+            tz4 = pattern[8]
+            tz = None
+            if tz3 or tz4:
+                tz = self.convert_to_pytz_format(tz3 or tz4)
+            time2 = {
+                'hh': int(t3),
+                'mm': int(t4),
+                'nn': 'hrs',
+                'tz': tz or self.timezone.zone,
+                'range': 'end',
+                'time_type': time_type
+            }
+
+            time_list.append(time1)
+            original_list.append(original1)
+            time_list.append(time2)
+            original_list.append(original2)
+            break
+        return time_list, original_list
+
     def _detect_range_12_hour_format_without_min(self, time_list=None, original_list=None):
         """
         Finds 12 hour range format time from text without minutes
@@ -347,8 +422,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)[\s-]*?({timezone})?\s*to'
-            r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'
+            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)'
+            r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -425,7 +500,7 @@ class TimeDetector(object):
 
         regex_patterns = re.compile(
             r'\b((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?'
-            r'([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
+            r'([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
         patterns = regex_patterns.findall(self.processed_text.lower())
@@ -480,7 +555,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b((?:before|bfre)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'
+                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
@@ -533,7 +608,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b((?:after|aftr)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-                              r'(am|pm|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
+                              r'(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0].strip()
@@ -585,7 +660,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b((?:before|bfore)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
-                              r'[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
+                              r'[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
+                              .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original1 = pattern[0].strip()
@@ -650,7 +726,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])'
-                              r'[\s-]*?(pm|am|a\.m|p\.m)\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
+                              r'[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
+                              .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -704,7 +781,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m|p\.m)\s*({timezone})?)\b'
+        patterns = re.findall(r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices), self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -926,7 +1003,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])?\s*'
-                              r'(?:h|hrs|hr)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m|p\.m|(?:{timezone})'
+                              r'(?:h|hrs|hr)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})'
                               r'|(?:h|hrs|hr)|\d))\b'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
@@ -976,7 +1053,7 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b(({timezone})?\s*(00?|1[3-9]?|2[0-3])[:.\s]([0-5][0-9])'
-                              r'\s*(?:h|hr|hrs)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m|p\.m|(?:h|hrs|hr)|'
+                              r'\s*(?:h|hr|hrs)?\s*({timezone})?)(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:h|hrs|hr)|'
                               r'(?:{timezone})|\d))\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
@@ -1035,7 +1112,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((0?[1-9]|1[0-2])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m|p\.m|\d))',
+        patterns = re.findall(r'\b((0?[1-9]|1[0-2])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m\.?|p\.m\.?|\d))',
                               self.processed_text.lower())
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)\s', self.processed_text.lower())
         pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)\s', self.processed_text.lower())
@@ -1151,7 +1228,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])\s*({timezone})?)'
-                              r'(?!\s*(?:am|pm|a\.m|p\.m|(?:{timezone})|\d))'.format(timezone=self.timezone_choices),
+                              r'(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})|\d))'
+                              .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         if not patterns:
             # Optional minutes but compulsory "hour" mention
