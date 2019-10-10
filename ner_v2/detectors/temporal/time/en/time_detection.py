@@ -973,13 +973,13 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((once|onc|1se)\s*(in|every|evry)?\s*(\d+|a)\s?(day|days))\b',
+        patterns = re.findall(r'\b((once|onc|1se)\s*(in|every|evry|in every)?\s*(\d+|a)\s?(day|days))\b',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
-            if type(pattern[3]) is int:
+            try:
                 t1 = 24 * int(pattern[3])
-            else:
+            except:
                 t1 = 24
             setter = "hh"
             antisetter = "mm"
