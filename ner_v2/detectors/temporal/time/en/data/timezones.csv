@@ -1,0 +1,10 @@
+code,timezone_variants,preferred,all_regions
+IST,IST|Indian Time|Indian Standard Time,Asia/Kolkata,Asia/Kolkata
+EST,EST|Eastern Standard Time|Eastern Time|ET|EDT,America/New_York,America/New_York|America/Detroit|America/Kentucky/Louisville|America/Kentucky/Monticello|America/Indiana/Indianapolis|America/Indiana/Vincennes|America/Indiana/Winamac|America/Indiana/Marengo|America/Indiana/Petersburg|America/Indiana/Vevay
+CST,CST|Central Standard Time|Central Time|CT|CDT,America/Chicago,America/Chicago|America/Indiana/Tell_City|America/Indiana/Knox|America/Menominee|America/North_Dakota/Center|America/North_Dakota/New_Salem|America/North_Dakota/Beulah
+MST,MST|Mountain Standard Time|Mountain Time|MT|MDT,America/Denver,America/Denver|America/Boise|America/Phoenix
+PST,PST|Pacific Standard Time|Pacific Time|PT|PDT,America/Los_Angeles,America/Los_Angeles
+AKST,AKST|Alaska Standard Time|Alaska Time|AKDT,America/Anchorage,America/Anchorage|America/Juneau|America/Sitka|America/Yakutat|America/Nome|America/Metlakatla
+HST,HST|Hawaii Standard Time|HDT,America/Adak,America/Adak|Pacific/Honolulu
+HAST,HAST|Hawaii-Aleutian Standard Time|Hawaii Aleutian Standard Time|Hawaii Time|HADT,Pacific/Honolulu,Pacific/Honolulu
+UTC,UTC|GMT|Greenwich Mean Time|Greenwich Time|Coordinated Universal Time,UTC,UTC

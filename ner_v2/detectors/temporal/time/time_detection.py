@@ -41,7 +41,7 @@ class TimeDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name='time', timezone='UTC', language=ENGLISH_LANG):
+    def __init__(self, entity_name='time', timezone=None, language=ENGLISH_LANG):
         """Initializes a TimeDetector object with given entity_name and timezone
 
         Args:
@@ -61,7 +61,10 @@ class TimeDetector(BaseDetector):
         self.time = []
         self.original_time_text = []
         self.tag = '__' + entity_name + '__'
-        self.timezone = get_timezone(timezone)
+        if timezone:
+            self.timezone = get_timezone(timezone)
+        else:
+            self.timezone = None
         self.language = language
 
         try:
