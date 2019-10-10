@@ -977,10 +977,10 @@ class TimeDetector(object):
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
-            try:
-                t1 = 24 * int(pattern[3])
-            except:
+            if not pattern[3] or pattern[3] == "a":
                 t1 = 24
+            else:
+                t1 = 24 * int(pattern[3])
             setter = "hh"
             antisetter = "mm"
             time = dict()
