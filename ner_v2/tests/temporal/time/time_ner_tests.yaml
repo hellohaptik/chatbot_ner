@@ -578,7 +578,7 @@ tests:
         tz: "UTC"
         range: "start"
         time_type: null
-        original_text: "12:30 am to 2:30 pm"
+        original_text: "from 12:30 am to 2:30 pm"
       - output_id: 2
         hh: 2
         mm: 30
