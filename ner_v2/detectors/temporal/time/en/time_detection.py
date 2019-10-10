@@ -277,8 +277,9 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?'
-            r'(pm|am|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
+            r'\b((?:from)?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?'
+            r'(pm|am|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-|till|until|untill|upto|up to)'
+            r'[\s-]*?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
             r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
@@ -356,8 +357,9 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
-            r'[\s-]*?({timezone})?\s*(?:to|-)[\s-]*?({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
+            r'\b((?:from)?({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
+            r'[\s-]*?({timezone})?\s*(?:to|-|till|until|untill|upto|up to)[\s-]*?({timezone})?\s*'
+            r'(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])'
             r'[\s-]*?({timezone})?)(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})|\d))'
             .format(timezone=self.timezone_choices)
         )
@@ -431,7 +433,8 @@ class TimeDetector(object):
         if original_list is None:
             original_list = []
         regex_patterns = re.compile(
-            r'\b(({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*(?:to|-)'
+            r'\b((?:from)?({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)[\s-]*?({timezone})?\s*'
+            r'(?:to|-|till|until|untill|upto|up to)'
             r'\s*({timezone})?[\s-]*?(0?[2-9]|0?1[0-2]?)[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
             .format(timezone=self.timezone_choices)
         )
@@ -563,8 +566,9 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((?:before|bfre)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)[\s-]*'
-                              r'(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
+        patterns = re.findall(r'\b((?:before|bfre|till|until|untill|upto|up to)[\s-]*({timezone})?\s*'
+                              r'(0?[2-9]|0?1[0-2]?)[\s-]*(?::|\.|\s)?[\s-]*?([0-5][0-9])[\s-]*?'
+                              r'(pm|am|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
         for pattern in patterns:
@@ -668,7 +672,8 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((?:before|bfore)[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
+        patterns = re.findall(r'\b((?:before|bfore|till|until|untill|upto|up to)'
+                              r'[\s-]*({timezone})?\s*(0?[2-9]|0?1[0-2]?)'
                               r'[\s-]*(am|pm|a\.m\.?|p\.m\.?)\s*({timezone})?)\b'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
@@ -968,11 +973,14 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b((once|onc|1se)\s*(in)?\s*(\d+)\s?(day|days))\b',
+        patterns = re.findall(r'\b((once|onc|1se)\s*(in|every|evry|in every)?\s*(\d+|a)\s?(day|days))\b',
                               self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
-            t1 = 24 * int(pattern[3])
+            if not pattern[3] or pattern[3] == "a":
+                t1 = 24
+            else:
+                t1 = 24 * int(pattern[3])
             setter = "hh"
             antisetter = "mm"
             time = dict()
@@ -1124,7 +1132,8 @@ class TimeDetector(object):
         patterns = re.findall(r'\b((0?[1-9]|1[0-2])[:.\s]([0-5][0-9]))(?!\s?(?:am|pm|a\.m\.?|p\.m\.?|\d))',
                               self.processed_text.lower())
         pattern_am = re.findall(r'\s(morning|early|subah|mrng|mrning|savere)\s', self.processed_text.lower())
-        pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham)\s', self.processed_text.lower())
+        pattern_pm = re.findall(r'\s(noon|afternoon|evening|evng|evning|sham|lunch|dinner)\s',
+                                self.processed_text.lower())
         pattern_night = re.findall(r'\s(night|nite|tonight|latenight|tonit|nit|rat)\s', self.processed_text.lower())
         pattern_tz = re.findall(r'(?:\b|[^a-zA-Z])({timezone})\b'.format(timezone=self.timezone_choices),
                                 self.processed_text.lower())
