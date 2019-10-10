@@ -1,5 +1,6 @@
 range_variants,position,range_type
 above | abv | abov |  more than | mor than | more den | mor den | greater than | greater | over,-1,min
+onwards | and above | or above | or more | or great | or abov | or abv,1,min
 max | upto | up to | around | below | less than | less | less den,-1,max
-max | onwards | and above | or above ,1,max
+max ,1,max
 To | - ,0,min_max
