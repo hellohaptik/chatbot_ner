@@ -4,7 +4,7 @@ from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_ST
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
     PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE, \
-    PARAMETER_LOCALE
+    PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -42,6 +42,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        PARAMETER_NUMBER_UNIT_TYPE: request.GET.get('unit_type'),
                        PARAMETER_LOCALE: request.GET.get('locale'),
+                       PARAMETER_RANGE_ENABLED: request.GET.get('range_enabled')
                        }
 
     return parameters_dict
@@ -72,6 +73,7 @@ def parse_post_request(request):
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
         PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type'),
         PARAMETER_LOCALE: request_data.get('locale'),
+        PARAMETER_RANGE_ENABLED: request_data.get('range_enabled')
     }
 
     return parameters_dict
@@ -209,8 +211,9 @@ def time(request):
             parameters_dict = get_parameters_dictionary(request)
             ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
-        timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
+        timezone = parameters_dict[PARAMETER_TIMEZONE] or None
         form_check = True if parameters_dict[PARAMETER_STRUCTURED_VALUE] else False
+        range_enabled = True if parameters_dict[PARAMETER_RANGE_ENABLED] else False
         time_detection = TimeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                       language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                       timezone=timezone)
@@ -224,7 +227,8 @@ def time(request):
             entity_output = time_detection.detect(message=message,
                                                   structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                   fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                  form_check=form_check)
+                                                  form_check=form_check,
+                                                  range_enabled=range_enabled)
         elif isinstance(message, (list, tuple)):
             entity_output = time_detection.detect_bulk(messages=message)
 

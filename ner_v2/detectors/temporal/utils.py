@@ -265,7 +265,7 @@ def get_next_date_with_dd(dd, after_datetime):
     return None, None, None
 
 
-def get_timezone(timezone, ignore_errors=True):
+def get_timezone(timezone, ignore_errors=False):
     # type: (Union[datetime.tzinfo, str, unicode], bool) -> datetime.tzinfo
     """
     Return a datetime.tzinfo (pytz timezone object). If `timezone` is a str, try constructing a pytz
@@ -275,7 +275,7 @@ def get_timezone(timezone, ignore_errors=True):
     Args:
         timezone (str or datetime.tzinfo): Either a valid timezone string or datetime.tzinfo object
         ignore_errors (bool, optional): when set to True, ignore errors and return a pytz.UTC when error occurs. When
-            set to False, raise exception when invalid timezone is given. Defaults to True.
+            set to False, raise exception when invalid timezone is given. Defaults to False.
 
     Returns:
         datetime.tzinfo: A pytz timezone object
@@ -294,5 +294,17 @@ def get_timezone(timezone, ignore_errors=True):
             timezone = pytz.timezone('UTC')
             ner_logger.debug('Using "UTC" as default timezone')
         else:
-            raise
+            return None
     return timezone
+
+
+def get_list_from_pipe_sep_string(text_string):
+    """
+    Split numerals
+    Args:
+        text_string (str):  text
+    Returns:
+        (list) : list containing numeral after split
+    """
+    text_list = text_string.split("|")
+    return [x.lower().strip() for x in text_list if x.strip()]

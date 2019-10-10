@@ -3,34 +3,37 @@ args:
 tests:
   en:
   - id: en_1
-    message: "the time is 12:35 am"
+    message: "the time is 12:35 am est"
     outputs:
     - hh: 12
       mm: 35
       nn: "am"
-      original_text: "12:35 am"
+      tz: "America/New_York"
+      original_text: "12:35 am est"
       output_id: 1
       range: null
       time_type: null
     range_enabled: false
   - id: en_2
-    message: "meet me at 10:33 pm at the cafe"
+    message: "meet me at 10:33 pm AKST at the cafe"
     outputs:
     - hh: 10
       mm: 33
       nn: "pm"
-      original_text: "10:33 pm"
+      tz: "America/Anchorage"
+      original_text: "10:33 pm akst"
       output_id: 1
       range: null
       time_type: null
     range_enabled: false
   - id: en_3
-    message: "meet me at 02 33 p.m. at the cafe"
+    message: "meet me at 02 33 p.m IST at the cafe"
     outputs:
     - hh: 2
       mm: 33
       nn: "pm"
-      original_text: "02 33 p.m"
+      tz: "Asia/Kolkata"
+      original_text: "02 33 p.m ist"
       output_id: 1
       range: null
       time_type: null
@@ -41,6 +44,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "12 am"
       output_id: 1
       range: null
@@ -52,6 +56,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "12-pm"
       output_id: 1
       range: null
@@ -63,6 +68,7 @@ tests:
     - hh: 1
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "1 am"
       output_id: 1
       range: null
@@ -74,6 +80,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -85,6 +92,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -96,6 +104,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -107,6 +116,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -118,6 +128,7 @@ tests:
     - hh: 0
       mm: 15
       nn: "df"
+      tz: "UTC"
       original_text: "in 15mins"
       output_id: 1
       range: null
@@ -129,6 +140,7 @@ tests:
     - hh: 0
       mm: 25
       nn: "df"
+      tz: "UTC"
       original_text: "about 25 minutes"
       output_id: 1
       range: null
@@ -140,6 +152,7 @@ tests:
     - hh: 5
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "after 5 hrs"
       output_id: 1
       range: null
@@ -151,6 +164,7 @@ tests:
     - hh: 13
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "in around 13 hours"
       output_id: 1
       range: null
@@ -162,6 +176,7 @@ tests:
     - hh: 0
       mm: 20
       nn: "df"
+      tz: "UTC"
       original_text: "20 minutes later"
       output_id: 1
       range: null
@@ -173,6 +188,7 @@ tests:
     - hh: 0
       mm: 5
       nn: "df"
+      tz: "UTC"
       original_text: "5mins latr"
       output_id: 1
       range: null
@@ -184,6 +200,7 @@ tests:
     - hh: 1
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "1 hour ltr"
       output_id: 1
       range: null
@@ -195,6 +212,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "df"
+      tz: "UTC"
       original_text: "3 hrs later"
       output_id: 1
       range: null
@@ -206,6 +224,7 @@ tests:
     - hh: 0
       mm: 1440
       nn: "ev"
+      tz: "UTC"
       original_text: "every 1440 minutes"
       output_id: 1
       range: null
@@ -217,6 +236,7 @@ tests:
     - hh: 24
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "evry 24 hrs"
       output_id: 1
       range: null
@@ -228,6 +248,7 @@ tests:
     - hh: 72
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "once in 3 days"
       output_id: 1
       range: null
@@ -239,6 +260,7 @@ tests:
     - hh: 24
       mm: 0
       nn: "ev"
+      tz: "UTC"
       original_text: "once in 1 day"
       output_id: 1
       range: null
@@ -250,6 +272,7 @@ tests:
     - hh: 0
       mm: 35
       nn: "hrs"
+      tz: "UTC"
       original_text: "00:35"
       output_id: 1
       range: null
@@ -261,6 +284,7 @@ tests:
     - hh: 22
       mm: 33
       nn: "hrs"
+      tz: "UTC"
       original_text: "22:33"
       output_id: 1
       range: null
@@ -272,6 +296,7 @@ tests:
     - hh: 14
       mm: 33
       nn: "hrs"
+      tz: "UTC"
       original_text: "14 33"
       output_id: 1
       range: null
@@ -283,6 +308,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "hrs"
+      tz: "UTC"
       original_text: "12 hrs"
       output_id: 1
       range: null
@@ -294,6 +320,7 @@ tests:
     - hh: 0
       mm: 0
       nn: "hrs"
+      tz: "UTC"
       original_text: "0 hours"
       output_id: 1
       range: null
@@ -305,6 +332,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -316,6 +344,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: "UTC"
       original_text: null
       output_id: 1
       range: null
@@ -327,6 +356,7 @@ tests:
     - hh: null
       mm: null
       nn: null
+      tz: null
       original_text: null
       output_id: 1
       range: null
@@ -338,6 +368,7 @@ tests:
     - hh: 12
       mm: 30
       nn: "am"
+      tz: "UTC"
       original_text: "12:30"
       output_id: 1
       range: null
@@ -349,6 +380,7 @@ tests:
     - hh: 11
       mm: 30
       nn: "am"
+      tz: "UTC"
       original_text: "11:30"
       output_id: 1
       range: null
@@ -360,6 +392,7 @@ tests:
     - hh: 11
       mm: 30
       nn: "pm"
+      tz: "UTC"
       original_text: "11:30"
       output_id: 1
       range: null
@@ -371,6 +404,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "12:00"
       output_id: 1
       range: null
@@ -382,6 +416,7 @@ tests:
     - hh: 5
       mm: 29
       nn: "pm"
+      tz: "UTC"
       original_text: "5:29"
       output_id: 1
       range: null
@@ -393,6 +428,7 @@ tests:
     - hh: 3
       mm: 11
       nn: "pm"
+      tz: "UTC"
       original_text: "3:11"
       output_id: 1
       range: null
@@ -404,6 +440,7 @@ tests:
     - hh: 12
       mm: 22
       nn: "pm"
+      tz: "UTC"
       original_text: "12:22"
       output_id: 1
       range: null
@@ -415,6 +452,7 @@ tests:
     - hh: 3
       mm: 33
       nn: "am"
+      tz: "UTC"
       original_text: "3:33"
       output_id: 1
       range: null
@@ -426,6 +464,7 @@ tests:
     - hh: 4
       mm: 44
       nn: "am"
+      tz: "UTC"
       original_text: "4:44"
       output_id: 1
       range: null
@@ -437,6 +476,7 @@ tests:
     - hh: 5
       mm: 55
       nn: "pm"
+      tz: "UTC"
       original_text: "5:55"
       output_id: 1
       range: null
@@ -448,6 +488,7 @@ tests:
     - hh: 6
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "6:00"
       output_id: 1
       range: null
@@ -459,6 +500,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "at 3"
       output_id: 1
       range: null
@@ -470,6 +512,7 @@ tests:
     - hh: 12
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "at 12"
       output_id: 1
       range: null
@@ -481,6 +524,7 @@ tests:
     - hh: 3
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "after 3"
       output_id: 1
       range: null
@@ -492,6 +536,7 @@ tests:
     - hh: 4
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "by 4"
       output_id: 1
       range: null
@@ -503,6 +548,7 @@ tests:
     - hh: 5
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "before 5"
       output_id: 1
       range: null
@@ -514,6 +560,7 @@ tests:
     - hh: 6
       mm: 0
       nn: "pm"
+      tz: "UTC"
       original_text: "exact 6"
       output_id: 1
       range: null
@@ -528,6 +575,7 @@ tests:
         hh: 12
         mm: 30
         nn: "am"
+        tz: "UTC"
         range: "start"
         time_type: null
         original_text: "12:30 am to 2:30 pm"
@@ -535,9 +583,136 @@ tests:
         hh: 2
         mm: 30
         nn: "pm"
+        tz: "UTC"
         range: "end"
         time_type: null
         original_text: "12:30 am to 2:30 pm"
+  - id: en_49
+    message: "Sessions begin at noon"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 11
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "noon"
+      - output_id: 2
+        hh: 5
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "noon"
+  - id: en_50
+    message: "Sessions begin at morning"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "morning"
+      - output_id: 2
+        hh: 11
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "morning"
+  - id: en_51
+    message: "Sessions begin at evening"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 5
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "evening"
+      - output_id: 2
+        hh: 9
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "evening"
+  - id: en_52
+    message: "Sessions begin at night"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 9
+        mm: 0
+        nn: "pm"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "night"
+      - output_id: 2
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "night"
+  - id: en_53
+    message: "Sessions begin at no particular preference"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 12
+        mm: 0
+        nn: "am"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "no particular preference"
+      - output_id: 2
+        hh: 11
+        mm: 59
+        nn: "pm"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "no particular preference"
+  - id: en_54
+    message: "10:00 to 14:00"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 10
+        mm: 0
+        nn: "hrs"
+        tz: "UTC"
+        range: "start"
+        time_type: null
+        original_text: "10:00 to 14:00"
+      - output_id: 2
+        hh: 14
+        mm: 0
+        nn: "hrs"
+        tz: "UTC"
+        range: "end"
+        time_type: null
+        original_text: "10:00 to 14:00"
   hi:
   - id: hi_1
     message: "सुबह 10 बजे"
@@ -545,6 +720,7 @@ tests:
     - hh: 10
       mm: 0
       nn: "am"
+      tz: "UTC"
       original_text: "सुबह 10 बजे"
       output_id: 1
       range: null

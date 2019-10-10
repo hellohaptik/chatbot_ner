@@ -5,6 +5,8 @@ import datetime
 import os
 import re
 
+import pytz
+
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.temporal.constant import (DATETIME_CONSTANT_FILE, ADD_DIFF_DATETIME_TYPE, NUMERALS_CONSTANT_FILE,
                                                 TIME_CONSTANT_FILE, REF_DATETIME_TYPE, HOUR_TIME_TYPE,
@@ -14,7 +16,7 @@ from ner_v2.detectors.temporal.utils import get_tuple_dict, get_hour_min_diff, g
 
 
 class BaseRegexTime(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC'):
+    def __init__(self, entity_name, data_directory_path, timezone=None):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
@@ -27,7 +29,10 @@ class BaseRegexTime(object):
         self.processed_text = ''
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
-        self.timezone = get_timezone(timezone)
+        if timezone:
+            self.timezone = get_timezone(timezone)
+        else:
+            self.timezone = None
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
@@ -45,8 +50,7 @@ class BaseRegexTime(object):
         # Variable to define default order in which these regex will work
         self.detector_preferences = [
             self._detect_time_with_coln_format,
-            self._detect_hour_minute
-        ]
+            self._detect_hour_minute]
 
     def set_bot_message(self, bot_message):
         """
@@ -190,8 +194,11 @@ class BaseRegexTime(object):
         Returns
             str: returns the meridiem type whether its am and pm
         """
-        current_hour = self.now_date.hour
-        current_min = self.now_date.minute
+        # If no TZ(neither from api call not from the user message) is given, use 'UTC'
+        new_timezone = self.timezone or pytz.timezone('UTC')
+        current_datetime = datetime.datetime.now(new_timezone)
+        current_hour = current_datetime.hour
+        current_min = current_datetime.minute
         if hours == 0 or hours >= TWELVE_HOUR:
             return 'hrs'
 
@@ -267,7 +274,8 @@ class BaseRegexTime(object):
             time = {
                 'hh': int(hh),
                 'mm': int(mm),
-                'nn': nn
+                'nn': nn,
+                'tz': None if not self.timezone else self.timezone.zone
             }
 
             time_list.append(time)
@@ -294,7 +302,7 @@ class BaseRegexTime(object):
             >>> time_list = []
             >>> original_list = []
             >>> preprocessed_text = u'आज 05:40 बजे अजना'
-            >>> _detect_time_with_coln_format(time_list, original_list)
+            >>> self._detect_time_with_coln_format(time_list, original_list)
             >>> ([{'hh': 5, 'mm': 40, 'nn': 'pm', 'time_type': None}], ["05:40"])
 
 
@@ -316,6 +324,7 @@ class BaseRegexTime(object):
                 time = {
                     'hh': hh,
                     'mm': mm,
+                    'tz': None if not self.timezone else self.timezone.zone,
                     'time_type': None
                 }
 
