@@ -2,7 +2,17 @@
 import pandas as pd
 import collections
 import os
-import re
+
+try:
+    import regex as re
+
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+
+    import re
+
+    _re_flags = re.UNICODE
 
 from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
@@ -151,8 +161,10 @@ class BaseNumberDetector(object):
 
         # add re.escape to handle decimal cases in detected original
         detected_original = re.escape(detected_original)
-        unit_matches = re.search(r'\W+((' + self.unit_choices + r')[\.\,\s]*' + detected_original + r')|(' +
-                                 detected_original + r'\s*(' + self.unit_choices + r'))\W+', processed_text,
+        unit_matches = re.search(r'\W+((' + self.unit_choices + r')[.,\s]*' + detected_original + r')\W+|\W+(' +
+                                 detected_original + r'\s*(' +
+                                 self.unit_choices + r'))\W+',
+                                 processed_text,
                                  re.UNICODE)
         if unit_matches:
             original_text_prefix, unit_prefix, original_text_suffix, unit_suffix = unit_matches.groups()
@@ -209,11 +221,19 @@ class BaseNumberDetector(object):
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
-            for number, original_text in zip(numbers, original_texts):
+            full_list = list(zip(numbers, original_texts))
+            """
+            list() is added to above zip as in python 3, zip() returns a zip object instead of zip function and
+                our lint checker is matching it for python 3
+            """
+            sorted_full_list = sorted(full_list, key=lambda kv: len(kv[1]), reverse=True)
+            for number, original_text in sorted_full_list:
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, numeral_text)
-                numeral_text = numeral_text.replace(original_text, self.tag)
+                # numeral_text = numeral_text.replace(original_text, self.tag)
+                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
+                numeral_text = _pattern.sub(self.tag, numeral_text)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
@@ -286,7 +306,8 @@ class BaseNumberDetector(object):
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
-                processed_text = processed_text.replace(original_text, self.tag)
+                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
+                processed_text = _pattern.sub(self.tag, processed_text)
                 number_list.append({
                     NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                     NUMBER_DETECTION_RETURN_DICT_UNIT: unit
@@ -307,8 +328,9 @@ class BaseNumberDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            self.tagged_text = self.tagged_text.replace(detected_text, self.tag)
-            self.processed_text = self.processed_text.replace(detected_text, '')
+            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
+            self.processed_text = _pattern.sub('', self.processed_text)
 
 
 class NumberDetector(BaseNumberDetector):
