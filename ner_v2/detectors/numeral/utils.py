@@ -80,7 +80,7 @@ def get_number_from_number_word(text, number_word_dict):
                 result_text, current_text = '', ''
 
             # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
-            current = 1 if (scale > 0 and current == 0 and increment == 0) else current
+            current = 1 if (scale > 0 and current == 0 and increment == 0 and word != 'zero') else current
             current = current * scale + increment
             current_text += part
             if scale > 1:
