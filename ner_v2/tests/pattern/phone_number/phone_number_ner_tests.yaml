@@ -102,7 +102,7 @@ tests:
     outputs:
     - original_text: "14089126172"
       output_id: 1
-      value: "14089126172"
+      value: "4089126172"
       country_calling_code: '1'
     - original_text: "02226129854"
       output_id: 2
