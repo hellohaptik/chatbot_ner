@@ -47,7 +47,8 @@ class PhoneNumberDetectorTestMeta(type):
 
         def run_test(self):
             message = testcase["message"]
-            number_detector_object = PhoneDetector(entity_name='phone_number', language=language)
+            locale = testcase["locale"]
+            number_detector_object = PhoneDetector(entity_name='phone_number', language=language, locale=locale)
             phone_number_list, spans = number_detector_object.detect_entity(message)
 
             expected_phone_number_list, expected_spans = parse_expected_outputs(testcase["outputs"])

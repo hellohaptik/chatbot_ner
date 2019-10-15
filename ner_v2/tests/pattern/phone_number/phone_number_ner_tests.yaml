@@ -2,107 +2,142 @@ tests:
   en:
   - id: en_1
     message: "Set a reminder on 02226129854"
+    locale: "en-in"
     outputs:
     - original_text: "02226129854"
       output_id: 1
-      value: "02226129854"
+      value: "2226129854"
+      country_calling_code: '91'
   - id: en_2
     message: "Set a reminder on 022 26129854"
+    locale: "en-in"
     outputs:
     - original_text: "022 26129854"
       output_id: 1
-      value: "02226129854"
+      value: "2226129854"
+      country_calling_code: '91'
   - id: en_3
     message: "Call the number 9820334455"
+    locale: "en-in"
     outputs:
     - original_text: "9820334455"
       output_id: 1
       value: "9820334455"
+      country_calling_code: '91'
   - id: en_4
     message: "Set a reminder on 919820334455"
+    locale: "en-in"
     outputs:
     - original_text: "919820334455"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_5
     message: "Set a reminder on 91 9820334455"
+    locale: "en-in"
     outputs:
     - original_text: "91 9820334455"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_6
     message: "Set a reminder on +91 9820334455"
+    locale: "en-in"
     outputs:
     - original_text: "+91 9820334455"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_7
     message: "Set a reminder on +919820334455"
+    locale: "en-in"
     outputs:
     - original_text: "+919820334455"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_8
     message: "Set a reminder on +919820334455"
+    locale: "en-in"
     outputs:
     - original_text: "+919820334455"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_9
     message: "Set a reminder on 91 9820-3344-55"
+    locale: "en-in"
     outputs:
     - original_text: "91 9820-3344-55"
       output_id: 1
-      value: "919820334455"
+      value: "9820334455"
+      country_calling_code: '91'
   - id: en_10
     message: "Set a reminder on +1 (408) 912-6172"
+    locale: "en-in"
     outputs:
     - original_text: "+1 (408) 912-6172"
       output_id: 1
-      value: "14089126172"
+      value: "4089126172"
+      country_calling_code: '1'
   - id: en_11
     message: "Set a reminder on +1 408 9126172"
+    locale: "en-in"
     outputs:
     - original_text: "+1 408 9126172"
       output_id: 1
-      value: "14089126172"
+      value: "4089126172"
+      country_calling_code: '1'
   - id: en_12
-    message: "Set a reminder on 14089126172"
+    message: "Set a reminder on +14089126172"
+    locale: "en-in"
     outputs:
-    - original_text: "14089126172"
+    - original_text: "+14089126172"
       output_id: 1
-      value: "14089126172"
+      value: "4089126172"
+      country_calling_code: '1'
   - id: en_13
-    message: "Send 1000rs to 14089126172 and call 02226129854"
+    message: "Send 1000rs to +14089126172 and call 02226129854"
+    locale: "en-in"
     outputs:
     - original_text: "14089126172"
       output_id: 1
       value: "14089126172"
+      country_calling_code: '1'
     - original_text: "02226129854"
       output_id: 2
-      value: "02226129854"
+      value: "2226129854"
+      country_calling_code: '91'
   hi:
   - id: hi_1
     message: "मेरे लिए ५००र्स ९८२०३३४४५५ पे भेज देना"
+    locale: "en-in"
     outputs:
     - original_text: "९८२०३३४४५५"
       output_id: 1
       value: "9820334455"
+      country_calling_code: '91'
   - id: hi_2
     message: "मेरे लिए ५००र्स ९८ २०३३४४५५ पे भेज देना"
+    locale: "en-in"
     outputs:
     - original_text: "९८ २०३३४४५५"
       output_id: 1
       value: "9820334455"
+      country_calling_code: '91'
   - id: hi_3
     message: "मेरा लैंडलाइन नंबर ०२२२६१२९८५७ है"
+    locale: "en-in"
     outputs:
     - original_text: "०२२२६१२९८५७"
       output_id: 1
-      value: "02226129857"
+      value: "2226129857"
+      country_calling_code: '91'
   - id: hi_4
     message: "मेरा लैंडलाइन नंबर ०२२ २६१२९८५७ है"
+    locale: "en-in"
     outputs:
     - original_text: "०२२ २६१२९८५७"
       output_id: 1
-      value: "02226129857"
+      value: "2226129857"
+      country_calling_code: '91'
