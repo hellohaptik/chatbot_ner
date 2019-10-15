@@ -45,7 +45,7 @@ class PhoneNumberDetectorTestMeta(type):
                     }
                     phone_num_list.append(phone_num_dict)
                     original_texts.append(original_text)
-            return phone_num_dict, original_texts
+            return phone_num_list, original_texts
 
         failure_string_prefix = u"Test failed for\nText = {message}\nLanguage = {language}\n"
 
