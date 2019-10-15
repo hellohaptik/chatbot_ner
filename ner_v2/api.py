@@ -537,7 +537,8 @@ def phone_number(request):
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                           fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                          bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
+                                                          bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
+                                                          locale=parameters_dict[PARAMETER_LOCALE])
         elif isinstance(message, (list, tuple)):
             entity_output = phone_number_detection.detect_bulk(messages=message)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
