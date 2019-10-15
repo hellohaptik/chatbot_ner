@@ -34,14 +34,17 @@ class PhoneNumberDetectorTestMeta(type):
     @classmethod
     def get_yaml_test(cls, testcase, language, **kwargs):
         def parse_expected_outputs(expected_outputs):
-            phone_num_list, original_texts = [], []
+            phone_num_dict, original_texts = {}, []
             for expected_output in expected_outputs:
                 original_text = \
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
-                    phone_num_list.append(str(expected_output["value"]))
+                    phone_num_dict = {
+                        'phone_number': str(expected_output["value"]),
+                        'country_calling_code': str(expected_output["country_calling_code"])
+                    }
                     original_texts.append(original_text)
-            return phone_num_list, original_texts
+            return phone_num_dict, original_texts
 
         failure_string_prefix = u"Test failed for\nText = {message}\nLanguage = {language}\n"
 
