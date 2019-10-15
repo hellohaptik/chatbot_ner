@@ -9,20 +9,6 @@ import phonenumbers
 NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
 
 
-def create_number_word_dict():
-    number_word_dictionary = {'one': NumberVariant(scale=1, increment=1),
-                              'two': NumberVariant(scale=1, increment=2),
-                              'three': NumberVariant(scale=1, increment=3),
-                              'four': NumberVariant(scale=1, increment=4),
-                              'five': NumberVariant(scale=1, increment=5),
-                              'six': NumberVariant(scale=1, increment=6),
-                              'seven': NumberVariant(scale=1, increment=7),
-                              'eight': NumberVariant(scale=1, increment=8),
-                              'nine': NumberVariant(scale=1, increment=9),
-                              'zero': NumberVariant(scale=1, increment=0)}
-    return number_word_dictionary
-
-
 class PhoneDetector(BaseDetector):
     """
     This method is used to detect phone numbers present in text. The phone detector takes into
@@ -52,7 +38,6 @@ class PhoneDetector(BaseDetector):
         self.phone = []
         self.original_phone_text = []
         self.country_code = ''
-        self.number_word_dict = create_number_word_dict()
 
     @property
     def supported_languages(self):
