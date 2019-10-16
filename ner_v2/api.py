@@ -519,6 +519,7 @@ def phone_number(request):
         ]
         """
     try:
+        parameters_dict = {}
         if request.method == "POST":
             parameters_dict = parse_post_request(request)
             ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
@@ -534,6 +535,7 @@ def phone_number(request):
         phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
                                                locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
         if isinstance(message, six.string_types):
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
