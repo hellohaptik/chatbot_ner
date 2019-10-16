@@ -21,7 +21,6 @@ class PhoneDetector(BaseDetector):
     """
 
     def __init__(self, entity_name, language=ENGLISH_LANG, locale='en-IN'):
-        # Todo: Change default from india to get it from the bot.
         """
         Args:
             entity_name (str): A string by which the detected numbers would be replaced with
@@ -33,7 +32,10 @@ class PhoneDetector(BaseDetector):
         super(PhoneDetector, self).__init__(language, locale)
         self.language = language
         self.entity_name = entity_name
-        self.locale = locale
+        if locale is None:
+            self.locale = 'en-IN'
+        else:
+            self.locale = locale
         self.text = ''
         self.phone = []
         self.original_phone_text = []
@@ -94,7 +96,7 @@ class PhoneDetector(BaseDetector):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
-        if self.original_phone_text is None and self.country_code in self.country_code_dict:
+        if self.original_phone_text == [] and self.country_code in self.country_code_dict:
             self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
         return self.phone, self.original_phone_text
 
@@ -183,9 +185,9 @@ class PhoneDetector(BaseDetector):
         phone_number_list_1.extend(phone_number_list2)
         return phone_number_list_1
 
-    def check_for_country_code(self, phone_num, country_code='IN'):
+    def check_for_country_code(self, phone_num, country_code):
         """
-        :param country_code: country code. default('in')
+        :param country_code: country code
         :param phone_num: the number which is to be checked for country code
         :return: dict with country_code if it's in phone_num and phone_number without country code
         Examples:
@@ -198,11 +200,11 @@ class PhoneDetector(BaseDetector):
             '^({country_code})'.format(country_code=self.country_code_dict[country_code]), re.U)
         p = check_country_regex.findall(phone_num)
         if len(p) == 1:
-            phone_dict['countryCallingCode'] = p[0]
-            phone_dict['phone'] = check_country_regex.sub(string=phone_num, repl='')
+            phone_dict['country_calling_code'] = p[0]
+            phone_dict['phone_number'] = check_country_regex.sub(string=phone_num, repl='')
         else:
-            phone_dict['countryCallingCode'] = None
-            phone_dict['phone'] = phone_num
+            phone_dict['country_calling_code'] = None
+            phone_dict['phone_number'] = phone_num
 
         return phone_dict
 
