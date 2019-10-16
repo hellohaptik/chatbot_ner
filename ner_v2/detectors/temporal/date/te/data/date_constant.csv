@@ -13,15 +13,15 @@ key,numeric_representation,date_type
 శుక్రవారము|శుక్రవారం|శుక్ర|shukravaram|shukra varam|shukravaaram|shukra,4,weekday
 శనివారము|స్థిరవారము|మందవారము|shanivaram|shanivaaram|mandavaram|mandavaaram,5,weekday
 ఆదివారము|భానువారము|రవివారము|అధిత్యవారము|తొలివారము|aadivaram|adivaram|adi varam|adi vaaram|bhanuvaram|bhanu|bhanu vaaram|ravivaram|ravi vaaramu|ravi varam|adityavaram|adithya varam|tholivaram|tholi vaaram|sunday,6,weekday
-మొదటి నెల|జనుఅరీ|జనవరి|జనవరి|january|jan|janavary,1,month
-ఫిబ్రవరి|ఫెబ్|february|feb|febravary,2,month
-మార్చ్|మార్|march|mar,3,month
+జన.|మొదటి నెల|జనుఅరీ|జనవరి|జనవరి|january|jan|janavary,1,month
+ఫిబ్ర.|ఫిబ్రవరి|ఫెబ్|february|feb|febravary,2,month
+ఏప్రి.|మార్చ్|మార్|march|mar,3,month
 ఏప్రిల్|april|apr,4,month
 మే|may,5,month
 జూన్|jun|june,6,month
 జులై|jul|july,7,month
-ఆగష్టు|అగస్ట్|ఆగస్ట్|august|aug,8,month
-సెప్టెంబర్|september|sep|sept,9,month
-అక్టోబర్|అక్టోబరు|oct|october,10,month
-నవంబర్|november|nov,11,month
-డిసెంబరు|డిసెంబర్|december|dec,12,month
+ఆగ.|ఆగష్టు|అగస్ట్|ఆగస్ట్|august|aug,8,month
+సెప్.|సెప్టెంబర్|september|sep|sept,9,month
+అక్టో.|అక్టోబర్|అక్టోబరు|oct|october,10,month
+నవ.|నవంబర్|november|nov,11,month
+డిసె.|డిసెంబరు|డిసెంబర్|december|dec,12,month
