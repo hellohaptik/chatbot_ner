@@ -42,7 +42,7 @@ class PhoneDetector(BaseDetector):
         self.country_code = self.get_country_code_from_locale()
         self.tagged_text = ''
         self.processed_text = ''
-        self.country_code_dict = {'IN': 91, 'US': 1, 'GB': 44}
+        self.country_code_dict = {'IN': '91', 'US': '1', 'GB': '44'}
         self.tag = '__' + self.entity_name + '__'
 
     @property
@@ -96,8 +96,8 @@ class PhoneDetector(BaseDetector):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
-        if self.original_phone_text == [] and self.country_code in self.country_code_dict:
-            self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
+        # if self.original_phone_text == [] and self.country_code in self.country_code_dict:
+        #     self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
         return self.phone, self.original_phone_text
 
     def detect_entity_from_regex(self, text, **kwargs):
@@ -136,7 +136,8 @@ class PhoneDetector(BaseDetector):
                 self.phone.append(self.check_for_country_code(phone_number, self.country_code))
                 self.original_phone_text.append(original_phone_number)
             elif len(phone_number) >= 10:
-                self.phone.append({'country_calling_code': None, 'phone_number': phone_number})
+                self.phone.append({'country_calling_code': self.country_code_dict[self.country_code],
+                                   'phone_number': phone_number})
                 self.original_phone_text.append(original_phone_number)
         self.get_tagged_text()
 
@@ -203,7 +204,7 @@ class PhoneDetector(BaseDetector):
             phone_dict['country_calling_code'] = p[0]
             phone_dict['phone_number'] = check_country_regex.sub(string=phone_num, repl='')
         else:
-            phone_dict['country_calling_code'] = None
+            phone_dict['country_calling_code'] = self.country_code_dict[self.country_code]
             phone_dict['phone_number'] = phone_num
 
         return phone_dict
