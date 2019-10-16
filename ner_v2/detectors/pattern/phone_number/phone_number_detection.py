@@ -20,7 +20,7 @@ class PhoneDetector(BaseDetector):
          original_phone_text (list): list to store substrings of the text detected as phone numbers
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, locale='en-IN'):
+    def __init__(self, entity_name, language=ENGLISH_LANG, locale=None):
         """
         Args:
             entity_name (str): A string by which the detected numbers would be replaced with
@@ -32,10 +32,7 @@ class PhoneDetector(BaseDetector):
         super(PhoneDetector, self).__init__(language, locale)
         self.language = language
         self.entity_name = entity_name
-        if locale is None:
-            self.locale = 'en-IN'
-        else:
-            self.locale = locale
+        self.locale = locale or 'en-IN'
         self.text = ''
         self.phone = []
         self.original_phone_text = []
@@ -60,7 +57,10 @@ class PhoneDetector(BaseDetector):
         """
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
-        return match[0].upper()
+        if match:
+            return match[0].upper()
+        else:
+            return 'IN'
 
     def detect_entity(self, text, **kwargs):
         """Detects phone numbers in the text string
@@ -96,8 +96,8 @@ class PhoneDetector(BaseDetector):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
-        # if self.original_phone_text == [] and self.country_code in self.country_code_dict:
-        #     self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
+        if self.original_phone_text == [] and self.country_code in self.country_code_dict:
+            self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
         return self.phone, self.original_phone_text
 
     def detect_entity_from_regex(self, text, **kwargs):
