@@ -100,7 +100,7 @@ tests:
     message: "Send 1000rs to +14089126172 and call 02226129854"
     locale: "en-in"
     outputs:
-    - original_text: "14089126172"
+    - original_text: "+14089126172"
       output_id: 1
       value: "4089126172"
       country_calling_code: '1'
