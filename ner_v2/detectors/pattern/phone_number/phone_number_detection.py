@@ -2,11 +2,8 @@
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
-import collections
 import re
 import phonenumbers
-
-NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
 
 
 class PhoneDetector(BaseDetector):
@@ -20,7 +17,7 @@ class PhoneDetector(BaseDetector):
          original_phone_text (list): list to store substrings of the text detected as phone numbers
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, locale='en-IN'):
+    def __init__(self, entity_name, language=ENGLISH_LANG, locale=None):
         """
         Args:
             entity_name (str): A string by which the detected numbers would be replaced with
@@ -32,10 +29,7 @@ class PhoneDetector(BaseDetector):
         super(PhoneDetector, self).__init__(language, locale)
         self.language = language
         self.entity_name = entity_name
-        if locale is None:
-            self.locale = 'en-IN'
-        else:
-            self.locale = locale
+        self.locale = locale or 'en-IN'
         self.text = ''
         self.phone = []
         self.original_phone_text = []
@@ -43,6 +37,7 @@ class PhoneDetector(BaseDetector):
         self.tagged_text = ''
         self.processed_text = ''
         self.country_code_dict = {'IN': '91', 'US': '1', 'GB': '44'}
+        self.possible_country_code_number_list = ['91', '1', '011 91', '44']
         self.tag = '__' + self.entity_name + '__'
 
     @property
@@ -60,7 +55,10 @@ class PhoneDetector(BaseDetector):
         """
         regex_pattern = re.compile('[-_](.*$)', re.U)
         match = regex_pattern.findall(self.locale)
-        return match[0].upper()
+        if match:
+            return match[0].upper()
+        else:
+            return 'IN'
 
     def detect_entity(self, text, **kwargs):
         """Detects phone numbers in the text string
@@ -91,19 +89,22 @@ class PhoneDetector(BaseDetector):
 
         """
         self.text = text
+        self.tagged_text = self.text
+        self.processed_text = self.text
         self.phone, self.original_phone_text = [], []
         for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
-        # if self.original_phone_text == [] and self.country_code in self.country_code_dict:
-        #     self.phone, self.original_phone_text = self.detect_entity_from_regex(text)
+        self.get_tagged_text()
+        if self.country_code in self.country_code_dict:
+            self.phone, self.original_phone_text = self.detect_entity_with_regex(self.tagged_text)
         return self.phone, self.original_phone_text
 
-    def detect_entity_from_regex(self, text, **kwargs):
+    def detect_entity_with_regex(self, tagged_text, **kwargs):
         """Detects phone numbers in the text string
         Args:
-            text: string to extract entities from
+            tagged_text: string to extract entities from
             **kwargs: it can be used to send specific arguments in future.
         Returns:
             self.phone (list): list consisting the detected phone numbers
@@ -119,7 +120,7 @@ class PhoneDetector(BaseDetector):
         (['919819983132', '9820334416'],[u'+९१ ९८१९९८३१३२', u'+९१ ९८१९९८३१३२'])
         """
 
-        self.text = text
+        self.text = tagged_text
         self.processed_text = self.text
         self.tagged_text = self.text
 
@@ -130,12 +131,12 @@ class PhoneDetector(BaseDetector):
         clean_phone_list = [self.clean_phone_number(p) for p in original_phone_text]
         phone = [self.get_number(phone) for phone in clean_phone_list]
 
-        self.phone, self.original_phone_text = [], []
+        # self.phone, self.original_phone_text = [], []
         for phone_number, original_phone_number in zip(phone, original_phone_text):
-            if len(phone_number) >= 12:
+            if len(phone_number) >= 10:
                 self.phone.append(self.check_for_country_code(phone_number, self.country_code))
                 self.original_phone_text.append(original_phone_number)
-            elif len(phone_number) >= 10:
+            else:
                 self.phone.append({'country_calling_code': self.country_code_dict[self.country_code],
                                    'phone_number': phone_number})
                 self.original_phone_text.append(original_phone_number)
@@ -198,7 +199,7 @@ class PhoneDetector(BaseDetector):
         """
         phone_dict = {}
         check_country_regex = re.compile(
-            '^({country_code})'.format(country_code=self.country_code_dict[country_code]), re.U)
+            r'^({country_code})\d{10}'.format(country_code='91|1|011 91'), re.U)
         p = check_country_regex.findall(phone_num)
         if len(p) == 1:
             phone_dict['country_calling_code'] = p[0]
