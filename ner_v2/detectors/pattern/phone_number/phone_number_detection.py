@@ -134,7 +134,7 @@ class PhoneDetector(BaseDetector):
         # self.phone, self.original_phone_text = [], []
         for phone_number, original_phone_number in zip(phone, original_phone_text):
             if len(phone_number) >= 10:
-                self.phone.append(self.check_for_country_code(phone_number, self.country_code))
+                self.phone.append(self.check_for_country_code(phone_number))
                 self.original_phone_text.append(original_phone_number)
             else:
                 self.phone.append({'country_calling_code': self.country_code_dict[self.country_code],
@@ -187,9 +187,8 @@ class PhoneDetector(BaseDetector):
         phone_number_list_1.extend(phone_number_list2)
         return phone_number_list_1
 
-    def check_for_country_code(self, phone_num, country_code):
+    def check_for_country_code(self, phone_num):
         """
-        :param country_code: country code
         :param phone_num: the number which is to be checked for country code
         :return: dict with country_code if it's in phone_num and phone_number without country code
         Examples:
@@ -198,8 +197,8 @@ class PhoneDetector(BaseDetector):
             {countryCallingCode:"91",phone_number:"9123456789"}
         """
         phone_dict = {}
-        check_country_regex = re.compile(
-            r'^({country_code})\d{10}'.format(country_code='91|1|011 91'), re.U)
+        check_country_regex = re.compile(r'^({country_code})\d{length}$'.
+                                         format(country_code='911|1|011 91|91', length='{10}'), re.U)
         p = check_country_regex.findall(phone_num)
         if len(p) == 1:
             phone_dict['country_calling_code'] = p[0]
