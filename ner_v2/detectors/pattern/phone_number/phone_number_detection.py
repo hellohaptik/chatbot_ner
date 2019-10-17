@@ -202,7 +202,8 @@ class PhoneDetector(BaseDetector):
         p = check_country_regex.findall(phone_num)
         if len(p) == 1:
             phone_dict['country_calling_code'] = p[0]
-            phone_dict['phone_number'] = check_country_regex.sub(string=phone_num, repl='')
+            country_code_sub_regex = re.compile(r'^{detected_code}'.format(detected_code=p[0]))
+            phone_dict['phone_number'] = country_code_sub_regex.sub(string=phone_num, repl='')
         else:
             phone_dict['country_calling_code'] = self.country_code_dict[self.country_code]
             phone_dict['phone_number'] = phone_num
