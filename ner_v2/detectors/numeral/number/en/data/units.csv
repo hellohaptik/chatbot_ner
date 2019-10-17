@@ -1,8 +1,8 @@
 unit_type,unit_value,unit_variants
-currency,INR,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | paisa | paise | inr | ₹
-currency,USD,Dollar | dollars | usd | $
-currency,EUR,Euro | euros | eur | 	€
-currency,GBP,Pound sterling | pound sterlings | quid | pounds | sterling | pound | gbp | £
+currency,inr,rupees | rupee | rs | rupya | rupaya | rupaye | rupye | rupay | paisa | paise | inr | ₹
+currency,usd,Dollar | dollars | usd | $
+currency,eur,Euro | euros | eur | 	€
+currency,gbp,Pound sterling | pound sterlings | quid | pounds | sterling | pound | gbp | £
 currency,cent,Cents | cent | ¢
 currency,pence,Pence | pences
 package_metric_unit,mg,mg | milligram | milligrams | mgs
