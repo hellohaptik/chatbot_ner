@@ -102,7 +102,7 @@ class PhoneDetector(BaseDetector):
         """
 
         for phone, original in zip(self.phone, self.original_phone_text):
-            if re.search(r'(\w{original}|{original}[])'.format(original=k[1])):
+            if re.search(r'([a-zA-Z0-9]{original}|{original}[a-zA-Z0-9])'.format(original=original)):
                 self.phone.remove(phone)
                 self.original_phone_text.remove(original)
 
