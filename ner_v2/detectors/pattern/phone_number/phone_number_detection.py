@@ -150,7 +150,7 @@ class PhoneDetector(BaseDetector):
                 self.phone.append(self.check_for_country_code(phone_number))
                 self.original_phone_text.append(original_phone_number)
             else:
-                self.phone.append({'country_calling_code': phonenumbers.country_code_for_region(self.country_code),
+                self.phone.append({'country_calling_code': str(phonenumbers.country_code_for_region(self.country_code)),
                                    'phone_number': phone_number})
                 self.original_phone_text.append(original_phone_number)
         self.get_tagged_text()
@@ -220,10 +220,10 @@ class PhoneDetector(BaseDetector):
                 country_code_sub_regex = re.compile(r'^{detected_code}'.format(detected_code=p[0]))
                 phone_dict['phone_number'] = country_code_sub_regex.sub(string=phone_num, repl='')
             else:
-                phone_dict['country_calling_code'] = phonenumbers.country_code_for_region(self.country_code)
+                phone_dict['country_calling_code'] = str(phonenumbers.country_code_for_region(self.country_code))
                 phone_dict['phone_number'] = phone_num
         else:
-            phone_dict['country_calling_code'] = phonenumbers.country_code_for_region(self.country_code)
+            phone_dict['country_calling_code'] = str(phonenumbers.country_code_for_region(self.country_code))
             phone_dict['phone_number'] = phone_num
 
         return phone_dict
