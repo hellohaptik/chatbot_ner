@@ -109,17 +109,17 @@ tests:
       value: "2226129854"
       country_calling_code: '91'
   - id: en_14
-      message: "Send 1000rs to +14089126172 and call 02226129854"
-      locale: "en-us"
-      outputs:
-        - original_text: "+14089126172"
-          output_id: 1
-          value: "4089126172"
-          country_calling_code: '1'
-        - original_text: "02226129854"
-          output_id: 2
-          value: "2226129854"
-          country_calling_code: '1'
+    message: "Send 1000rs to +14089126172 and call 02226129854"
+    locale: "en-us"
+    outputs:
+      - original_text: "+14089126172"
+        output_id: 1
+        value: "4089126172"
+        country_calling_code: '1'
+      - original_text: "02226129854"
+        output_id: 2
+        value: "2226129854"
+        country_calling_code: '1'
   hi:
   - id: hi_1
     message: "मेरे लिए ५००र्स ९८२०३३४४५५ पे भेज देना"
