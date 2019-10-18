@@ -93,7 +93,18 @@ class PhoneDetector(BaseDetector):
                                    "phone_number": str(match.number.national_number)})
                 self.original_phone_text.append(self.text[match.start:match.end])
 
+        self.check_for_alphas()
         return self.phone, self.original_phone_text
+
+    def check_for_alphas(self):
+        """
+        checks if any leading or trailing alphabets in the detected phone numbers and removes those numbers
+        """
+
+        for phone, original in zip(self.phone, self.original_phone_text):
+            if re.search(r'(\w{original}|{original}[])'.format(original=k[1])):
+                self.phone.remove(phone)
+                self.original_phone_text.remove(original)
 
     def check_for_country_code(self, phone_num):
         """
