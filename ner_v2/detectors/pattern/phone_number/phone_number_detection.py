@@ -31,8 +31,8 @@ class PhoneDetector(BaseDetector):
         self.entity_name = entity_name
         self.locale = locale or 'en-IN'
         self.text = ''
-        self.phone = []
-        self.original_phone_text = []
+        self.phone, self.original_phone_text = [], []
+        self.final_phone, self.final_original_text = [], []
         self.country_code = self.get_country_code_from_locale()
         self.tagged_text = ''
         self.processed_text = ''
@@ -92,14 +92,24 @@ class PhoneDetector(BaseDetector):
         self.tagged_text = self.text
         self.processed_text = self.text
         self.phone, self.original_phone_text = [], []
-        for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code):
+        self.final_phone, self.final_original_text = [], []
+        for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code, leniency=0):
             self.phone.append({"country_calling_code": str(match.number.country_code),
                                "phone_number": str(match.number.national_number)})
             self.original_phone_text.append(self.text[match.start:match.end])
-        self.get_tagged_text()
-        if self.country_code in self.country_code_dict:
-            self.phone, self.original_phone_text = self.detect_entity_with_regex(self.tagged_text)
-        return self.phone, self.original_phone_text
+        # self.get_tagged_text()
+        for phone_number, original_phone_number in zip(self.phone, self.original_phone_text):
+            if len(phone_number) > 10:
+                self.final_phone.append(self.check_for_country_code(phone_number))
+                self.final_original_text.append(original_phone_number)
+            else:
+                self.final_phone.append({'country_calling_code': self.country_code_dict[self.country_code],
+                                         'phone_number': phone_number})
+                self.final_original_text.append(original_phone_number)
+
+        # if self.country_code in self.country_code_dict:
+        #     self.phone, self.original_phone_text = self.detect_entity_with_regex(self.tagged_text)
+        return self.final_phone, self.final_original_text
 
     def detect_entity_with_regex(self, tagged_text, **kwargs):
         """Detects phone numbers in the text string
@@ -133,7 +143,7 @@ class PhoneDetector(BaseDetector):
 
         # self.phone, self.original_phone_text = [], []
         for phone_number, original_phone_number in zip(phone, original_phone_text):
-            if len(phone_number) >= 10:
+            if len(phone_number) > 10:
                 self.phone.append(self.check_for_country_code(phone_number))
                 self.original_phone_text.append(original_phone_number)
             else:
