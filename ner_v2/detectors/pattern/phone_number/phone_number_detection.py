@@ -102,7 +102,7 @@ class PhoneDetector(BaseDetector):
         validated_phone = []
         validated_original_text = []
         for phone, original in zip(self.phone, self.original_phone_text):
-            if re.match(r'\W' + re.escape(original) + r'\W', self.text, re.UNICODE):
+            if re.search(r'\W' + re.escape(original) + r'\W', self.text, re.UNICODE):
                 validated_phone.append(phone)
                 validated_original_text.append(original)
         return validated_phone, validated_original_text
