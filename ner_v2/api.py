@@ -536,6 +536,7 @@ def phone_number(request):
                                                locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
         entity_output = None
+        ner_logger.debug(parameters_dict)
         if isinstance(message, six.string_types):
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
