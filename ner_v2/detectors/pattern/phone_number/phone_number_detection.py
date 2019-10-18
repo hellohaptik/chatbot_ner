@@ -81,7 +81,7 @@ class PhoneDetector(BaseDetector):
         [u'+९१ ९८१९९८३१३२', u'+९१ ९८१९९८३१३२'])
 
         """
-        self.text = text
+        self.text = " " + text.lower().strip() + " "
         self.phone, self.original_phone_text = [], []
         for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code, leniency=0):
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
@@ -92,19 +92,20 @@ class PhoneDetector(BaseDetector):
                 self.phone.append({"country_calling_code": str(match.number.country_code),
                                    "phone_number": str(match.number.national_number)})
                 self.original_phone_text.append(self.text[match.start:match.end])
-
-        self.check_for_alphas()
+        self.phone, self.original_phone_text = self.check_for_alphas()
         return self.phone, self.original_phone_text
 
     def check_for_alphas(self):
         """
         checks if any leading or trailing alphabets in the detected phone numbers and removes those numbers
         """
-
+        validated_phone = []
+        validated_original_text = []
         for phone, original in zip(self.phone, self.original_phone_text):
-            if re.search(r'([a-zA-Z0-9]{original}|{original}[a-zA-Z0-9])'.format(original=original), self.text):
-                self.phone.remove(phone)
-                self.original_phone_text.remove(original)
+            if re.match(r'\W' + re.escape(original) + r'\W', self.text, re.UNICODE):
+                validated_phone.append(phone)
+                validated_original_text.append(original)
+        return validated_phone, validated_original_text
 
     def check_for_country_code(self, phone_num):
         """
