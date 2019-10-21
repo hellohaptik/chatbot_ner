@@ -32,6 +32,8 @@ class PhoneDetector(BaseDetector):
         self.text = ''
         self.phone, self.original_phone_text = [], []
         self.country_code = self.get_country_code_from_locale()
+        self.entity_name = entity_name
+        self.tag = '__' + self.entity_name + '__'
 
     @property
     def supported_languages(self):
