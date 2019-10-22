@@ -568,7 +568,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message)
 
     if not entity_list and fallback_text:
-        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
+        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split(), fallback_text)
         detection_method = fallback_method
 
     if entity_list and original_text_list:
