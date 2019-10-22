@@ -1,4 +1,3 @@
-
 # ************************ constant used for detection_method ************************
 
 # when entity is detected from message
@@ -45,6 +44,7 @@ PARAMETER_BOT_MESSAGE = 'bot_message'
 PARAMETER_TIMEZONE = 'timezone'
 PARAMETER_REGEX = 'regex'
 PARAMETER_PAST_DATE_REFERENCED = 'past_date_referenced'
+PARAMETER_RANGE_ENABLED = 'range_enabled'
 
 # Language parameters of the query.
 PARAMETER_LANGUAGE_SCRIPT = 'language_script'  # ISO 639 code for language. For eg, 'en' for 'Namaste', 'Hello'
@@ -56,3 +56,6 @@ DICTIONARY_DATA_VARIANTS = 'variants'
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
+
+# Locale for Date and Phone Number detection
+PARAMETER_LOCALE = 'locale'
