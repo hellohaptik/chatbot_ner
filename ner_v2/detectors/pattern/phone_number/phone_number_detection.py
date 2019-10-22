@@ -72,14 +72,14 @@ class PhoneDetector(BaseDetector):
         text = 'call +1 (408) 912-6172'
         p = PhoneDetector(entity_name='phone_number', language='en', locale='en-US')
         p.detect_entity(text=text)
-        ([{'country_calling_code':'1', phone_number':'4089126172'} ],
+        ([{'country_calling_code':'1', value':'4089126172'} ],
          [u'+1 (408) 912-6172'])
 
         text = '+९१ ९८१९९८३१३२ पर कॉल करें और संदेश ९८२०३३४४१६ पर कॉल करें'
         p = PhoneDetector(entity_name='phone_number', language='hi', locale='en-IN')
         p.detect_entity(text=text)
-        ([{'country_calling_code':'91', phone_number':'9819983132'}
-        ,{ 'country_calling_code':'91', phone_number:'9820334416'} ],
+        ([{'country_calling_code':'91', value':'9819983132'}
+        ,{ 'country_calling_code':'91', value:'9820334416'} ],
         [u'+९१ ९८१९९८३१३२', u'+९१ ९८१९९८३१३२'])
 
         """
@@ -92,7 +92,7 @@ class PhoneDetector(BaseDetector):
             else:
                 # This means our detector has detected some other country code.
                 self.phone.append({"country_calling_code": str(match.number.country_code),
-                                   "phone_number": str(match.number.national_number)})
+                                   "value": str(match.number.national_number)})
                 self.original_phone_text.append(self.text[match.start:match.end])
         self.phone, self.original_phone_text = self.check_for_alphas()
         return self.phone, self.original_phone_text
@@ -116,7 +116,7 @@ class PhoneDetector(BaseDetector):
         Examples:
             phone_num = '919123456789'
             countryCallingCode = 'IN'
-            {countryCallingCode:"91",phone_number:"9123456789"}
+            {countryCallingCode:"91",value:"9123456789"}
         """
         phone_dict = {}
 
@@ -127,12 +127,12 @@ class PhoneDetector(BaseDetector):
             if len(p) == 1:
                 phone_dict['country_calling_code'] = p[0]
                 country_code_sub_regex = re.compile(r'^{detected_code}'.format(detected_code=p[0]))
-                phone_dict['phone_number'] = country_code_sub_regex.sub(string=phone_num, repl='')
+                phone_dict['value'] = country_code_sub_regex.sub(string=phone_num, repl='')
             else:
                 phone_dict['country_calling_code'] = str(phonenumbers.country_code_for_region(self.country_code))
-                phone_dict['phone_number'] = phone_num
+                phone_dict['value'] = phone_num
         else:
             phone_dict['country_calling_code'] = str(phonenumbers.country_code_for_region(self.country_code))
-            phone_dict['phone_number'] = phone_num
+            phone_dict['value'] = phone_num
 
         return phone_dict
