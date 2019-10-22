@@ -40,7 +40,7 @@ class PhoneNumberDetectorTestMeta(type):
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
                     phone_num_dict = {
-                        'phone_number': str(expected_output["value"]),
+                        'value': str(expected_output["value"]),
                         'country_calling_code': str(expected_output["country_calling_code"])
                     }
                     phone_num_list.append(phone_num_dict)
