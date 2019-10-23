@@ -3,6 +3,18 @@ TIME_CONSTANT_FILE = 'time_constant.csv'
 DATETIME_CONSTANT_FILE = 'datetime_diff_constant.csv'
 NUMERALS_CONSTANT_FILE = 'numbers_constant.csv'
 
+# timezones data file and its columns
+# name of the data file
+TIMEZONES_CONSTANT_FILE = 'timezones.csv'
+# index of the csv file(try using the common standard)
+TIMEZONES_CODE_COLUMN_NAME = 'code'
+# all regions in Olson format pytz
+TIMEZONES_ALL_REGIONS_COLUMN_NAME = 'all_regions'
+# preferred region in the above all_regions (Olson format pytz)
+TIMEZONES_PREFERRED_REGION_COLUMN_NAME = 'preferred'
+# Formal usage variants of the index
+TIMEZONE_VARIANTS_VARIANTS_COLUMN_NAME = 'timezone_variants'
+
 CONSTANT_FILE_KEY = 'key'
 
 # date type referring to date in month like "2 tarikh" (reference: hindi)

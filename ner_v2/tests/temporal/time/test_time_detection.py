@@ -45,6 +45,7 @@ class TimeDetectionTestMeta(type):
                     "hh": expected_output["hh"],
                     "mm": expected_output["mm"],
                     "nn": expected_output["nn"],
+                    'tz': expected_output["tz"],
                     "range": expected_output["range"],
                     "time_type": expected_output["time_type"]
                 }

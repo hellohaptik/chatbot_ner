@@ -6,7 +6,7 @@ This is the V2 version of date detector module that will detect date in multiple
 - Hindi
 - Marathi
 - Gujarati
-- Telgu
+- Telugu
 - Tamil
 
 ### Usage
@@ -14,7 +14,7 @@ This is the V2 version of date detector module that will detect date in multiple
 - **Python Shell**
 
   ```python
-  >> from ner_v2.detector.temporal.date.date_detection import DateDetector
+  >> from ner_v2.detectors.temporal.date.date_detection import DateDetector
   >> detector = DateDetector(entity_name='date', language='hi')  # here language will be ISO 639-1 code
   >> detector.detect_entity(text= 'agla mangalvar')
   >> {'entity_value': [{'dd':12 ,'mm': 10, 'yy': 2018}], 'original_text':['agla mangalvar']}
