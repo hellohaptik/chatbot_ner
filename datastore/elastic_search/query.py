@@ -512,7 +512,7 @@ def _parse_es_search_results(results_list):
         for results in results_list:
             entity_values, entity_variants = [], []
             variants_to_values = collections.OrderedDict()
-            if results and results['hits']['total'] > 0:
+            if results and results.get('hits') and results['hits']['total'] > 0:
                 for hit in results['hits']['hits']:
                     if 'highlight' not in hit:
                         continue
