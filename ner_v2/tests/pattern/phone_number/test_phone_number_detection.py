@@ -39,7 +39,11 @@ class PhoneNumberDetectorTestMeta(type):
                 original_text = \
                     expected_output["original_text"].lower().strip() if expected_output["original_text"] else None
                 if original_text:
-                    phone_num_list.append(str(expected_output["value"]))
+                    phone_num_dict = {
+                        'value': str(expected_output["value"]),
+                        'country_calling_code': str(expected_output["country_calling_code"])
+                    }
+                    phone_num_list.append(phone_num_dict)
                     original_texts.append(original_text)
             return phone_num_list, original_texts
 
@@ -47,7 +51,8 @@ class PhoneNumberDetectorTestMeta(type):
 
         def run_test(self):
             message = testcase["message"]
-            number_detector_object = PhoneDetector(entity_name='phone_number', language=language)
+            locale = testcase["locale"]
+            number_detector_object = PhoneDetector(entity_name='phone_number', language=language, locale=locale)
             phone_number_list, spans = number_detector_object.detect_entity(message)
 
             expected_phone_number_list, expected_spans = parse_expected_outputs(testcase["outputs"])

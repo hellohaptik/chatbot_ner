@@ -3,7 +3,8 @@ from chatbot_ner.config import ner_logger
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
-    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE
+    PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE, \
+    PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -40,6 +41,8 @@ def get_parameters_dictionary(request):
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        PARAMETER_NUMBER_UNIT_TYPE: request.GET.get('unit_type'),
+                       PARAMETER_LOCALE: request.GET.get('locale'),
+                       PARAMETER_RANGE_ENABLED: request.GET.get('range_enabled')
                        }
 
     return parameters_dict
@@ -68,7 +71,9 @@ def parse_post_request(request):
         PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
         PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
-        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type')
+        PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type'),
+        PARAMETER_LOCALE: request_data.get('locale'),
+        PARAMETER_RANGE_ENABLED: request_data.get('range_enabled')
     }
 
     return parameters_dict
@@ -95,6 +100,7 @@ def date(request):
             timezone (str): timezone of the user
             source_language (str): source language code (ISO 639-1)
             language_script (str): language code of script (ISO 639-1)
+            locale (str): locale of the user(ISO 639-1)
 
     Returns:
         response (django.http.response.HttpResponse): HttpResponse object
@@ -109,6 +115,7 @@ def date(request):
            timezone = 'UTC'
            source_language = 'hi'
            language_script = 'en'
+           locale = 'hi-in'
            output = date(request)
            print output
 
@@ -130,7 +137,8 @@ def date(request):
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                               timezone=timezone,
-                                              past_date_referenced=past_date_referenced)
+                                              past_date_referenced=past_date_referenced,
+                                              locale=parameters_dict[PARAMETER_LOCALE])
 
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
@@ -203,8 +211,9 @@ def time(request):
             parameters_dict = get_parameters_dictionary(request)
             ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
-        timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
+        timezone = parameters_dict[PARAMETER_TIMEZONE] or None
         form_check = True if parameters_dict[PARAMETER_STRUCTURED_VALUE] else False
+        range_enabled = True if parameters_dict[PARAMETER_RANGE_ENABLED] else False
         time_detection = TimeDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                       language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                       timezone=timezone)
@@ -218,7 +227,8 @@ def time(request):
             entity_output = time_detection.detect(message=message,
                                                   structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                   fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                                  form_check=form_check)
+                                                  form_check=form_check,
+                                                  range_enabled=range_enabled)
         elif isinstance(message, (list, tuple)):
             entity_output = time_detection.detect_bulk(messages=message)
 
@@ -509,6 +519,7 @@ def phone_number(request):
         ]
         """
     try:
+        parameters_dict = {}
         if request.method == "POST":
             parameters_dict = parse_post_request(request)
             ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
@@ -521,8 +532,11 @@ def phone_number(request):
         ner_logger.debug('Entity Name %s' % entity_name)
         ner_logger.debug('Source Language %s' % language)
 
-        phone_number_detection = PhoneDetector(entity_name=entity_name, language=language)
+        phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
+                                               locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
+        entity_output = None
+        ner_logger.debug(parameters_dict)
         if isinstance(message, six.string_types):
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],

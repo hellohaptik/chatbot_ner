@@ -49,7 +49,7 @@ class NameDetector(object):
         self.text_detection_object = TextDetector(entity_name=entity_name)
 
     @staticmethod
-    def get_format_name(name_list):
+    def get_format_name(name_tokens, text):
         """
         Takes input as name_list which contains the names detected.
         It separates the first, middle and last names.
@@ -58,7 +58,7 @@ class NameDetector(object):
         2.The original text.
 
         Args:
-            name_list (list): List of names detected
+            name_tokens (list): List of tokens in the name
             Example:
                  ['yash', 'doshi']
 
@@ -68,19 +68,23 @@ class NameDetector(object):
                 ["yash modi"]
             )
         """
-        original_text = " ".join(name_list)
+        entity_value = []
+        original_text = []
 
-        first_name = name_list[0]
+        name_text = " ".join(name_tokens)
+
+        first_name = name_tokens[0]
         middle_name = None
         last_name = None
 
-        if len(name_list) > 1:
-            last_name = name_list[-1]
-            middle_name = " ".join(name_list[1:-1]) or None
+        if name_text in text:
+            if len(name_tokens) > 1:
+                last_name = name_tokens[-1]
+                middle_name = " ".join(name_tokens[1:-1]) or None
 
-        entity_value = {FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name}
-
-        return [entity_value], [original_text]
+            entity_value.append({FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name})
+            original_text.append(name_text)
+        return entity_value, original_text
 
     def text_detection_name(self, text=None):
         """
@@ -127,19 +131,19 @@ class NameDetector(object):
             return entity_value, original_text
 
         if pattern1_match:
-            entity_value, original_text = self.get_format_name(pattern1_match[0][1].split())
+            entity_value, original_text = self.get_format_name(pattern1_match[0][1].split(), self.text)
 
         elif pattern2_match:
-            entity_value, original_text = self.get_format_name(pattern2_match[0].split())
+            entity_value, original_text = self.get_format_name(pattern2_match[0].split(), self.text)
 
         elif pattern3_match:
-            entity_value, original_text = self.get_format_name(pattern3_match[0].split())
+            entity_value, original_text = self.get_format_name(pattern3_match[0].split(), self.text)
 
         elif len(name_tokens) < 4:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
-                entity_value, original_text = self.get_format_name(pos_words)
+                entity_value, original_text = self.get_format_name(pos_words, self.text)
 
         return entity_value, original_text
 
@@ -297,7 +301,7 @@ class NameDetector(object):
             name_list.append(name_holder)
 
         for name in name_list:
-            name_entity_value, original_text_value = self.get_format_name(name)
+            name_entity_value, original_text_value = self.get_format_name(name, self.text)
             original_text.extend(original_text_value)
             entity_value.extend(name_entity_value)
 
