@@ -60,7 +60,8 @@ class BaseRegexDate(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which these regex will work
-        self.detector_preferences = [self._detect_relative_date,
+        self.detector_preferences = [self._gregorian_day_month_year_format,
+                                     self._detect_relative_date,
                                      self._detect_date_month,
                                      self._detect_date_ref_month_1,
                                      self._detect_date_ref_month_2,
