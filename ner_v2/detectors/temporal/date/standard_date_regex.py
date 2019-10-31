@@ -537,6 +537,94 @@ class BaseRegexDate(object):
             original_list.append(original)
         return date_list, original_list
 
+    def _gregorian_day_month_year_format(self, date_list=None, original_list=None):
+        """
+        Detects date in the following format
+
+        format: <day><separator><month><separator><year>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: m, mm
+            year: yy, yyyy
+            separator: "/", "-", "."
+
+        Two character years are assumed to be belong to 21st century - 20xx.
+        Only years between 1900 to 2099 are detected
+
+        Few valid examples:
+            "6/2/39", "7/01/1997", "28-12-2096"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        regex_pattern = re.compile(r'[^/\-\.\w](([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
+        patterns = regex_pattern.findall(self.processed_text.lower())
+        for pattern in patterns:
+            original = pattern[0]
+            dd = int(pattern[1])
+            mm = int(pattern[2])
+            yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
+            try:
+                # to catch dates which are not possible like "31/11" (october 31st)
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd))\
+                        < self.now_date:
+                    yy += 1
+            except:
+                return date_list, original_list
+
+            date = {
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_EXACT
+            }
+            date_list.append(date)
+            # original = self.regx_to_process.text_substitute(original)
+            original_list.append(original)
+        return date_list, original_list
+
+    def normalize_year(self, year):
+        """
+        Normalize two digit year to four digits by taking into consideration the bot message. Useful in cases like
+        date of birth where past century is preferred than current. If no bot message is given it falls back to
+        current century
+
+        Args:
+            year (str): Year string to normalize
+
+        Returns:
+            str: year in four digits
+        """
+        past_regex = re.compile(r'birth|bday|dob|born|जन्म|जन्मदिन|పుట్టినరోజు|పుట్టిన')
+        present_regex = None
+        future_regex = None
+        this_century = int(str(self.now_date.year)[:2])
+        if len(year) == 2:
+            if self.bot_message:
+                if past_regex and past_regex.search(self.bot_message):
+                    return str(this_century - 1) + year
+                elif present_regex and present_regex.search(self.bot_message):
+                    return str(this_century) + year
+                elif future_regex and future_regex.search(self.bot_message):
+                    return str(this_century + 1) + year
+
+        # if patterns didn't match or no bot message set, fallback to current century
+        if len(year) == 2:
+            return str(this_century) + year
+
+        return year
+
     def _update_processed_text(self, original_date_list):
         """
         Replaces detected date with tag generated from entity_name used to initialize the object with

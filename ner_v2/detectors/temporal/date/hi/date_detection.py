@@ -28,6 +28,7 @@ class DateDetector(BaseRegexDate):
             self._detect_weekday_diff,
             self._detect_weekday,
             self.custom_christmas_date_detector,
+            self._gregorian_day_month_year_format
         ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
