@@ -149,7 +149,7 @@ class DateDetector(object):
         else:
             return None
 
-    def detect_date(self, text):
+    def detect_date(self, text, bot_message=None):
         """
         Detects exact date for complete date information - day, month, year are available in text
         and possible dates for if there are missing parts of date - day, month, year assuming sensible defaults. Also
@@ -164,6 +164,8 @@ class DateDetector(object):
         self.text = " " + text.strip().lower() + " "
         self.processed_text = self.text
         self.tagged_text = self.text
+        if bot_message:
+            self.set_bot_message(bot_message)
         if self.locale:
             self.country_code = self.get_country_code_from_locale()
         date_list = []

@@ -832,7 +832,8 @@ class DateDetector(object):
         self.processed_text = self.text
         self.tagged_text = self.text
         if self.language_date_detector:
-            self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text)
+            self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text,
+                                                                                         self.bot_message)
 
         validated_date_list, validated_original_list = [], []
 

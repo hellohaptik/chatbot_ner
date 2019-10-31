@@ -74,10 +74,12 @@ class BaseRegexDate(object):
                                      self._detect_weekday
                                      ]
 
-    def detect_date(self, text):
+    def detect_date(self, text, bot_message=None):
         self.text = text
         self.processed_text = text
         self.tagged_text = text
+        if bot_message:
+            self.set_bot_message(bot_message)
 
         date_list, original_list = None, None
         for detector in self.detector_preferences:
@@ -625,6 +627,15 @@ class BaseRegexDate(object):
             return str(this_century) + year
 
         return year
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: is the previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
 
     def _update_processed_text(self, original_date_list):
         """
