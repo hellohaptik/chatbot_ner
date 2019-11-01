@@ -595,7 +595,11 @@ class BaseRegexDate(object):
             }
             date_list.append(date)
             # original = self.regx_to_process.text_substitute(original)
-            original_list.append(original)
+            if translate_number != self.processed_text.lower():
+                match = re.search(original, translate_number)
+                original_list.append(self.processed_text[(match.span()[0]):(match.span()[1])])
+            else:
+                original_list.append(original)
         return date_list, original_list
 
     @staticmethod
