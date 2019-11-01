@@ -615,7 +615,7 @@ class BaseRegexDate(object):
         this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
             if self.bot_message:
-                if past_regex and past_regex.search(self.bot_message):
+                if past_regex and past_regex.search(self.bot_message) and int(year) > int(str(self.now_date.year)[2:]):
                     return str(this_century - 1) + year
                 elif present_regex and present_regex.search(self.bot_message):
                     return str(this_century) + year
