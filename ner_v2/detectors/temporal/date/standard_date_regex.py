@@ -572,7 +572,8 @@ class BaseRegexDate(object):
             date_list = []
         regex_pattern = re.compile(r'[^/\-\.\w](([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
                                    r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
-        patterns = regex_pattern.findall(self.processed_text.lower())
+        translate_number = self.convert_numbers(self.processed_text.lower())
+        patterns = regex_pattern.findall(translate_number)
         for pattern in patterns:
             original = pattern[0]
             dd = int(pattern[1])
@@ -597,13 +598,22 @@ class BaseRegexDate(object):
             original_list.append(original)
         return date_list, original_list
 
+    @staticmethod
+    def convert_numbers(text):
+        result = text
+        digit = re.compile(r'(\d)', re.U)
+        groups = digit.findall(result)
+        for group in groups:
+            result = result.replace(group, str(int(group)))
+        return result
+
     def normalize_year(self, year):
         """
         Normalize two digit year to four digits by taking into consideration the bot message. Useful in cases like
         date of birth where past century is preferred than current. If no bot message is given it falls back to
         current century
 
-        Args:
+        Args:[{"key":"message","value":"१/३/६६","description":""}]
             year (str): Year string to normalize
 
         Returns:
