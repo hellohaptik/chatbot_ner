@@ -74,12 +74,10 @@ class BaseRegexDate(object):
                                      self._detect_weekday
                                      ]
 
-    def detect_date(self, text, bot_message=None):
+    def detect_date(self, text):
         self.text = text
         self.processed_text = text
         self.tagged_text = text
-        if bot_message:
-            self.set_bot_message(bot_message)
 
         date_list, original_list = None, None
         for detector in self.detector_preferences:
