@@ -838,6 +838,8 @@ class DateDetector(object):
         self.text = ' ' + text.strip().lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
+        if bot_message:
+            self.bot_message = bot_message
         if self.language_date_detector:
             self.date, self.original_date_text = self.language_date_detector.detect_date(self.processed_text,
                                                                                          self.bot_message)
