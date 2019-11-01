@@ -261,8 +261,8 @@ class DateDetectionTest(TestCase):
         bot_message = u'जन्मदिन'
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale)
-        date_dicts, original_texts = date_detector_object.detect_entity(message)
         date_detector_object.set_bot_message(bot_message)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         self.assertIn({
             'normal': True,
