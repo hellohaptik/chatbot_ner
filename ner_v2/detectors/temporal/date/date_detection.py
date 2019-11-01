@@ -92,7 +92,7 @@ class DateAdvancedDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
-    def detect_entity(self, text, run_model=False, **kwargs):
+    def detect_entity(self, text, run_model=False, bot_message=None, **kwargs):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.
@@ -132,10 +132,15 @@ class DateAdvancedDetector(BaseDetector):
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
         respectively.
+        :param text: text
+        :param run_model: run_model
+        :param bot_message: bot_message
         """
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
+        if bot_message:
+            self.bot_message = bot_message
         date_data = []
         if run_model:
             date_data = self._date_model_detection()
