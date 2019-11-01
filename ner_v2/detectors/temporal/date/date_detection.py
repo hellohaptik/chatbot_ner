@@ -509,7 +509,7 @@ class DateAdvancedDetector(BaseDetector):
 
                 (['friday'], ['friday'])
         """
-        date_list, original_list = self.date_detector_object.detect_entity(text)
+        date_list, original_list = self.date_detector_object.detect_entity(text, self.bot_message)
         return date_list, original_list
 
     def unzip_convert_date_dictionaries(self, entity_dict_list):
@@ -808,7 +808,7 @@ class DateDetector(object):
                 locale=self.locale
             )
 
-    def detect_entity(self, text, **kwargs):
+    def detect_entity(self, text, bot_message=None, **kwargs):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.
@@ -830,6 +830,8 @@ class DateDetector(object):
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
         respectively.
+        :param text: text
+        :param bot_message: bot message
 
         """
 

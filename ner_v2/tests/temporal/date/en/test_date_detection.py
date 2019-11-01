@@ -261,6 +261,7 @@ class DateDetectionTest(TestCase):
         bot_message = u'जन्मदिन'
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale)
+        date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
         date_dicts, original_texts = date_detector_object.detect_entity(message, bot_message=bot_message)
 
         self.assertIn({
