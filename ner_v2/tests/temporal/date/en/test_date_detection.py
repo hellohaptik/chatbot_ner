@@ -245,3 +245,29 @@ class DateDetectionTest(TestCase):
         }, date_dicts)
 
         self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_hi_gregorian_dd_mm_yy_format(self):
+        """
+        Date detection for pattern '१/३/६६'
+        """
+        message = u'१/३/६६'
+        locale = 'hi-in'
+        # If we run
+        day1 = 1
+        month = 3
+        year1 = 1966
+        bot_message = u'जन्मदिन'
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message, bot_message=bot_message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
