@@ -609,7 +609,8 @@ class BaseRegexDate(object):
         Returns:
             str: year in four digits
         """
-        past_regex = re.compile(r'birth|bday|dob|born|जन्म|जन्मदिन|పుట్టినరోజు|పుట్టిన')
+        past_regex = re.compile(r'birth|bday|dob|born|जन्म|जन्मदिन|పుట్టినరోజు|పుట్టిన', flags=re.UNICODE)
+        # Todo: Add more language variations of birthday.
         present_regex = None
         future_regex = None
         this_century = int(str(self.now_date.year)[:2])
