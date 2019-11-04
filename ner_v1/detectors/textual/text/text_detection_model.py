@@ -89,6 +89,13 @@ class TextModelDetector(TextDetector):
 
             crf_original_texts = crf_model.detect_entity(text=text)
 
+        # Access free_text_detection_results(list of str).
+        # If present replace crf_original_texts with free_text_detection_results.
+        # Call combine results to .combine_results() from dictionary detection and free_text_detection_results.
+        free_text_detection_results = kwargs.get("free_text_detection_results")
+        if free_text_detection_results:
+            crf_original_texts = free_text_detection_results
+
         values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
 
         text_entity_verified_values, original_texts = self.combine_results(values=values,
@@ -161,12 +168,22 @@ class TextModelDetector(TextDetector):
 
         crf_original_texts = []
 
+        # Access free_text_detection_results(list of lists).
+        # If present replace crf_original_texts with free_text_detection_results.
+        # Call .combine_results() to combine results from dictionary detection and free_text_detection_results.
+        free_text_detection_results = kwargs.get("free_text_detection_results")
+        if free_text_detection_results:
+            crf_original_texts = free_text_detection_results
+
         values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(texts, **kwargs)
         text_entity_values_list, original_texts_detected_list = [], []
-        for inner_values, inner_original_texts in six.moves.zip(values_list, original_texts_list):
+
+        for inner_crf_original_texts, inner_values, inner_original_texts in six.moves.zip_longest(crf_original_texts,
+                                                                                                  values_list,
+                                                                                                  original_texts_list):
             text_entity_verified_values, original_texts = \
                 self.combine_results(values=inner_values, original_texts=inner_original_texts,
-                                     crf_original_texts=crf_original_texts)
+                                     crf_original_texts=inner_crf_original_texts if inner_crf_original_texts else [])
             text_entity_values_list.append(text_entity_verified_values)
             original_texts_detected_list.append(original_texts)
         return text_entity_values_list, original_texts_detected_list
