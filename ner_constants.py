@@ -56,3 +56,5 @@ DICTIONARY_DATA_VARIANTS = 'variants'
 PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
+
+PARAMETER_PRIOR_CRF_RESULTS = "crf_results"

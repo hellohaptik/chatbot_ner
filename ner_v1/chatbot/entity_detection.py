@@ -233,6 +233,8 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     read_model_from_s3 = kwargs.get('read_model_from_s3', False)
     read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
 
+    free_text_detection_results = kwargs.get("free_text_detection_results", [])
+
     text_model_detector = TextModelDetector(entity_name=entity_name,
                                             language=language,
                                             live_crf_model_path=live_crf_model_path,
@@ -519,7 +521,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language=ENGLISH_LANG):
+                    language=ENGLISH_LANG, **kwargs):
     """Use NameDetector to detect names
 
     Args:
@@ -552,6 +554,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
     # TODO refactor NameDetector to make this easy to read and use
+    free_text_detection_results = kwargs.get("free_text_detection_results", [])
     name_detection = NameDetector(entity_name=entity_name, language=language)
     text, detection_method, fallback_text, fallback_method = (structured_value,
                                                               FROM_STRUCTURE_VALUE_VERIFIED,

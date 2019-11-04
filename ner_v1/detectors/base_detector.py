@@ -104,7 +104,9 @@ class BaseDetector(object):
                 messages.append(translation_output[TRANSLATED_TEXT] if translation_output['status'] else '')
 
         texts = messages
-        entities_list, original_texts_list = self.detect_entity_bulk(texts=texts)
+        free_text_detection_results = kwargs.get("free_text_detection_results", [])
+        entities_list, original_texts_list = self.detect_entity_bulk(
+            texts=texts, free_text_detection_results=free_text_detection_results)
 
         if entities_list:
             values_list, method, original_texts_list = entities_list, FROM_MESSAGE, original_texts_list
@@ -169,6 +171,7 @@ class BaseDetector(object):
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
 
         """
+        free_text_detection_results = kwargs.get("free_text_detection_results", [])
         if self._source_language_script != self._target_language_script and self._translation_enabled:
             if structured_value:
                 translation_output = translate_text(structured_value, self._source_language_script,
@@ -180,7 +183,8 @@ class BaseDetector(object):
                 message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
-        entity_list, original_text_list = self.detect_entity(text=text)
+        entity_list, original_text_list = self.detect_entity(text=text,
+                                                             free_text_detection_results=free_text_detection_results)
 
         if structured_value:
             if entity_list:
