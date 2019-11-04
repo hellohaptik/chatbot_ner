@@ -57,4 +57,5 @@ PARAMETER_MIN_DIGITS = 'min_number_digits'
 PARAMETER_MAX_DIGITS = 'max_number_digits'
 PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
 
-PARAMETER_PRIOR_CRF_RESULTS = "crf_results"
+# Prior detection results from CRF models.
+PARAMETER_PRIOR_CRF_RESULTS = "free_text_detection_results"
