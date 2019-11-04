@@ -143,7 +143,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text, bot_message=None):
+    def detect_entity(self, text, bot_message=None, **kwargs):
         """
         Takes text as input and  returns two lists
         1.entity_value in the form of first, middle and last names
@@ -154,7 +154,7 @@ class NameDetector(object):
 
            Example:
                     text=my name is yash doshi
-       Returns:
+        Returns:
                 [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
         if bot_message:
@@ -163,15 +163,23 @@ class NameDetector(object):
 
         self.text = text
         self.tagged_text = self.text
+        free_text_detection_results = kwargs.get("free_text_detection_results")
 
         entity_value, original_text = ([], [])
 
-        if self.language == ENGLISH_LANG:
-            entity_value, original_text = self.detect_english_name()
-        elif self.language == HINDI_LANG:
-            entity_value, original_text = self.detect_hindi_name()
+        if not free_text_detection_results:
+            if self.language == ENGLISH_LANG:
+                entity_value, original_text = self.detect_english_name()
+            elif self.language == HINDI_LANG:
+                entity_value, original_text = self.detect_hindi_name()
+
+        else:
+            replaced_text = self.replace_free_text_detection_text(free_text_detection_results,
+                                                       text=text)
+            entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         self._update_processed_text(person_name_list=original_text)
+
 
         return entity_value, original_text
 
@@ -239,6 +247,46 @@ class NameDetector(object):
 
         return entity_value, original_text
 
+    def replace_free_text_detection_text(self, free_text_detection_results, text):
+        """
+        Replace detected names from the text according to replace_detected_text.
+        Separate method for replacing free_text_detection_results because it these results are not at token level.
+        For example -
+            text = "my name is yash doshi"
+            free_text_detection_results = ["yash doshi"]
+            while, text_detection_original_texts = ["yash", "doshi"]
+
+
+        Args:
+            free_text_detection_results(list): list containing free_text_entity_results
+            text(str): original to run detection on
+
+        Returns:
+            replaced_text(str): text with marked tokens
+
+        Example:
+            >> text = "my name is yash doshi"
+            >> free_text_detection_results = ["yash doshi"]
+            >> replace_free_text_detection_text(free_text_detection_results, text)
+            'my name is _yash_ _doshi_'
+
+        """
+        if self.language == ENGLISH_LANG:
+            replaced_text = nltk_tokenizer.tokenize(text.lower())
+            # TODO: Add postprocessing after tokenization to handle titles like dr., mr. etc
+            # TODO: Tokenization issue where trailing '.'s are considered a separate token
+        else:
+            replaced_text = text.lower().strip().split()
+
+        for name in free_text_detection_results:
+            name_tokens = name.split()
+            for token in name_tokens:
+                for j in range(len(replaced_text)):
+                    replaced_text[j] = replaced_text[j].replace(token, "_" + token + "_")
+
+        return replaced_text
+
+
     def replace_detected_text(self, text_detection_result, text):
         """
         Replaces the detected name from text_detection_result by _<name>_
@@ -252,7 +300,7 @@ class NameDetector(object):
             Example:
                     text_detection_result= ([u'dosh', u'yash'], ['doshi', 'yash'])
             Returns:
-                    ['my', 'name', 'is', 'yash', 'doshi']
+                    ['my', 'name', 'is', '_yash_', '_doshi_']
 
         """
         replaced_text = []
