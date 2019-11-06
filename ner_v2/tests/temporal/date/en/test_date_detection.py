@@ -257,11 +257,11 @@ class DateDetectionTest(TestCase):
         # If we run
         day1 = 1
         month = 3
-        year1 = 1966
-        bot_message = u'जन्मदिन'
+        year1 = 2066
+        past_date_referenced = True
 
-        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale)
-        date_detector_object.set_bot_message(bot_message)
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale,
+                                                    past_date_referenced= past_date_referenced)
         date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         self.assertIn({
