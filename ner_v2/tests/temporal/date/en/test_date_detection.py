@@ -257,7 +257,7 @@ class DateDetectionTest(TestCase):
         # If we run
         day1 = 1
         month = 3
-        year1 = 2066
+        year1 = 1966
         past_date_referenced = True
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale,
