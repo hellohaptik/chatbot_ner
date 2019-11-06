@@ -261,7 +261,7 @@ class DateDetectionTest(TestCase):
         past_date_referenced = True
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale,
-                                                    past_date_referenced= past_date_referenced)
+                                                    past_date_referenced=past_date_referenced)
         date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         self.assertIn({
