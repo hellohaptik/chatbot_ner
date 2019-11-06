@@ -36,7 +36,7 @@ class BaseRegexDate(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
-        self.is_past_referenced = past_date_referenced
+        self.past_date_referenced = past_date_referenced
 
         # dict to store words for date, numerals and words which comes in reference to some date
         self.date_constant_dict = {}
@@ -198,7 +198,7 @@ class BaseRegexDate(object):
         date_rel_match = self.regex_relative_date.findall(self.processed_text)
         for date_match in date_rel_match:
             original = date_match[0]
-            if not self.is_past_referenced:
+            if not self.past_date_referenced:
                 req_date = self.now_date + datetime.timedelta(days=self.date_constant_dict[date_match[1]][0])
             else:
                 req_date = self.now_date - datetime.timedelta(days=self.date_constant_dict[date_match[1]][0])
@@ -242,7 +242,7 @@ class BaseRegexDate(object):
                 yymmdd = str(self.now_date.year + 1) + mmdd
                 yy = self.now_date.year + 1
 
-            if self.is_past_referenced:
+            if self.past_date_referenced:
                 if int(today_yymmdd) < int(yymmdd):
                     yy -= 1
             date = {
@@ -345,11 +345,11 @@ class BaseRegexDate(object):
         for date_match in date_ref_month_match:
             original = date_match[0]
             dd = self._get_int_from_numeral(date_match[1])
-            if (self.now_date.day > dd and self.is_past_referenced) or \
-                    (self.now_date.day <= dd and not self.is_past_referenced):
+            if (self.now_date.day > dd and self.past_date_referenced) or\
+                    (self.now_date.day <= dd and not self.past_date_referenced):
                 mm = self.now_date.month
                 yy = self.now_date.year
-            elif self.now_date.day <= dd and self.is_past_referenced:
+            elif self.now_date.day <= dd and self.past_date_referenced:
                 req_date = self.now_date - relativedelta(months=1)
                 mm = req_date.month
                 yy = req_date.year
@@ -629,8 +629,8 @@ class BaseRegexDate(object):
         this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
             if self.bot_message:
-                if self.is_past_referenced or (past_regex and past_regex.search(self.bot_message)
-                                               and int(year) > int(str(self.now_date.year)[2:])):
+                if self.past_date_referenced or (past_regex and past_regex.search(self.bot_message)
+                                                 and int(year) > int(str(self.now_date.year)[2:])):
                     return str(this_century - 1) + year
                 elif present_regex and present_regex.search(self.bot_message):
                     return str(this_century) + year
