@@ -92,7 +92,7 @@ class TextModelDetector(TextDetector):
         # Access free_text_detection_results(list of str).
         # If present replace crf_original_texts with free_text_detection_results.
         # Call combine results to .combine_results() from dictionary detection and free_text_detection_results.
-        free_text_detection_results = kwargs.get("free_text_detection_results")
+        free_text_detection_results = kwargs.get("free_text_detection_results", [])
         if free_text_detection_results:
             crf_original_texts = free_text_detection_results
 
