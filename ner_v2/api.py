@@ -37,7 +37,7 @@ def get_parameters_dictionary(request):
                        PARAMETER_TIMEZONE: request.GET.get('timezone'),
                        PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
                        PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
-                       PARAMETER_PAST_DATE_REFERENCED: request.GET.get('past_date_referenced', 'False'),
+                       PARAMETER_PAST_DATE_REFERENCED: request.GET.get('date_past_reference', 'False'),
                        PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
                        PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
                        PARAMETER_NUMBER_UNIT_TYPE: request.GET.get('unit_type'),
