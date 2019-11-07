@@ -272,9 +272,16 @@ class NameDetector(object):
 
         """
         if self.language == ENGLISH_LANG:
-            replaced_text = nltk_tokenizer.tokenize(text.lower())
-            # TODO: Add postprocessing after tokenization to handle titles like dr., mr. etc
-            # TODO: Tokenization issue where trailing '.'s are considered a separate token
+            replaced_text_ = nltk_tokenizer.tokenize(text.lower())
+            replaced_text = []
+            for index, token in enumerate(replaced_text_):
+                if token == "." and 0 < index < len(replaced_text_) - 1 and replaced_text[-1] + "." in text.lower():
+                    replaced_text[-1] = replaced_text[-1] + "."
+                else:
+                    _token = token.strip('!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
+                    if not _token:
+                        _token = token
+                    replaced_text.append(token)
         else:
             replaced_text = text.lower().strip().split()
 
@@ -285,7 +292,6 @@ class NameDetector(object):
                     replaced_text[j] = replaced_text[j].replace(token, "_" + token + "_")
 
         return replaced_text
-
 
     def replace_detected_text(self, text_detection_result, text):
         """
