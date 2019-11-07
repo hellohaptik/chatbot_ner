@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from __future__ import absolute_import
 
 import datetime
@@ -233,6 +235,33 @@ class DateDetectionTest(TestCase):
         year1 = 2099
 
         date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='en', locale=locale)
+        date_dicts, original_texts = date_detector_object.detect_entity(message)
+
+        self.assertIn({
+            'normal': True,
+            'start_range': False,
+            'end_range': False,
+            'from': False,
+            'to': False,
+            'value': {'dd': day1, 'mm': month, 'yy': year1, 'type': 'date'}
+        }, date_dicts)
+
+        self.assertEqual(original_texts.count(message.lower()), 1)
+
+    def test_hi_gregorian_dd_mm_yy_format(self):
+        """
+        Date detection for pattern '१/३/६६'
+        """
+        message = u'१/३/६६'
+        locale = 'hi-in'
+        # If we run
+        day1 = 1
+        month = 3
+        year1 = 1966
+        past_date_referenced = True
+
+        date_detector_object = DateAdvancedDetector(entity_name=self.entity_name, language='hi', locale=locale,
+                                                    past_date_referenced=past_date_referenced)
         date_dicts, original_texts = date_detector_object.detect_entity(message)
 
         self.assertIn({

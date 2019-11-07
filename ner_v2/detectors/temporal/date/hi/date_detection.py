@@ -16,6 +16,7 @@ class DateDetector(BaseRegexDate):
                                            timezone=timezone,
                                            past_date_referenced=past_date_referenced)
         self.detector_preferences = [
+            self._gregorian_day_month_year_format,
             self._detect_relative_date,
             self._detect_date_month,
             self._detect_date_ref_month_1,
@@ -27,7 +28,7 @@ class DateDetector(BaseRegexDate):
             self._detect_weekday_ref_month_2,
             self._detect_weekday_diff,
             self._detect_weekday,
-            self.custom_christmas_date_detector,
+            self.custom_christmas_date_detector
         ]
 
     def custom_christmas_date_detector(self, date_list=None, original_list=None):
