@@ -58,7 +58,8 @@ class DateAdvancedDetector(BaseDetector):
                 supported_languages.append(_dir)
         return supported_languages
 
-    def __init__(self, entity_name='date', language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name='date', locale=None, language=ENGLISH_LANG, timezone='UTC',
+                 past_date_referenced=False, bot_message=None):
         """
         Initializes the DateDetector object with given entity_name and pytz timezone object
 
@@ -70,6 +71,7 @@ class DateAdvancedDetector(BaseDetector):
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
         """
+        self.locale = locale
         self._supported_languages = self.get_supported_languages()
         super(DateAdvancedDetector, self).__init__(language=language)
         self.text = ''
@@ -82,8 +84,11 @@ class DateAdvancedDetector(BaseDetector):
         self.date_detector_object = DateDetector(entity_name=entity_name,
                                                  language=language,
                                                  timezone=timezone,
-                                                 past_date_referenced=past_date_referenced)
+                                                 past_date_referenced=past_date_referenced,
+                                                 locale=locale)
         self.bot_message = None
+        if bot_message:
+            self.set_bot_message(bot_message)
 
     @property
     def supported_languages(self):
@@ -129,6 +134,8 @@ class DateAdvancedDetector(BaseDetector):
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
         respectively.
+        :param text: text
+        :param run_model: run_model
         """
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
@@ -655,7 +662,6 @@ class DateAdvancedDetector(BaseDetector):
                                     (For example, UI elements like form, payload, etc)
             fallback_value (str): If the detection logic fails to detect any value either from structured_value
                               or message then we return a fallback_value as an output.
-            bot_message (str): previous message from a bot/agent.
 
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
@@ -667,9 +673,8 @@ class DateAdvancedDetector(BaseDetector):
                 message = 'i want to order chinese from  mainland china and pizza from domminos'
                 structured_value = None
                 fallback_value = None
-                bot_message = None
                 output = detect(message=message, structured_value=structured_value,
-                                  fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value)
                 print output
 
                     >> [{'detection': 'message', 'original_text': 'mainland china', 'entity_value':
@@ -682,9 +687,8 @@ class DateAdvancedDetector(BaseDetector):
                 entity_name = 'movie'
                 structured_value = 'inferno'
                 fallback_value = None
-                bot_message = None
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
-                                  fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value)
                 print output
 
                     >> [{'detection': 'structure_value_verified', 'original_text': 'inferno', 'entity_value':
@@ -695,9 +699,8 @@ class DateAdvancedDetector(BaseDetector):
                 entity_name = 'movie'
                 structured_value = 'delhi'
                 fallback_value = None
-                bot_message = None
                 output = get_text(message=message, entity_name=entity_name, structured_value=structured_value,
-                                  fallback_value=fallback_value, bot_message=bot_message)
+                                  fallback_value=fallback_value)
                 print output
 
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
@@ -756,7 +759,7 @@ class DateDetector(object):
         language: source language of text
     """
 
-    def __init__(self, entity_name, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale=None, language=ENGLISH_LANG, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -765,6 +768,7 @@ class DateDetector(object):
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
+            locale(Optional, str): user locale default is None
         """
         self.text = ''
         self.tagged_text = ''
@@ -777,13 +781,15 @@ class DateDetector(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
         self.language = language
+        self.locale = locale
 
         try:
             date_detector_module = importlib.import_module(
                 'ner_v2.detectors.temporal.date.{0}.date_detection'.format(self.language))
             self.language_date_detector = date_detector_module.DateDetector(entity_name=self.entity_name,
                                                                             past_date_referenced=past_date_referenced,
-                                                                            timezone=self.timezone)
+                                                                            timezone=self.timezone,
+                                                                            locale=self.locale)
         except ImportError:
             standard_date_regex = importlib.import_module(
                 'ner_v2.detectors.temporal.date.standard_date_regex'
@@ -793,7 +799,8 @@ class DateDetector(object):
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language),
                 timezone=self.timezone,
-                past_date_referenced=past_date_referenced
+                past_date_referenced=past_date_referenced,
+                locale=self.locale
             )
 
     def detect_entity(self, text, **kwargs):
@@ -818,7 +825,7 @@ class DateDetector(object):
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
         respectively.
-
+        :param text: text
         """
 
         self.text = ' ' + text.strip().lower() + ' '
@@ -848,6 +855,7 @@ class DateDetector(object):
             bot_message: is the previous message that is sent by the bot
         """
         self.bot_message = bot_message
+        self.language_date_detector.set_bot_message(bot_message)
 
     def to_datetime_object(self, base_date_value_dict):
         """
