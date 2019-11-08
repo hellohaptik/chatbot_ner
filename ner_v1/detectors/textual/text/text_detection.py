@@ -379,18 +379,19 @@ class TextDetector(BaseDetector):
         # if present use combine_results to merge the results.
         free_text_detection_results = kwargs.get("free_text_detection_results", [])
 
+        values, texts = [], []
         if len(text_entity_values) > 0 and len(original_texts) > 0:
             self.tagged_text = self.__tagged_texts[0]
             self.processed_text = self.__processed_texts[0]
+            values, texts = text_entity_values[0], original_texts[0]
 
-            if free_text_detection_results:
-                text_entity_verified_values, original_texts = self.combine_results(
-                    values=text_entity_values[0],
-                    original_texts=original_texts[0],
-                    crf_original_texts=free_text_detection_results)
-                return text_entity_verified_values[0], original_texts[0]
-            return text_entity_values[0], original_texts[0]
-        return [], []
+        if free_text_detection_results:
+            text_entity_verified_values, original_texts = self.combine_results(
+                values=values,
+                original_texts=texts,
+                crf_original_texts=free_text_detection_results)
+            return text_entity_verified_values, original_texts
+        return values, texts
 
     def _text_detection_with_variants(self):
         """
