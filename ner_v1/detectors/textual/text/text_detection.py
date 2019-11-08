@@ -334,7 +334,7 @@ class TextDetector(BaseDetector):
         text_entity_values_list, original_texts_list = self._text_detection_with_variants()
 
         # itertate over text_entity_values_list, original_texts_list and if free_text_detection_results has any entry
-        # for that index use combine_results to merge the results.
+        # for that index use combine_results to merge the results from free_text and detection.
         for i, (values, original_texts, free_text_detection_results_) in enumerate(
                 six.moves.zip_longest(text_entity_values_list, original_texts_list, free_text_detection_results)):
             if free_text_detection_results_:
