@@ -28,6 +28,7 @@ class DateDetector(object):
         original_date_text: list to store substrings of the text detected as date entities
         tag: entity_name prepended and appended with '__'
         timezone: Optional, pytz.timezone object used for getting current time, default is pytz.timezone('UTC')
+        locale: Optional, locale of the user for getting country code
         now_date: datetime object holding timestamp while DateDetector instantiation
         month_dictionary: dictonary mapping month indexes to month spellings and
                           fuzzy variants(spell errors, abbreviations)
@@ -70,7 +71,7 @@ class DateDetector(object):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, locale=None, timezone='UTC', past_date_referenced=False):
         """Initializes a DateDetector object with given entity_name and pytz timezone object
 
         Args:
@@ -79,6 +80,7 @@ class DateDetector(object):
             timezone (Optional, str): timezone identifier string that is used to create a pytz timezone object
                                       default is UTC
             past_date_referenced (bool): to know if past or future date is referenced for date text like 'kal', 'parso'
+            locale (Optional, str): user locale for getting the country code.
 
         """
         self.text = ''
@@ -95,6 +97,58 @@ class DateDetector(object):
         self.month_dictionary = MONTH_DICT
         self.day_dictionary = DAY_DICT
         self.bot_message = None
+        self.locale = locale
+        self.country_code = None
+        self.past_date_referenced = past_date_referenced
+        self.default_detector_preferences = [self._gregorian_day_month_year_format,
+                                             self._gregorian_month_day_year_format,
+                                             self._gregorian_year_month_day_format,
+                                             self._gregorian_advanced_day_month_year_format,
+                                             self._day_month_format_for_arrival_departure,
+                                             self._date_range_ddth_of_mmm_to_ddth,
+                                             self._date_range_ddth_to_ddth_of_next_month,
+                                             self._gregorian_day_with_ordinals_month_year_format,
+                                             self._gregorian_advanced_year_month_day_format,
+                                             self._gregorian_year_day_month_format,
+                                             self._gregorian_month_day_with_ordinals_year_format,
+                                             self._gregorian_day_month_format,
+                                             self._gregorian_month_day_format,
+                                             self._day_after_tomorrow,
+                                             self._date_days_after,
+                                             self._date_days_later,
+                                             self._day_before_yesterday,
+                                             self._todays_date,
+                                             self._tomorrows_date,
+                                             self._yesterdays_date,
+                                             self._day_in_next_week,
+                                             self._day_range_for_nth_week_month
+                                             ]
+        """
+        Rules to add new country code preferences:
+        1. Create a new key with country code.
+        2. Add all the methods which should be given higher preference in a list with the
+           most preferred method first.
+        3. Warning: Be careful about the order in which you set your preferences.
+            For EX: If you set `self._gregorian_day_month_format` at a higher preference than
+            `self._gregorian_advanced_day_month_year_format`, only `22nd MAR` will be detected in  `22nd MAR 2034`.
+        """
+        self.country_date_detector_preferences = {
+            'US': [self._gregorian_month_day_year_format],
+            'IN': [self._gregorian_day_month_year_format],
+        }
+
+    def get_country_code_from_locale(self):
+        """
+        Extracts locale from country code.
+        Ex: locale:'en_us' sets,
+            self.country_code = 'US'
+        """
+        regex_pattern = re.compile('[-_](.*$)', re.U)
+        match = regex_pattern.findall(self.locale)
+        if match:
+            return match[0].upper()
+        else:
+            return None
 
     def detect_date(self, text):
         """
@@ -111,7 +165,8 @@ class DateDetector(object):
         self.text = " " + text.strip().lower() + " "
         self.processed_text = self.text
         self.tagged_text = self.text
-
+        if self.locale:
+            self.country_code = self.get_country_code_from_locale()
         date_list = []
         original_list = []
         date_list, original_list = self.get_exact_date(date_list, original_list)
@@ -147,51 +202,18 @@ class DateDetector(object):
             corresponding substrings in the given text.
 
         """
-        date_list, original_list = self._gregorian_day_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_year_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_advanced_day_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_month_format_for_arrival_departure(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_of_mmm_to_ddth(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_range_ddth_to_ddth_of_next_month(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_day_with_ordinals_month_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_advanced_year_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_year_day_month_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_with_ordinals_year_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_day_month_format(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._gregorian_month_day_format(date_list, original_list)
-        self._update_processed_text(original_list)
-
-        date_list, original_list = self._day_after_tomorrow(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_days_after(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._date_days_later(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_before_yesterday(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._todays_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._tomorrows_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._yesterdays_date(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_in_next_week(date_list, original_list)
-        self._update_processed_text(original_list)
-        date_list, original_list = self._day_range_for_nth_week_month(date_list, original_list)
-        self._update_processed_text(original_list)
+        if self.country_code and self.country_code in self.country_date_detector_preferences:
+            for preferred_detector in self.country_date_detector_preferences[self.country_code]:
+                date_list, original_list = preferred_detector(date_list, original_list)
+                self._update_processed_text(original_list)
+            for detector in self.default_detector_preferences:
+                if detector not in self.country_date_detector_preferences[self.country_code]:
+                    date_list, original_list = detector(date_list, original_list)
+                    self._update_processed_text(original_list)
+        else:
+            for detector in self.default_detector_preferences:
+                date_list, original_list = detector(date_list, original_list)
+                self._update_processed_text(original_list)
 
         return date_list, original_list
 
@@ -224,15 +246,13 @@ class DateDetector(object):
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_given_day(date_list, original_list)
         self._update_processed_text(original_list)
-        # FIXME: This call order causes everyday to be taken away from "everyday except <>" which means
-        # FIXME: successive calls for everyday_except_weekends and everyday_except_weekdays return wrong results
-        date_list, original_list = self._date_identification_everyday(date_list, original_list, n_days=15)
-        self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_everyday_except_weekends(date_list, original_list,
                                                                                       n_days=15)
         self._update_processed_text(original_list)
         date_list, original_list = self._date_identification_everyday_except_weekdays(date_list, original_list,
                                                                                       n_days=50)
+        self._update_processed_text(original_list)
+        date_list, original_list = self._date_identification_everyday(date_list, original_list, n_days=15)
         self._update_processed_text(original_list)
         date_list, original_list = self._day_within_one_week(date_list, original_list)
         self._update_processed_text(original_list)
@@ -285,16 +305,21 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
-                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)(?:\s|$)')
+        regex_pattern = re.compile(r'[^/\-\.\w](([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             dd = int(pattern[1])
             mm = int(pattern[2])
             yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
-            if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) < self.now_date:
-                yy += 1
+            try:
+                # to catch dates which are not possible like "31/11" (october 31st)
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
+                        < self.now_date:
+                    yy += 1
+            except:
+                return date_list, original_list
 
             date = {
                 'dd': int(dd),
@@ -337,14 +362,21 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]'
-                                   r'\s?((?:20|19)?[0-9]{2}))(\s|$)')
+        regex_pattern = re.compile(r'[^/\-\.\w]((1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9])'
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
             dd = pattern[2]
             mm = pattern[1]
-            yy = self.normalize_year(pattern[3])
+            yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
+            try:
+                # to catch dates which are not possible like "11/31" (october 31st)
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
+                        < self.now_date:
+                    yy += 1
+            except:
+                return date_list, original_list
 
             date = {
                 'dd': int(dd),
@@ -388,7 +420,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[/\-\.]\s?'
-                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+                                   r'(1[0-2]|0?[1-9])\s?[/\-\.]\s?([12][0-9]|3[01]|0?[1-9]))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -438,7 +470,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?[\/\ \-\.\,]\s?([A-Za-z]+)\s?[\/\ \-\.\,]\s?'
-                                   r'((?:20|19)?[0-9]{2}))(\s|$)')
+                                   r'((?:20|19)?[0-9]{2}))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -492,7 +524,7 @@ class DateDetector(object):
         if original_list is None:
             original_list = []
         regex_pattern = re.compile(r'\b(([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?\s?(?:of)?[\s\,\-]\s?'
-                                   r'([A-Za-z]+)[\s\,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
+                                   r'([A-Za-z]+)[\s\,\-]\s?((?:20|19)?[0-9]{2}))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
@@ -543,7 +575,7 @@ class DateDetector(object):
         if date_list is None:
             date_list = []
         regex_pattern = re.compile(r'\b(((?:20|19)[0-9]{2})\s?[\/\ \,\-]\s?([A-Za-z]+)\s?'
-                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))(\s|$)')
+                                   r'[\/\ \,\-]\s?([12][0-9]|3[01]|0?[1-9]))\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
@@ -645,17 +677,27 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b(([A-Za-z]+)[\ \,\-]\s?([12][0-9]|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
-                                   r'[\ \,\-]\s?((?:20|19)?[0-9]{2}))(\s|$)')
+        regex_pattern = re.compile(r'\b(((?:20|19)?[0-9]{2})?\s?([A-Za-z]+)[\ \,\-]\s?([12][0-9]'
+                                   r'|3[01]|0?[1-9])\s?(?:nd|st|rd|th)?'
+                                   r'(?:[\ \,\-]\s?((?:20|19)?[0-9]{2}))?)\W')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]
-            dd = pattern[2]
-            probable_mm = pattern[1]
-            yy = self.normalize_year(pattern[3])
+            yy1 = pattern[1]
+            yy2 = pattern[4]
+            dd = pattern[3]
+            yy = int(self.normalize_year(yy1 or yy2 or str(self.now_date.year)))
+            probable_mm = pattern[2]
             mm = self.__get_month_index(probable_mm)
 
             if mm:
+                try:
+                    # to catch dates which are not possible like "31/11" (october 31st)
+                    if not yy1 and not yy2 and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
+                            < self.now_date:
+                        yy += 1
+                except:
+                    return date_list, original_list
                 date = {
                     'dd': int(dd),
                     'mm': int(mm),
@@ -1375,13 +1417,22 @@ class DateDetector(object):
         end = now + datetime.timedelta(days=n_days)
         regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekends?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
-
+        is_everyday_result = []
         if not patterns:
             weekday_regex_pattern = re.compile(r'\b((week\s?days?|all\sweekdays))\b')
             patterns = weekday_regex_pattern.findall(self.processed_text.lower())
+            every_weekday_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)\s+'
+                                               r'(week\s?days?|all\sweekdays))\b', re.IGNORECASE)
+            is_everyday_result = every_weekday_pattern.findall(self.text)
         constant_type = WEEKDAYS
-        if self._is_everyday_present(self.text):
+        if is_everyday_result:
             constant_type = REPEAT_WEEKDAYS
+            patterns = is_everyday_result
+        # checks if phrase of the form everyday except weekdays is present in the sentence.
+        regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekdays?)\b')
+        check_patterns_for_except_weekdays = regex_pattern.findall(self.processed_text.lower())
+        if check_patterns_for_except_weekdays:
+            patterns = []
         today = now.weekday()
         count = 0
         weekend = []
@@ -1453,13 +1504,18 @@ class DateDetector(object):
         end = now + datetime.timedelta(days=n_days)
         regex_pattern = re.compile(r'\b((every\s?day|daily|all\s?days)\s+except\s+weekdays?)\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
+        is_everyday_result = []
         if not patterns:
             weekend_regex_pattern = re.compile(r'\b((week\s?ends?|all\sweekends))\b')
             patterns = weekend_regex_pattern.findall(self.processed_text.lower())
-        constant_type = WEEKENDS
-        if self._is_everyday_present(self.text):
-            constant_type = REPEAT_WEEKENDS
+            every_weekend_pattern = re.compile(r'\b((every|daily|recur|always|continue|every\s*day|all)'
+                                               r'\s+(week\s?ends?|all\sweekends))\b', re.IGNORECASE)
+            is_everyday_result = every_weekend_pattern.findall(self.text)
 
+        constant_type = WEEKENDS
+        if is_everyday_result:
+            constant_type = REPEAT_WEEKENDS
+            patterns = is_everyday_result
         today = now.weekday()
         count = 0
         weekend = []
@@ -1943,13 +1999,13 @@ class DateDetector(object):
         future_regex = None
         this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
-            if self.bot_message:
-                if past_regex and past_regex.search(self.bot_message):
-                    return str(this_century - 1) + year
-                elif present_regex and present_regex.search(self.bot_message):
-                    return str(this_century) + year
-                elif future_regex and future_regex.search(self.bot_message):
-                    return str(this_century + 1) + year
+            if (((self.bot_message and past_regex.search(self.bot_message)) or
+                 (self.past_date_referenced is True)) and (int(year) > int(str(self.now_date.year)[2:]))):
+                return str(this_century - 1) + year
+            elif present_regex and present_regex.search(self.bot_message):
+                return str(this_century) + year
+            elif future_regex and future_regex.search(self.bot_message):
+                return str(this_century + 1) + year
 
         # if patterns didn't match or no bot message set, fallback to current century
         if len(year) == 2:

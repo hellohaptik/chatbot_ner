@@ -13,15 +13,16 @@ from ner_v2.detectors.temporal.utils import next_weekday, nth_weekday, get_tuple
 
 
 class BaseRegexDate(object):
-    def __init__(self, entity_name, data_directory_path, timezone='UTC', past_date_referenced=False):
+    def __init__(self, entity_name, data_directory_path, locale=None, timezone='UTC', past_date_referenced=False):
         """
         Base Regex class which will be imported by language date class by giving their data folder path
         This will create standard regex and their parser to detect date for given language.
         Args:
             data_directory_path (str): path of data folder for given language
-            timezone (str): user timezone default UTC
+            timezone (Optional, str): user timezone default UTC
             past_date_referenced (boolean): if the date reference is in past, this is helpful for text like 'kal',
                                           'parso' to know if the reference is past or future.
+            locale (Optional, str): user locale default None
         """
         self.text = ''
         self.tagged_text = ''
@@ -35,7 +36,7 @@ class BaseRegexDate(object):
         self.now_date = datetime.datetime.now(tz=self.timezone)
         self.bot_message = None
 
-        self.is_past_referenced = past_date_referenced
+        self.past_date_referenced = past_date_referenced
 
         # dict to store words for date, numerals and words which comes in reference to some date
         self.date_constant_dict = {}
@@ -59,7 +60,8 @@ class BaseRegexDate(object):
         self.init_regex_and_parser(data_directory_path)
 
         # Variable to define default order in which these regex will work
-        self.detector_preferences = [self._detect_relative_date,
+        self.detector_preferences = [self._gregorian_day_month_year_format,
+                                     self._detect_relative_date,
                                      self._detect_date_month,
                                      self._detect_date_ref_month_1,
                                      self._detect_date_ref_month_2,
@@ -196,7 +198,7 @@ class BaseRegexDate(object):
         date_rel_match = self.regex_relative_date.findall(self.processed_text)
         for date_match in date_rel_match:
             original = date_match[0]
-            if not self.is_past_referenced:
+            if not self.past_date_referenced:
                 req_date = self.now_date + datetime.timedelta(days=self.date_constant_dict[date_match[1]][0])
             else:
                 req_date = self.now_date - datetime.timedelta(days=self.date_constant_dict[date_match[1]][0])
@@ -240,7 +242,7 @@ class BaseRegexDate(object):
                 yymmdd = str(self.now_date.year + 1) + mmdd
                 yy = self.now_date.year + 1
 
-            if self.is_past_referenced:
+            if self.past_date_referenced:
                 if int(today_yymmdd) < int(yymmdd):
                     yy -= 1
             date = {
@@ -343,11 +345,11 @@ class BaseRegexDate(object):
         for date_match in date_ref_month_match:
             original = date_match[0]
             dd = self._get_int_from_numeral(date_match[1])
-            if (self.now_date.day > dd and self.is_past_referenced) or \
-                    (self.now_date.day <= dd and not self.is_past_referenced):
+            if (self.now_date.day > dd and self.past_date_referenced) or\
+                    (self.now_date.day <= dd and not self.past_date_referenced):
                 mm = self.now_date.month
                 yy = self.now_date.year
-            elif self.now_date.day <= dd and self.is_past_referenced:
+            elif self.now_date.day <= dd and self.past_date_referenced:
                 req_date = self.now_date - relativedelta(months=1)
                 mm = req_date.month
                 yy = req_date.year
@@ -535,6 +537,119 @@ class BaseRegexDate(object):
             date_list.append(date)
             original_list.append(original)
         return date_list, original_list
+
+    def _gregorian_day_month_year_format(self, date_list=None, original_list=None):
+        """
+        Detects date in the following format
+
+        format: <day><separator><month><separator><year>
+        where each part is in of one of the formats given against them
+            day: d, dd
+            month: m, mm
+            year: yy, yyyy
+            separator: "/", "-", "."
+
+        Two character years are assumed to be belong to 21st century - 20xx.
+        Only years between 1900 to 2099 are detected
+
+        Few valid examples:
+            "6/2/39", "7/01/1997", "28-12-2096"
+
+        Args:
+            date_list: Optional, list to store dictionaries of detected dates
+            original_list: Optional, list to store corresponding substrings of given text which were detected as
+                            date entities
+        Returns:
+            A tuple of two lists with first list containing the detected date entities and second list containing their
+            corresponding substrings in the given text.
+
+        """
+        if original_list is None:
+            original_list = []
+        if date_list is None:
+            date_list = []
+        regex_pattern = re.compile(r'[^/\-\.\w](([12][0-9]|3[01]|0?[1-9])\s?[/\-\.]\s?(1[0-2]|0?[1-9])'
+                                   r'(?:\s?[/\-\.]\s?((?:20|19)?[0-9]{2}))?)\W')
+        translate_number = self.convert_numbers(self.processed_text.lower())
+        patterns = regex_pattern.findall(translate_number)
+        for pattern in patterns:
+            original = pattern[0]
+            dd = int(pattern[1])
+            mm = int(pattern[2])
+            yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
+            try:
+                # to catch dates which are not possible like "31/11" (october 31st)
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd))\
+                        < self.now_date:
+                    yy += 1
+            except:
+                return date_list, original_list
+
+            date = {
+                'dd': int(dd),
+                'mm': int(mm),
+                'yy': int(yy),
+                'type': TYPE_EXACT
+            }
+            date_list.append(date)
+            # original = self.regx_to_process.text_substitute(original)
+            if translate_number != self.processed_text.lower():
+                match = re.search(original, translate_number)
+                original_list.append(self.processed_text[(match.span()[0]):(match.span()[1])])
+            else:
+                original_list.append(original)
+        return date_list, original_list
+
+    @staticmethod
+    def convert_numbers(text):
+        result = text
+        digit = re.compile(r'(\d)', re.U)
+        groups = digit.findall(result)
+        for group in groups:
+            result = result.replace(group, str(int(group)))
+        return result
+
+    def normalize_year(self, year):
+        """
+        Normalize two digit year to four digits by taking into consideration the bot message. Useful in cases like
+        date of birth where past century is preferred than current. If no bot message is given it falls back to
+        current century
+
+        Args:[{"key":"message","value":"१/३/६६","description":""}]
+            year (str): Year string to normalize
+
+        Returns:
+            str: year in four digits
+        """
+        # past_regex = re.compile(ur'birth|bday|dob|born|जन्म|जन्मदिन|పుట్టినరోజు|పుట్టిన', flags=re.UNICODE)
+        past_regex = None
+        # Todo: Add more language variations of birthday.
+        present_regex = None
+        future_regex = None
+        this_century = int(str(self.now_date.year)[:2])
+        if len(year) == 2:
+            if (((self.bot_message and past_regex and past_regex.search(self.bot_message)) or
+                 (self.past_date_referenced is True)) and (int(year) > int(str(self.now_date.year)[2:]))):
+                return str(this_century - 1) + year
+            elif present_regex and present_regex.search(self.bot_message):
+                return str(this_century) + year
+            elif future_regex and future_regex.search(self.bot_message):
+                return str(this_century + 1) + year
+
+        # if patterns didn't match or no bot message set, fallback to current century
+        if len(year) == 2:
+            return str(this_century) + year
+
+        return year
+
+    def set_bot_message(self, bot_message):
+        """
+        Sets the object's bot_message attribute
+
+        Args:
+            bot_message: is the previous message that is sent by the bot
+        """
+        self.bot_message = bot_message
 
     def _update_processed_text(self, original_date_list):
         """

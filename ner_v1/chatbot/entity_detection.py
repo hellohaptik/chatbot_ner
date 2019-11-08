@@ -256,7 +256,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
                                                    bot_message=bot_message,
                                                    free_text_detection_results=free_text_detection_results)
     elif isinstance(message, (list, tuple)):
-        entity_output = text_model_detector.detect_bulk(messages=message)
+        entity_output = text_model_detector.detect_bulk(messages=message, fallback_values=fallback_value)
 
     return entity_output
 
@@ -574,7 +574,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
                                                                        free_text_detection_results=free_text_detection_results)
 
     if not entity_list and fallback_text:
-        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())
+        entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split(), fallback_text)
         detection_method = fallback_method
 
     if entity_list and original_text_list:
