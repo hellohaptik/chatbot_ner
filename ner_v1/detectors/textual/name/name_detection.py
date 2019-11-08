@@ -175,7 +175,7 @@ class NameDetector(object):
 
         else:
             replaced_text = self.replace_free_text_detection_text(free_text_detection_results,
-                                                       text=text)
+                                                                  text=text)
             entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
         self._update_processed_text(person_name_list=original_text)

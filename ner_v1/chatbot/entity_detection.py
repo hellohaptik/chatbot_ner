@@ -493,7 +493,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
     """
-    free_text_detection_results = kwargs.get("free_text_detection_results", [])
+    # free_text_detection_results = kwargs.get("free_text_detection_results", [])
     city_detection = CityDetector(entity_name=entity_name, language=language)
     city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
@@ -570,8 +570,10 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
     entity_list, original_text_list = [], []
 
     if text:
-        entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message,
-                                                                       free_text_detection_results=free_text_detection_results)
+        entity_list, original_text_list = name_detection.detect_entity(
+            text=text,
+            bot_message=bot_message,
+            free_text_detection_results=free_text_detection_results)
 
     if not entity_list and fallback_text:
         entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split())

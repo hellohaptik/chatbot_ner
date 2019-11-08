@@ -186,11 +186,10 @@ class BaseDetector(object):
             if not match:
                 unprocessed_crf_original_texts.append(crf_original_texts[i])
 
-        unprocessed_crf_original_texts_verified = self._add_verification_source(values=unprocessed_crf_original_texts,
-                                                                                verification_source_dict=
-                                                                                {DATASTORE_VERIFIED: False,
-                                                                                 CRF_MODEL_VERIFIED: True}
-                                                                                )
+        unprocessed_crf_original_texts_verified = self._add_verification_source(
+            values=unprocessed_crf_original_texts,
+            verification_source_dict={DATASTORE_VERIFIED: False, CRF_MODEL_VERIFIED: True})
+
         combined_values.extend(unprocessed_crf_original_texts_verified)
         combined_original_texts.extend(unprocessed_crf_original_texts)
 
