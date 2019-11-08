@@ -12,6 +12,13 @@ from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_N
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
 
+try:
+    import regex as re
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+except ImportError:
+    import re
+    _re_flags = re.UNICODE
+
 
 
 class BaseDetector(object):
