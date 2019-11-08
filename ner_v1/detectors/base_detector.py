@@ -10,6 +10,8 @@ from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
+
 
 
 class BaseDetector(object):
@@ -118,6 +120,74 @@ class BaseDetector(object):
         return self.output_entity_bulk(entity_values_list=values_list, original_texts_list=original_texts_list,
                                        detection_method=method,
                                        detection_language=self._target_language_script)
+
+    def _add_verification_source(self, values, verification_source_dict):
+        """
+        Add the verification source for the detected entities
+        Args:
+            values (list): List of detected text type entities
+            verification_source_dict (dict): Dict consisting of the verification source and value.
+        Returns:
+            text_entity_verified_values (list): List of dicts consisting of the key and values for the keys
+            value and verification source
+        Example:
+            values = [u'Chennai', u'New Delhi', u'chennai']
+            verification_source_dict = {"datastore_verified": True}
+
+            >> add_verification_source(values, verification_source_dict)
+                [{'datastore_verified': True, 'value': u'Chennai'},
+                 {'datastore_verified': True, 'value': u'New Delhi'},
+                 {'datastore_verified': True, 'value': u'chennai'}]
+        """
+        text_entity_verified_values = []
+        for text_entity_value in values:
+            text_entity_dict = {ENTITY_VALUE_DICT_KEY: text_entity_value}
+            text_entity_dict.update(verification_source_dict)
+            text_entity_verified_values.append(text_entity_dict)
+        return text_entity_verified_values
+
+    def combine_results(self, values, original_texts, crf_original_texts):
+        """
+        This method is used to combine the results provided by the datastore search and the
+        crf_model if trained.
+        Args:
+            values (list): List of values detected by datastore
+            original_texts (list): List of original texts present in the texts for which value shave been
+                                   detected
+            crf_original_texts (list): Entities detected by the Crf Model
+        Returns:
+            combined_values (list): List of dicts each dict consisting of the entity value and additionally
+                                    the keys for the datastore and crf model detection
+            combined_original_texts (list): List of original texts detected by the datastore and the crf model.
+        """
+        unprocessed_crf_original_texts = []
+
+        combined_values = self._add_verification_source(values=values,
+                                                        verification_source_dict={
+                                                            DATASTORE_VERIFIED: True,
+                                                            CRF_MODEL_VERIFIED: False
+                                                        })
+        combined_original_texts = original_texts
+        for i in range(len(crf_original_texts)):
+            match = False
+            for j in range(len(original_texts)):
+                if crf_original_texts[i] == original_texts[j]:
+                    combined_values[j][CRF_MODEL_VERIFIED] = True
+                    match = True
+                elif re.findall(r'\b%s\b' % crf_original_texts[i], original_texts[j]):
+                    match = True
+            if not match:
+                unprocessed_crf_original_texts.append(crf_original_texts[i])
+
+        unprocessed_crf_original_texts_verified = self._add_verification_source(values=unprocessed_crf_original_texts,
+                                                                                verification_source_dict=
+                                                                                {DATASTORE_VERIFIED: False,
+                                                                                 CRF_MODEL_VERIFIED: True}
+                                                                                )
+        combined_values.extend(unprocessed_crf_original_texts_verified)
+        combined_original_texts.extend(unprocessed_crf_original_texts)
+
+        return combined_values, combined_original_texts
 
     def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
         """

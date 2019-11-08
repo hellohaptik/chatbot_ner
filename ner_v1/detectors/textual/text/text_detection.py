@@ -3,6 +3,7 @@ import re
 import string
 
 from six import iteritems
+import six
 
 import language_utilities.constant as lang_constant
 from chatbot_ner.config import ner_logger
@@ -321,8 +322,18 @@ class TextDetector(BaseDetector):
                         ]
 
         """
+        free_text_detection_results = kwargs.get("free_text_detection_results", [])
         self._process_text(texts)
         text_entity_values_list, original_texts_list = self._text_detection_with_variants()
+
+        for i, (values, original_texts, free_text_detection_results_) in enumerate(
+                six.moves.zip_longest(text_entity_values_list, original_texts_list, free_text_detection_results)):
+            if free_text_detection_results_:
+                text_entity_values_list[i], original_texts_list[i] = self.combine_results(
+                    values=values,
+                    original_texts=original_texts,
+                    crf_original_texts=free_text_detection_results_)
+
         return text_entity_values_list, original_texts_list
 
     def detect_entity(self, text, **kwargs):
@@ -361,9 +372,18 @@ class TextDetector(BaseDetector):
         self._process_text([text])
         text_entity_values, original_texts = self._text_detection_with_variants()
 
+        free_text_detection_results = kwargs.get("free_text_detection_results", [])
+
         if len(text_entity_values) > 0 and len(original_texts) > 0:
             self.tagged_text = self.__tagged_texts[0]
             self.processed_text = self.__processed_texts[0]
+
+            if free_text_detection_results:
+                text_entity_verified_values, original_texts = self.combine_results(
+                    values=text_entity_values[0],
+                    original_texts=original_texts[0],
+                    crf_original_texts=free_text_detection_results)
+                return text_entity_verified_values[0], original_texts[0]
             return text_entity_values[0], original_texts[0]
         return [], []
 
