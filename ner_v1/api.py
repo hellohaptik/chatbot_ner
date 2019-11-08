@@ -270,7 +270,8 @@ def location(request):
         entity_output = get_location(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                     parameters_dict[PARAMETER_BOT_MESSAGE])
+                                     parameters_dict[PARAMETER_BOT_MESSAGE],
+                                     free_text_detection_results=parameters_dict[PARAMETER_PRIOR_CRF_RESULTS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for location: %s ' % e)

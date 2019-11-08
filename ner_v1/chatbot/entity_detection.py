@@ -261,7 +261,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     return entity_output
 
 
-def get_location(message, entity_name, structured_value, fallback_value, bot_message):
+def get_location(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """"Use TextDetector (elasticsearch) to detect location
 
     TODO: We can improve this by creating separate for location detection instead of using TextDetector
@@ -297,10 +297,10 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
             >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
                  'original_text': 'andheri west'}]
     """
-
+    free_text_detection_results = kwargs.get("free_text_detection_results", [])
     text_detection = TextDetector(entity_name=entity_name)
     return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
-                                 bot_message=bot_message)
+                                 bot_message=bot_message, free_text_detection_results=free_text_detection_results)
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
@@ -410,7 +410,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
                                   bot_message=bot_message)
 
 
-def get_city(message, entity_name, structured_value, fallback_value, bot_message, language):
+def get_city(message, entity_name, structured_value, fallback_value, bot_message, language, **kwargs):
     """Use CityDetector to detect cities
 
     Args:
@@ -493,6 +493,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
     """
+    free_text_detection_results = kwargs.get("free_text_detection_results", [])
     city_detection = CityDetector(entity_name=entity_name, language=language)
     city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
