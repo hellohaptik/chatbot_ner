@@ -1,8 +1,10 @@
+import concurrent.futures
 import json
 import time
+
 import six
-import concurrent.futures
 from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE,
@@ -188,6 +190,7 @@ def parse_kwargs(request_data):
     return parameters_dict
 
 
+@csrf_exempt
 def detect_entities(request):
     response = {'entities': [], 'exec_time': -1}
     request_data = json.loads(request.body)
