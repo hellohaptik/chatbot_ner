@@ -206,7 +206,7 @@ def detect_entities(request):
             exec_cls = concurrent.futures.ThreadPoolExecutor
         else:
             exec_cls = concurrent.futures.ProcessPoolExecutor
-        with exec_cls(max_workers=num_workers, thread_name_prefix='entity_thread_') as parallel_executor:
+        with exec_cls(max_workers=num_workers) as parallel_executor:
             futures = []
             for entity_name, entity_kwargs in entities.items():
                 entity_url_key = entity_kwargs.pop('entity_url_key')
