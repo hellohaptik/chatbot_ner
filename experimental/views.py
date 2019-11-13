@@ -194,7 +194,10 @@ def parse_kwargs(request_data):
 def detect_entities(request):
     response = {'entities': [], 'exec_time': -1}
     request_data = json.loads(request.body)
-    exec_backend = request_data.get('exec_backend', '').strip()
+    exec_backend = request_data.get('exec_backend')
+    if exec_backend is None:
+        exec_backend = ''
+    exec_backend = exec_backend.strip()
     num_workers = request_data.get('num_workers', 4)
     entities = request_data.get('entities', {})
     start_time = time.time()
