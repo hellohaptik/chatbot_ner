@@ -1,4 +1,5 @@
 import concurrent.futures
+import functools
 import json
 import time
 
@@ -113,31 +114,28 @@ def phone_number_v2(parameters_dict):
     return entity_name, entity_output
 
 
-def unpacked_executor(fn):
-    def inner(parameters_dict):
-        parameters_dict['language'] = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
-        parameters_dict['pattern'] = parameters_dict[PARAMETER_REGEX]
-        return parameters_dict[PARAMETER_ENTITY_NAME], fn(**parameters_dict)
-
-    return inner
+def unpacked_executor(parameters_dict, fn):
+    parameters_dict['language'] = parameters_dict[PARAMETER_SOURCE_LANGUAGE]
+    parameters_dict['pattern'] = parameters_dict[PARAMETER_REGEX]
+    return parameters_dict[PARAMETER_ENTITY_NAME], fn(**parameters_dict)
 
 
 MAP = {
-    'v1/text/': unpacked_executor(get_text),
-    'v1/location/': unpacked_executor(get_location),
-    'v1/phone_number/': unpacked_executor(get_phone_number),
-    'v1/email/': unpacked_executor(get_email),
-    'v1/city/': unpacked_executor(get_city),
-    'v1/pnr/': unpacked_executor(get_pnr),
-    'v1/shopping_size/': unpacked_executor(get_shopping_size),
-    'v1/passenger_count/': unpacked_executor(get_passenger_count),
-    'v1/number/': unpacked_executor(get_number),
-    'v1/time/': unpacked_executor(get_time),
-    'v1/time_with_range/': unpacked_executor(get_time_with_range),
-    'v1/date/': unpacked_executor(get_date),
-    'v1/budget/': unpacked_executor(get_budget),
-    'v1/person_name/': unpacked_executor(get_person_name),
-    'v1/regex/': unpacked_executor(get_regex),
+    'v1/text/': functools.partial(unpacked_executor, get_text),
+    'v1/location/': functools.partial(unpacked_executor, get_location),
+    'v1/phone_number/': functools.partial(unpacked_executor, get_phone_number),
+    'v1/email/': functools.partial(unpacked_executor, get_email),
+    'v1/city/': functools.partial(unpacked_executor, get_city),
+    'v1/pnr/': functools.partial(unpacked_executor, get_pnr),
+    'v1/shopping_size/': functools.partial(unpacked_executor, get_shopping_size),
+    'v1/passenger_count/': functools.partial(unpacked_executor, get_passenger_count),
+    'v1/number/': functools.partial(unpacked_executor, get_number),
+    'v1/time/': functools.partial(unpacked_executor, get_time),
+    'v1/time_with_range/': functools.partial(unpacked_executor, get_time_with_range),
+    'v1/date/': functools.partial(unpacked_executor, get_date),
+    'v1/budget/': functools.partial(unpacked_executor, get_budget),
+    'v1/person_name/': functools.partial(unpacked_executor, get_person_name),
+    'v1/regex/': functools.partial(unpacked_executor, get_regex),
     'v2/date/': date_v2,
     'v2/time/': time_v2,
     'v2/number/': number_v2,
