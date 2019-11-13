@@ -4,6 +4,7 @@ from django.conf.urls import url
 
 from ner_v1 import api as api_v1
 from ner_v2 import api as api_v2
+from experimental.views import detect_entities
 
 from external_api import api as external_api
 
@@ -34,6 +35,8 @@ urlpatterns = [
     url(r'^v2/number/$', api_v2.number),
     url(r'^v2/phone_number/$', api_v2.phone_number),
     url(r'^v2/number_range/$', api_v2.number_range),
+
+    url(r'^experimental/detect/', detect_entities),
 
     # V2 bulk detectors
     url(r'^v2/date_bulk/$', api_v2.date),

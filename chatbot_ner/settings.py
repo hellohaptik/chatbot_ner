@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'datastore',
     'ner_v1',
     'ner_v2',
+    'experimental',
     'models',
     'django_nose'
 ]

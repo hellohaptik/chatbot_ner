@@ -247,6 +247,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
+    entity_output = None
     if isinstance(message, six.string_types):
         entity_output = text_model_detector.detect(message=message,
                                                    structured_value=structured_value,
@@ -258,7 +259,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     return entity_output
 
 
-def get_location(message, entity_name, structured_value, fallback_value, bot_message):
+def get_location(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """"Use TextDetector (elasticsearch) to detect location
 
     TODO: We can improve this by creating separate for location detection instead of using TextDetector
@@ -300,7 +301,7 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
                                  bot_message=bot_message)
 
 
-def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
+def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """Use PhoneDetector to detect phone numbers
 
     Args:
@@ -353,7 +354,7 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
                                   bot_message=bot_message)
 
 
-def get_email(message, entity_name, structured_value, fallback_value, bot_message):
+def get_email(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """Use EmailDetector to detect email ids
 
     Args:
@@ -407,7 +408,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
                                   bot_message=bot_message)
 
 
-def get_city(message, entity_name, structured_value, fallback_value, bot_message, language):
+def get_city(message, entity_name, structured_value, fallback_value, bot_message, language, **kwargs):
     """Use CityDetector to detect cities
 
     Args:
@@ -519,7 +520,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language=ENGLISH_LANG):
+                    language=ENGLISH_LANG, **kwargs):
     """Use NameDetector to detect names
 
     Args:
@@ -577,7 +578,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
     return None
 
 
-def get_pnr(message, entity_name, structured_value, fallback_value, bot_message):
+def get_pnr(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """Use PNRDetector to detect pnr
 
     Args:
@@ -617,7 +618,7 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
                                 bot_message=bot_message)
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern):
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern, **kwargs):
     """Use RegexDetector to detect text that abide by the specified
         pattern.
         The meta_data consists the pattern
@@ -671,7 +672,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
     return None
 
 
-def get_shopping_size(message, entity_name, structured_value, fallback_value, bot_message):
+def get_shopping_size(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """Use ShoppingSizeDetector to detect cloth size
 
     Args:
@@ -711,7 +712,7 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
                                  bot_message=bot_message)
 
 
-def get_passenger_count(message, entity_name, structured_value, fallback_value, bot_message):
+def get_passenger_count(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
     """Use PassengerDetector to detect passenger_count
 
     Args:
@@ -751,7 +752,8 @@ def get_passenger_count(message, entity_name, structured_value, fallback_value, 
                                       fallback_value=fallback_value, bot_message=bot_message)
 
 
-def get_number(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
+def get_number(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None,
+               **kwargs):
     """Use NumberDetector to detect numerals
 
     Args:
@@ -810,7 +812,7 @@ def get_number(message, entity_name, structured_value, fallback_value, bot_messa
                                    bot_message=bot_message)
 
 
-def get_time(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
+def get_time(message, entity_name, structured_value, fallback_value, bot_message, timezone=None, **kwargs):
     """Use TimeDetector to detect time
 
     Args:
@@ -855,7 +857,7 @@ def get_time(message, entity_name, structured_value, fallback_value, bot_message
                                  bot_message=bot_message)
 
 
-def get_time_with_range(message, entity_name, structured_value, fallback_value, bot_message, timezone=None):
+def get_time_with_range(message, entity_name, structured_value, fallback_value, bot_message, timezone=None, **kwargs):
     """Use TimeDetector to detect time with range
 
     Args:
@@ -901,7 +903,7 @@ def get_time_with_range(message, entity_name, structured_value, fallback_value, 
                                  bot_message=bot_message)
 
 
-def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC'):
+def get_date(message, entity_name, structured_value, fallback_value, bot_message, timezone='UTC', **kwargs):
     """Use DateDetector to detect date
 
     Args:
@@ -987,7 +989,8 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
     return None
 
 
-def get_budget(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None):
+def get_budget(message, entity_name, structured_value, fallback_value, bot_message, min_digit=None, max_digit=None,
+               **kwargs):
     """Use BudgetDetector to detect budget
 
     Args:
