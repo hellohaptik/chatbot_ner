@@ -192,7 +192,7 @@ def parse_kwargs(request_data):
 
 @csrf_exempt
 def detect_entities(request):
-    response = {'entities': [], 'exec_time': -1}
+    response = {'entities': {}, 'exec_time': -1}
     request_data = json.loads(request.body)
     exec_backend = request_data.get('exec_backend')
     if exec_backend is None:
