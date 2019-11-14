@@ -4,8 +4,9 @@ import json
 import time
 
 import six
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from pyinstrument import Profiler
 
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE,
@@ -190,8 +191,11 @@ def parse_kwargs(request_data):
 
 @csrf_exempt
 def detect_entities(request):
-    response = {'entities': {}, 'exec_time': -1}
     request_data = json.loads(request.body)
+    profile_mode = request_data.get('mode', '').lower() == 'profiler'
+    profiler = Profiler()
+    profiler.start()
+    response = {'entities': {}, 'exec_time': -1}
     exec_backend = request_data.get('exec_backend')
     if exec_backend is None:
         exec_backend = ''
@@ -221,4 +225,8 @@ def detect_entities(request):
             entity_name_, data = MAP[entity_url_key](parameters_dict=parsed_kwargs)
             response['entities'][entity_name_] = {'data': data}
     response['exec_time'] = time.time() - start_time
-    return JsonResponse(response)
+    http_response = JsonResponse(response)
+    profiler.stop()
+    if profile_mode:
+        http_response = HttpResponse(profiler.output_html())
+    return http_response
