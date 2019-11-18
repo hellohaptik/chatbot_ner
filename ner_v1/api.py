@@ -106,9 +106,9 @@ def parse_post_request(request):
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
         PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path'),
-        PARAMETER_PRIOR_CRF_RESULTS: request_data.get("crf_results", [])
+        PARAMETER_PRIOR_CRF_RESULTS: json.loads(request_data.get("crf_results", '[]'))
     }
-
+    ner_logger.info(parameters_dict)
     return parameters_dict
 
 
