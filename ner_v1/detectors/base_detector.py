@@ -276,7 +276,7 @@ class BaseDetector(object):
 
         text = structured_value if structured_value else message
 
-        # Prior results from detection using CRF models
+        # Prior results from detection.
         free_text_detection_results = kwargs.get("free_text_detection_results", [])
         entity_list, original_text_list = self.detect_entity(text=text,
                                                              free_text_detection_results=free_text_detection_results)

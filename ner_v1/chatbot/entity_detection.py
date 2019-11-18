@@ -17,6 +17,7 @@ from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
+from chatbot_ner.config import ner_logger
 import six
 
 """
@@ -249,6 +250,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
+    ner_logger.info("free text detection results: {}".format(free_text_detection_results))
     if isinstance(message, six.string_types):
         entity_output = text_model_detector.detect(message=message,
                                                    structured_value=structured_value,

@@ -336,13 +336,20 @@ class TextDetector(BaseDetector):
 
         # itertate over text_entity_values_list, original_texts_list and if free_text_detection_results has any entry
         # for that index use combine_results to merge the results from free_text and detection.
+
+        combined_entity_values, combined_original_texts = [], []
         for i, (values, original_texts, free_text_detection_results_) in enumerate(
                 six.moves.zip_longest(text_entity_values_list, original_texts_list, free_text_detection_results)):
             if free_text_detection_results_:
-                text_entity_values_list[i], original_texts_list[i] = self.combine_results(
+                combined_entity_values_, combined_original_texts_ = self.combine_results(
                     values=values,
                     original_texts=original_texts,
                     crf_original_texts=free_text_detection_results_)
+                combined_entity_values.append(combined_entity_values_)
+                combined_original_texts.append(combined_original_texts_)
+            else:
+                combined_entity_values.append(values)
+                combined_original_texts.append(original_texts)
 
         return text_entity_values_list, original_texts_list
 
@@ -392,7 +399,9 @@ class TextDetector(BaseDetector):
             self.processed_text = self.__processed_texts[0]
             values, texts = text_entity_values[0], original_texts[0]
 
+        ner_logger.info("prior detection results - {}".format(free_text_detection_results))
         if free_text_detection_results:
+            ner_logger.info("combining results")
             text_entity_verified_values, original_texts = self.combine_results(
                 values=values,
                 original_texts=texts,
