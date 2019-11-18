@@ -70,7 +70,7 @@ def get_parameters_dictionary(request):
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request.GET.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request.GET.get('read_model_from_s3')),
         PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
-        PARAMETER_PRIOR_CRF_RESULTS: json.loads(request.GET.get("crf_results", "[]"))
+        PARAMETER_PRIOR_CRF_RESULTS: request.GET.get_list("crf_results", [])
     }
     return parameters_dict
 
