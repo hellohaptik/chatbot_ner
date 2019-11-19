@@ -116,7 +116,7 @@ class BaseDetector(object):
 
         # Prior results from detection using CRF models
         free_text_detection_results = kwargs.get("free_text_detection_results", [])
-        entities_list, original_texts_list = self.detect_entity_bulk(
+        entities_list, original_texts_list_ = self.detect_entity_bulk(
             texts=texts, free_text_detection_results=free_text_detection_results)
 
         fallback_values = kwargs.get('fallback_values')
@@ -126,7 +126,7 @@ class BaseDetector(object):
             if entities_list[i]:
                 values_list.append(entities_list[i])
                 detection_method_list.append(FROM_MESSAGE)
-                original_texts_list.append(original_list[i])
+                original_texts_list.append(original_texts_list_[i])
 
             elif fallback_values and fallback_values[i]:
                 values_list.append([fallback_values[i]])
