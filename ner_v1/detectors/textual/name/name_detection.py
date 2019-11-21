@@ -161,9 +161,6 @@ class NameDetector(object):
         Returns:
                 [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
-        if bot_message:
-            if not self.context_check_botmessage(bot_message):
-                return [], []
 
         self.text = text
         self.tagged_text = self.text
@@ -172,6 +169,9 @@ class NameDetector(object):
         entity_value, original_text = ([], [])
 
         if not free_text_detection_results:
+            if bot_message:
+                if not self.context_check_botmessage(bot_message):
+                    return [], []
             if self.language == ENGLISH_LANG:
                 entity_value, original_text = self.detect_english_name()
             elif self.language == HINDI_LANG:
