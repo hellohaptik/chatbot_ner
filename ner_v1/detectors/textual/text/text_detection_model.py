@@ -92,7 +92,8 @@ class TextModelDetector(TextDetector):
         if free_text_detection_results is None:
             free_text_detection_results = []
 
-        values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
+        values, original_texts = super(TextModelDetector, self).detect_entity(
+            text, free_text_detection_results=free_text_detection_results, **kwargs)
 
         text_entity_verified_values, original_texts = \
             self.combine_results(values=values,
@@ -182,7 +183,8 @@ class TextModelDetector(TextDetector):
             text_entity_verified_values, original_texts = \
                 self.combine_results(
                     values=inner_values, original_texts=inner_original_texts,
-                    free_text_detection_results=inner_free_text_detection_results if inner_free_text_detection_results else [])
+                    free_text_detection_results=inner_free_text_detection_results if
+                    inner_free_text_detection_results else [])
             text_entity_values_list.append(text_entity_verified_values)
             original_texts_detected_list.append(original_texts)
         return text_entity_values_list, original_texts_detected_list

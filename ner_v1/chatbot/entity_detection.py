@@ -92,7 +92,8 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG, **kwargs):
+def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG,
+             free_text_detection_results=None, **kwargs):
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
@@ -234,7 +235,8 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     read_model_from_s3 = kwargs.get('read_model_from_s3', False)
     read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
 
-    free_text_detection_results = kwargs.get("free_text_detection_results", [])
+    if free_text_detection_results is None:
+        free_text_detection_results = []
 
     text_model_detector = TextModelDetector(entity_name=entity_name,
                                             language=language,
