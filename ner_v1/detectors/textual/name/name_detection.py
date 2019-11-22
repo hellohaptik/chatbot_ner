@@ -281,17 +281,18 @@ class NameDetector(object):
 
         """
         if self.language == ENGLISH_LANG:
-            replaced_text_ = nltk_tokenizer.tokenize(text.lower())
-            replaced_text = []
-            for index, token in enumerate(replaced_text_):
+            replaced_original_text_tokens = nltk_tokenizer.tokenize(text.lower())
+            replaced_text_tokens = []
+            for index, token in enumerate(replaced_original_text_tokens):
                 # Fix to handle tokenizer error for tokens with trailing `.`. For eg.
                 # >> text = "my name is v.k. singh"
                 # >> tokens = tokenize(text)
                 # >> tokens
                 #    ["my", "name", "is", "v.k", ".", "singh"]
                 # this extra `.` token causes problem while training.
-                if token == "." and 0 < index < len(replaced_text_) - 1 and replaced_text[-1] + "." in text.lower():
-                    replaced_text[-1] = replaced_text[-1] + "."
+                if token == "." and 0 < index < len(replaced_original_text_tokens) - 1 \
+                        and replaced_text_tokens[-1] + "." in text.lower():
+                    replaced_text_tokens[-1] = replaced_text_tokens[-1] + "."
                 else:
                     # fix to handle examples like `miami,21st street` where tokenizer gives ["miami,21st", "street"].
                     # This causes problems while tagging entities according indices.
@@ -300,17 +301,17 @@ class NameDetector(object):
                     _token = token.strip('!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
                     if not _token:
                         _token = token
-                    replaced_text.append(_token)
+                    replaced_text_tokens.append(_token)
         else:
-            replaced_text = text.lower().strip().split()
+            replaced_text_tokens = text.lower().strip().split()
 
         for name in free_text_detection_results:
             name_tokens = name.split()
             for token in name_tokens:
-                for j in range(len(replaced_text)):
-                    replaced_text[j] = replaced_text[j].replace(token, "_" + token + "_")
+                for j in range(len(replaced_text_tokens)):
+                    replaced_text_tokens[j] = replaced_text_tokens[j].replace(token, "_" + token + "_")
 
-        return replaced_text
+        return replaced_text_tokens
 
     def replace_detected_text(self, text_detection_result, text):
         """
