@@ -331,7 +331,7 @@ class TextDetector(BaseDetector):
 
         """
         # For bulk detection free_text_detection_results will be a list of list of str
-        if free_text_detection_results:
+        if free_text_detection_results is None:
             free_text_detection_results = []
         self._process_text(texts)
         text_entity_values_list, original_texts_list = self._text_detection_with_variants()
