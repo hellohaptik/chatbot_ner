@@ -266,7 +266,8 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     return entity_output
 
 
-def get_location(message, entity_name, structured_value, fallback_value, bot_message, **kwargs):
+def get_location(message, entity_name, structured_value, fallback_value, bot_message,
+                 free_text_detection_results=None, **kwargs):
     """"Use TextDetector (elasticsearch) to detect location
 
     TODO: We can improve this by creating separate for location detection instead of using TextDetector
@@ -282,6 +283,7 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        free_text_detection_results(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -302,7 +304,7 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
             >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
                  'original_text': 'andheri west'}]
     """
-    free_text_detection_results = kwargs.get("free_text_detection_results", [])
+    free_text_detection_results = free_text_detection_results or []
     text_detection = TextDetector(entity_name=entity_name)
     return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                  bot_message=bot_message, free_text_detection_results=free_text_detection_results)
@@ -498,7 +500,6 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
     """
-    # free_text_detection_results = kwargs.get("free_text_detection_results", [])
     city_detection = CityDetector(entity_name=entity_name, language=language)
     city_detection.set_bot_message(bot_message=bot_message)
     if structured_value:
@@ -528,7 +529,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language=ENGLISH_LANG, **kwargs):
+                    language=ENGLISH_LANG, free_text_detection_results=None, **kwargs):
     """Use NameDetector to detect names
 
     Args:
@@ -543,6 +544,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
+        free_text_detection_results(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -561,7 +563,8 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
     # TODO refactor NameDetector to make this easy to read and use
-    free_text_detection_results = kwargs.get("free_text_detection_results", [])
+    free_text_detection_results = free_text_detection_results or []
+
     name_detection = NameDetector(entity_name=entity_name, language=language)
     text, detection_method, fallback_text, fallback_method = (structured_value,
                                                               FROM_STRUCTURE_VALUE_VERIFIED,
