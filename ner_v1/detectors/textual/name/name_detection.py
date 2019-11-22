@@ -118,12 +118,14 @@ class NameDetector(object):
         pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
+        pattern4 = re.compile(r"i\s+am\s+([\w\s]+)")
         name_tokens = text.split()
         # Passing empty tokens to tag will cause IndexError
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
         pattern3_match = pattern3.findall(text)
+        pattern4_match = pattern4.findall(text)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
@@ -139,6 +141,9 @@ class NameDetector(object):
         elif pattern3_match:
             entity_value, original_text = self.get_format_name(pattern3_match[0].split(), self.text)
 
+        elif pattern4_match:
+            entity_value, original_text = self.get_format_name(pattern4_match[0].split(), self.text)
+
         elif len(name_tokens) < 4:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
@@ -147,7 +152,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text, bot_message=None, **kwargs):
+    def detect_entity(self, text, bot_message=None, free_text_detection_results=None, **kwargs):
         """
         Takes text as input and  returns two lists
         1.entity_value in the form of first, middle and last names
@@ -155,6 +160,7 @@ class NameDetector(object):
         Args:
            text(string): the original text
            bot_message(string): previous bot message
+           free_text_detection_results(list of str): detected values from prior detection
 
            Example:
                     text=my name is yash doshi
@@ -164,7 +170,6 @@ class NameDetector(object):
 
         self.text = text
         self.tagged_text = self.text
-        free_text_detection_results = kwargs.get("free_text_detection_results")
 
         entity_value, original_text = ([], [])
 
@@ -279,13 +284,23 @@ class NameDetector(object):
             replaced_text_ = nltk_tokenizer.tokenize(text.lower())
             replaced_text = []
             for index, token in enumerate(replaced_text_):
+                # Fix to handle tokenizer error for tokens with trailing `.`. For eg.
+                # >> text = "my name is v.k. singh"
+                # >> tokens = tokenize(text)
+                # >> tokens
+                #    ["my", "name", "is", "v.k", ".", "singh"]
+                # this extra `.` token causes problem while training.
                 if token == "." and 0 < index < len(replaced_text_) - 1 and replaced_text[-1] + "." in text.lower():
                     replaced_text[-1] = replaced_text[-1] + "."
                 else:
+                    # fix to handle examples like `miami,21st street` where tokenizer gives ["miami,21st", "street"].
+                    # This causes problems while tagging entities according indices.
+                    # For eg is miami is an entity and its indices are (0,5) then due to this extra `,` tagging will be
+                    # problem because now length of token will become 6 not 5.
                     _token = token.strip('!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
                     if not _token:
                         _token = token
-                    replaced_text.append(token)
+                    replaced_text.append(_token)
         else:
             replaced_text = text.lower().strip().split()
 

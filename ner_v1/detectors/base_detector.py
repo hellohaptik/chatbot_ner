@@ -10,7 +10,7 @@ from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
+from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 
 try:
     import regex as re
@@ -18,7 +18,6 @@ try:
 except ImportError:
     import re
     _re_flags = re.UNICODE
-
 
 
 class BaseDetector(object):
@@ -56,11 +55,12 @@ class BaseDetector(object):
         return []
 
     @abc.abstractmethod
-    def detect_entity(self, text, **kwargs):
+    def detect_entity(self, text, free_text_detection_results=None, **kwargs):
         """
         This method runs the core entity detection logic defined inside entity detectors
         Args:
             text: text snippet from which entities needs to be detected
+            free_text_detection_results: prior detection results
             **kwargs: values specific to different detectors such as 'last bot message', custom configs, etc.
         Return: 
             tuple: Two lists of same length containing detected values and original substring from text which is used
@@ -81,12 +81,13 @@ class BaseDetector(object):
             raise NotImplementedError('Please enable translation or extend language support'
                                       'for %s' % self._source_language_script)
 
-    def detect_bulk(self, messages=None, **kwargs):
+    def detect_bulk(self, messages=None, free_text_detection_results=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
 
         Args:
             messages (list of strings): list of natural text(s) on which detection logic is to be run.
+            free_text_detection_results(list of list of str): prior detection results
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
                           entity_value is in itself a dict with its keys varying from entity to entity
@@ -114,9 +115,10 @@ class BaseDetector(object):
 
         texts = messages
 
-        # Prior results from detection using CRF models
-        free_text_detection_results = kwargs.get("free_text_detection_results", [])
-        entities_list, original_texts_list_ = self.detect_entity_bulk(
+        # Prior results from entity detection using methods like CRF etc.
+        if free_text_detection_results is None:
+            free_text_detection_results = []
+        entities_list, original_list = self.detect_entity_bulk(
             texts=texts, free_text_detection_results=free_text_detection_results)
 
         fallback_values = kwargs.get('fallback_values')
@@ -126,7 +128,7 @@ class BaseDetector(object):
             if entities_list[i]:
                 values_list.append(entities_list[i])
                 detection_method_list.append(FROM_MESSAGE)
-                original_texts_list.append(original_texts_list_[i])
+                original_texts_list.append(original_list[i])
 
             elif fallback_values and fallback_values[i]:
                 values_list.append([fallback_values[i]])
@@ -167,7 +169,7 @@ class BaseDetector(object):
             text_entity_verified_values.append(text_entity_dict)
         return text_entity_verified_values
 
-    def combine_results(self, values, original_texts, crf_original_texts):
+    def combine_results(self, values, original_texts, free_text_detection_results):
         """
         This method is used to combine the results provided by the datastore search and the
         crf_model if trained.
@@ -175,7 +177,7 @@ class BaseDetector(object):
             values (list): List of values detected by datastore
             original_texts (list): List of original texts present in the texts for which value shave been
                                    detected
-            crf_original_texts (list): Entities detected by the Crf Model
+            free_text_detection_results (list): Entities detected by the models like crf etc.
         Returns:
             combined_values (list): List of dicts each dict consisting of the entity value and additionally
                                     the keys for the datastore and crf model detection
@@ -186,30 +188,31 @@ class BaseDetector(object):
         combined_values = self._add_verification_source(values=values,
                                                         verification_source_dict={
                                                             DATASTORE_VERIFIED: True,
-                                                            CRF_MODEL_VERIFIED: False
+                                                            MODEL_VERIFIED: False
                                                         })
         combined_original_texts = original_texts
-        for i in range(len(crf_original_texts)):
+        for i in range(len(free_text_detection_results)):
             match = False
             for j in range(len(original_texts)):
-                if crf_original_texts[i] == original_texts[j]:
-                    combined_values[j][CRF_MODEL_VERIFIED] = True
+                if free_text_detection_results[i] == original_texts[j]:
+                    combined_values[j][MODEL_VERIFIED] = True
                     match = True
-                elif re.findall(r'\b%s\b' % crf_original_texts[i], original_texts[j]):
+                elif re.findall(r'\b%s\b' % free_text_detection_results[i], original_texts[j]):
                     match = True
             if not match:
-                unprocessed_crf_original_texts.append(crf_original_texts[i])
+                unprocessed_crf_original_texts.append(free_text_detection_results[i])
 
         unprocessed_crf_original_texts_verified = self._add_verification_source(
             values=unprocessed_crf_original_texts,
-            verification_source_dict={DATASTORE_VERIFIED: False, CRF_MODEL_VERIFIED: True})
+            verification_source_dict={DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
 
         combined_values.extend(unprocessed_crf_original_texts_verified)
         combined_original_texts.extend(unprocessed_crf_original_texts)
 
         return combined_values, combined_original_texts
 
-    def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
+    def detect(self, message=None, structured_value=None, fallback_value=None,
+               free_text_detection_results=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
         Args:
@@ -220,6 +223,7 @@ class BaseDetector(object):
                                     (For example, UI elements like form, payload, etc)
             fallback_value (str): If the detection logic fails to detect any value either from structured_value
                               or message then we return a fallback_value as an output.
+            free_text_detection_results(list of str): prior detection results from models like CRF etc.
             bot_message (str): previous message from a bot/agent.
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
@@ -277,7 +281,8 @@ class BaseDetector(object):
         text = structured_value if structured_value else message
 
         # Prior results from detection.
-        free_text_detection_results = kwargs.get("free_text_detection_results", [])
+        if free_text_detection_results:
+            free_text_detection_results = []
         entity_list, original_text_list = self.detect_entity(text=text,
                                                              free_text_detection_results=free_text_detection_results)
 

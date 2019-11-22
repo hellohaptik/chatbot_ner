@@ -1,9 +1,5 @@
-import re
-
 from language_utilities.constant import ENGLISH_LANG
 from models.crf_v2.crf_detect_entity import CrfDetection
-from ner_constants import ENTITY_VALUE_DICT_KEY
-from ner_v1.constant import DATASTORE_VERIFIED, CRF_MODEL_VERIFIED
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 import six
 
@@ -39,7 +35,7 @@ class TextModelDetector(TextDetector):
         self.read_embeddings_from_remote_url = read_embeddings_from_remote_url
         self.live_crf_model_path = live_crf_model_path
 
-    def detect_entity(self, text, **kwargs):
+    def detect_entity(self, text, free_text_detection_results=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities  and their corresponding original substrings in text respectively.
@@ -50,6 +46,7 @@ class TextModelDetector(TextDetector):
         In addition to this method also runs the CRF MODEL if trained and provides the results for the given entity.
         Args:
             text (str or unicode): string to extract textual entities from
+            free_text_detection_results(list of str): list of previous detected values
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -92,20 +89,20 @@ class TextModelDetector(TextDetector):
         # Access free_text_detection_results(list of str).
         # If present replace crf_original_texts with free_text_detection_results.
         # Call combine results to .combine_results() from dictionary detection and free_text_detection_results.
-        free_text_detection_results = kwargs.get("free_text_detection_results", [])
-        if free_text_detection_results:
-            crf_original_texts = free_text_detection_results
+        if free_text_detection_results is None:
+            free_text_detection_results = []
 
         values, original_texts = super(TextModelDetector, self).detect_entity(text, **kwargs)
 
-        text_entity_verified_values, original_texts = self.combine_results(values=values,
-                                                                           original_texts=original_texts,
-                                                                           crf_original_texts=crf_original_texts)
+        text_entity_verified_values, original_texts = \
+            self.combine_results(values=values,
+                                 original_texts=original_texts,
+                                 free_text_detection_results=free_text_detection_results)
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
 
         return self.text_entity_values, self.original_texts
 
-    def detect_entity_bulk(self, texts, **kwargs):
+    def detect_entity_bulk(self, texts, free_text_detection_results=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of list of detected text entities  and their corresponding original substrings
@@ -118,6 +115,7 @@ class TextModelDetector(TextDetector):
 
         Args:
             texts (list of strings): natural language sentence(s) to extract entities from
+            free_text_detection_results(list of lists of str): values from previous detection
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
 
         Returns:
@@ -171,19 +169,20 @@ class TextModelDetector(TextDetector):
         # Access free_text_detection_results(list of lists).
         # If present replace crf_original_texts with free_text_detection_results.
         # Call .combine_results() to combine results from dictionary detection and free_text_detection_results.
-        free_text_detection_results = kwargs.get("free_text_detection_results")
-        if free_text_detection_results:
-            crf_original_texts = free_text_detection_results
+        if free_text_detection_results is None:
+            free_text_detection_results = []
 
         values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(texts, **kwargs)
         text_entity_values_list, original_texts_detected_list = [], []
 
-        for inner_crf_original_texts, inner_values, inner_original_texts in six.moves.zip_longest(crf_original_texts,
-                                                                                                  values_list,
-                                                                                                  original_texts_list):
+        for inner_free_text_detection_results, inner_values, inner_original_texts in six.moves.zip_longest(
+                free_text_detection_results,
+                values_list,
+                original_texts_list):
             text_entity_verified_values, original_texts = \
-                self.combine_results(values=inner_values, original_texts=inner_original_texts,
-                                     crf_original_texts=inner_crf_original_texts if inner_crf_original_texts else [])
+                self.combine_results(
+                    values=inner_values, original_texts=inner_original_texts,
+                    free_text_detection_results=inner_free_text_detection_results if inner_free_text_detection_results else [])
             text_entity_values_list.append(text_entity_verified_values)
             original_texts_detected_list.append(original_texts)
         return text_entity_values_list, original_texts_detected_list

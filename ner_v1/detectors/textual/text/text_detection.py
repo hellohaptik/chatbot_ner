@@ -277,7 +277,7 @@ class TextDetector(BaseDetector):
 
         return u' '.join(matched_tokens)
 
-    def detect_entity_bulk(self, texts, **kwargs):
+    def detect_entity_bulk(self, texts, free_text_detection_results=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of list of detected text entities  and their corresponding original substrings
@@ -288,6 +288,7 @@ class TextDetector(BaseDetector):
 
         Args:
             texts (list): list of strings(bulk detect) to extract textual entities from
+            free_text_detection_results(list of list of str): results from prior detection.
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -330,7 +331,8 @@ class TextDetector(BaseDetector):
 
         """
         # For bulk detection free_text_detection_results will be a list of list of str
-        free_text_detection_results = kwargs.get("free_text_detection_results", [])
+        if free_text_detection_results:
+            free_text_detection_results = []
         self._process_text(texts)
         text_entity_values_list, original_texts_list = self._text_detection_with_variants()
 
@@ -338,22 +340,22 @@ class TextDetector(BaseDetector):
         # for that index use combine_results to merge the results from free_text and detection.
 
         combined_entity_values, combined_original_texts = [], []
-        for i, (values, original_texts, free_text_detection_results_) in enumerate(
+        for i, (values, original_texts, inner_free_text_detection_results_) in enumerate(
                 six.moves.zip_longest(text_entity_values_list, original_texts_list, free_text_detection_results)):
-            if free_text_detection_results_:
-                combined_entity_values_, combined_original_texts_ = self.combine_results(
+            if inner_free_text_detection_results_:
+                inner_combined_entity_values, inner_combined_original_texts = self.combine_results(
                     values=values,
                     original_texts=original_texts,
-                    crf_original_texts=free_text_detection_results_)
-                combined_entity_values.append(combined_entity_values_)
-                combined_original_texts.append(combined_original_texts_)
+                    free_text_detection_results=inner_free_text_detection_results_)
+                combined_entity_values.append(inner_combined_entity_values)
+                combined_original_texts.append(inner_combined_original_texts)
             else:
                 combined_entity_values.append(values)
                 combined_original_texts.append(original_texts)
 
         return text_entity_values_list, original_texts_list
 
-    def detect_entity(self, text, **kwargs):
+    def detect_entity(self, text, free_text_detection_results=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -362,6 +364,7 @@ class TextDetector(BaseDetector):
         is returned. For more information on how data is stored, see Datastore docs.
         Args:
             text (unicode): string to extract textual entities from
+            free_text_detection_results(list of str): prior detection results
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -391,7 +394,8 @@ class TextDetector(BaseDetector):
 
         # For single message detection free_text_detection_results will be a list of str
         # if present use combine_results to merge the results.
-        free_text_detection_results = kwargs.get("free_text_detection_results", [])
+        if free_text_detection_results is None:
+            free_text_detection_results = []
 
         values, texts = [], []
         if len(text_entity_values) > 0 and len(original_texts) > 0:
@@ -401,11 +405,11 @@ class TextDetector(BaseDetector):
 
         ner_logger.info("prior detection results - {}".format(free_text_detection_results))
         if free_text_detection_results:
-            ner_logger.info("combining results")
+            ner_logger.info("combining results for {0}, {1}, {2}".format(values, texts, free_text_detection_results))
             text_entity_verified_values, original_texts = self.combine_results(
                 values=values,
                 original_texts=texts,
-                crf_original_texts=free_text_detection_results)
+                free_text_detection_results=free_text_detection_results)
             return text_entity_verified_values, original_texts
         return values, texts
 
