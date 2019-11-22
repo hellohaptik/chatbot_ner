@@ -328,17 +328,17 @@ class NameDetector(object):
                     ['my', 'name', 'is', '_yash_', '_doshi_']
 
         """
-        replaced_text = []
+        replaced_text_tokens = []
         if self.language == ENGLISH_LANG:
-            replaced_text = nltk_tokenizer.tokenize(text.lower())
+            replaced_text_tokens = nltk_tokenizer.tokenize(text.lower())
         elif self.language == HINDI_LANG:
-            replaced_text = text.lower().strip().split()
+            replaced_text_tokens = text.lower().strip().split()
 
         for detected_original_text in (text_detection_result[1]):
-            for j in range(len(replaced_text)):
-                replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
+            for j in range(len(replaced_text_tokens)):
+                replaced_text_tokens[j] = replaced_text_tokens[j].replace(detected_original_text, "_" + detected_original_text + "_")
 
-        return replaced_text
+        return replaced_text_tokens
 
     def detect_person_name_entity(self, replaced_text):
         """
