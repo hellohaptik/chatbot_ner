@@ -173,7 +173,8 @@ class TextModelDetector(TextDetector):
         if free_text_detection_results is None:
             free_text_detection_results = []
 
-        values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(texts, **kwargs)
+        values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(
+            texts, free_text_detection_results=free_text_detection_results, **kwargs)
         text_entity_values_list, original_texts_detected_list = [], []
 
         for inner_free_text_detection_results, inner_values, inner_original_texts in six.moves.zip_longest(
