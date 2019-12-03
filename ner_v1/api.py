@@ -5,13 +5,15 @@ import json
 
 import six
 from django.http import HttpResponse
+from django.views.decorators.cache import cache_page
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX,
                            PARAMETER_LANGUAGE_SCRIPT,
-                           PARAMETER_SOURCE_LANGUAGE)
+                           PARAMETER_SOURCE_LANGUAGE,
+                           CACHE_TIMEOUT)
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from ner_v1.chatbot.entity_detection import (get_location, get_phone_number, get_email, get_city, get_pnr,
                                              get_number, get_passenger_count, get_shopping_size, get_time,
@@ -110,6 +112,7 @@ def parse_post_request(request):
 
 
 @csrf_exempt
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def text(request):
     """
     Run text detector with crf model on the 'message or list of messages' passed in the request
@@ -324,6 +327,7 @@ def regex(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def email(request):
     """This functionality calls the get_email() functionality to detect email. It is called through api call
 
@@ -370,6 +374,7 @@ def person_name(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def city(request):
     """This functionality calls the get_city() functionality to detect city. It is called through api call
 
@@ -394,6 +399,7 @@ def city(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def pnr(request):
     """This functionality calls the get_pnr() functionality to detect pnr. It is called through api call
 
@@ -438,6 +444,7 @@ def shopping_size(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def number(request):
     """This functionality calls the get_numeric() functionality to detect numbers. It is called through api call
 
@@ -463,6 +470,7 @@ def number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def passenger_count(request):
     """This functionality calls the get_passenger_count() functionality to detect passenger count.
     It is called through api call
@@ -490,6 +498,7 @@ def passenger_count(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def time(request):
     """This functionality calls the get_time() functionality to detect time. It is called through api call
 

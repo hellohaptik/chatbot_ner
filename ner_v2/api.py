@@ -4,7 +4,7 @@ from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_ST
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
     PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE, \
-    PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED
+    PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED, CACHE_TIMEOUT
 
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
@@ -14,6 +14,7 @@ from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
 from django.http import HttpResponse
 import json
 import six
@@ -163,6 +164,7 @@ def date(request):
 
 
 @csrf_exempt
+@cache_page(CACHE_TIMEOUT, cache="redis")
 def time(request):
     """This functionality use TimeDetector to detect time. It is called through api call
 

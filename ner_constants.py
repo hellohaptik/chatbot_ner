@@ -59,3 +59,5 @@ PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
 
 # Locale for Date and Phone Number detection
 PARAMETER_LOCALE = 'locale'
+
+CACHE_TIMEOUT = 86400
