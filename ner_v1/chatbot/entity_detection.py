@@ -235,8 +235,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     read_model_from_s3 = kwargs.get('read_model_from_s3', False)
     read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
 
-    if free_text_detection_results is None:
-        free_text_detection_results = []
+    free_text_detection_results = free_text_detection_results or []
 
     text_model_detector = TextModelDetector(entity_name=entity_name,
                                             language=language,
@@ -588,6 +587,8 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         detection_method = fallback_method
 
     if entity_list and original_text_list:
+        if free_text_detection_results:
+            detection_method = ["free text entity"]
         return output_entity_dict_list(entity_list, original_text_list, detection_method)
 
     return None
