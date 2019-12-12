@@ -588,7 +588,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
 
     if entity_list and original_text_list:
         if free_text_detection_results:
-            detection_method = ["free text entity"]
+            detection_method = "free text entity"
         return output_entity_dict_list(entity_list, original_text_list, detection_method)
 
     return None
