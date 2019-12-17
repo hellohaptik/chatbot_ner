@@ -300,7 +300,30 @@ HINDI_STOPWORDS = [u'अत',
 HINDI_QUESTIONWORDS = [u'क्या', u'कब', u'कहा', u'क्यों', u'कौन', u'कौन', u'जिसे', u'जिसका', u'कैसे', u'कितने']
 
 # Variants in "name" to check for previous context flag
-NAME_VARIATIONS = ['name', u'नाम']
+NAME_VARIATIONS = ["enter your full name again",
+                   "what's your name",
+                   "mention your name ",
+                   "provide your name ",
+                   "help me with your name",
+                   "What's your full name?",
+                   "Here is the menu!",
+                   "forgot to mention your name",
+                   "please help me with your full name",
+                   "please let me know your full name.",
+                   "please enter your name",
+                   "help me with your full name",
+                   "looks like you forgot to mention your name",
+                   "enter your name",
+                   "share your name",
+                   "know your name",
+                   "tell me your name",
+                   "tell your name",
+                   "what should in call you",
+                   "say your name",
+                   "call you",
+                   "address you",
+                   "your name",
+                   "your full name"]
 
 # Common hindi words occuring in context to a name
 COMMON_HINDI_WORDS_OCCURING_WITH_NAME = {u"मुझे",
