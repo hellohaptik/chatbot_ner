@@ -99,6 +99,7 @@ class DateDetector(object):
         self.bot_message = None
         self.locale = locale
         self.country_code = None
+        self.past_date_referenced = past_date_referenced
         self.default_detector_preferences = [self._gregorian_day_month_year_format,
                                              self._gregorian_month_day_year_format,
                                              self._gregorian_year_month_day_format,
@@ -314,7 +315,7 @@ class DateDetector(object):
             yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
             try:
                 # to catch dates which are not possible like "31/11" (october 31st)
-                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd))\
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                         < self.now_date:
                     yy += 1
             except:
@@ -371,7 +372,7 @@ class DateDetector(object):
             yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
             try:
                 # to catch dates which are not possible like "11/31" (october 31st)
-                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd))\
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                         < self.now_date:
                     yy += 1
             except:
@@ -1998,13 +1999,13 @@ class DateDetector(object):
         future_regex = None
         this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
-            if self.bot_message:
-                if past_regex and past_regex.search(self.bot_message):
-                    return str(this_century - 1) + year
-                elif present_regex and present_regex.search(self.bot_message):
-                    return str(this_century) + year
-                elif future_regex and future_regex.search(self.bot_message):
-                    return str(this_century + 1) + year
+            if (((self.bot_message and past_regex.search(self.bot_message)) or
+                 (self.past_date_referenced is True)) and (int(year) > int(str(self.now_date.year)[2:]))):
+                return str(this_century - 1) + year
+            elif present_regex and present_regex.search(self.bot_message):
+                return str(this_century) + year
+            elif future_regex and future_regex.search(self.bot_message):
+                return str(this_century + 1) + year
 
         # if patterns didn't match or no bot message set, fallback to current century
         if len(year) == 2:

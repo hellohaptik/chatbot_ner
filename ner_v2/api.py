@@ -132,8 +132,9 @@ def date(request):
             ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
 
         timezone = parameters_dict[PARAMETER_TIMEZONE] or 'UTC'
-        date_past_reference = parameters_dict.get(PARAMETER_PAST_DATE_REFERENCED, "false")
-        past_date_referenced = date_past_reference == 'true' or date_past_reference == 'True'
+        past_date_referenced = parameters_dict.get(PARAMETER_PAST_DATE_REFERENCED, False)
+        past_date_referenced = True if (past_date_referenced == 'true' or past_date_referenced == 'True') else False
+
         date_detection = DateAdvancedDetector(entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                               language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
                                               timezone=timezone,
