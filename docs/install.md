@@ -56,6 +56,8 @@ cd docker
 docker-compose up --build -d
 ```
 
+Open `docker/.env` file and edit the environment variables if needed. (You should change the SECRET_KEY).
+
 The above will also mount local repo root directory inside the containers /app directory.
 Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
    > **NOTE**: make sure that nothing is running on port 8081 on your server or your local environment.

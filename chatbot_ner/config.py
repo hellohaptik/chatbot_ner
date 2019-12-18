@@ -104,7 +104,6 @@ CRF_MODEL_S3_BUCKET_REGION = os.environ.get('CRF_MODEL_S3_BUCKET_REGION')
 
 WORD_EMBEDDING_REMOTE_URL = os.environ.get('WORD_EMBEDDING_REMOTE_URL')
 
-
 GOOGLE_TRANSLATE_API_KEY = os.environ.get('GOOGLE_TRANSLATE_API_KEY')
 
 if not GOOGLE_TRANSLATE_API_KEY:
@@ -144,26 +143,23 @@ if ES_DOC_TYPE:
 else:
     CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = 'data_dictionary'
 
-ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
-ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
-ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
 ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
+ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
+ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
+ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 
-if not ES_AWS_SERVICE:
-    ES_AWS_SERVICE = 'es'
-
-if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AWS_SERVICE:
-    CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,
-                                                                   ES_AWS_REGION, ES_AWS_SERVICE)
+if ES_AWS_SERVICE and ES_AWS_REGION:
+    ner_logger.info('`ES_AWS_SERVICE` and `ES_AWS_REGION` are set. Using AWS Elasticsearch settings ')
     CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
-elif ES_AWS_REGION and ES_AWS_SERVICE:
-    CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
-    CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
-    CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
+    if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY:
+        CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID,
+                                                                       ES_AWS_SECRET_ACCESS_KEY,
+                                                                       ES_AWS_REGION, ES_AWS_SERVICE)
 else:
-    ner_logger.warning('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
+    ner_logger.warning('`ES_AWS_SERVICE` and `ES_AWS_REGION` are not set. '
+                       'This is not a problem if you are using self hosted ES')
 
 # Model Vars
 if os.path.exists(MODEL_CONFIG_PATH):
