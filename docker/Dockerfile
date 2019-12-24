@@ -31,9 +31,8 @@ ENV PORT=8081
 ENV TIMEOUT=600
 ENV DEBIAN_FRONTEND=noninteractive
 
-
-#ENV DATE_MODEL_TYPE=crf
-#ENV DATE_MODEL_PATH=/root/models/models_live/date/crf/model.crf
+# Important change this via .env (the file copied from config.example)
+ENV SECRET_KEY=!yqqcz-v@(s@kpygpvomcuu3il0q1&qtpz)e_g0ulo-sdv%c0c
 
 EXPOSE 8081
 

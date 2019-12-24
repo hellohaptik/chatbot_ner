@@ -6,16 +6,15 @@ from elasticsearch import RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-CONFIG_PATH = os.path.join(BASE_DIR, 'config')
 MODEL_CONFIG_PATH = os.path.join(BASE_DIR, 'model_config')
 
 LOG_PATH = os.path.join(BASE_DIR, 'logs')
+
+# TODO: Set this up via Django LOGGING
 # SET UP NER LOGGING
 if not os.path.exists(LOG_PATH):
     os.makedirs(LOG_PATH)
 
-# LOGGING
-# TODO - Make this much generic & simpler in the future
 LOG_LEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'error').upper()
 
 # Common formatter
@@ -48,25 +47,18 @@ handler.setFormatter(formatter)
 nlp_logger.addHandler(handler)
 nlp_logger.addHandler(handler_stdout)
 
-if os.path.exists(CONFIG_PATH):
-    dotenv.read_dotenv(CONFIG_PATH)
-else:
-    ner_logger.debug('Warning: no file named "config" found at %s. This is not a problem if your '
-                     'datastore(elasticsearch) connection settings are already available in the environment',
-                     CONFIG_PATH)
-
-# TODO Consider prefixing everything config with NER_ because these names are in the environment and so are
-# TODO lot of others too which may conflict in name. Example user is already using some another instance of
-# TODO Elasticsearch for other purposes
 ENGINE = os.environ.get('ENGINE')
 if ENGINE:
     ENGINE = ENGINE.lower()
+else:
+    ner_logger.warning("`ENGINE` variable is not set, Text type entities won't work without it")
+
 # ES settings (Mandatory to use Text type entities)
 ES_URL = os.environ.get('ES_URL')
 ES_HOST = os.environ.get('ES_HOST')
 ES_PORT = os.environ.get('ES_PORT')
 ES_INDEX_NAME = os.environ.get('ES_INDEX_NAME')
-ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE')
+ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE', 'data_dictionary')
 ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
 ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
@@ -81,8 +73,8 @@ try:
     ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
     ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
 except ValueError:
-    ES_BULK_MSG_SIZE = 10000
-    ES_SEARCH_SIZE = 10000
+    ES_BULK_MSG_SIZE = 1000
+    ES_SEARCH_SIZE = 1000
 
 # Optional Vars
 ES_INDEX_1 = os.environ.get('ES_INDEX_1')
@@ -101,10 +93,7 @@ ELASTICSEARCH_CRF_DATA_DOC_TYPE = os.environ.get('ELASTICSEARCH_CRF_DATA_DOC_TYP
 # Crf Model Specific with additional AWS storage (optional)
 CRF_MODEL_S3_BUCKET_NAME = os.environ.get('CRF_MODEL_S3_BUCKET_NAME')
 CRF_MODEL_S3_BUCKET_REGION = os.environ.get('CRF_MODEL_S3_BUCKET_REGION')
-
 WORD_EMBEDDING_REMOTE_URL = os.environ.get('WORD_EMBEDDING_REMOTE_URL')
-
-
 GOOGLE_TRANSLATE_API_KEY = os.environ.get('GOOGLE_TRANSLATE_API_KEY')
 
 if not GOOGLE_TRANSLATE_API_KEY:
@@ -116,6 +105,7 @@ CHATBOT_NER_DATASTORE = {
     'elasticsearch': {
         'connection_url': ES_URL,  # Elastic Search URL
         'name': ES_INDEX_NAME,  # Index name used
+        'doc_type': ES_DOC_TYPE,  # Index's doc type
         'host': ES_HOST,  # Elastic Search Host
         'port': ES_PORT,  # Port of elastic search
         'user': ES_AUTH_NAME,
@@ -139,31 +129,23 @@ CHATBOT_NER_DATASTORE = {
     }
 }
 
-if ES_DOC_TYPE:
-    CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = ES_DOC_TYPE
-else:
-    CHATBOT_NER_DATASTORE['elasticsearch']['doc_type'] = 'data_dictionary'
-
-ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
-ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
-ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
 ES_AWS_SERVICE = os.environ.get('ES_AWS_SERVICE')
+ES_AWS_REGION = os.environ.get('ES_AWS_REGION')
+ES_AWS_ACCESS_KEY_ID = os.environ.get('ES_AWS_ACCESS_KEY_ID')
+ES_AWS_SECRET_ACCESS_KEY = os.environ.get('ES_AWS_SECRET_ACCESS_KEY')
 
-if not ES_AWS_SERVICE:
-    ES_AWS_SERVICE = 'es'
-
-if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY and ES_AWS_REGION and ES_AWS_SERVICE:
-    CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID, ES_AWS_SECRET_ACCESS_KEY,
-                                                                   ES_AWS_REGION, ES_AWS_SERVICE)
+if ES_AWS_SERVICE and ES_AWS_REGION:
+    ner_logger.info('`ES_AWS_SERVICE` and `ES_AWS_REGION` are set. Using AWS Elasticsearch settings ')
     CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
-elif ES_AWS_REGION and ES_AWS_SERVICE:
-    CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
-    CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
-    CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
+    if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY:
+        CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID,
+                                                                       ES_AWS_SECRET_ACCESS_KEY,
+                                                                       ES_AWS_REGION, ES_AWS_SERVICE)
 else:
-    ner_logger.warning('Elasticsearch: Some or all AWS settings missing from environment, this will skip AWS auth!')
+    ner_logger.warning('`ES_AWS_SERVICE` and `ES_AWS_REGION` are not set. '
+                       'This is not a problem if you are using self hosted ES')
 
 # Model Vars
 if os.path.exists(MODEL_CONFIG_PATH):
