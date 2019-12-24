@@ -1,16 +1,13 @@
 # This is config.example file for chatbot_ner module similar to .env.example file to hold settings
 # Copy it to a file named config and fill in all the values.
 # Never push your personal keys and passwords to any public repository!
-# Make sure the variables in this file are in the environment. Example:
-#   $ source chatbot_ner/config
 # Please don't add spaces around '='
 
-# This is the primary engine to use. Valid values are one of the following:
-#     elasticsearch
+# This is the primary engine to use. Valid values are one of the following: ['elasticsearch']
 
 ENGINE=elasticsearch
 
-# ES prefixed values correspond to settings for elasticsearch.
+# ES prefixed variables correspond to settings for elasticsearch.
 # ES_URL is the complete url with auth name and password required to connect. If provided, this will override ES_HOST,
 # ES_PORT, ES_AUTH_NAME, ES_AUTH_PASSWORD
 # ES_HOST by default is host for ES that comes up with compose
@@ -22,6 +19,15 @@ ES_URL=
 ES_PORT=9200
 ES_INDEX_NAME=entity_data
 ES_DOC_TYPE=data_dictionary
+# ES_BULK_MSG_SIZE is an integer value
+ES_BULK_MSG_SIZE=1000
+# ES_SEARCH_SIZE is an integer value
+ES_SEARCH_SIZE=10000
+# Provide the following values if you need AWS authentication
+ES_AWS_SERVICE=
+ES_AWS_REGION=
+ES_AWS_ACCESS_KEY_ID=
+ES_AWS_SECRET_ACCESS_KEY=
 
 NAME=chatbot_ner
 DJANGODIR=/app
@@ -31,25 +37,11 @@ DJANGO_SETTINGS_MODULE=chatbot_ner.settings
 DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py
 DJANGO_LOG_LEVEL=debug
 DJANGO_DEBUG=False
+# Important: Change the value of SECRET_KEY to something else and keep it secret
+SECRET_KEY=!yqqcz-v@(s@kpygpvomcuu3il0q1&qtpz)e_g0ulo-sdv%c0c
 PORT=8081
 TIMEOUT=600
-
 CITY_MODEL_TYPE=crf
 CITY_MODEL_PATH=
-GOOGLE_TRANSLATE_API_KEY=
-
-
-# ES_BULK_MSG_SIZE is an integer value
-ES_BULK_MSG_SIZE=1000
-
-# ES_SEARCH_SIZE is an integer value
-ES_SEARCH_SIZE=10000
-
-# Provide the following values if you need AWS authentication
-ES_AWS_SECRET_ACCESS_KEY=
-ES_AWS_ACCESS_KEY_ID=
-ES_AWS_REGION=
-ES_AWS_SERVICE=
-
 # In order to enable entity detection for multiple languages, we use google translate. Please enter the key(optional)
 GOOGLE_TRANSLATE_API_KEY=
