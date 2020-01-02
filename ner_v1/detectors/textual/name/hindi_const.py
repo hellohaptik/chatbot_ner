@@ -324,6 +324,8 @@ NAME_VARIATIONS = ["enter your full name again",
                    "address you",
                    "your name",
                    "your full name",
+                   "what is your name",
+                   "is your name",
                    u"नाम"]
 
 # Common hindi words occuring in context to a name
