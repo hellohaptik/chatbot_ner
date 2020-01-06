@@ -299,7 +299,8 @@ class NameDetector(object):
                         and replaced_text_tokens[-1] + "." in text.lower():
                     replaced_text_tokens[-1] = replaced_text_tokens[-1] + "."
                 else:
-                    # fix to handle examples like `miami,21st street` where tokenizer gives ["miami,", "21st", "street"]
+                    # Fix to handle examples like `miami,21st street`
+                    # where tokenizer gives ["miami,", "21st", "street"].
                     # This causes problems while tagging entities according indices.
                     # For eg is miami is an entity and its indices are (0,5) then due to this extra `,` tagging will be
                     # problem because now length of token will become 6 not 5.
