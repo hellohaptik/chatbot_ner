@@ -58,7 +58,7 @@ PARAMETER_MAX_DIGITS = 'max_number_digits'
 PARAMETER_NUMBER_UNIT_TYPE = 'unit_type'
 
 # Prior detection results from CRF models.
-PARAMETER_PRIOR_RESULTS = "free_text_detection_results"
+PARAMETER_PRIOR_RESULTS = "predetected_values"
 
 # Locale for Date and Phone Number detection
 PARAMETER_LOCALE = 'locale'

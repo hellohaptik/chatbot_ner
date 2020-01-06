@@ -93,7 +93,7 @@ The output is stored in a list of dictionary contains the following structure
 
 
 def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG,
-             free_text_detection_results=None, **kwargs):
+             predetected_values=None, **kwargs):
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
@@ -235,7 +235,7 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     read_model_from_s3 = kwargs.get('read_model_from_s3', False)
     read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
 
-    free_text_detection_results = free_text_detection_results or []
+    predetected_values = predetected_values or []
 
     text_model_detector = TextModelDetector(entity_name=entity_name,
                                             language=language,
@@ -251,22 +251,22 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-    ner_logger.info("free text detection results: {}".format(free_text_detection_results))
+    ner_logger.info("free text detection results: {}".format(predetected_values))
     if isinstance(message, six.string_types):
         entity_output = text_model_detector.detect(message=message,
                                                    structured_value=structured_value,
                                                    fallback_value=fallback_value,
                                                    bot_message=bot_message,
-                                                   free_text_detection_results=free_text_detection_results)
+                                                   predetected_values=predetected_values)
     elif isinstance(message, (list, tuple)):
         entity_output = text_model_detector.detect_bulk(messages=message, fallback_values=fallback_value,
-                                                        free_text_detection_results=free_text_detection_results)
+                                                        predetected_values=predetected_values)
 
     return entity_output
 
 
 def get_location(message, entity_name, structured_value, fallback_value, bot_message,
-                 free_text_detection_results=None, **kwargs):
+                 predetected_values=None, **kwargs):
     """"Use TextDetector (elasticsearch) to detect location
 
     TODO: We can improve this by creating separate for location detection instead of using TextDetector
@@ -282,7 +282,7 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-        free_text_detection_results(list of str): prior detection results from models like crf etc.
+        predetected_values(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -303,10 +303,10 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
             >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
                  'original_text': 'andheri west'}]
     """
-    free_text_detection_results = free_text_detection_results or []
+    predetected_values = predetected_values or []
     text_detection = TextDetector(entity_name=entity_name)
     return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
-                                 bot_message=bot_message, free_text_detection_results=free_text_detection_results)
+                                 bot_message=bot_message, predetected_values=predetected_values)
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
@@ -528,7 +528,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language=ENGLISH_LANG, free_text_detection_results=None, **kwargs):
+                    language=ENGLISH_LANG, predetected_values=None, **kwargs):
     """Use NameDetector to detect names
 
     Args:
@@ -543,7 +543,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
-        free_text_detection_results(list of str): prior detection results from models like crf etc.
+        predetected_values(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -562,7 +562,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
     # TODO refactor NameDetector to make this easy to read and use
-    free_text_detection_results = free_text_detection_results or []
+    predetected_values = predetected_values or []
 
     name_detection = NameDetector(entity_name=entity_name, language=language)
     text, detection_method, fallback_text, fallback_method = (structured_value,
@@ -580,15 +580,15 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
         entity_list, original_text_list = name_detection.detect_entity(
             text=text,
             bot_message=bot_message,
-            free_text_detection_results=free_text_detection_results)
+            predetected_values=predetected_values)
 
     if not entity_list and fallback_text:
         entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split(), fallback_text)
         detection_method = fallback_method
 
     if entity_list and original_text_list:
-        if free_text_detection_results:
-            detection_method = "free text entity"
+        # if predetected_values:
+        #     detection_method = "free text entity"
         return output_entity_dict_list(entity_list, original_text_list, detection_method)
 
     return None

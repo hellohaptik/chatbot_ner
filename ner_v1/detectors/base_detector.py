@@ -55,12 +55,12 @@ class BaseDetector(object):
         return []
 
     @abc.abstractmethod
-    def detect_entity(self, text, free_text_detection_results=None, **kwargs):
+    def detect_entity(self, text, predetected_values=None, **kwargs):
         """
         This method runs the core entity detection logic defined inside entity detectors
         Args:
             text: text snippet from which entities needs to be detected
-            free_text_detection_results: prior detection results
+            predetected_values: prior detection results
             **kwargs: values specific to different detectors such as 'last bot message', custom configs, etc.
         Return: 
             tuple: Two lists of same length containing detected values and original substring from text which is used
@@ -81,13 +81,13 @@ class BaseDetector(object):
             raise NotImplementedError('Please enable translation or extend language support'
                                       'for %s' % self._source_language_script)
 
-    def detect_bulk(self, messages=None, free_text_detection_results=None, **kwargs):
+    def detect_bulk(self, messages=None, predetected_values=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
 
         Args:
             messages (list of strings): list of natural text(s) on which detection logic is to be run.
-            free_text_detection_results(list of list of str): prior detection results
+            predetected_values(list of list of str): prior detection results
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
                           entity_value is in itself a dict with its keys varying from entity to entity
@@ -116,10 +116,10 @@ class BaseDetector(object):
         texts = messages
 
         # Prior results from entity detection using methods like CRF etc.
-        if free_text_detection_results is None:
-            free_text_detection_results = []
+        if predetected_values is None:
+            predetected_values = []
         entities_list, original_list = self.detect_entity_bulk(
-            texts=texts, free_text_detection_results=free_text_detection_results)
+            texts=texts, predetected_values=predetected_values)
 
         fallback_values = kwargs.get('fallback_values')
         values_list, detection_method_list, original_texts_list = [], [], []
@@ -169,7 +169,7 @@ class BaseDetector(object):
             text_entity_verified_values.append(text_entity_dict)
         return text_entity_verified_values
 
-    def combine_results(self, values, original_texts, free_text_detection_results):
+    def combine_results(self, values, original_texts, predetected_values):
         """
         This method is used to combine the results provided by the datastore search and the
         crf_model if trained.
@@ -177,7 +177,7 @@ class BaseDetector(object):
             values (list): List of values detected by datastore
             original_texts (list): List of original texts present in the texts for which value shave been
                                    detected
-            free_text_detection_results (list): Entities detected by the models like crf etc.
+            predetected_values (list): Entities detected by the models like crf etc.
         Returns:
             combined_values (list): List of dicts each dict consisting of the entity value and additionally
                                     the keys for the datastore and crf model detection
@@ -191,16 +191,16 @@ class BaseDetector(object):
                                                             MODEL_VERIFIED: False
                                                         })
         combined_original_texts = original_texts
-        for i in range(len(free_text_detection_results)):
+        for i in range(len(predetected_values)):
             match = False
             for j in range(len(original_texts)):
-                if free_text_detection_results[i] == original_texts[j]:
+                if predetected_values[i] == original_texts[j]:
                     combined_values[j][MODEL_VERIFIED] = True
                     match = True
-                elif re.findall(r'\b%s\b' % free_text_detection_results[i], original_texts[j]):
+                elif re.findall(r'\b%s\b' % predetected_values[i], original_texts[j]):
                     match = True
             if not match:
-                unprocessed_crf_original_texts.append(free_text_detection_results[i])
+                unprocessed_crf_original_texts.append(predetected_values[i])
 
         unprocessed_crf_original_texts_verified = self._add_verification_source(
             values=unprocessed_crf_original_texts,
@@ -212,7 +212,7 @@ class BaseDetector(object):
         return combined_values, combined_original_texts
 
     def detect(self, message=None, structured_value=None, fallback_value=None,
-               free_text_detection_results=None, **kwargs):
+               predetected_values=None, **kwargs):
         """
         Use detector to detect entities from text. It also translates query to language compatible to detector
         Args:
@@ -223,7 +223,7 @@ class BaseDetector(object):
                                     (For example, UI elements like form, payload, etc)
             fallback_value (str): If the detection logic fails to detect any value either from structured_value
                               or message then we return a fallback_value as an output.
-            free_text_detection_results(list of str): prior detection results from models like CRF etc.
+            predetected_values(list of str): prior detection results from models like CRF etc.
             bot_message (str): previous message from a bot/agent.
         Returns:
             dict or None: dictionary containing entity_value, original_text and detection;
@@ -281,10 +281,10 @@ class BaseDetector(object):
         text = structured_value if structured_value else message
 
         # Prior results from detection.
-        if free_text_detection_results is None:
-            free_text_detection_results = []
+        if predetected_values is None:
+            predetected_values = []
         entity_list, original_text_list = self.detect_entity(text=text,
-                                                             free_text_detection_results=free_text_detection_results)
+                                                             predetected_values=predetected_values)
 
         if structured_value:
             if entity_list:

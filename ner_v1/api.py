@@ -71,7 +71,7 @@ def get_parameters_dictionary(request):
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request.GET.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request.GET.get('read_model_from_s3')),
         PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
-        PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("crf_results", '[]'))
+        PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("predetected_values", '[]'))
     }
     ner_logger.info("parameters dict - {}".format(parameters_dict))
     return parameters_dict
@@ -106,7 +106,7 @@ def parse_post_request(request):
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
         PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path'),
-        PARAMETER_PRIOR_RESULTS: request_data.get("crf_results", [])
+        PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
     return parameters_dict
@@ -250,7 +250,7 @@ def text(request):
             live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH],
             read_model_from_s3=parameters_dict[PARAMETER_READ_MODEL_FROM_S3],
             read_embeddings_from_remote_url=parameters_dict[PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL],
-            free_text_detection_results=parameters_dict[PARAMETER_PRIOR_RESULTS]
+            predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS]
         )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
@@ -273,7 +273,7 @@ def location(request):
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
                                      parameters_dict[PARAMETER_BOT_MESSAGE],
-                                     free_text_detection_results=parameters_dict[PARAMETER_PRIOR_RESULTS])
+                                     predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for location: %s ' % e)
@@ -367,7 +367,7 @@ def person_name(request):
                                         fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                         bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
                                         language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
-                                        free_text_detection_results=parameters_dict[PARAMETER_PRIOR_RESULTS])
+                                        predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for person_name: %s ' % e)

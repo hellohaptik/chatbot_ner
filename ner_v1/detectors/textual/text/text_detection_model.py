@@ -35,7 +35,7 @@ class TextModelDetector(TextDetector):
         self.read_embeddings_from_remote_url = read_embeddings_from_remote_url
         self.live_crf_model_path = live_crf_model_path
 
-    def detect_entity(self, text, free_text_detection_results=None, **kwargs):
+    def detect_entity(self, text, predetected_values=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities  and their corresponding original substrings in text respectively.
@@ -46,7 +46,7 @@ class TextModelDetector(TextDetector):
         In addition to this method also runs the CRF MODEL if trained and provides the results for the given entity.
         Args:
             text (str or unicode): string to extract textual entities from
-            free_text_detection_results(list of str): list of previous detected values
+            predetected_values(list of str): list of previous detected values
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -86,24 +86,24 @@ class TextModelDetector(TextDetector):
 
             crf_original_texts = crf_model.detect_entity(text=text)
 
-        # Access free_text_detection_results(list of str).
-        # If present replace crf_original_texts with free_text_detection_results.
-        # Call combine results to .combine_results() from dictionary detection and free_text_detection_results.
-        if free_text_detection_results is None:
-            free_text_detection_results = []
+        # Access predetected_values(list of str).
+        # If present replace crf_original_texts with predetected_values.
+        # Call combine results to .combine_results() from dictionary detection and predetected_values.
+        if predetected_values is None:
+            predetected_values = []
 
         values, original_texts = super(TextModelDetector, self).detect_entity(
-            text, free_text_detection_results=free_text_detection_results, **kwargs)
+            text, predetected_values=predetected_values, **kwargs)
 
         text_entity_verified_values, original_texts = \
             self.combine_results(values=values,
                                  original_texts=original_texts,
-                                 free_text_detection_results=free_text_detection_results)
+                                 predetected_values=predetected_values)
         self.text_entity_values, self.original_texts = text_entity_verified_values, original_texts
 
         return self.text_entity_values, self.original_texts
 
-    def detect_entity_bulk(self, texts, free_text_detection_results=None, **kwargs):
+    def detect_entity_bulk(self, texts, predetected_values=None, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of list of detected text entities  and their corresponding original substrings
@@ -116,7 +116,7 @@ class TextModelDetector(TextDetector):
 
         Args:
             texts (list of strings): natural language sentence(s) to extract entities from
-            free_text_detection_results(list of lists of str): values from previous detection
+            predetected_values(list of lists of str): values from previous detection
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
 
         Returns:
@@ -167,25 +167,25 @@ class TextModelDetector(TextDetector):
 
         crf_original_texts = []
 
-        # Access free_text_detection_results(list of lists).
-        # If present replace crf_original_texts with free_text_detection_results.
-        # Call .combine_results() to combine results from dictionary detection and free_text_detection_results.
-        if free_text_detection_results is None:
-            free_text_detection_results = []
+        # Access predetected_values(list of lists).
+        # If present replace crf_original_texts with predetected_values.
+        # Call .combine_results() to combine results from dictionary detection and predetected_values.
+        if predetected_values is None:
+            predetected_values = []
 
         values_list, original_texts_list = super(TextModelDetector, self).detect_entity_bulk(
-            texts, free_text_detection_results=free_text_detection_results, **kwargs)
+            texts, predetected_values=predetected_values, **kwargs)
         text_entity_values_list, original_texts_detected_list = [], []
 
-        for inner_free_text_detection_results, inner_values, inner_original_texts in six.moves.zip_longest(
-                free_text_detection_results,
+        for inner_predetected_values, inner_values, inner_original_texts in six.moves.zip_longest(
+                predetected_values,
                 values_list,
                 original_texts_list):
             text_entity_verified_values, original_texts = \
                 self.combine_results(
                     values=inner_values, original_texts=inner_original_texts,
-                    free_text_detection_results=inner_free_text_detection_results if
-                    inner_free_text_detection_results else [])
+                    predetected_values=inner_predetected_values if
+                    inner_predetected_values else [])
             text_entity_values_list.append(text_entity_verified_values)
             original_texts_detected_list.append(original_texts)
         return text_entity_values_list, original_texts_detected_list

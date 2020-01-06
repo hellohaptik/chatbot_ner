@@ -10,6 +10,7 @@ from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUE
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -152,7 +153,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text, bot_message=None, free_text_detection_results=None, **kwargs):
+    def detect_entity(self, text, bot_message=None, predetected_values=None, **kwargs):
         """
         Takes text as input and  returns two lists
         1.entity_value in the form of first, middle and last names
@@ -160,7 +161,7 @@ class NameDetector(object):
         Args:
            text(string): the original text
            bot_message(string): previous bot message
-           free_text_detection_results(list of str): detected values from prior detection
+           predetected_values(list of str): detected values from prior detection
 
            Example:
                     text=my name is yash doshi
@@ -173,7 +174,7 @@ class NameDetector(object):
 
         entity_value, original_text = ([], [])
 
-        if not free_text_detection_results:
+        if not predetected_values:
             if bot_message:
                 if not self.context_check_botmessage(bot_message):
                     return [], []
@@ -181,11 +182,15 @@ class NameDetector(object):
                 entity_value, original_text = self.detect_english_name()
             elif self.language == HINDI_LANG:
                 entity_value, original_text = self.detect_hindi_name()
+                for entity_value_dict in entity_value:
+                    entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
 
         else:
-            replaced_text = self.replace_free_text_detection_text(free_text_detection_results,
-                                                                  text=text)
+            replaced_text = self.replace_predetected_text(predetected_values,
+                                                          text=text)
             entity_value, original_text = self.detect_person_name_entity(replaced_text)
+            for entity_value_dict in entity_value:
+                entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
 
         self._update_processed_text(person_name_list=original_text)
 
@@ -256,18 +261,18 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def replace_free_text_detection_text(self, free_text_detection_results, text):
+    def replace_predetected_text(self, predetected_values, text):
         """
         Replace detected names from the text according to replace_detected_text.
-        Separate method for replacing free_text_detection_results because it these results are not at token level.
+        Separate method for replacing predetected_values because it these results are not at token level.
         For example -
             text = "my name is yash doshi"
-            free_text_detection_results = ["yash doshi"]
+            predetected_values = ["yash doshi"]
             while, text_detection_original_texts = ["yash", "doshi"]
 
 
         Args:
-            free_text_detection_results(list): list containing free_text_entity_results
+            predetected_values(list): list containing predetected_values
             text(str): original to run detection on
 
         Returns:
@@ -275,8 +280,8 @@ class NameDetector(object):
 
         Example:
             >> text = "my name is yash doshi"
-            >> free_text_detection_results = ["yash doshi"]
-            >> replace_free_text_detection_text(free_text_detection_results, text)
+            >> predetected_values = ["yash doshi"]
+            >> replace_predetected_text(predetected_values, text)
             'my name is _yash_ _doshi_'
 
         """
@@ -294,7 +299,7 @@ class NameDetector(object):
                         and replaced_text_tokens[-1] + "." in text.lower():
                     replaced_text_tokens[-1] = replaced_text_tokens[-1] + "."
                 else:
-                    # fix to handle examples like `miami,21st street` where tokenizer gives ["miami,21st", "street"].
+                    # fix to handle examples like `miami,21st street` where tokenizer gives ["miami,", "21st", "street"]
                     # This causes problems while tagging entities according indices.
                     # For eg is miami is an entity and its indices are (0,5) then due to this extra `,` tagging will be
                     # problem because now length of token will become 6 not 5.
@@ -305,7 +310,7 @@ class NameDetector(object):
         else:
             replaced_text_tokens = text.lower().strip().split()
 
-        for name in free_text_detection_results:
+        for name in predetected_values:
             name_tokens = name.split()
             for token in name_tokens:
                 for j in range(len(replaced_text_tokens)):
