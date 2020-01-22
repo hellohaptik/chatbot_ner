@@ -4,6 +4,8 @@ import os
 
 import pandas as pd
 from django.test import TestCase
+import mock
+import json
 
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 
@@ -20,14 +22,16 @@ class NameDetectionTest(TestCase):
             'language': [],
             'message': [],
             'expected_value': [],
+            'mocked_values':[]
         }
-        for (language, message, first_name, middle_name, last_name, original_entity) in zip(
+        for (language, message, first_name, middle_name, last_name, original_entity, mocked_values) in zip(
                 self.data['language'],
                 self.data['message'],
                 self.data['first_name'],
                 self.data['middle_name'],
                 self.data['last_name'],
-                self.data['original_entities']):
+                self.data['original_entities'],
+                self.data['mocked_values']):
             fn = []
             mn = []
             ln = []
@@ -48,13 +52,18 @@ class NameDetectionTest(TestCase):
             test_dict['language'].append(language)
             test_dict['message'].append(message)
             test_dict['expected_value'].append(temp)
+            test_dict['mocked_values'].append(mocked_values)
 
         return test_dict
 
-    def test_person_name_detection(self):
+    @mock.patch.object(NameDetector, "text_detection_name")
+    def test_person_name_detection(self, mock_text_detection_name):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
             expected_value = self.test_dict['expected_value'][i]
+
+            mock_text_detection_name.return_value = json.loads(self.test_dict['mocked_values'][i])
+
             name_detector = NameDetector(language=self.test_dict['language'][i], entity_name='person_name')
             detected_texts, original_texts = name_detector.detect_entity(text=message)
             zipped = zip(detected_texts, original_texts)
