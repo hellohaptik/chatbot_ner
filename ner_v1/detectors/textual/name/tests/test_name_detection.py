@@ -22,7 +22,7 @@ class NameDetectionTest(TestCase):
             'language': [],
             'message': [],
             'expected_value': [],
-            'mocked_values':[]
+            'mocked_values': [],
         }
         for (language, message, first_name, middle_name, last_name, original_entity, mocked_values) in zip(
                 self.data['language'],
