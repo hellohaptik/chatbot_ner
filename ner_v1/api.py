@@ -23,7 +23,6 @@ from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZIN
                              PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
                              PARAMETER_LIVE_CRF_MODEL_PATH)
 from django.views.decorators.csrf import csrf_exempt
-from chatbot_ner.config import ner_logger
 
 
 def to_bool(value):
