@@ -37,10 +37,10 @@ class NameDetectionTest(TestCase):
             ln = []
             oe = []
 
-            fn.extend(first_name.split('|'))
-            mn.extend(middle_name.split('|'))
-            ln.extend(last_name.split('|'))
-            oe.extend(original_entity.split('|'))
+            fn.extend(str(first_name).split('|'))
+            mn.extend(str(middle_name).split('|'))
+            ln.extend(str(last_name).split('|'))
+            oe.extend(str(original_entity).split('|'))
 
             temp = []
             for f, m, l, o in zip(fn, mn, ln, oe):
