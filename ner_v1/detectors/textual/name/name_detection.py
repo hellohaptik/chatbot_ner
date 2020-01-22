@@ -182,8 +182,9 @@ class NameDetector(object):
                 entity_value, original_text = self.detect_english_name()
             elif self.language == HINDI_LANG:
                 entity_value, original_text = self.detect_hindi_name()
-                for entity_value_dict in entity_value:
-                    entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
+
+            for entity_value_dict in entity_value:
+                entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
 
         else:
             replaced_text = self.replace_predetected_text(predetected_values,
