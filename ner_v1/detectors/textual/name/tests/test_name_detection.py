@@ -7,6 +7,7 @@ from django.test import TestCase
 import mock
 import json
 
+from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 
 
@@ -66,6 +67,9 @@ class NameDetectionTest(TestCase):
 
             name_detector = NameDetector(language=self.test_dict['language'][i], entity_name='person_name')
             detected_texts, original_texts = name_detector.detect_entity(text=message)
+            for d in detected_texts:
+                d.pop(MODEL_VERIFIED)
+                d.pop(DATASTORE_VERIFIED)
             zipped = zip(detected_texts, original_texts)
             self.assertEqual(expected_value, zipped)
 

@@ -184,14 +184,15 @@ class NameDetector(object):
                 entity_value, original_text = self.detect_hindi_name()
 
             for entity_value_dict in entity_value:
-                entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
+                entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
 
         else:
             replaced_text = self.replace_predetected_text(predetected_values,
                                                           text=text)
             entity_value, original_text = self.detect_person_name_entity(replaced_text)
+
             for entity_value_dict in entity_value:
-                entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
+                entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
 
         self._update_processed_text(person_name_list=original_text)
 
