@@ -16,7 +16,6 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
 from chatbot_ner.config import ner_logger
 import six
 
@@ -231,36 +230,29 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """
     fuzziness = kwargs.get('fuzziness', None)
     min_token_len_fuzziness = kwargs.get('min_token_len_fuzziness', None)
-    live_crf_model_path = kwargs.get('live_crf_model_path', None)
-    read_model_from_s3 = kwargs.get('read_model_from_s3', False)
-    read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
-
     predetected_values = predetected_values or []
 
-    text_model_detector = TextModelDetector(entity_name=entity_name,
-                                            language=language,
-                                            live_crf_model_path=live_crf_model_path,
-                                            read_model_from_s3=read_model_from_s3,
-                                            read_embeddings_from_remote_url=read_embeddings_from_remote_url)
-
+    text_detector = TextDetector(entity_name=entity_name, source_language_script=language)
     if fuzziness:
         fuzziness = parse_fuzziness_parameter(fuzziness)
-        text_model_detector.set_fuzziness_threshold(fuzziness)
+        text_detector.set_fuzziness_threshold(fuzziness)
 
     if min_token_len_fuzziness:
         min_token_len_fuzziness = int(min_token_len_fuzziness)
-        text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+        text_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-    ner_logger.info("free text detection results: {}".format(predetected_values))
+    ner_logger.info("Predetected values: {}".format(predetected_values))
     if isinstance(message, six.string_types):
-        entity_output = text_model_detector.detect(message=message,
-                                                   structured_value=structured_value,
-                                                   fallback_value=fallback_value,
-                                                   bot_message=bot_message,
-                                                   predetected_values=predetected_values)
+        entity_output = text_detector.detect(message=message,
+                                             structured_value=structured_value,
+                                             fallback_value=fallback_value,
+                                             bot_message=bot_message,
+                                             predetected_values=predetected_values)
     elif isinstance(message, (list, tuple)):
-        entity_output = text_model_detector.detect_bulk(messages=message, fallback_values=fallback_value,
-                                                        predetected_values=predetected_values)
+        entity_output = text_detector.detect_bulk(messages=message, fallback_values=fallback_value,
+                                                  predetected_values=predetected_values)
+    else:
+        raise TypeError('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
 
     return entity_output
 

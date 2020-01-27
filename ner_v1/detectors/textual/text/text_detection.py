@@ -353,7 +353,7 @@ class TextDetector(BaseDetector):
                 combined_entity_values.append(values)
                 combined_original_texts.append(original_texts)
 
-        return text_entity_values_list, original_texts_list
+        return combined_entity_values, combined_original_texts
 
     def detect_entity(self, text, predetected_values=None, **kwargs):
         """
