@@ -2,7 +2,6 @@
 
 import datetime
 import re
-
 from dateutil.relativedelta import relativedelta
 
 from ner_v2.detectors.temporal.constant import (DATE_CONSTANT_FILE, DATETIME_CONSTANT_FILE,
@@ -345,7 +344,7 @@ class BaseRegexDate(object):
         for date_match in date_ref_month_match:
             original = date_match[0]
             dd = self._get_int_from_numeral(date_match[1])
-            if (self.now_date.day > dd and self.past_date_referenced) or\
+            if (self.now_date.day > dd and self.past_date_referenced) or \
                     (self.now_date.day <= dd and not self.past_date_referenced):
                 mm = self.now_date.month
                 yy = self.now_date.year
@@ -579,10 +578,10 @@ class BaseRegexDate(object):
             yy = int(self.normalize_year(pattern[3])) if pattern[3] else self.now_date.year
             try:
                 # to catch dates which are not possible like "31/11" (october 31st)
-                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd))\
+                if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                         < self.now_date:
                     yy += 1
-            except:
+            except Exception:
                 return date_list, original_list
 
             date = {
@@ -628,8 +627,8 @@ class BaseRegexDate(object):
         future_regex = None
         this_century = int(str(self.now_date.year)[:2])
         if len(year) == 2:
-            if (((self.bot_message and past_regex and past_regex.search(self.bot_message)) or
-                 (self.past_date_referenced is True)) and (int(year) > int(str(self.now_date.year)[2:]))):
+            if (((self.bot_message and past_regex and past_regex.search(self.bot_message))
+                 or (self.past_date_referenced is True)) and (int(year) > int(str(self.now_date.year)[2:]))):
                 return str(this_century - 1) + year
             elif present_regex and present_regex.search(self.bot_message):
                 return str(this_century) + year

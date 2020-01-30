@@ -5,12 +5,12 @@ import string
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
+from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -201,7 +201,6 @@ class NameDetector(object):
 
         self._update_processed_text(person_name_list=original_text)
 
-
         return entity_value, original_text
 
     def detect_english_name(self, text=None):
@@ -345,7 +344,8 @@ class NameDetector(object):
 
         for detected_original_text in (text_detection_result[1]):
             for j in range(len(replaced_text_tokens)):
-                replaced_text_tokens[j] = replaced_text_tokens[j].replace(detected_original_text, "_" + detected_original_text + "_")
+                replaced_text_tokens[j] = replaced_text_tokens[j].replace(
+                    detected_original_text, "_" + detected_original_text + "_")
 
         return replaced_text_tokens
 
