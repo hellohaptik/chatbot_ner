@@ -10,8 +10,8 @@ from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX,
-                           PARAMETER_LANGUAGE_SCRIPT,
-                           PARAMETER_SOURCE_LANGUAGE)
+                           PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, PARAMETER_PRIOR_RESULTS)
+
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from ner_v1.chatbot.entity_detection import (get_location, get_phone_number, get_email, get_city, get_pnr,
                                              get_number, get_passenger_count, get_shopping_size, get_time,
@@ -69,9 +69,10 @@ def get_parameters_dictionary(request):
         PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request.GET.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request.GET.get('read_model_from_s3')),
-        PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path')
+        PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
+        PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("predetected_values", '[]'))
     }
-
+    ner_logger.info("parameters dict - {}".format(parameters_dict))
     return parameters_dict
 
 
@@ -103,7 +104,8 @@ def parse_post_request(request):
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
         PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
         PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
-        PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path')
+        PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path'),
+        PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
     return parameters_dict
@@ -247,6 +249,7 @@ def text(request):
             live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH],
             read_model_from_s3=parameters_dict[PARAMETER_READ_MODEL_FROM_S3],
             read_embeddings_from_remote_url=parameters_dict[PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL],
+            predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS]
         )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
@@ -268,7 +271,8 @@ def location(request):
         entity_output = get_location(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
-                                     parameters_dict[PARAMETER_BOT_MESSAGE])
+                                     parameters_dict[PARAMETER_BOT_MESSAGE],
+                                     predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for location: %s ' % e)
@@ -361,7 +365,8 @@ def person_name(request):
                                         structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                         fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
                                         bot_message=parameters_dict[PARAMETER_BOT_MESSAGE],
-                                        language=parameters_dict[PARAMETER_SOURCE_LANGUAGE])
+                                        language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
+                                        predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for person_name: %s ' % e)

@@ -16,7 +16,7 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from ner_v1.detectors.textual.text.text_detection_model import TextModelDetector
+from chatbot_ner.config import ner_logger
 import six
 
 """
@@ -91,7 +91,8 @@ The output is stored in a list of dictionary contains the following structure
 """
 
 
-def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG, **kwargs):
+def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG,
+             predetected_values=None, **kwargs):
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
@@ -229,36 +230,35 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
     """
     fuzziness = kwargs.get('fuzziness', None)
     min_token_len_fuzziness = kwargs.get('min_token_len_fuzziness', None)
-    live_crf_model_path = kwargs.get('live_crf_model_path', None)
-    read_model_from_s3 = kwargs.get('read_model_from_s3', False)
-    read_embeddings_from_remote_url = kwargs.get('read_embeddings_from_remote_url', False)
+    predetected_values = predetected_values or []
 
-    text_model_detector = TextModelDetector(entity_name=entity_name,
-                                            language=language,
-                                            live_crf_model_path=live_crf_model_path,
-                                            read_model_from_s3=read_model_from_s3,
-                                            read_embeddings_from_remote_url=read_embeddings_from_remote_url)
-
+    text_detector = TextDetector(entity_name=entity_name, source_language_script=language)
     if fuzziness:
         fuzziness = parse_fuzziness_parameter(fuzziness)
-        text_model_detector.set_fuzziness_threshold(fuzziness)
+        text_detector.set_fuzziness_threshold(fuzziness)
 
     if min_token_len_fuzziness:
         min_token_len_fuzziness = int(min_token_len_fuzziness)
-        text_model_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
+        text_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
+    ner_logger.info("Predetected values: {}".format(predetected_values))
     if isinstance(message, six.string_types):
-        entity_output = text_model_detector.detect(message=message,
-                                                   structured_value=structured_value,
-                                                   fallback_value=fallback_value,
-                                                   bot_message=bot_message)
+        entity_output = text_detector.detect(message=message,
+                                             structured_value=structured_value,
+                                             fallback_value=fallback_value,
+                                             bot_message=bot_message,
+                                             predetected_values=predetected_values)
     elif isinstance(message, (list, tuple)):
-        entity_output = text_model_detector.detect_bulk(messages=message, fallback_values=fallback_value)
+        entity_output = text_detector.detect_bulk(messages=message, fallback_values=fallback_value,
+                                                  predetected_values=predetected_values)
+    else:
+        raise TypeError('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
 
     return entity_output
 
 
-def get_location(message, entity_name, structured_value, fallback_value, bot_message):
+def get_location(message, entity_name, structured_value, fallback_value, bot_message,
+                 predetected_values=None, **kwargs):
     """"Use TextDetector (elasticsearch) to detect location
 
     TODO: We can improve this by creating separate for location detection instead of using TextDetector
@@ -274,6 +274,7 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        predetected_values(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -294,10 +295,10 @@ def get_location(message, entity_name, structured_value, fallback_value, bot_mes
             >> [{'detection': 'message', 'entity_value': {'value': 'Andheri West'}, 'language': 'en',
                  'original_text': 'andheri west'}]
     """
-
+    predetected_values = predetected_values or []
     text_detection = TextDetector(entity_name=entity_name)
     return text_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
-                                 bot_message=bot_message)
+                                 bot_message=bot_message, predetected_values=predetected_values)
 
 
 def get_phone_number(message, entity_name, structured_value, fallback_value, bot_message):
@@ -407,7 +408,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
                                   bot_message=bot_message)
 
 
-def get_city(message, entity_name, structured_value, fallback_value, bot_message, language):
+def get_city(message, entity_name, structured_value, fallback_value, bot_message, language, **kwargs):
     """Use CityDetector to detect cities
 
     Args:
@@ -519,7 +520,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
 
 
 def get_person_name(message, entity_name, structured_value, fallback_value, bot_message,
-                    language=ENGLISH_LANG):
+                    language=ENGLISH_LANG, predetected_values=None, **kwargs):
     """Use NameDetector to detect names
 
     Args:
@@ -534,6 +535,7 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
+        predetected_values(list of str): prior detection results from models like crf etc.
 
 
     Returns:
@@ -552,6 +554,8 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
             'entity_value': {'first_name': yash, 'middle_name': None, 'last_name': doshi}}]
     """
     # TODO refactor NameDetector to make this easy to read and use
+    predetected_values = predetected_values or []
+
     name_detection = NameDetector(entity_name=entity_name, language=language)
     text, detection_method, fallback_text, fallback_method = (structured_value,
                                                               FROM_STRUCTURE_VALUE_VERIFIED,
@@ -565,13 +569,18 @@ def get_person_name(message, entity_name, structured_value, fallback_value, bot_
     entity_list, original_text_list = [], []
 
     if text:
-        entity_list, original_text_list = name_detection.detect_entity(text=text, bot_message=bot_message)
+        entity_list, original_text_list = name_detection.detect_entity(
+            text=text,
+            bot_message=bot_message,
+            predetected_values=predetected_values)
 
     if not entity_list and fallback_text:
         entity_list, original_text_list = NameDetector.get_format_name(fallback_text.split(), fallback_text)
         detection_method = fallback_method
 
     if entity_list and original_text_list:
+        # if predetected_values:
+        #     detection_method = "free text entity"
         return output_entity_dict_list(entity_list, original_text_list, detection_method)
 
     return None
