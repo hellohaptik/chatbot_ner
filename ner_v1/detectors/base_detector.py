@@ -185,11 +185,9 @@ class BaseDetector(object):
         """
         unprocessed_crf_original_texts = []
 
-        combined_values = self._add_verification_source(values=values,
-                                                        verification_source_dict={
-                                                            DATASTORE_VERIFIED: True,
-                                                            MODEL_VERIFIED: False
-                                                        })
+        combined_values = self._add_verification_source(
+            values=values, verification_source_dict={DATASTORE_VERIFIED: True, MODEL_VERIFIED: False}
+        )
         combined_original_texts = original_texts
         for i in range(len(predetected_values)):
             match = False
@@ -197,14 +195,18 @@ class BaseDetector(object):
                 if predetected_values[i] == original_texts[j]:
                     combined_values[j][MODEL_VERIFIED] = True
                     match = True
-                elif re.findall(r'\b%s\b' % predetected_values[i], original_texts[j]):
+                    break
+                elif re.findall(r'\b%s\b' % re.escape(predetected_values[i]), original_texts[j]):
+                    # If predetected value is a substring of some value detected by datastore, skip it from output
                     match = True
+                    break
             if not match:
                 unprocessed_crf_original_texts.append(predetected_values[i])
 
         unprocessed_crf_original_texts_verified = self._add_verification_source(
             values=unprocessed_crf_original_texts,
-            verification_source_dict={DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
+            verification_source_dict={DATASTORE_VERIFIED: False, MODEL_VERIFIED: True}
+        )
 
         combined_values.extend(unprocessed_crf_original_texts_verified)
         combined_original_texts.extend(unprocessed_crf_original_texts)

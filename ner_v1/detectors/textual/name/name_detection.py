@@ -83,7 +83,13 @@ class NameDetector(object):
                 last_name = name_tokens[-1]
                 middle_name = " ".join(name_tokens[1:-1]) or None
 
-            entity_value.append({FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name})
+            entity_value.append({
+                FIRST_NAME: first_name,
+                MIDDLE_NAME: middle_name,
+                LAST_NAME: last_name,
+                DATASTORE_VERIFIED: False,
+                MODEL_VERIFIED: False,
+            })
             original_text.append(name_text)
         return entity_value, original_text
 
@@ -187,8 +193,7 @@ class NameDetector(object):
                 entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
 
         else:
-            replaced_text = self.replace_predetected_text(predetected_values,
-                                                          text=text)
+            replaced_text = self.replace_predetected_text(predetected_values, text=text)
             entity_value, original_text = self.detect_person_name_entity(replaced_text)
 
             for entity_value_dict in entity_value:
