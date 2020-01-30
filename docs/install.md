@@ -39,7 +39,7 @@ Following are the steps to create the Docker image and run NER with Docker.
 
       Docker Compose
       ```shell
-      sudo curl -L https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+      sudo curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
       sudo chmod +x /usr/local/bin/docker-compose
       ```
    - MacOS:
@@ -55,6 +55,8 @@ cp .env docker/.env
 cd docker
 docker-compose up --build -d
 ```
+
+Open `docker/.env` file and edit the environment variables if needed. (You should change the SECRET_KEY).
 
 The above will also mount local repo root directory inside the containers /app directory.
 Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
