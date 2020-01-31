@@ -325,7 +325,7 @@ NAME_VARIATIONS = ["enter your full name again",
                    "your full name",
                    "what is your name",
                    "is your name",
-                   u"नाम"]
+                   u"नाम", u'नेम', u'*नाम*', u'*नेम*']
 
 # Common hindi words occuring in context to a name
 COMMON_HINDI_WORDS_OCCURING_WITH_NAME = {u"मुझे",
