@@ -57,16 +57,13 @@ class NameDetectionTest(TestCase):
 
         return test_dict
 
-    @mock.patch.object(NameDetector, "text_detection_name")
-    def test_person_name_detection(self, mock_text_detection_name):
+    def test_person_name_detection(self):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
             expected_value = self.test_dict['expected_value'][i]
-
-            mock_text_detection_name.return_value = json.loads(self.test_dict['mocked_values'][i])
-
             name_detector = NameDetector(language=self.test_dict['language'][i], entity_name='person_name')
-            detected_texts, original_texts = name_detector.detect_entity(text=message)
+            detected_texts, original_texts = name_detector.detect_entity(text=message,
+                                                                         bot_message='what is your name')
             for d in detected_texts:
                 d.pop(MODEL_VERIFIED)
                 d.pop(DATASTORE_VERIFIED)
