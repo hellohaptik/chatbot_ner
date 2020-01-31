@@ -5,6 +5,7 @@ import string
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
+from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
@@ -27,7 +28,7 @@ class NameDetector(object):
                      on calling detect_entity()
         tagged_text: string with city entities replaced with tag defined by entity_name
         processed_text: string with detected time entities removed
-        text_detection_object: the object which is used to call the TextDetector
+        bot_message: previous message
     """
 
     def __init__(self, entity_name, language=ENGLISH_LANG):
@@ -46,7 +47,8 @@ class NameDetector(object):
         self.processed_text = ''
         self.original_name_text = []
         self.tag = '_' + entity_name + '_'
-        self.text_detection_object = TextDetector(entity_name=entity_name)
+
+        self.bot_message = None
 
     @staticmethod
     def get_format_name(name_tokens, text):
@@ -82,23 +84,16 @@ class NameDetector(object):
                 last_name = name_tokens[-1]
                 middle_name = " ".join(name_tokens[1:-1]) or None
 
-            entity_value.append({FIRST_NAME: first_name, MIDDLE_NAME: middle_name, LAST_NAME: last_name})
+            entity_value.append({
+                FIRST_NAME: first_name,
+                MIDDLE_NAME: middle_name,
+                LAST_NAME: last_name,
+                DATASTORE_VERIFIED: False,
+                MODEL_VERIFIED: False,
+            })
             original_text.append(name_text)
         return entity_value, original_text
 
-    def text_detection_name(self, text=None):
-        """
-        Makes a call to TextDetection and return the person_name detected from the elastic search.
-        Returns:
-           Tuple with list of names detected in TextDetection in the form of variants detected and original_text
-
-         Example : my name is yash doshi
-
-         ([u'dosh', u'yash'], ['doshi', 'yash'])
-        """
-        if text is None:
-            text = self.text
-        return self.text_detection_object.detect_entity(text=text)
 
     def get_name_using_pos_tagger(self, text):
         """
@@ -118,12 +113,14 @@ class NameDetector(object):
         pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
+        pattern4 = re.compile(r"i\s+am\s+([\w\s]+)")
         name_tokens = text.split()
         # Passing empty tokens to tag will cause IndexError
         tagged_names = pos_tagger_object.tag(name_tokens)
         pattern1_match = pattern1.findall(text)
         pattern2_match = pattern2.findall(text)
         pattern3_match = pattern3.findall(text)
+        pattern4_match = pattern4.findall(text)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
@@ -139,7 +136,10 @@ class NameDetector(object):
         elif pattern3_match:
             entity_value, original_text = self.get_format_name(pattern3_match[0].split(), self.text)
 
-        elif len(name_tokens) < 4:
+        elif pattern4_match:
+            entity_value, original_text = self.get_format_name(pattern4_match[0].split(), self.text)
+
+        elif len(name_tokens) < 4 and self.bot_message:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
@@ -147,7 +147,7 @@ class NameDetector(object):
 
         return entity_value, original_text
 
-    def detect_entity(self, text, bot_message=None):
+    def detect_entity(self, text, bot_message=None, predetected_values=None, **kwargs):
         """
         Takes text as input and  returns two lists
         1.entity_value in the form of first, middle and last names
@@ -155,25 +155,38 @@ class NameDetector(object):
         Args:
            text(string): the original text
            bot_message(string): previous bot message
+           predetected_values(list of str): detected values from prior detection
 
            Example:
                     text=my name is yash doshi
-       Returns:
+        Returns:
                 [{first_name: "yash", middle_name: None, last_name: "modi"}], [ yash modi"]
         """
-        if bot_message:
-            if not self.context_check_botmessage(bot_message):
-                return [], []
 
         self.text = text
         self.tagged_text = self.text
+        self.bot_message = bot_message
 
         entity_value, original_text = ([], [])
 
-        if self.language == ENGLISH_LANG:
-            entity_value, original_text = self.detect_english_name()
-        elif self.language == HINDI_LANG:
-            entity_value, original_text = self.detect_hindi_name()
+        if not predetected_values:
+            if self.bot_message:
+                if not self.context_check_botmessage(self.bot_message):
+                    return [], []
+            if self.language == ENGLISH_LANG:
+                entity_value, original_text = self.detect_english_name()
+            elif self.language == HINDI_LANG:
+                entity_value, original_text = self.detect_hindi_name()
+
+            for entity_value_dict in entity_value:
+                entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
+
+        else:
+            replaced_text = self.replace_predetected_text(predetected_values, text=text)
+            entity_value, original_text = self.detect_person_name_entity(replaced_text)
+
+            for entity_value_dict in entity_value:
+                entity_value_dict.update({DATASTORE_VERIFIED: False, MODEL_VERIFIED: True})
 
         self._update_processed_text(person_name_list=original_text)
 
@@ -196,11 +209,6 @@ class NameDetector(object):
         if text is None:
             text = self.text
         entity_value, original_text = self.get_name_using_pos_tagger(text)
-        if not entity_value:
-            text_detection_result = self.text_detection_name(text)
-            replaced_text = self.replace_detected_text(text_detection_result, text=text)
-            entity_value, original_text = self.detect_person_name_entity(replaced_text)
-
         return entity_value, original_text
 
     def detect_hindi_name(self):
@@ -243,6 +251,64 @@ class NameDetector(object):
 
         return entity_value, original_text
 
+    def replace_predetected_text(self, predetected_values, text):
+        """
+        Replace detected names from the text according to replace_detected_text.
+        Separate method for replacing predetected_values because it these results are not at token level.
+        For example -
+            text = "my name is yash doshi"
+            predetected_values = ["yash doshi"]
+            while, text_detection_original_texts = ["yash", "doshi"]
+
+
+        Args:
+            predetected_values(list): list containing predetected_values
+            text(str): original to run detection on
+
+        Returns:
+            replaced_text(str): text with marked tokens
+
+        Example:
+            >> text = "my name is yash doshi"
+            >> predetected_values = ["yash doshi"]
+            >> replace_predetected_text(predetected_values, text)
+            'my name is _yash_ _doshi_'
+
+        """
+        if self.language == ENGLISH_LANG:
+            replaced_original_text_tokens = nltk_tokenizer.tokenize(text.lower())
+            replaced_text_tokens = []
+            for index, token in enumerate(replaced_original_text_tokens):
+                # Fix to handle tokenizer error for tokens with trailing `.`. For eg.
+                # >> text = "my name is v.k. singh"
+                # >> tokens = tokenize(text)
+                # >> tokens
+                #    ["my", "name", "is", "v.k", ".", "singh"]
+                # this extra `.` token causes problem while training.
+                if token == "." and 0 < index < len(replaced_original_text_tokens) - 1 \
+                        and replaced_text_tokens[-1] + "." in text.lower():
+                    replaced_text_tokens[-1] = replaced_text_tokens[-1] + "."
+                else:
+                    # Fix to handle examples like `miami,21st street`
+                    # where tokenizer gives ["miami,", "21st", "street"].
+                    # This causes problems while tagging entities according indices.
+                    # For eg is miami is an entity and its indices are (0,5) then due to this extra `,` tagging will be
+                    # problem because now length of token will become 6 not 5.
+                    _token = token.strip('!"#$%&\'()*+,-/:;<=>?@[\\]^_`{|}~')
+                    if not _token:
+                        _token = token
+                    replaced_text_tokens.append(_token)
+        else:
+            replaced_text_tokens = text.lower().strip().split()
+
+        for name in predetected_values:
+            name_tokens = name.split()
+            for token in name_tokens:
+                for j in range(len(replaced_text_tokens)):
+                    replaced_text_tokens[j] = replaced_text_tokens[j].replace(token, "_" + token + "_")
+
+        return replaced_text_tokens
+
     def replace_detected_text(self, text_detection_result, text):
         """
         Replaces the detected name from text_detection_result by _<name>_
@@ -256,20 +322,21 @@ class NameDetector(object):
             Example:
                     text_detection_result= ([u'dosh', u'yash'], ['doshi', 'yash'])
             Returns:
-                    ['my', 'name', 'is', 'yash', 'doshi']
+                    ['my', 'name', 'is', '_yash_', '_doshi_']
 
         """
-        replaced_text = []
+        replaced_text_tokens = []
         if self.language == ENGLISH_LANG:
-            replaced_text = nltk_tokenizer.tokenize(text.lower())
+            replaced_text_tokens = nltk_tokenizer.tokenize(text.lower())
         elif self.language == HINDI_LANG:
-            replaced_text = text.lower().strip().split()
+            replaced_text_tokens = text.lower().strip().split()
 
         for detected_original_text in (text_detection_result[1]):
-            for j in range(len(replaced_text)):
-                replaced_text[j] = replaced_text[j].replace(detected_original_text, "_" + detected_original_text + "_")
+            for j in range(len(replaced_text_tokens)):
+                replaced_text_tokens[j] = replaced_text_tokens[j].replace(
+                    detected_original_text, "_" + detected_original_text + "_")
 
-        return replaced_text
+        return replaced_text_tokens
 
     def detect_person_name_entity(self, replaced_text):
         """
