@@ -28,7 +28,7 @@ class NameDetector(object):
                      on calling detect_entity()
         tagged_text: string with city entities replaced with tag defined by entity_name
         processed_text: string with detected time entities removed
-        text_detection_object: the object which is used to call the TextDetector
+        bot_message: previous message
     """
 
     def __init__(self, entity_name, language=ENGLISH_LANG):
@@ -47,7 +47,8 @@ class NameDetector(object):
         self.processed_text = ''
         self.original_name_text = []
         self.tag = '_' + entity_name + '_'
-        self.text_detection_object = TextDetector(entity_name=entity_name)
+
+        self.bot_message = None
 
     @staticmethod
     def get_format_name(name_tokens, text):
@@ -93,19 +94,6 @@ class NameDetector(object):
             original_text.append(name_text)
         return entity_value, original_text
 
-    def text_detection_name(self, text=None):
-        """
-        Makes a call to TextDetection and return the person_name detected from the elastic search.
-        Returns:
-           Tuple with list of names detected in TextDetection in the form of variants detected and original_text
-
-         Example : my name is yash doshi
-
-         ([u'dosh', u'yash'], ['doshi', 'yash'])
-        """
-        if text is None:
-            text = self.text
-        return self.text_detection_object.detect_entity(text=text)
 
     def get_name_using_pos_tagger(self, text):
         """
@@ -151,7 +139,7 @@ class NameDetector(object):
         elif pattern4_match:
             entity_value, original_text = self.get_format_name(pattern4_match[0].split(), self.text)
 
-        elif len(name_tokens) < 4:
+        elif len(name_tokens) < 4 and self.bot_message:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
@@ -177,12 +165,13 @@ class NameDetector(object):
 
         self.text = text
         self.tagged_text = self.text
+        self.bot_message = bot_message
 
         entity_value, original_text = ([], [])
 
         if not predetected_values:
-            if bot_message:
-                if not self.context_check_botmessage(bot_message):
+            if self.bot_message:
+                if not self.context_check_botmessage(self.bot_message):
                     return [], []
             if self.language == ENGLISH_LANG:
                 entity_value, original_text = self.detect_english_name()
