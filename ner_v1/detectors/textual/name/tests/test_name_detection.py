@@ -4,8 +4,6 @@ import os
 
 import pandas as pd
 from django.test import TestCase
-import mock
-import json
 
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.detectors.textual.name.name_detection import NameDetector
