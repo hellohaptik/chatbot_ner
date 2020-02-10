@@ -1,6 +1,6 @@
 # This is to automated chatbot_ner installation
 
-FROM python:2.7.15
+FROM python:3.6.10
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
 
@@ -10,12 +10,14 @@ WORKDIR /app
 COPY docker/install.sh initial_setup.py /app/
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
+# cython is installed because pandas build fails otherwise
 RUN mkdir -p ~/model_lib && \
     mkdir -p /root/models && \
     /app/install.sh && \
     touch /app/config && \
     touch /app/model_config && \
-    pip install --no-cache-dir -I uwsgi
+    pip install --no-cache-dir -I uwsgi && \
+    pip install cython
 
 COPY requirements.txt /app/requirements.txt
 
