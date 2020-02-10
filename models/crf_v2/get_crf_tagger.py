@@ -1,14 +1,15 @@
+from __future__ import absolute_import
 from lib.singleton import Singleton
 from chatbot_ner.config import CRF_MODEL_S3_BUCKET_REGION, CRF_MODEL_S3_BUCKET_NAME, ner_logger
 from lib.aws_utils import read_model_dict_from_s3
 import pycrfsuite
+import six
 
 
-class CrfModel(object):
+class CrfModel(six.with_metaclass(Singleton, object)):
     """
     This class is used to load the crf tagger for a given entity
     """
-    __metaclass__ = Singleton
 
     def __init__(self, entity_name):
         """

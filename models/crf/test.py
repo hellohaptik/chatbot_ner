@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
@@ -6,6 +7,7 @@ from .constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
 from .constant import INBOUND, OUTBOUND
 from .output_generation.city import generate_city_output
 from .output_generation.date import generate_date_output
+from six.moves import range
 
 try:
     import CRFPP

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import os
 import time
 
@@ -42,6 +44,6 @@ print("Deleting any stale data ...")
 db.delete()
 print("Creating the structure ...")
 db.create()
-print("Populating data from " + os.path.join(BASE_DIR, 'data', 'entity_data') + " ...")
+print(("Populating data from " + os.path.join(BASE_DIR, 'data', 'entity_data') + " ..."))
 db.populate(entity_data_directory_path=DEFAULT_ENTITY_DATA_DIRECTORY)
 print("Done!")

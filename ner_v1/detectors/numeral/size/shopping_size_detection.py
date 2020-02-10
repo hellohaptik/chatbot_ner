@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import re
 
 from ner_v1.detectors.textual.text.text_detection import TextDetector

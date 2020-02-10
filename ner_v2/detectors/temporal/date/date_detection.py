@@ -21,6 +21,8 @@ from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_
                                                 TYPE_NEXT_DAY, TYPE_REPEAT_DAY)
 from ner_v2.detectors.temporal.utils import get_timezone
 from ner_v2.detectors.utils import get_lang_data_path
+from six.moves import range
+from six.moves import zip
 
 
 class DateAdvancedDetector(BaseDetector):

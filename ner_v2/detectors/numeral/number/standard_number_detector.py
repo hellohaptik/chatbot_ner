@@ -1,7 +1,9 @@
 # coding=utf-8
+from __future__ import absolute_import
 import pandas as pd
 import collections
 import os
+from six.moves import zip
 
 try:
     import regex as re
@@ -51,10 +53,10 @@ class BaseNumberDetector(object):
         # Method to initialise value in regex
         self.init_regex_and_parser(data_directory_path)
 
-        sorted_len_units_keys = sorted(self.units_map.keys(), key=len, reverse=True)
+        sorted_len_units_keys = sorted(list(self.units_map.keys()), key=len, reverse=True)
         self.unit_choices = "|".join([re.escape(x) for x in sorted_len_units_keys])
 
-        sorted_len_scale_map = sorted(self.scale_map.keys(), key=len, reverse=True)
+        sorted_len_scale_map = sorted(list(self.scale_map.keys()), key=len, reverse=True)
         # using re.escape for strict matches in case pattern comes with '.' or '*', which should be escaped
         self.scale_map_choices = "|".join([re.escape(x) for x in sorted_len_scale_map])
 

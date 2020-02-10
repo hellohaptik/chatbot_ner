@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from collections import defaultdict
 
 from six import iteritems
@@ -92,7 +93,7 @@ def combine_output_of_detection_logic_and_tag(entity_data, text):
         else:
             final_entity_data[entity] = None
 
-    original_text_list = tag_preprocess_dict.keys()
+    original_text_list = list(tag_preprocess_dict.keys())
     original_text_list = sort_original_text(original_text_list)
     for original_text in original_text_list:
         tag = ''

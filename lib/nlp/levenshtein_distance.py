@@ -1,3 +1,4 @@
+from six.moves import range
 def edit_distance(string1, string2, insertion_cost=1, deletion_cost=1, substitution_cost=2, max_distance=None):
     """
     Calculate the weighted levenshtein distance between two strings
@@ -30,7 +31,7 @@ def edit_distance(string1, string2, insertion_cost=1, deletion_cost=1, substitut
 
     if len(string1) > len(string2):
         string1, string2 = string2, string1
-    distances = range(len(string1) + 1)
+    distances = list(range(len(string1) + 1))
     for index2, char2 in enumerate(string2):
         new_distances = [index2 + 1]
         for index1, char1 in enumerate(string1):

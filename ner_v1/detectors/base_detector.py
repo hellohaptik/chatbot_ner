@@ -11,6 +11,7 @@ from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_N
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
+from six.moves import range
 
 try:
     import regex as re
@@ -20,7 +21,7 @@ except ImportError:
     _re_flags = re.UNICODE
 
 
-class BaseDetector(object):
+class BaseDetector(six.with_metaclass(abc.ABCMeta, object)):
     """
     This class is the base class from which will be inherited by individual detectors. It primarily contains the
     priority flow of structured value, message and fallback value and is also use to extend language support for
@@ -31,7 +32,6 @@ class BaseDetector(object):
         _target_language_script (str): ISO-639 language code in which detector would process the query
         _translation_enabled (bool): Decides to either enable or disable translation API
     """
-    __metaclass__ = abc.ABCMeta
 
     def __init__(self, source_language_script=ENGLISH_LANG, translation_enabled=False):
         """

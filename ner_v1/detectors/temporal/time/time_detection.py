@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from datetime import datetime
 import re
 import pytz
@@ -1459,7 +1460,7 @@ class TimeDetector(BaseDetector):
         time_list_final = []
         original_list_final = []
         for i, entity in enumerate(time_list):
-            if 'range' not in entity.keys():
+            if 'range' not in list(entity.keys()):
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
             elif not entity['range']:

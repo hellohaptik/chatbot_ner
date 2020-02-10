@@ -14,6 +14,7 @@ from datastore.utils import get_files_from_directory, read_csv, remove_duplicate
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import DICTIONARY_DATA_VARIANTS
+from six.moves import map
 
 # Local imports
 
@@ -106,7 +107,7 @@ def get_variants_dictionary_value_from_key(csv_file_path, dictionary_key, logger
         next(csv_reader)
         for data_row in csv_reader:
             try:
-                data = map(str.strip, data_row[1].split('|'))
+                data = list(map(str.strip, data_row[1].split('|')))
                 # remove empty strings
                 data = [variant for variant in data if variant]
                 dictionary_value[data_row[0].strip().replace('.', ' ')].extend(data)

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import importlib
 import math
 import os
@@ -6,6 +7,7 @@ from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
+from six.moves import zip
 
 
 class NumberDetector(BaseDetector):

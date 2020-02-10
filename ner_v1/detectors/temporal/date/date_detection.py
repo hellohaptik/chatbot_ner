@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import absolute_import
 import copy
 import datetime
 import re
@@ -15,6 +16,8 @@ from ner_v1.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                              TYPE_THIS_DAY, TYPE_PAST,
                              TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
                              REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
+from six.moves import range
+from six.moves import zip
 
 
 class DateAdvancedDetector(object):

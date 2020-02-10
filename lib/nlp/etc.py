@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import csv
 
 
@@ -40,6 +41,6 @@ def filter_list(list_to_filter, remove_elements):
         print output
         >> ['hello']
     """
-    return filter(lambda token: token not in remove_elements, list_to_filter)
+    return [token for token in list_to_filter if token not in remove_elements]
 
 

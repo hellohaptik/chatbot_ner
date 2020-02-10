@@ -10,9 +10,10 @@ from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 from lib.singleton import Singleton
+import six
 
 
-class DataStore(object):
+class DataStore(six.with_metaclass(Singleton, object)):
     """
     Singleton class to connect to engine storing entity related data
 
@@ -34,7 +35,6 @@ class DataStore(object):
         _store_name: Name of the database/index to query on the engine server
         _client_or_connection: Low level connection object to the engine, None at initialization
     """
-    __metaclass__ = Singleton
 
     def __init__(self):
         """

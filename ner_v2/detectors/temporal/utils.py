@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import calendar
 from datetime import datetime, timedelta, tzinfo  # FIXME: Change import to `import datetime`
 
@@ -7,6 +8,7 @@ import six
 
 from chatbot_ner.config import ner_logger
 from ner_v2.detectors.temporal.constant import POSITIVE_TIME_DIFF, NEGATIVE_TIME_DIFF, CONSTANT_FILE_KEY
+from six.moves import range
 
 
 def nth_weekday(weekday, n, ref_date):

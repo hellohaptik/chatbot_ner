@@ -1,9 +1,11 @@
 # coding=utf-8
+from __future__ import absolute_import
 from language_utilities.constant import ENGLISH_LANG
 from language_utilities.constant import TRANSLATED_TEXT
 from chatbot_ner.config import ner_logger, GOOGLE_TRANSLATE_API_KEY
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 import requests
+import six
 
 
 TRANSLATE_URL = "https://www.googleapis.com/language/translate/v2?key=" + GOOGLE_TRANSLATE_API_KEY
@@ -18,8 +20,8 @@ def unicode_urlencode(params):
         (str): url string with params encoded
     """
     if isinstance(params, dict):
-        params = params.items()
-    return urllib.urlencode([(k, isinstance(v, unicode) and v.encode('utf-8') or v) for k, v in params])
+        params = list(params.items())
+    return six.moves.urllib.parse.urlencode([(k, isinstance(v, six.text_type) and v.encode('utf-8') or v) for k, v in params])
 
 
 def translate_text(text, source_language_code, target_language_code=ENGLISH_LANG):

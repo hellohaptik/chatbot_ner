@@ -1077,7 +1077,7 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
 
     entity_list = []
     for i, entity_value in enumerate(entity_value_list):
-        if type(entity_value) in [str, unicode]:
+        if type(entity_value) in [str, six.text_type]:
             entity_value = {
                 ENTITY_VALUE_DICT_KEY: entity_value
             }
