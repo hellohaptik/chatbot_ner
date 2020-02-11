@@ -394,7 +394,7 @@ class CityDetector(object):
 
                 (['Mumbai'], ['bombay'])
         """
-        city_list, original_list = self.text_detection_object.detect_entity(text)
+        city_list, original_list = self.text_detection_object.detect_entity(text, return_str=True)
         return city_list, original_list
 
     def _update_processed_text(self, city_dict_list):
