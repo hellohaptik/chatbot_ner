@@ -133,7 +133,7 @@ class ShoppingSizeDetector(BaseDetector):
         if original_list is None:
             original_list = []
 
-        size_list, original_list = self.text_detection_object.detect_entity(self.text)
+        size_list, original_list = self.text_detection_object.detect_entity(self.text, return_str=True)
         self.tagged_text = self.text_detection_object.tagged_text
         self.processed_text = self.text_detection_object.processed_text
         return size_list, original_list

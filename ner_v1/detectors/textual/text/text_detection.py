@@ -359,7 +359,7 @@ class TextDetector(BaseDetector):
 
         return combined_entity_values, combined_original_texts
 
-    def detect_entity(self, text, predetected_values=None, **kwargs):
+    def detect_entity(self, text, predetected_values=None, return_str=False, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -369,6 +369,7 @@ class TextDetector(BaseDetector):
         Args:
             text (str): string to extract textual entities from
             predetected_values (list of str): prior detection results
+            return_str(bool): To call combine results or not.
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -405,8 +406,9 @@ class TextDetector(BaseDetector):
             self.processed_text = self.__processed_texts[0]
             values, texts = text_entity_values[0], original_texts[0]
 
-        values, texts = self.combine_results(values=values, original_texts=texts,
-                                             predetected_values=predetected_values)
+        if not return_str:
+            values, texts = self.combine_results(values=values, original_texts=texts,
+                                                 predetected_values=predetected_values)
 
         return values, texts
 
