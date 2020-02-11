@@ -407,7 +407,7 @@ class BudgetDetector(BaseDetector):
 
         text_detection_object = TextDetector(entity_name=self.entity_name)
 
-        budget_text_list, original_text_list = text_detection_object.detect_entity(self.text)
+        budget_text_list, original_text_list = text_detection_object.detect_entity(self.text, return_str=True)
         # FIXME: Broken/Ineffective code.
         self.tagged_text = text_detection_object.tagged_text
         self.processed_text = text_detection_object.processed_text

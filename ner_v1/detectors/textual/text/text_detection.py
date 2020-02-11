@@ -10,6 +10,7 @@ from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
+from ner_constants import ENTITY_VALUE_DICT_KEY
 
 try:
     import regex as re
@@ -359,7 +360,7 @@ class TextDetector(BaseDetector):
 
         return combined_entity_values, combined_original_texts
 
-    def detect_entity(self, text, predetected_values=None, **kwargs):
+    def detect_entity(self, text, predetected_values=None, return_str=False, **kwargs):
         """
         Detects all textual entities in text that are similar to variants of 'entity_name' stored in the datastore and
         returns two lists of detected text entities and their corresponding original substrings in text respectively.
@@ -369,6 +370,7 @@ class TextDetector(BaseDetector):
         Args:
             text (str): string to extract textual entities from
             predetected_values (list of str): prior detection results
+            return_str(bool): To call combine results or not.
             **kwargs: it can be used to send specific arguments in future. for example, fuzziness, previous context.
         Returns:
             tuple:
@@ -407,6 +409,8 @@ class TextDetector(BaseDetector):
 
         values, texts = self.combine_results(values=values, original_texts=texts,
                                              predetected_values=predetected_values)
+        if return_str:
+            values = [value_dict[ENTITY_VALUE_DICT_KEY] for value_dict in values]
 
         return values, texts
 
