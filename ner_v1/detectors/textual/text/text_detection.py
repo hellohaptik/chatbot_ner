@@ -10,6 +10,7 @@ from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
+from ner_constants import ENTITY_VALUE_DICT_KEY
 
 try:
     import regex as re
@@ -406,9 +407,10 @@ class TextDetector(BaseDetector):
             self.processed_text = self.__processed_texts[0]
             values, texts = text_entity_values[0], original_texts[0]
 
-        if not return_str:
-            values, texts = self.combine_results(values=values, original_texts=texts,
-                                                 predetected_values=predetected_values)
+        values, texts = self.combine_results(values=values, original_texts=texts,
+                                             predetected_values=predetected_values)
+        if return_str:
+            values = [value_dict[ENTITY_VALUE_DICT_KEY] for value_dict in values]
 
         return values, texts
 
