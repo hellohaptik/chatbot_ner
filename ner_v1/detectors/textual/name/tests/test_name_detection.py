@@ -7,6 +7,8 @@ from django.test import TestCase
 
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.detectors.textual.name.name_detection import NameDetector
+from six.moves import range
+from six.moves import zip
 
 
 class NameDetectionTest(TestCase):
@@ -65,7 +67,7 @@ class NameDetectionTest(TestCase):
             for d in detected_texts:
                 d.pop(MODEL_VERIFIED)
                 d.pop(DATASTORE_VERIFIED)
-            zipped = zip(detected_texts, original_texts)
+            zipped = list(zip(detected_texts, original_texts))
             self.assertEqual(expected_value, zipped)
 
     def generate_person_name_dict(self, person_name_dict):

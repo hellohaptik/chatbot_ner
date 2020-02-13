@@ -4,6 +4,7 @@ from language_utilities.constant import ENGLISH_LANG
 from ner_v1.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT
 from ner_v1.detectors.base_detector import BaseDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from six.moves import zip
 
 
 class BudgetDetector(BaseDetector):
@@ -119,9 +120,9 @@ class BudgetDetector(BaseDetector):
         self.tag = '__' + self.entity_name + '__'
         self._use_text_detection = use_text_detection
 
-        units, scales = zip(*sorted(
+        units, scales = list(zip(*sorted(
             list(BudgetDetector._scale_patterns.items()), key=lambda pattern_scale: len(pattern_scale[0]), reverse=True
-        ))
+        )))
         self._scale_compiled_patterns = [(scale, re.compile(unit)) for scale, unit in zip(scales, units)]
         digits_pattern = r'((?:\d+(?:\,\d+)*(?:\.\d+)?)|(?:(?:\d+(?:\,\d+)*)?(?:\.\d+)))'
         units_pattern = r'({})?'.format('|'.join(units))

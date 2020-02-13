@@ -11,6 +11,7 @@ from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from ner_v1.detectors.base_detector import BaseDetector
 from ner_constants import ENTITY_VALUE_DICT_KEY
+from six.moves import range
 
 try:
     import regex as re
@@ -445,7 +446,7 @@ class TextDetector(BaseDetector):
                     variant = variant.decode('utf-8')
 
                 variants_to_values[variant] = value
-            variants_list = variants_to_values.keys()
+            variants_list = list(variants_to_values.keys())
 
             # Length based ordering, this reorders the results from datastore
             # that are already sorted by some relevance scoring

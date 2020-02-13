@@ -13,6 +13,8 @@ from datastore import constants
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
+from six.moves import range
+from six.moves import zip
 
 # Local imports
 

@@ -8,6 +8,7 @@ from django.test import TestCase
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number.standard_number_detector import NumberVariant
 from ner_v2.detectors.numeral.utils import get_number_from_number_word
+from six.moves import zip
 
 
 class NumberFromWordsTest(TestCase):
@@ -69,7 +70,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'I want to book for one passenger'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 1)
         self.assertIn((1, 'one'), zipped)
 
@@ -79,7 +80,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'need hundred change'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 1)
         self.assertIn((100, 'hundred'), zipped)
 
@@ -89,7 +90,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'haptik get one thousand two hundred five messages daily'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 1)
         self.assertIn((1205, 'one thousand two hundred five'), zipped)
 
@@ -99,7 +100,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'one two three'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 3)
         self.assertIn((1, 'one'), zipped)
         self.assertIn((2, 'two'), zipped)
@@ -111,7 +112,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'one thousand to one hundred two'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 2)
         self.assertIn((1000, 'one thousand'), zipped)
         self.assertIn((102, 'one hundred two'), zipped)
@@ -122,7 +123,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'one thousand one two three'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 3)
         self.assertIn((1001, 'one thousand one'), zipped)
         self.assertIn((2, 'two'), zipped)
@@ -134,7 +135,7 @@ class NumberFromWordsTest(TestCase):
         """
         message = 'there are one thousand   one   hundred two students attending placement drive'
         detect_texts, original_texts = get_number_from_number_word(message, self.number_words_map)
-        zipped = zip(detect_texts, original_texts)
+        zipped = list(zip(detect_texts, original_texts))
         self.assertEqual(len(zipped), 1)
         self.assertIn((1102, 'one thousand   one   hundred two'), zipped)
 

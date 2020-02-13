@@ -9,6 +9,7 @@ from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_
                                                 MONTH_DICT, DAY_DICT, ORDINALS_MAP)
 from ner_v2.detectors.temporal.utils import (get_weekdays_for_month, get_next_date_with_dd, get_previous_date_with_dd,
                                              get_timezone)
+from six.moves import zip
 
 
 class DateDetector(object):
@@ -1651,7 +1652,7 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        ordinal_choices = "|".join(ORDINALS_MAP.keys())
+        ordinal_choices = "|".join(list(ORDINALS_MAP.keys()))
         regex_pattern = re.compile(r'((' + ordinal_choices + r')\s+week\s+(of\s+)?([A-Za-z]+)(?:\s+month)?)\s+')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:

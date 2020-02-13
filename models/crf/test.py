@@ -6,6 +6,7 @@ from .constant import CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
 from .constant import INBOUND, OUTBOUND
 from .output_generation.city import generate_city_output
 from .output_generation.date import generate_date_output
+from six.moves import range
 
 try:
     import CRFPP
