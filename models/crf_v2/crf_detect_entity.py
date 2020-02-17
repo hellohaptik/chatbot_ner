@@ -3,6 +3,7 @@ from .crf_preprocess_data import CrfPreprocessData
 from .get_crf_tagger import CrfModel
 from chatbot_ner.config import CRF_MODELS_PATH
 from models.crf_v2.constants import CRF_B_LABEL, CRF_I_LABEL
+from six.moves import range
 
 
 class CrfDetection(object):

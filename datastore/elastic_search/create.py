@@ -1,4 +1,4 @@
-from utils import filter_kwargs
+from .utils import filter_kwargs
 
 log_prefix = 'datastore.elastic_search.create'
 

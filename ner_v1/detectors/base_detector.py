@@ -11,6 +11,7 @@ from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_N
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
+from six.moves import range
 
 try:
     import regex as re

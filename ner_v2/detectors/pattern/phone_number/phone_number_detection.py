@@ -4,6 +4,7 @@ from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
 import re
 import phonenumbers
+from six.moves import zip
 
 
 class PhoneDetector(BaseDetector):

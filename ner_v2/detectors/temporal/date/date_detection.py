@@ -7,7 +7,8 @@ import importlib
 import os
 import re
 
-import six
+from six.moves import range
+from six.moves import zip
 
 import models.crf.constant as model_constant
 import ner_v2.detectors.temporal.constant as temporal_constant
@@ -230,7 +231,7 @@ class DateAdvancedDetector(BaseDetector):
                 parts = re.split(r'\s+(?:\-|to|till|se)\s+', sentence_part)
                 skip_next_pair = False
                 _day_of_week_types = [temporal_constant.TYPE_THIS_DAY, temporal_constant.TYPE_NEXT_DAY]
-                for start_part, end_part in six.moves.zip(parts, parts[1:]):
+                for start_part, end_part in zip(parts, parts[1:]):
                     if skip_next_pair:
                         skip_next_pair = False
                         continue

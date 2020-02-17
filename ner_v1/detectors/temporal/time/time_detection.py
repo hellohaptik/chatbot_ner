@@ -1459,7 +1459,7 @@ class TimeDetector(BaseDetector):
         time_list_final = []
         original_list_final = []
         for i, entity in enumerate(time_list):
-            if 'range' not in entity.keys():
+            if 'range' not in entity:
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
             elif not entity['range']:

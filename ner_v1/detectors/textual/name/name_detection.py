@@ -11,6 +11,7 @@ from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUE
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
+from six.moves import range
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -521,7 +522,7 @@ class NameDetector(object):
         Returns:
             text (str): text with emojis replaced with ''
         """
-        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(EMOJI_RANGES.values())), re.UNICODE)
+        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(list(EMOJI_RANGES.values()))), re.UNICODE)
         text = emoji_pattern.sub(repl='', string=text)
         return text
 
