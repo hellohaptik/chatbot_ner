@@ -110,7 +110,7 @@ class NameDetector(object):
 
         entity_value, original_text = [], []
         pos_tagger_object = POS()
-        pattern1 = re.compile(r"name\s*(is|)\s*([\w\s]+)")
+        pattern1 = re.compile(r"name\s+(?:is\s+)?([\w\s]+)")
         pattern2 = re.compile(r"myself\s+([\w\s]+)")
         pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
         pattern4 = re.compile(r"i\s+am\s+([\w\s]+)")
@@ -128,7 +128,7 @@ class NameDetector(object):
             return entity_value, original_text
 
         if pattern1_match:
-            entity_value, original_text = self.get_format_name(pattern1_match[0][1].split(), self.text)
+            entity_value, original_text = self.get_format_name(pattern1_match[0].split(), self.text)
 
         elif pattern2_match:
             entity_value, original_text = self.get_format_name(pattern2_match[0].split(), self.text)
