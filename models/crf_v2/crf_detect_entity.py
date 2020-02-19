@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from lib.nlp.tokenizer import Tokenizer, NLTK_TOKENIZER
 from .crf_preprocess_data import CrfPreprocessData
 from .get_crf_tagger import CrfModel

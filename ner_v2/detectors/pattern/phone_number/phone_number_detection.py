@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG

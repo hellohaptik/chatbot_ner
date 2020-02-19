@@ -1,7 +1,6 @@
+from __future__ import absolute_import
 import re
-
 from word2number import w2n
-
 from lib.nlp.const import nltk_tokenizer
 from ner_v1.constant import DIGIT_UNITS, NUMERIC_VARIANTS
 from ner_v1.detectors.base_detector import BaseDetector

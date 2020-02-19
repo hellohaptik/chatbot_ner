@@ -1,7 +1,6 @@
+from __future__ import absolute_import
 from collections import defaultdict
-
 from six import iteritems
-
 from lib.nlp.const import TOKENIZER
 from lib.nlp.regexreplace import RegexReplace
 from ner_constants import ORIGINAL_TEXT, DETECTION_METHOD, FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
