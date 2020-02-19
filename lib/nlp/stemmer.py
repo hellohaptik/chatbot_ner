@@ -3,11 +3,12 @@ from nltk.stem.porter import PorterStemmer
 
 # constants
 from lib.singleton import Singleton
+import six
 
 PORTER_STEMMER = 'PORTER_STEMMER'
 
 
-class Stemmer(object):
+class Stemmer(six.with_metaclass(Singleton, object)):
     """
     Detects the stemmer of a word.
     Its a wrapper class which can be used to call respective stemmer library. Currently, It has been integrated
@@ -35,8 +36,6 @@ class Stemmer(object):
         stemmer: Object of the stemmer obtained from external library example, PorterStemmer
 
     """
-
-    __metaclass__ = Singleton
 
     def __init__(self, stemmer_selected=PORTER_STEMMER):
         """Initializes a Stemmer object
