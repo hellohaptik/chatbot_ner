@@ -3,11 +3,12 @@ from nltk.stem import WordNetLemmatizer
 
 # constants
 from lib.singleton import Singleton
+import six
 
 WORDNET_LEMMATIZER = 'WORDNET_LEMMATIZER'
 
 
-class Lemmatizer(object):
+class Lemmatizer(six.with_metaclass(Singleton, object)):
     """
     Detects the lemma of a word.
     Its a wrapper class which can be used to call respective lemmatizer library. Currently, It has been integrated
@@ -41,8 +42,6 @@ class Lemmatizer(object):
         lemmatizer: Object of the lemmatizer obtained from external library example, WordNetLemmatizer
 
     """
-
-    __metaclass__ = Singleton
 
     def __init__(self, lemmatizer_selected=WORDNET_LEMMATIZER):
         """Initializes a Lemmatizer object

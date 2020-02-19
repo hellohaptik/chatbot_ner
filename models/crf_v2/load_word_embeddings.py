@@ -7,13 +7,13 @@ import requests
 import json
 from models.crf_v2.constants import TEXT_LIST, CRF_WORD_EMBEDDINGS_LIST
 from chatbot_ner.config import ner_logger
+import six
 
 
-class LoadWordEmbeddings(object):
+class LoadWordEmbeddings(six.with_metaclass(Singleton, object)):
     """
     This method is used to load the word_embeddings into the memory
     """
-    __metaclass__ = Singleton
 
     def __init__(self):
         """

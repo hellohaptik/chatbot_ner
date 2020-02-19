@@ -3,6 +3,7 @@ import nltk
 
 # constants
 from lib.singleton import Singleton
+import six
 
 DEFAULT_NLTK_TAGGER_PATH = 'taggers/maxent_treebank_pos_tagger/english.pickle'
 NLTK_MAXENT_TAGGER = 'NLTK_MAXENT_TAGGER'
@@ -19,8 +20,7 @@ class APTaggerUtils(object):
         return tagged_tokens
 
 
-class POS(object):
-    __metaclass__ = Singleton
+class POS(six.with_metaclass(Singleton, object)):
 
     def __init__(self, tagger_selected=NLTK_AP_TAGGER, tagger=None):
         self.tagger_dict = {
