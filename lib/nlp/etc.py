@@ -37,10 +37,10 @@ def filter_list(list_to_filter, remove_elements):
     Returns:
         list of str: The list of elements in first list but not in second
 
-        For example output = remove_one_list_to_another(list1=['hi', 'hello', 'bye'],['hi', 'bye'])
-        print output
+        For example, output = filter_list(['hi', 'hello', 'bye'],['hi', 'bye'])
+        print(output)
         >> ['hello']
     """
-    return filter(lambda token: token not in remove_elements, list_to_filter)
+    return [item for item in list_to_filter if item not in remove_elements]
 
 
