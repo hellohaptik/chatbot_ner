@@ -6,6 +6,8 @@ from models.crf_v2.load_word_embeddings import LoadWordEmbeddings
 from chatbot_ner.config import ner_logger
 from models.crf_v2.constants import SENTENCE_LIST, CRF_WORD_EMBEDDINGS, CRF_WORD_VEC_FEATURE, CRF_B_LABEL,\
     CRF_B_TAG, CRF_I_LABEL, CRF_I_TAG, CRF_POS_TAGS, CRF_LABELS, CRF_O_LABEL, CRF_BOS, CRF_EOS
+from six.moves import range
+from six.moves import zip
 
 
 class CrfPreprocessData(object):

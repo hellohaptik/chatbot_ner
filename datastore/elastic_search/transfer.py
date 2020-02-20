@@ -202,7 +202,7 @@ class ESTransfer(object):
             total_records = results['hits']['total']
             for post in results['hits']['hits']:
                 data_new.append(post)
-            if '_scroll_id' in results.keys():
+            if '_scroll_id' in results:
                 scroll_size = len(results['hits']['hits'])
                 while (scroll_size > 0):
                     scroll_id = results['_scroll_id']
@@ -411,7 +411,7 @@ class ESTransfer(object):
         response = requests.get(es_url + '/*/_alias/' + alias_name)
         if response.status_code == 200:
             json_obj = json.loads(response.content)
-            indices = json_obj.keys()
+            indices = list(json_obj.keys())
             if self.es_index_1 in indices:
                 return self.es_index_1
             elif self.es_index_2 in indices:

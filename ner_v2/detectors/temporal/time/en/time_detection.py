@@ -95,7 +95,7 @@ class TimeDetector(object):
 
         self.init_regex_and_parser(os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                                 LANGUAGE_DATA_DIRECTORY))
-        sorted_len_timezone_keys = sorted(self.timezones_map.keys(), key=len, reverse=True)
+        sorted_len_timezone_keys = sorted(list(self.timezones_map.keys()), key=len, reverse=True)
         self.timezone_choices = "|".join([re.escape(x.lower()) for x in sorted_len_timezone_keys])
 
     def set_bot_message(self, bot_message):
@@ -1738,7 +1738,7 @@ class TimeDetector(object):
         time_list_final = []
         original_list_final = []
         for i, entity in enumerate(time_list):
-            if 'range' not in entity.keys():
+            if 'range' not in entity:
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
             elif not entity['range']:

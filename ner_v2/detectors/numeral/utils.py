@@ -1,5 +1,5 @@
 import re
-
+from six.moves import range
 
 def get_number_from_number_word(text, number_word_dict):
     """

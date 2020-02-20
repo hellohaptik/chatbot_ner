@@ -8,6 +8,7 @@ from .exceptions import AwsCrfModelWriteException, ESCrfTrainingEntityListNotFou
     ESCrfTrainingTextListNotFoundException
 from datetime import datetime
 import os
+from six.moves import zip
 
 
 class CrfTrain(object):
