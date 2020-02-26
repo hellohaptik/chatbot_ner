@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import nltk
 
 
@@ -39,7 +40,7 @@ class Ngram(object):
         all_ngrams = nltk.ngrams(word_list, n)
         ngram_list = []
         for ngram in all_ngrams:
-            lowered_ngram_tokens = map(lambda token: token.lower(), ngram)
+            lowered_ngram_tokens = [token.lower() for token in ngram]
             if any(token not in stop_word_set for token in lowered_ngram_tokens):
                 ngram_list.append(' '.join(ngram))
         return ngram_list

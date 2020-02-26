@@ -1,5 +1,5 @@
+from __future__ import absolute_import
 import re
-
 from ner_v1.detectors.base_detector import BaseDetector
 from language_utilities.constant import ENGLISH_LANG
 

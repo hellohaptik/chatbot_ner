@@ -1,6 +1,6 @@
+from __future__ import absolute_import
 import os
 import time
-
 import nltk
 
 BASE_DIR = os.path.dirname(__file__)

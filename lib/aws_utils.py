@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import boto
 import boto3
 from chatbot_ner.config import ner_logger

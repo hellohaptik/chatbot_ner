@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from chatbot_ner.config import CITY_MODEL_TYPE, DATE_MODEL_TYPE
 from .constant import CRF_MODEL_TYPE, CITY_ENTITY_TYPE, DATE_ENTITY_TYPE
 from .test import PredictCRF
