@@ -23,7 +23,6 @@ class NumberRangeDetectorTestMeta(type):
     def yaml_testsuite_generator(cls):
         for filepath in cls.yaml_test_files:
             test_data = yaml.load(io.open(filepath, "r", encoding="utf-8"))
-            print(test_data["tests"])
             for language in test_data["tests"]:
                 for i, testcase in enumerate(test_data["tests"][language]):
                     yield (
