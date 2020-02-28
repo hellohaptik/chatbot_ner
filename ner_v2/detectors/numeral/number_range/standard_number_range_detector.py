@@ -423,7 +423,7 @@ class BaseNumberRangeDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            _pattern = re.compile(u'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            _pattern = re.compile(u'\\b%s\\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 
