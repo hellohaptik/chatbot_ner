@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 from chatbot_ner.config import ner_logger, CITY_MODEL_PATH, DATE_MODEL_PATH
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS

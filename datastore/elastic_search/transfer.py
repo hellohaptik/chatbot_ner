@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import requests
 import json
 from elasticsearch import Elasticsearch, RequestsHttpConnection

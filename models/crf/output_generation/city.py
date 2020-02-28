@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import models.crf.constant as model_constant
 
 

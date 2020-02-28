@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import elasticsearch
 import os
 from chatbot_ner.settings import BASE_DIR

@@ -1,5 +1,5 @@
+from __future__ import absolute_import
 import re
-
 from language_utilities.constant import ENGLISH_LANG
 from ner_v1.constant import BUDGET_TYPE_NORMAL, BUDGET_TYPE_TEXT
 from ner_v1.detectors.base_detector import BaseDetector

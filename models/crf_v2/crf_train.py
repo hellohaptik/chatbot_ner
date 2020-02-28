@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import pycrfsuite
 from chatbot_ner.config import ner_logger, CRF_MODEL_S3_BUCKET_NAME, CRF_MODEL_S3_BUCKET_REGION, CRF_MODELS_PATH
 from datastore.datastore import DataStore

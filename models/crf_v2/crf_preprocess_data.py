@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import numpy as np
 from lib.nlp.pos import POS
 import re

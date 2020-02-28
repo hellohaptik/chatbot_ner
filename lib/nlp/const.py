@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import os
 from lib.nlp.etc import store_data_in_list
 from lib.nlp.ngram import Ngram

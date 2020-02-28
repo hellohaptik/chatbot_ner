@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
 import os
 

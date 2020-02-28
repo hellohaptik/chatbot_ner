@@ -1,10 +1,11 @@
+from __future__ import absolute_import
 import re
-
 import nltk
 import regex
 
 # constants
 from lib.singleton import Singleton
+import six
 
 NLTK_TOKENIZER = 'WORD_TOKENIZER'
 PRELOADED_NLTK_TOKENIZER = 'PRELOADED_NLTK_TOKENIZER'
@@ -12,7 +13,7 @@ LUCENE_STANDARD_TOKENIZER = 'LUCENE_STANDARD_TOKENIZER'
 WHITESPACE_TOKENIZER = 'WHITESPACE_TOKENIZER'
 
 
-class Tokenizer(object):
+class Tokenizer(six.with_metaclass(Singleton, object)):
     """
     Returns the list of the tokens from the text
     Its a wrapper class which can be used to call respective tokenizer library. Currently, It has been integrated
@@ -30,8 +31,6 @@ class Tokenizer(object):
         tokenizer: Object of the tokenizer obtained from external library example, Word Tokenizer
 
     """
-
-    __metaclass__ = Singleton
 
     def __init__(self, tokenizer_selected=NLTK_TOKENIZER):
         """Initializes a Tokenizer object
