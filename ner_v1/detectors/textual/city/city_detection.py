@@ -139,7 +139,8 @@ class CityDetector(object):
             Whereas for arrival city the key "to" will be set to True.
         """
         city_dict_list = []
-        patterns = re.findall(u'\\s(([A-Za-z\u0900-\u097F]+)\\s+(\-|to|2|se|से|and)\\s+([A-Za-z\u0900-\u097F\\s]+))\.?',
+        patterns = re.findall(u'\\s(([A-Za-z\u0900-\u097F]+)\\s'
+                              '+(\\-|to|2|se|से|and)\\s+([A-Za-z\u0900-\u097F\\s]+))\\.?',
                               self.processed_text.lower(), re.UNICODE)
         for pattern in patterns:
             city_dict_list.extend(
@@ -170,7 +171,7 @@ class CityDetector(object):
         city_dict_list = []
         patterns = re.findall(u'\\s((?:from|frm|departing|depart|leaving|leave)\\s+([A-Za-z\u0900-\u097F]+)'
                               u'\\s+(?:and|to|se|से|2|for|fr|arriving|arrive|reaching|reach|rch)'
-                              u'\\s+([A-Za-z\u0900-\u097F]+))\.?',
+                              u'\\s+([A-Za-z\u0900-\u097F]+))\\.?',
                               self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
@@ -203,7 +204,7 @@ class CityDetector(object):
         city_dict_list = []
         patterns = re.findall(u'\\s((?:and|to|2|for|fr|arriving|arrive|reaching|reach|rch)'
                               u'\\s+([A-Za-z\u0900-\u097F]+)\\s+(?:from|frm|departing|depart|leaving|leave)'
-                              u'\\s+([A-Za-z\u0900-\u097F]+))\.?',
+                              u'\\s+([A-Za-z\u0900-\u097F]+))\\.?',
                               self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
@@ -232,8 +233,9 @@ class CityDetector(object):
 
         """
         city_dict_list = []
-        patterns = re.findall(u'\\s((from|frm|departing|depart|leaving|leave|origin city\:|departure city\:|going to)'
-                              u'\\s+([A-Za-z\u0900-\u097F]+))\.?\\s',
+        patterns = re.findall(u'\\s((from|frm|departing|depart|leaving|leave|origin '
+                              'city\\:|departure city\\:|going to)'
+                              u'\\s+([A-Za-z\u0900-\u097F]+))\\.?\\s',
                               self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
@@ -259,8 +261,8 @@ class CityDetector(object):
         """
         city_dict_list = []
         patterns_1 = re.findall(u'\\s((to|2|for|fr|arriving|arrive|reaching|'
-                                u'reach|rch|destination city\:|arrival city\:)'
-                                u'\\s+([A-Za-z\u0900-\u097F]+))\.?\\s',
+                                u'reach|rch|destination city\\:|arrival city\\:)'
+                                u'\\s+([A-Za-z\u0900-\u097F]+))\\.?\\s',
                                 self.processed_text.lower(), re.UNICODE)
         patterns_2 = re.findall(u'([A-Za-z\u0900-\u097F]+)\\s+(jana|jaana|jau|ghum|ghoom|जाना|जाऊं|जाऊँ|घूम)',
                                 self.processed_text.lower(),
@@ -312,7 +314,7 @@ class CityDetector(object):
             elif arrival_regexp.search(self.bot_message) is not None:
                 arrival_city_flag = True
 
-        patterns = re.findall(u'\\s((.+))\.?', self.processed_text.lower(), re.UNICODE)
+        patterns = re.findall(u'\\s((.+))\\.?', self.processed_text.lower(), re.UNICODE)
 
         for pattern in patterns:
             pattern = list(pattern)
