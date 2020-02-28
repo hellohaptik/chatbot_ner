@@ -18,7 +18,7 @@ except ImportError:
     _re_flags = re.UNICODE
 
 NumberRangeVariant = collections.namedtuple('NumberRangeVariant', ['position', 'range_type'])
-ValueTextPair = collections.namedtuple('ValueTextPaiu', ['entity_value', 'original_text'])
+ValueTextPair = collections.namedtuple('ValueTextPair', ['entity_value', 'original_text'])
 
 
 class BaseNumberRangeDetector(object):
