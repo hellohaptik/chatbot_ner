@@ -3,7 +3,7 @@ six==1.11.0
 gunicorn==19.6.0
 pytz==2014.2
 nltk==3.4.5
-numpy==1.10.4
+numpy==1.16
 elasticsearch==5.5.0
 requests==2.20.0
 requests-aws4auth==0.9

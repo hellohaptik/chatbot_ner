@@ -42,8 +42,8 @@ class NumberRangeDetector(BaseNumberRangeDetector):
         """
         number_range_list = number_range_list or []
         original_list = original_list or []
-        between_range_pattern = re.compile(ur'(between\s+({number}\d+)(?:\s+and|-)'
-                                           ur'\s+({number}\d+))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
+        between_range_pattern = re.compile(u'(between\\s+({number}\\d+)(?:\\s+and|-)'
+                                           u'\\s+({number}\\d+))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
         number_range_matches = between_range_pattern.findall(self.processed_text)
         for match in number_range_matches:
             number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=match[2],
