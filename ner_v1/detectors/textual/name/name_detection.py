@@ -233,7 +233,7 @@ class NameDetector(object):
 
         text = self.remove_emojis(text=self.text)
         text_before_hindi_regex_operations = text
-        regex = re.compile(ur'[^\u0900-\u097F\s]+', re.U)
+        regex = re.compile(u'[^\u0900-\u097F\\s]+', re.U)
         text = regex.sub(string=text, repl='')
 
         regex_detection_result = self.get_hindi_names_from_regex(text=text)
@@ -244,9 +244,9 @@ class NameDetector(object):
             entity_value, original_text = self.get_hindi_names_without_regex(text=text)
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
-            english_present_regex = re.compile(ur'[a-zA-Z\s]+', re.U)
+            english_present_regex = re.compile(u'[a-zA-Z\\s]+', re.U)
             if english_present_regex.search(text_before_hindi_regex_operations):
-                remove_everything_except_english = re.compile(ur'[^a-zA-Z\s]+', re.U)
+                remove_everything_except_english = re.compile(u'[^a-zA-Z\\s]+', re.U)
                 text_only_english = remove_everything_except_english.sub(
                     string=text_before_hindi_regex_operations, repl='')
                 entity_value, original_text = self.detect_english_name(text=text_only_english.strip())
@@ -467,11 +467,11 @@ class NameDetector(object):
             >>[u'प्रतिक श्रीदत्त जयराओ']
 
         """
-        regex_list = [ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s+(?:लोग)\s+([\u0900-\u097F\s]+)"
-                      ur"\s+(?:नाम\sसे)\s+(?:कहते|बुलाते|बुलाओ)",
-                      ur"(?:नाम|मैं|हम|मै)\s+([\u0900-\u097F\s]+)",
-                      ur"(?:मुझे|हमें|मुझको|हमको|हमे)\s+([\u0900-\u097F\s]+)(?:कहते|बुलाते|बुलाओ)",
-                      ur"\s*([\u0900-\u097F\s]+)(?:मुझे|मैं|मै)(?:कहते|बुलाते|बुलाओ)?"
+        regex_list = [u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+(?:लोग)\\s+([\u0900-\u097F\\s]+)"
+                      u"\\s+(?:नाम\\sसे)\\s+(?:कहते|बुलाते|बुलाओ)",
+                      u"(?:नाम|मैं|हम|मै)\\s+([\u0900-\u097F\\s]+)",
+                      u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+([\u0900-\u097F\\s]+)(?:कहते|बुलाते|बुलाओ)",
+                      u"\\s*([\u0900-\u097F\\s]+)(?:मुझे|मैं|मै)(?:कहते|बुलाते|बुलाओ)?"
                       ]
 
         for regex in regex_list:
@@ -523,7 +523,7 @@ class NameDetector(object):
         Returns:
             text (str): text with emojis replaced with ''
         """
-        emoji_pattern = re.compile(ur'[{0}]+'.format(''.join(list(EMOJI_RANGES.values()))), re.UNICODE)
+        emoji_pattern = re.compile(u'[{0}]+'.format(''.join(list(EMOJI_RANGES.values()))), re.UNICODE)
         text = emoji_pattern.sub(repl='', string=text)
         return text
 

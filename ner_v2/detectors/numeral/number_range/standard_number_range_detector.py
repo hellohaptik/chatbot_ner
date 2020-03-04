@@ -194,7 +194,7 @@ class BaseNumberRangeDetector(object):
     def _detect_absolute_number(self, number_list, original_list):
         number_list = number_list or []
         original_list = original_list or []
-        abs_number_pattern = re.compile(ur'({number}\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
+        abs_number_pattern = re.compile(u'({number}\\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
                                         re.UNICODE)
         abs_number_matches = abs_number_pattern.findall(self.processed_text)
         for match in abs_number_matches:
@@ -282,7 +282,7 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_prefix_variants:
             min_prefix_choices = '|'.join(self.min_range_prefix_variants)
-            min_range_start_pattern = re.compile(ur'((?:{min_prefix_choices})\s+({number}\d+))'.format(
+            min_range_start_pattern = re.compile(u'((?:{min_prefix_choices})\\s+({number}\\d+))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_prefix_choices=min_prefix_choices), re.UNICODE)
             number_range_matches = min_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -310,7 +310,7 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_suffix_variants:
             min_suffix_choices = '|'.join(self.min_range_suffix_variants)
-            min_range_end_pattern = re.compile(ur'(({number}\d+)\s+(?:{min_suffix_choices}))'.format(
+            min_range_end_pattern = re.compile(u'(({number}\\d+)\\s+(?:{min_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_suffix_choices=min_suffix_choices), re.UNICODE)
             number_range_matches = min_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -340,7 +340,7 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_prefix_variants:
             max_prefix_choices = '|'.join(self.max_range_prefix_variants)
-            max_range_start_pattern = re.compile(ur'((?:{max_prefix_choices})\s+({number}\d+))'.format(
+            max_range_start_pattern = re.compile(u'((?:{max_prefix_choices})\\s+({number}\\d+))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_prefix_choices=max_prefix_choices), re.UNICODE)
             number_range_matches = max_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -369,7 +369,7 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_suffix_variants:
             max_suffix_choices = '|'.join(self.max_range_suffix_variants)
-            max_range_end_pattern = re.compile(ur'(({number}\d+)\s+(?:{max_suffix_choices}))'.format(
+            max_range_end_pattern = re.compile(u'(({number}\\d+)\\s+(?:{max_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_suffix_choices=max_suffix_choices), re.UNICODE)
             number_range_matches = max_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -399,8 +399,8 @@ class BaseNumberRangeDetector(object):
 
         if self.min_max_range_variants:
             min_max_choices = '|'.join(self.min_max_range_variants)
-            min_max_range_pattern = re.compile(ur'(({number}\d+)\s*(?:{min_max_choices})\s*'
-                                               ur'({number}\d+))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
+            min_max_range_pattern = re.compile(u'(({number}\\d+)\\s*(?:{min_max_choices})\\s*'
+                                               u'({number}\\d+))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
                                                                          min_max_choices=min_max_choices), re.UNICODE)
             number_range_matches = min_max_range_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -423,7 +423,7 @@ class BaseNumberRangeDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
+            _pattern = re.compile(u'\\b%s\\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 
