@@ -105,3 +105,5 @@ sftp-config.json
 logs/
 
 .vscode
+newman_v1_data.json
+newman_v2_data.json
