@@ -1,0 +1,38 @@
+[
+    {
+        "input": {
+            "message": "shirts between 2000 to 3000",
+            "entity_name": "budget"
+        },
+        "expected": {
+            "original_text": "2000 to 3000",
+            "max_budget": 3000,
+            "type": "normal_budget",
+            "min_budget": 2000
+        }
+    },
+    {
+        "input": {
+            "message": "I want to see jeans between 2500 to 4200",
+            "entity_name": "budget"
+        },
+        "expected": {
+            "original_text": "2500 to 4200",
+            "max_budget": 4200,
+            "type": "normal_budget",
+            "min_budget": 2500
+        }
+    },
+    {
+        "input": {
+            "message": "formals between 5000 to 9999",
+            "entity_name": "budget"
+        },
+        "expected": {
+            "original_text": "5000 to 9999",
+            "max_budget": 9999,
+            "type": "normal_budget",
+            "min_budget": 5000
+        }
+    }
+]

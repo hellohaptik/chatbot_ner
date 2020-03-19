@@ -1,0 +1,62 @@
+[
+    {
+        "input": {
+            "message": "I want to purchase 30 units of mobile and 40 units of Television",
+            "entity_name": "number_of_unit",
+            "min_digits": 1,
+            "max_digits": 2
+        },
+        "expected": [
+            {
+                "original_text": "30",
+                "value": "30",
+                "language": "en"
+            },
+            {
+                "original_text": "40",
+                "value": "40",
+                "language": "en"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to purchase 12 units of banana and 15 units of apple",
+            "entity_name": "number_of_unit",
+            "min_digits": 1,
+            "max_digits": 2
+        },
+        "expected": [
+            {
+                "original_text": "12",
+                "value": "12",
+                "language": "en"
+            },
+            {
+                "original_text": "15",
+                "value": "15",
+                "language": "en"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to purchase 99 units of spoon and 1 units of Table",
+            "entity_name": "number_of_unit",
+            "min_digits": 1,
+            "max_digits": 2
+        },
+        "expected": [
+            {
+                "original_text": "99",
+                "value": "99",
+                "language": "en"
+            },
+            {
+                "original_text": "1",
+                "value": "1",
+                "language": "en"
+            }
+        ]
+    }
+]

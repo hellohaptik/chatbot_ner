@@ -1,0 +1,41 @@
+[
+    {
+        "input": {
+            "message": "i want to go to mumbai",
+            "entity_name": "city_list"
+        },
+        "expected": {
+            "original_text": "mumbai",
+            "to": true,
+            "from": false,
+            "value": "mumbai",
+            "normal": false
+        }
+    },
+    {
+        "input": {
+            "message": "i want to go to delhi",
+            "entity_name": "city_list"
+        },
+        "expected": {
+            "original_text": "delhi",
+            "to": true,
+            "from": false,
+            "value": "New Delhi",
+            "normal": false
+        }
+    },
+    {
+        "input": {
+            "message": "i want to go to chennai",
+            "entity_name": "city_list"
+        },
+        "expected": {
+            "original_text": "chennai",
+            "to": true,
+            "from": false,
+            "value": "Chennai",
+            "normal": false
+        }
+    }
+]
