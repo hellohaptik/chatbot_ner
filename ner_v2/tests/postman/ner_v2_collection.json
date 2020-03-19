@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "b9419bfc-6483-48fb-87a1-e5e9016e37ad",
+		"name": "ner_v2_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Number Range Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2481d107-0e0c-4545-8576-b04e4e2ff818",
+						"exec": [
+							"tests[\"Successful GET request\"] = responseCode.code === 200;",
+							"if(responseCode.code === 200){",
+							"    var responseData = JSON.parse(responseBody);",
+							"    if(responseData.data.length === 0){",
+							"        tests['Number Range detected'] = true === false;",
+							"    }",
+							"    else{",
+							"        tests[\"Number Range Entity - Validate detected min_value\"] = responseData.data[0].entity_value.min_value === data.number_range_expected.min_value;",
+							"        tests[\"Number Range Entity - Validate detected max_value\"] = responseData.data[0].entity_value.max_value === data.number_range_expected.max_value;",
+							"        tests[\"Number Range Entity - Validate detected original text\"] = responseData.data[0].original_text === data.number_range_expected.original_text;",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v2/number_range/?message={{number_range_message}}&entity_name={{number_range_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v2",
+						"number_range",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{number_range_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{number_range_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Phone number entity v2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e6e7a3fe-9a22-49a0-8ca9-cdffb794f743",
+						"exec": [
+							"tests[\"Successful GET request\"] = responseCode.code === 200;",
+							"if(responseCode.code === 200){",
+							"    var responseData = JSON.parse(responseBody);",
+							"if(responseData.data.length === 0){",
+							"        tests['phone number detected'] = true === false;",
+							"    }",
+							"    else{",
+							"        tests[\"Phone Number V2 Entity - Validate phone number\"] = responseData.data[0].entity_value.value === data.phoneV2_expected.value;",
+							"        tests[\"Phone Number V2 Entity - Validate detected original text\"] = responseData.data[0].original_text === data.phoneV2_expected.original_text;",
+							"        tests[\"Phone Number V2 Entity - Validate country code\"] = responseData.data[0].entity_value.country_calling_code === data.phoneV2_expected.country_calling_code;",
+							"    }",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v2/phone_number/?message={{phoneV2_message}}&entity_name={{phoneV2_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v2",
+						"phone_number",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{phoneV2_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{phoneV2_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

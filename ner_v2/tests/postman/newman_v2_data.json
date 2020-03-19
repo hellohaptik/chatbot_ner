@@ -1,0 +1,53 @@
+[
+    {
+        "number_range_message": "Give me a number between 1 and 100", 
+        "phoneV2_entity_name": "phone_number", 
+        "phoneV2_message": "my contact number is 08877665543", 
+        "phoneV2_expected": {
+            "original_text": "08877665543", 
+            "country_calling_code": "91", 
+            "language": "en", 
+            "value": "8877665543"
+        }, 
+        "number_range_expected": {
+            "original_text": "between 1 and 100", 
+            "max_value": "100", 
+            "min_value": "1"
+        }, 
+        "number_range_entity_name": "number_range"
+    }, 
+    {
+        "number_range_message": "My monthly salary will be more than 2k per month", 
+        "phoneV2_entity_name": "phone_number", 
+        "phoneV2_message": "My phone number would be 9930341387", 
+        "phoneV2_expected": {
+            "original_text": "9930341387", 
+            "country_calling_code": "91", 
+            "language": "en", 
+            "value": "9930341387"
+        }, 
+        "number_range_expected": {
+            "original_text": "more than 2k", 
+            "max_value": null, 
+            "min_value": "2000"
+        }, 
+        "number_range_entity_name": "number_range"
+    }, 
+    {
+        "number_range_message": "more than 200", 
+        "phoneV2_entity_name": "phone_number", 
+        "phoneV2_message": "You can call me on +919920231234", 
+        "phoneV2_expected": {
+            "original_text": "919920231234", 
+            "country_calling_code": "91", 
+            "language": "en", 
+            "value": "9920231234"
+        }, 
+        "number_range_expected": {
+            "original_text": "more than 200", 
+            "max_value": null, 
+            "min_value": "200"
+        }, 
+        "number_range_entity_name": "number_range"
+    }
+]
