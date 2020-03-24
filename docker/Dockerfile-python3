@@ -4,17 +4,12 @@ FROM python:3.6.10
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
 
-# get nodejs install script and pass it to execute: 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
-# and install nodejs
-RUN apt-get install nodejs
-
-# install newman and newman-reporter-html
-RUN npm install -g newman
-RUN npm install -g newman-reporter-html
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
+    apt-get install nodejs && \
+    npm install -g newman && \
+    npm install -g newman-reporter-html
 
 WORKDIR /app
-
 
 COPY docker/install.sh initial_setup.py /app/
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
