@@ -43,8 +43,9 @@ def read_entities_data(entities_data_path):
     return entities_data
 
 
-def generate_newman_data(entities_data):
+def generate_newman_data(entities_data_path):
     data = []
+    entities_data = read_entities_data(entities_data_path)
     for k in entities_data:
         data.append(entities_data[k])
     newman_data = []

@@ -22,11 +22,14 @@ if(os.path.basename(os.getcwd()) != postman_data_directory):
 if newman.check_if_data_valid(entities_data_path):
     try:
         es.index_data(es_data_path)
-        entities_data = newman.read_entities_data(entities_data_path)
-        newman_data = newman.generate_newman_data(entities_data)
+        newman_data = newman.generate_newman_data(entities_data_path)
         with open(newman_data_path, 'w') as fp:
             json.dump(newman_data, fp, indent=4)
-        subprocess.Popen(f"newman run {collection_data_path} -d {newman_data_path} -e {environment_file_path}", shell=True).wait()
+        newman_command = (
+            f'newman run {collection_data_path} -d {newman_data_path}'
+            f' -e {environment_file_path}'
+        )
+        subprocess.Popen(newman_command, shell=True).wait()
         es.clear_data(es_data_path)
     except Exception as e:
         print(str(e))
