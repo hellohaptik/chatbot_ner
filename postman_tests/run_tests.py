@@ -1,8 +1,8 @@
 from __future__ import absolute_import
-from lib import newman
 import subprocess
 import os
 import json
+from lib import newman
 from lib import es
 
 

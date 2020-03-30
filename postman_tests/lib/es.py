@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 import os
 import glob
-from . import common
-import requests
 import json
 import csv
+import requests
+from . import common
 
 es_api_url = "http://localhost:8081/entities/data/v1"
 
