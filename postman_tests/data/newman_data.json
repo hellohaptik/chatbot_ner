@@ -1,0 +1,412 @@
+[
+    {
+        "phoneV2_message": "my contact number is 08877665543",
+        "phoneV2_entity_name": "phone_number",
+        "phoneV2_expected": {
+            "original_text": "08877665543",
+            "country_calling_code": "91",
+            "value": "8877665543",
+            "language": "en"
+        },
+        "date_message": "Set me a reminder for 23 December",
+        "date_entity_name": "date",
+        "date_expected": {
+            "original_text": "23 december",
+            "type": "date",
+            "dd": 23,
+            "mm": 12,
+            "yy": 2020
+        },
+        "city_message": "i want to go to mumbai",
+        "city_entity_name": "city_list",
+        "city_expected": {
+            "original_text": "mumbai",
+            "to": true,
+            "from": false,
+            "value": "mumbai",
+            "normal": false
+        },
+        "pnr_message": "check my pnr status for 2141215305.",
+        "pnr_entity_name": "pnr",
+        "pnr_expected": {
+            "original_text": "2141215305",
+            "value": "2141215305",
+            "language": "en"
+        },
+        "number_message": "I want to purchase 30 units of mobile and 40 units of Television",
+        "number_entity_name": "number_of_unit",
+        "number_min_digits": 1,
+        "number_max_digits": 2,
+        "number_expected": [
+            {
+                "original_text": "30",
+                "value": "30",
+                "language": "en"
+            },
+            {
+                "original_text": "40",
+                "value": "40",
+                "language": "en"
+            }
+        ],
+        "number_range_message": "Give me a number between 1 and 100",
+        "number_range_entity_name": "number_range",
+        "number_range_expected": {
+            "original_text": "between 1 and 100",
+            "min_value": "1",
+            "max_value": "100"
+        },
+        "time_message": "John arrived at the bus stop at 13:50 hrs expecting the bus to be there in 15 mins.But the bus was scheduled for 12:30 pm",
+        "time_entity_name": "time",
+        "time_expected": [
+            {
+                "original_text": "12:30 pm",
+                "mm": 30,
+                "hh": 12,
+                "nn": "pm",
+                "language": "en"
+            },
+            {
+                "original_text": "in 15 mins",
+                "mm": 15,
+                "hh": 0,
+                "nn": "df",
+                "language": "en"
+            },
+            {
+                "original_text": "13:50",
+                "mm": 50,
+                "hh": 13,
+                "nn": "hrs",
+                "language": "en"
+            }
+        ],
+        "budget_message": "shirts between 2000 to 3000",
+        "budget_entity_name": "budget",
+        "budget_expected": {
+            "original_text": "2000 to 3000",
+            "max_budget": 3000,
+            "type": "normal_budget",
+            "min_budget": 2000
+        },
+        "person_name_message": "my name is yash doshi",
+        "person_name_entity_name": "person_name",
+        "person_name_expected": {
+            "original_text": "yash doshi",
+            "first_name": "yash",
+            "last_name": "doshi",
+            "middle_name": null,
+            "model_verified": false,
+            "datastore_verified": true
+        },
+        "email_message": "my email id is apurv.nagvenkar@gmail.com",
+        "email_entity_name": "email",
+        "email_expected": {
+            "original_text": "apurv.nagvenkar@gmail.com",
+            "value": "apurv.nagvenkar@gmail.com",
+            "language": "en"
+        },
+        "time_range_message": "Set a drink water reminder for tomorrow from 5:00 AM to 9:00 PM",
+        "time_range_entity_name": "time_with_range",
+        "time_range_expected": [
+            {
+                "original_text": "5:00 am to 9:00 pm",
+                "mm": 0,
+                "hh": 5,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "5:00 am to 9:00 pm",
+                "mm": 0,
+                "hh": 9,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ],
+        "regex_message": "123456 is my otp",
+        "regex_entity_name": "regex",
+        "regex_regex": "\\d{4,6}",
+        "regex_expected": {
+            "original_text": "123456",
+            "value": "123456"
+        },
+        "phoneV1_message": "my contact number is 9049961794",
+        "phoneV1_entity_name": "phone_number",
+        "phoneV1_expected": {
+            "original_text": "9049961794",
+            "country_calling_code": "91",
+            "value": "9049961794",
+            "language": "en"
+        }
+    },
+    {
+        "phoneV2_message": "My phone number would be 9930341387",
+        "phoneV2_entity_name": "phone_number",
+        "phoneV2_expected": {
+            "original_text": "9930341387",
+            "country_calling_code": "91",
+            "value": "9930341387",
+            "language": "en"
+        },
+        "date_message": "Set me a reminder for 2 May",
+        "date_entity_name": "date",
+        "date_expected": {
+            "original_text": "2 may",
+            "type": "date",
+            "dd": 2,
+            "mm": 5,
+            "yy": 2020
+        },
+        "city_message": "i want to go to delhi",
+        "city_entity_name": "city_list",
+        "city_expected": {
+            "original_text": "delhi",
+            "to": true,
+            "from": false,
+            "value": "New Delhi",
+            "normal": false
+        },
+        "pnr_message": "check my pnr status for 3714578.",
+        "pnr_entity_name": "pnr",
+        "pnr_expected": {
+            "original_text": "3714578",
+            "value": "3714578",
+            "language": "en"
+        },
+        "number_message": "I want to purchase 12 units of banana and 15 units of apple",
+        "number_entity_name": "number_of_unit",
+        "number_min_digits": 1,
+        "number_max_digits": 2,
+        "number_expected": [
+            {
+                "original_text": "12",
+                "value": "12",
+                "language": "en"
+            },
+            {
+                "original_text": "15",
+                "value": "15",
+                "language": "en"
+            }
+        ],
+        "number_range_message": "My monthly salary will be more than 2k per month",
+        "number_range_entity_name": "number_range",
+        "number_range_expected": {
+            "original_text": "more than 2k",
+            "min_value": "2000",
+            "max_value": null
+        },
+        "time_message": "Aman arrived at the bus stop at 17:20 hrs expecting the bus to be there in 11 mins.But the bus was scheduled for 5:47 pm",
+        "time_entity_name": "time",
+        "time_expected": [
+            {
+                "original_text": "5:47 pm",
+                "mm": 47,
+                "hh": 5,
+                "nn": "pm",
+                "language": "en"
+            },
+            {
+                "original_text": "in 11 mins",
+                "mm": 11,
+                "hh": 0,
+                "nn": "df",
+                "language": "en"
+            },
+            {
+                "original_text": "17:20",
+                "mm": 20,
+                "hh": 17,
+                "nn": "hrs",
+                "language": "en"
+            }
+        ],
+        "budget_message": "I want to see jeans between 2500 to 4200",
+        "budget_entity_name": "budget",
+        "budget_expected": {
+            "original_text": "2500 to 4200",
+            "max_budget": 4200,
+            "type": "normal_budget",
+            "min_budget": 2500
+        },
+        "person_name_message": "my name is Deep Viral Baweja",
+        "person_name_entity_name": "person_name",
+        "person_name_expected": {
+            "original_text": "Deep Viral Baweja",
+            "first_name": "Deep",
+            "last_name": "Baweja",
+            "middle_name": "Viral",
+            "model_verified": false,
+            "datastore_verified": true
+        },
+        "email_message": "my email id is ashutosh@haptik.co",
+        "email_entity_name": "email",
+        "email_expected": {
+            "original_text": "ashutosh@haptik.co",
+            "value": "ashutosh@haptik.co",
+            "language": "en"
+        },
+        "time_range_message": "Set a drink water reminder for tomorrow from 8:30 am to 5:30 pm",
+        "time_range_entity_name": "time_with_range",
+        "time_range_expected": [
+            {
+                "original_text": "8:30 am to 5:30 pm",
+                "mm": 30,
+                "hh": 8,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "8:30 am to 5:30 pm",
+                "mm": 30,
+                "hh": 5,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ],
+        "regex_message": "798865 is my otp",
+        "regex_entity_name": "regex",
+        "regex_regex": "\\d{4,6}",
+        "regex_expected": {
+            "original_text": "798865",
+            "value": "798865"
+        },
+        "phoneV1_message": "My phone number would be 9930341387",
+        "phoneV1_entity_name": "phone_number",
+        "phoneV1_expected": {
+            "original_text": "9930341387",
+            "country_calling_code": "91",
+            "value": "9930341387",
+            "language": "en"
+        }
+    },
+    {
+        "phoneV2_message": "You can call me on +919920231234",
+        "phoneV2_entity_name": "phone_number",
+        "phoneV2_expected": {
+            "original_text": "919920231234",
+            "country_calling_code": "91",
+            "value": "9920231234",
+            "language": "en"
+        },
+        "date_message": "Set me a reminder for 3 June",
+        "date_entity_name": "date",
+        "date_expected": {
+            "original_text": "3 june",
+            "type": "date",
+            "dd": 3,
+            "mm": 6,
+            "yy": 2020
+        },
+        "city_message": "i want to go to chennai",
+        "city_entity_name": "city_list",
+        "city_expected": {
+            "original_text": "chennai",
+            "to": true,
+            "from": false,
+            "value": "Chennai",
+            "normal": false
+        },
+        "pnr_message": "check my pnr status for 11234456.",
+        "pnr_entity_name": "pnr",
+        "pnr_expected": {
+            "original_text": "11234456",
+            "value": "11234456",
+            "language": "en"
+        },
+        "number_message": "I want to purchase 99 units of spoon and 1 units of Table",
+        "number_entity_name": "number_of_unit",
+        "number_min_digits": 1,
+        "number_max_digits": 2,
+        "number_expected": [
+            {
+                "original_text": "99",
+                "value": "99",
+                "language": "en"
+            },
+            {
+                "original_text": "1",
+                "value": "1",
+                "language": "en"
+            }
+        ],
+        "number_range_message": "more than 200",
+        "number_range_entity_name": "number_range",
+        "number_range_expected": {
+            "original_text": "more than 200",
+            "min_value": "200",
+            "max_value": null
+        },
+        "budget_message": "formals between 5000 to 9999",
+        "budget_entity_name": "budget",
+        "budget_expected": {
+            "original_text": "5000 to 9999",
+            "max_budget": 9999,
+            "type": "normal_budget",
+            "min_budget": 5000
+        },
+        "person_name_message": "His name is amaan srivastava",
+        "person_name_entity_name": "person_name",
+        "person_name_expected": {
+            "original_text": "amaan srivastava",
+            "first_name": "amaan",
+            "last_name": "srivastava",
+            "middle_name": null,
+            "model_verified": false,
+            "datastore_verified": true
+        },
+        "email_message": "my email id is amansrivastava94@gmail.com",
+        "email_entity_name": "email",
+        "email_expected": {
+            "original_text": "amansrivastava94@gmail.com",
+            "value": "amansrivastava94@gmail.com",
+            "language": "en"
+        },
+        "time_range_message": "Set a drink water reminder for tomorrow from 11:40 AM to 11:12 PM",
+        "time_range_entity_name": "time_with_range",
+        "time_range_expected": [
+            {
+                "original_text": "11:40 am to 11:12 pm",
+                "mm": 40,
+                "hh": 11,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "11:40 am to 11:12 pm",
+                "mm": 12,
+                "hh": 11,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ],
+        "regex_message": "my otp is 112233",
+        "regex_entity_name": "regex",
+        "regex_regex": "\\d{4,6}",
+        "regex_expected": {
+            "original_text": "112233",
+            "value": "112233"
+        },
+        "phoneV1_message": "You can call me on +919920231234",
+        "phoneV1_entity_name": "phone_number",
+        "phoneV1_expected": {
+            "original_text": "919920231234",
+            "country_calling_code": "91",
+            "value": "919920231234",
+            "language": "en"
+        }
+    }
+]

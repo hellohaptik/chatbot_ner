@@ -1,0 +1,919 @@
+{
+	"info": {
+		"_postman_id": "94050ad5-c8a5-49ba-b8b6-ba19c4f0d2ea",
+		"name": "ner_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "City entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d2e89180-b51e-44fe-87af-a971b48f15bb",
+						"exec": [
+							"var shouldBeSkipped = !('city_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get city data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid to\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.to).to.eql(data.city_expected.to); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid from\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.from).to.eql(data.city_expected.from); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data[0].original_text).to.eql(data.city_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"     var jsonData = pm.response.json();",
+							"     pm.expect(jsonData.data[0].entity_value.value.toLowerCase()).to.eql(data.city_expected.value.toLowerCase()); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid normal\", function() {",
+							"     var jsonData = pm.response.json();",
+							"     pm.expect(jsonData.data[0].entity_value.normal).to.eql(data.city_expected.normal); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/city/?message={{city_message}}&entity_name={{city_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"city",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{city_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{city_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Time Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5c4a0338-38cf-482b-be58-de81496136bb",
+						"exec": [
+							"var shouldBeSkipped = !('time_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get time data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.be.above(0);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].original_text).to.eql(data.time_expected[i].original_text); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid minutes\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.mm).to.eql(data.time_expected[i].mm); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid hours\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.hh).to.eql(data.time_expected[i].hh); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid normal\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.normal).to.eql(data.time_expected[i].normal); ",
+							"   }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/time/?message={{time_message}}&entity_name={{time_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"time",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{time_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{time_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Person Name Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aab03db0-2700-4ed1-a9d4-978acce08ba1",
+						"exec": [
+							"var shouldBeSkipped = !('person_name_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get person name data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.person_name_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid first_name\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.first_name).to.eql(data.person_name_expected.first_name); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid last_name\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.last_name).to.eql(data.person_name_expected.last_name); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid middle_name\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.middle_name).to.eql(data.person_name_expected.middle_name); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid model_verified\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.model_verified).to.eql(data.person_name_expected.model_verified); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid datastore_verified\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.datastore_verified).to.eql(data.person_name_expected.datastore_verified); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/person_name/?message={{person_name_message}}&entity_name={{person_name_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"person_name",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{person_name_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{person_name_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PNR Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c88850db-8dc1-4ca4-bb67-66568fb04fd1",
+						"exec": [
+							"var shouldBeSkipped = !('pnr_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get pnr data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.pnr_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value).to.eql(data.pnr_expected.value); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/pnr/?message={{pnr_message}}&entity_name={{pnr_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"pnr",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{pnr_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{pnr_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Time Range Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "6726f8f5-a85a-46c8-9d67-c483d2d68db3",
+						"exec": [
+							"var shouldBeSkipped = !('time_range_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get time_range data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.be.above(0);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].original_text).to.eql(data.time_range_expected[i].original_text); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid minutes\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.mm).to.eql(data.time_range_expected[i].mm); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid hours\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.hh).to.eql(data.time_range_expected[i].hh); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid range\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.range).to.eql(data.time_range_expected[i].range); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid normal\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.normal).to.eql(data.time_range_expected[i].normal); ",
+							"   }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/time_with_range/?message={{time_range_message}}&entity_name={{time_range_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"time_with_range",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{time_range_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{time_range_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Regex Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "180b0299-b3bf-4afb-acff-1642a40ada0c",
+						"exec": [
+							"var shouldBeSkipped = !('regex_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get regex data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.regex_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value).to.eql(data.regex_expected.value); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/regex/?message={{regex_message}}&entity_name={{regex_entity_name}}&regex={{regex_regex}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"regex",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{regex_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{regex_entity_name}}"
+						},
+						{
+							"key": "regex",
+							"value": "{{regex_regex}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Email Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f0342e22-da7b-44f2-a55b-b52050907b35",
+						"exec": [
+							"var shouldBeSkipped = !('email_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get email data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.email_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value).to.eql(data.email_expected.value); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/email/?message={{email_message}}&entity_name={{email_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"email",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{email_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{email_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Budget Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "912756f9-cceb-4ba3-ac67-14d83c3df8e4",
+						"exec": [
+							"var shouldBeSkipped = !('budget_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get budget data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.budget_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid max_budget\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.max_budget).to.eql(data.budget_expected.max_budget); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid min_budget\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.min_budget).to.eql(data.budget_expected.min_budget); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid type\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.type).to.eql(data.budget_expected.type); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/budget/?message={{budget_message}}&entity_name={{budget_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"budget",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{budget_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{budget_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Date Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "df576c4c-f337-4964-9cfb-a7f4e5611784",
+						"exec": [
+							"var shouldBeSkipped = !('date_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get date data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.date_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid type\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value.type).to.eql(data.date_expected.type); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid day\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value.dd).to.eql(data.date_expected.dd); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid month\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value.mm).to.eql(data.date_expected.mm); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid year\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value.yy).to.eql(data.date_expected.yy); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/date/?message={{date_message}}&entity_name={{date_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"date",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{date_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{date_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Number Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a1bf1b2a-f098-41d2-8c33-dd5d78ea8b4f",
+						"exec": [
+							"var shouldBeSkipped = !('number_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get number data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.be.above(0);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].original_text).to.eql(data.number_expected[i].original_text); ",
+							"   }",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   for(i = 0; i < jsonData.data.length; i++) {",
+							"       pm.expect(jsonData.data[i].entity_value.value).to.eql(data.number_expected[i].value); ",
+							"   }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/number/?message={{number_message}}&entity_name={{number_entity_name}}&min_number_digits={{number_min_digits}}&max_number_digits={{number_max_digits}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"number",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{number_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{number_entity_name}}"
+						},
+						{
+							"key": "min_number_digits",
+							"value": "{{number_min_digits}}"
+						},
+						{
+							"key": "max_number_digits",
+							"value": "{{number_max_digits}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Number Range Entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2481d107-0e0c-4545-8576-b04e4e2ff818",
+						"exec": [
+							"var shouldBeSkipped = !('number_range_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get number_range data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.number_range_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid min_value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.min_value).to.eql(data.number_range_expected.min_value); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid max_value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.max_value).to.eql(data.number_range_expected.max_value); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v2/number_range/?message={{number_range_message}}&entity_name={{number_range_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v2",
+						"number_range",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{number_range_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{number_range_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Phone number entity v2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e6e7a3fe-9a22-49a0-8ca9-cdffb794f743",
+						"exec": [
+							"var shouldBeSkipped = !('phoneV2_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get phone number data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.phoneV2_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value).to.eql(data.phoneV2_expected.value); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid country_calling_code\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.country_calling_code).to.eql(data.phoneV2_expected.country_calling_code); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v2/phone_number/?message={{phoneV2_message}}&entity_name={{phoneV2_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v2",
+						"phone_number",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{phoneV2_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{phoneV2_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Phone number entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4b978b73-2ca4-4263-afcb-ae44affa1fed",
+						"exec": [
+							"var shouldBeSkipped = !('phoneV1_expected' in data);",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"We get phone number data from the message\", function() {",
+							"    pm.expect(pm.response.json().data.length).to.eql(1);",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid original_text\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].original_text).to.eql(data.phoneV1_expected.original_text); ",
+							"});",
+							"",
+							"(shouldBeSkipped ? pm.test.skip : pm.test)(\"Response data has valid value\", function() {",
+							"   var jsonData = pm.response.json();",
+							"   pm.expect(jsonData.data[0].entity_value.value).to.eql(data.phoneV1_expected.value); ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{url}}/v1/phone_number/?message={{phoneV1_message}}&entity_name={{phoneV1_entity_name}}",
+					"protocol": "http",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"v1",
+						"phone_number",
+						""
+					],
+					"query": [
+						{
+							"key": "message",
+							"value": "{{phoneV1_message}}"
+						},
+						{
+							"key": "entity_name",
+							"value": "{{phoneV1_entity_name}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}

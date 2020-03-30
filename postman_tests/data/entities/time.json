@@ -1,0 +1,60 @@
+[
+    {
+        "input": {
+            "message": "John arrived at the bus stop at 13:50 hrs expecting the bus to be there in 15 mins.But the bus was scheduled for 12:30 pm",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+                "original_text": "12:30 pm",
+                "mm": 30,
+                "hh": 12,
+                "nn": "pm",
+                "language": "en"
+            },
+            {
+                "original_text": "in 15 mins",
+                "mm": 15,
+                "hh": 0,
+                "nn": "df",
+                "language": "en"
+            },
+            {
+                "original_text": "13:50",
+                "mm": 50,
+                "hh": 13,
+                "nn": "hrs",
+                "language": "en"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Aman arrived at the bus stop at 17:20 hrs expecting the bus to be there in 11 mins.But the bus was scheduled for 5:47 pm",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+                "original_text": "5:47 pm",
+                "mm": 47,
+                "hh": 5,
+                "nn": "pm",
+                "language": "en"
+            },
+            {
+                "original_text": "in 11 mins",
+                "mm": 11,
+                "hh": 0,
+                "nn": "df",
+                "language": "en"
+            },
+            {
+                "original_text": "17:20",
+                "mm": 20,
+                "hh": 17,
+                "nn": "hrs",
+                "language": "en"
+            }
+        ]
+    }
+]

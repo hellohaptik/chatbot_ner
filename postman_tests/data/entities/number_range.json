@@ -1,0 +1,35 @@
+[
+    {
+        "input": {
+            "message": "Give me a number between 1 and 100",
+            "entity_name": "number_range"
+        },
+        "expected": {
+            "original_text": "between 1 and 100",
+            "min_value": "1",
+            "max_value": "100"
+        }
+    },
+    {
+        "input": {
+            "message": "My monthly salary will be more than 2k per month",
+            "entity_name": "number_range"
+        },
+        "expected": {
+            "original_text": "more than 2k",
+            "min_value": "2000",
+            "max_value": null
+        }
+    },
+    {
+        "input": {
+            "message": "more than 200",
+            "entity_name": "number_range"
+        },
+        "expected": {
+            "original_text": "more than 200",
+            "min_value": "200",
+            "max_value": null
+        }
+    }
+]
