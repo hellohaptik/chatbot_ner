@@ -6,7 +6,7 @@ from lib import newman
 from lib import es
 
 
-postman_data_directory = 'postman_tests/'
+postman_tests_directory = 'postman_tests/'
 entities_data_path = 'data/entities/'
 newman_data_path = 'data/newman_data.json'
 collection_data_path = 'data/ner_collection.json'
@@ -15,8 +15,8 @@ es_data_path = 'data/elastic_search/'
 
 
 #Switch to postman_tests if not already in that directory
-if(os.path.basename(os.getcwd()) != postman_data_directory):
-    os.chdir(postman_data_directory)
+if(os.path.basename(os.getcwd()) != postman_tests_directory):
+    os.chdir(postman_tests_directory)
 
 
 if newman.check_if_data_valid(entities_data_path):
