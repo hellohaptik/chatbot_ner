@@ -5,6 +5,7 @@ import subprocess
 import glob
 
 
+postman_data_directory = 'postman_tests/'
 entities_data_path = 'data/entities/'
 newman_data_path = 'data/newman_data.json'
 collection_data_path = 'data/ner_collection.json'
@@ -74,6 +75,11 @@ def generate_newman_data(entities_data):
                 temp.update(item)
             newman_data.append(temp)
     return newman_data
+
+
+#Switch to postman_tests if not already in that directory
+if(os.path.basename(os.getcwd()) != postman_data_directory):
+    os.chdir(postman_data_directory)
 
 
 if check_if_data_valid():
