@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import json
 import os
 import glob
+from . import common
 
 
 def check_if_data_valid(entities_data_path):
@@ -24,15 +25,10 @@ def check_if_data_valid(entities_data_path):
         return False
 
 
-def get_entity_name(file_path):
-    base=os.path.basename(file_path)
-    return os.path.splitext(base)[0]
-
-
 def read_entities_data(entities_data_path):
     entities_data = {}
     for file_path in glob.glob(os.path.join(entities_data_path, '*.json')):
-        entity = get_entity_name(file_path)
+        entity = common.get_entity_name(file_path)
         entities_data[entity] = []
         with open(file_path, 'r') as file:
             data = json.load(file)
