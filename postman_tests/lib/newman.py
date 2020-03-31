@@ -6,8 +6,16 @@ from . import common
 
 
 def check_if_data_valid(entities_data_path):
-    # Doing basic sanity checking here.
-    # Check that every test case is valid json and has the keys: input and expected
+    """
+    Doing basic sanity checking here.
+    Check that every test case is valid json and has the keys: input and expected
+
+    Parameters: 
+    entities_data_path (string): Path to the data/entities directory
+
+    Returns: 
+    boolean: Returns True if all files contain valid json.
+    """
     try:
         path = ''
         for file_path in glob.glob(os.path.join(entities_data_path, '*.json')):
@@ -26,6 +34,16 @@ def check_if_data_valid(entities_data_path):
 
 
 def read_entities_data(entities_data_path):
+    """
+    Read all the files in data/entities and generate a single dictionary containing
+    data for every entity.
+
+    Parameters: 
+    entities_data_path (string): Path to the data/entities directory.
+
+    Returns: 
+    dictionary: Dict containing data read from the data files for every entity.
+    """
     entities_data = {}
     for file_path in glob.glob(os.path.join(entities_data_path, '*.json')):
         entity = common.get_entity_name(file_path)
@@ -44,6 +62,16 @@ def read_entities_data(entities_data_path):
 
 
 def generate_newman_data(entities_data_path):
+    """
+    Generate data in a format that can be passed to the command-line tool
+    newman for runing the tests.
+
+    Parameters: 
+    entities_data_path (string): Path to the data/entities directory.
+
+    Returns: 
+    list: List of dictionaries where each dictionary is data for a single test iteration.
+    """
     data = []
     entities_data = read_entities_data(entities_data_path)
     for k in entities_data:
