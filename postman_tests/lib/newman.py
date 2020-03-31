@@ -10,10 +10,10 @@ def check_if_data_valid(entities_data_path):
     Doing basic sanity checking here.
     Check that every test case is valid json and has the keys: input and expected
 
-    Parameters: 
+    Parameters:
     entities_data_path (string): Path to the data/entities directory
 
-    Returns: 
+    Returns:
     boolean: Returns True if all files contain valid json.
     """
     try:
@@ -38,10 +38,10 @@ def read_entities_data(entities_data_path):
     Read all the files in data/entities and generate a single dictionary containing
     data for every entity.
 
-    Parameters: 
+    Parameters:
     entities_data_path (string): Path to the data/entities directory.
 
-    Returns: 
+    Returns:
     dictionary: Dict containing data read from the data files for every entity.
     """
     entities_data = {}
@@ -66,10 +66,10 @@ def generate_newman_data(entities_data_path):
     Generate data in a format that can be passed to the command-line tool
     newman for runing the tests.
 
-    Parameters: 
+    Parameters:
     entities_data_path (string): Path to the data/entities directory.
 
-    Returns: 
+    Returns:
     list: List of dictionaries where each dictionary is data for a single test iteration.
     """
     data = []
@@ -84,7 +84,7 @@ def generate_newman_data(entities_data_path):
             if item:
                 iteration_data.append(item.pop(0))
                 found = True
-        if found == False:
+        if not found:
             break
         else:
             temp = {}

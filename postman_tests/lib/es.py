@@ -6,6 +6,7 @@ import csv
 import requests
 from . import common
 
+
 es_api_url = "http://localhost:8081/entities/data/v1"
 
 
@@ -13,10 +14,10 @@ def index_data(es_data_path):
     """
     Index data for every entity being tested into ElasticSearch
 
-    Parameters: 
+    Parameters:
     es_data_path (string): Path to the data/elastic_search directory
 
-    Returns: 
+    Returns:
     None
     """
     for file_path in glob.glob(os.path.join(es_data_path, '*.csv')):
@@ -31,10 +32,10 @@ def clear_data(es_data_path):
     """
     Clear the data for every entity that was indexed for testing from ElasticSearch
 
-    Parameters: 
-    es_data_path (string): Path to the data/elastic_search directory
+    Parameters:
+    es_data_path (string): Path to the data/elastic_search directory.
 
-    Returns: 
+    Returns:
     None
     """
     for file_path in glob.glob(os.path.join(es_data_path, '*.csv')):
@@ -45,20 +46,21 @@ def clear_data(es_data_path):
         req = requests.post(f"{es_api_url}/{entity_name}", data=contents)
         print(req.text)
 
+
 def convert_csv_to_json(file_path):
     """
     Read the csv file at file_path and convert its data to json
 
-    Parameters: 
+    Parameters:
     file_path (string): Path of a file in the data/elastic_search directory
 
-    Returns: 
+    Returns:
     string: The JSON representation of the csv data in the file
     """
     data = {'replace': True, 'edited': []}
     with open(file_path, 'r') as file:
         csv_data = csv.reader(file)
-        next(file) # Omit header row
+        next(file)  # Omit header row
         for row in csv_data:
             record = {'word': row[0]}
             record['variants'] = {
@@ -75,12 +77,12 @@ def get_variants(str):
     """
     Convert the string containing all the variants into a list
 
-    Parameters: 
+    Parameters:
     str (string): String containing all the variant names.
 
-    Returns: 
+    Returns:
     list: List of strings where each string is a variant name.
     """
-    str = str.replace(' ','')
+    str = str.replace(' ', '')
     arr = str.split('|')
     return [item for item in arr if item]

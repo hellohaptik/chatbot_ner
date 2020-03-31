@@ -14,7 +14,7 @@ environment_file_path = 'data/environment.json'
 es_data_path = 'data/elastic_search/'
 
 
-#Switch to postman_tests if not already in that directory
+# Switch to postman_tests if not already in that directory
 if(os.path.basename(os.getcwd()) != postman_tests_directory):
     os.chdir(postman_tests_directory)
 
