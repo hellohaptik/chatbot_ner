@@ -7,9 +7,9 @@ docker exec -it docker_chatbot-ner_1 python postman_tests/run_tests.py
 A shortcut for running the above is available. Just run ```./run_postman_tests.sh``` in the root directory.
 
 
-**Adding new entities**
+**Adding test data for new entities**
 
-To add a new entity create a new json file in postman_tests/data/entities/.
+To add test data for a new entity create a new json file in postman_tests/data/entities/.
 
 The format should follow the below structure:
 
@@ -48,7 +48,7 @@ expected is either a single object containing parameters whose values we are tes
 Add tests for the new entity using steps given below in this document and send a PR containing the new collection and data.
 
 
-**Modifying entities**
+**Modifying test data of existing entities**
 
 Modify the enitities data json file in postman_tests/data/entities and if required the tests as well using steps given below in this document and send a PR for the modifications.
 
