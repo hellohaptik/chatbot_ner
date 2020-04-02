@@ -865,7 +865,7 @@ class TimeDetector(object):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = 'df'
             time['tz'] = None if not self.timezone else self.timezone.zone
@@ -907,7 +907,7 @@ class TimeDetector(object):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = 'df'
             time['tz'] = None if not self.timezone else self.timezone.zone
@@ -949,7 +949,7 @@ class TimeDetector(object):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
             time['tz'] = None if not self.timezone else self.timezone.zone
@@ -985,7 +985,7 @@ class TimeDetector(object):
             setter = "hh"
             antisetter = "mm"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
             time['tz'] = None if not self.timezone else self.timezone.zone
