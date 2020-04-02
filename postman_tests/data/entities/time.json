@@ -56,5 +56,34 @@
                 "language": "en"
             }
         ]
+    },
+    {
+        "input": {
+            "message": "Hritik arrived at the bus stop at 11:35 hrs expecting the bus to be there in 30 mins.But the bus was scheduled for 11:30 am",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+                "original_text": "11:30 am",
+                "mm": 30,
+                "hh": 11,
+                "nn": "am",
+                "language": "en"
+            },
+            {
+                "original_text": "in 30 mins",
+                "mm": 30,
+                "hh": 0,
+                "nn": "df",
+                "language": "en"
+            },
+            {
+                "original_text": "11:35",
+                "mm": 35,
+                "hh": 11,
+                "nn": "am",
+                "language": "en"
+            }
+        ]
     }
 ]
