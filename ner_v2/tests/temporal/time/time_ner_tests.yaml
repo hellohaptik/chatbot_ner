@@ -713,6 +713,77 @@ tests:
         range: "end"
         time_type: null
         original_text: "10:00 to 14:00"
+  - id: en_55
+    message: "check back in 5 mins"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 0
+        mm: 5
+        nn: "df"
+        original_text: "in 5 mins"
+  - id: en_56
+    message: "check back in 5 hrs"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 5
+        mm: 0
+        nn: "df"
+        original_text: "in 5 hrs"
+  - id: en_57
+    message: "try 4 minutes later"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 0
+        mm: 4
+        nn: "df"
+        original_text: "4 minutes later"
+  - id: en_58
+    message: "try 10 hours later"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 10
+        mm: 0
+        nn: "df"
+        original_text: "10 hours later"
+  - id: en_59
+    message: "repeat every 16 minutes"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 0
+        mm: 16
+        nn: "ev"
+        original_text: "every 16 minutes"
+  - id: en_60
+    message: "repeat evry 21 hrs"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 21
+        mm: 0
+        nn: "ev"
+        original_text: "evry 21 hrs"
+  - id: en_61
+    message: "set it for once in 3 days"
+    bot_message: null
+    range_enabled: true
+    outputs:
+      - output_id: 1
+        hh: 72
+        mm: 0
+        nn: "ev"
+        original_text: "once in 3 days"
+
   hi:
   - id: hi_1
     message: "सुबह 10 बजे"
