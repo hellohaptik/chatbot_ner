@@ -1,6 +1,6 @@
 {
 	"id": "9dbcc6c6-dd15-498a-a4f7-5fc0cd63d542",
-	"name": "chatbot-ner-dev",
+	"name": "chatbot-ner-prod",
 	"values": [
 		{
 			"key": "url",
@@ -10,5 +10,6 @@
 	],
 	"_postman_variable_scope": "environment",
 	"_postman_exported_at": "2020-03-05T12:18:03.223Z",
-	"_postman_exported_using": "Postman/7.19.1"
+	"_postman_exported_using": "Postman/7.19.1",
+	"es_host": "localhost:8081"
 }

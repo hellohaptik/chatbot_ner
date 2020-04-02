@@ -7,10 +7,18 @@ import requests
 from . import common
 
 
-es_api_url = "http://localhost:8081/entities/data/v1"
+def get_es_api_url(config_path):
+    if os.path.exists(f"{config_path}/dev.json"):
+        config_file_path = f"{config_path}/dev.json"
+    else:
+        config_file_path = f"{config_path}/prod.json"
+    with open(config_file_path, 'r') as f:
+        data = json.load(f)
+    base_url = data["es_host"]
+    return f"http://{base_url}/entities/data/v1"
 
 
-def index_data(es_data_path):
+def index_data(es_data_path, config_path):
     """
     Index data for every entity being tested into ElasticSearch
 
@@ -24,11 +32,12 @@ def index_data(es_data_path):
         entity_name = common.get_entity_name(file_path)
         print(f"Indexing {entity_name}")
         contents = convert_csv_to_json(file_path)
-        req = requests.post(f"{es_api_url}/{entity_name}", data=contents)
+        url = get_es_api_url(config_path)
+        req = requests.post(f"{url}/{entity_name}", data=contents)
         print(req.text)
 
 
-def clear_data(es_data_path):
+def clear_data(es_data_path, config_path):
     """
     Clear the data for every entity that was indexed for testing from ElasticSearch
 
@@ -43,7 +52,8 @@ def clear_data(es_data_path):
         print(f"Clearing ES data for {entity_name}")
         contents = convert_csv_to_json(file_path)
         contents = contents.replace("\"edited\":", "\"deleted\":")
-        req = requests.post(f"{es_api_url}/{entity_name}", data=contents)
+        url = get_es_api_url(config_path)
+        req = requests.post(f"{url}/{entity_name}", data=contents)
         print(req.text)
 
 
