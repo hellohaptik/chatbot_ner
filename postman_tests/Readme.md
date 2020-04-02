@@ -19,31 +19,17 @@ The format should follow the below structure:
 
     },
 
-    "expected": {
+    "expected": [
+        {
 
-    }
-]
-```
-
-or 
-
-```
-[
-    "input": {
-
-    },
-
-    "expected": {
-        [
-
-        ]
-    }
+        }
+    ]
 ]
 ```
 
 input contains the parameters that we pass as query parameters in the GET rquest.
 
-expected is either a single object containing parameters whose values we are testing or it can be an array of objects depending on the response.
+expected is an array of objects that we get in the response.
 
 Add tests for the new entity using steps given below in this document and send a PR containing the new collection and data.
 

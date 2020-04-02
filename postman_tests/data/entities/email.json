@@ -1,35 +1,41 @@
 [
-    {
-        "input": {
-            "message": "my email id is apurv.nagvenkar@gmail.com",
-            "entity_name": "email"
-        },
-        "expected": {
-            "original_text": "apurv.nagvenkar@gmail.com",
-            "value": "apurv.nagvenkar@gmail.com",
-            "language": "en"
-        }
+  {
+    "input": {
+      "message": "my email id is apurv.nagvenkar@gmail.com",
+      "entity_name": "email"
     },
-    {
-        "input": {
-            "message": "my email id is ashutosh@haptik.co",
-            "entity_name": "email"
-        },
-        "expected": {
-            "original_text": "ashutosh@haptik.co",
-            "value": "ashutosh@haptik.co",
-            "language": "en"
-        }
+    "expected": [
+      {
+        "original_text": "apurv.nagvenkar@gmail.com",
+        "value": "apurv.nagvenkar@gmail.com",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "my email id is ashutosh@haptik.co",
+      "entity_name": "email"
     },
-    {
-        "input": {
-            "message": "my email id is amansrivastava94@gmail.com",
-            "entity_name": "email"
-        },
-        "expected": {
-            "original_text": "amansrivastava94@gmail.com",
-            "value": "amansrivastava94@gmail.com",
-            "language": "en"
-        }
-    }
+    "expected": [
+      {
+        "original_text": "ashutosh@haptik.co",
+        "value": "ashutosh@haptik.co",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "my email id is amansrivastava94@gmail.com",
+      "entity_name": "email"
+    },
+    "expected": [
+      {
+        "original_text": "amansrivastava94@gmail.com",
+        "value": "amansrivastava94@gmail.com",
+        "language": "en"
+      }
+    ]
+  }
 ]

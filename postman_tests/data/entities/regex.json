@@ -1,36 +1,42 @@
 [
-    {
-        "input": {
-            "message": "123456 is my otp",
-            "entity_name": "regex",
-            "regex": "\\d{4,6}"
-        },
+  {
+    "input": {
+      "message": "123456 is my otp",
+      "entity_name": "regex",
+      "regex": "\\d{4,6}"
+    },
 
-        "expected": {
-            "original_text": "123456",
-            "value": "123456"
-        }
+    "expected": [
+      {
+        "original_text": "123456",
+        "value": "123456"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "798865 is my otp",
+      "entity_name": "regex",
+      "regex": "\\d{4,6}"
     },
-    {
-        "input": {
-            "message": "798865 is my otp",
-            "entity_name": "regex",
-            "regex": "\\d{4,6}"
-        },
-        "expected": {
-            "original_text": "798865",
-            "value": "798865"
-        }
+    "expected": [
+      {
+        "original_text": "798865",
+        "value": "798865"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "my otp is 112233",
+      "entity_name": "regex",
+      "regex": "\\d{4,6}"
     },
-    {
-        "input": {
-            "message": "my otp is 112233",
-            "entity_name": "regex",
-            "regex": "\\d{4,6}"
-        },
-        "expected": {
-            "original_text": "112233",
-            "value": "112233"
-        }
-    }
+    "expected": [
+      {
+        "original_text": "112233",
+        "value": "112233"
+      }
+    ]
+  }
 ]

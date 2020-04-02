@@ -1,41 +1,47 @@
 [
-    {
-        "input": {
-            "message": "Set me a reminder for 23 December",
-            "entity_name": "date"
-        },
-        "expected": {
-            "original_text": "23 december",
-            "type": "date",
-            "dd": 23,
-            "mm": 12,
-            "yy": 2020
-        }
+  {
+    "input": {
+      "message": "Set me a reminder for 23 December",
+      "entity_name": "date"
     },
-    {
-        "input": {
-            "message": "Set me a reminder for 2 May",
-            "entity_name": "date"
-        },
-        "expected": {
-            "original_text": "2 may",
-            "type": "date",
-            "dd": 2,
-            "mm": 5,
-            "yy": 2020
-        }
+    "expected": [
+      {
+        "original_text": "23 december",
+        "type": "date",
+        "dd": 23,
+        "mm": 12,
+        "yy": 2020
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "Set me a reminder for 2 May",
+      "entity_name": "date"
     },
-    {
-        "input": {
-            "message": "Set me a reminder for 3 June",
-            "entity_name": "date"
-        },
-        "expected": {
-            "original_text": "3 june",
-            "type": "date",
-            "dd": 3,
-            "mm": 6,
-            "yy": 2020
-        }
-    }
+    "expected": [
+      {
+        "original_text": "2 may",
+        "type": "date",
+        "dd": 2,
+        "mm": 5,
+        "yy": 2020
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "Set me a reminder for 3 June",
+      "entity_name": "date"
+    },
+    "expected": [
+      {
+        "original_text": "3 june",
+        "type": "date",
+        "dd": 3,
+        "mm": 6,
+        "yy": 2020
+      }
+    ]
+  }
 ]

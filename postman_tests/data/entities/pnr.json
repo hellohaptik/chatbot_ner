@@ -1,35 +1,41 @@
 [
-    {
-        "input": {
-            "message": "check my pnr status for 2141215305.",
-            "entity_name": "pnr"
-        },
-        "expected": {
-            "original_text": "2141215305",
-            "value": "2141215305",
-            "language": "en"
-        }
+  {
+    "input": {
+      "message": "check my pnr status for 2141215305.",
+      "entity_name": "pnr"
     },
-    {
-        "input": {
-            "message": "check my pnr status for 3714578.",
-            "entity_name": "pnr"
-        },
-        "expected": {
-            "original_text": "3714578",
-            "value": "3714578",
-            "language": "en"
-        }
+    "expected": [
+      {
+        "original_text": "2141215305",
+        "value": "2141215305",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "check my pnr status for 3714578.",
+      "entity_name": "pnr"
     },
-    {
-        "input": {
-            "message": "check my pnr status for 11234456.",
-            "entity_name": "pnr"
-        },
-        "expected": {
-            "original_text": "11234456",
-            "value": "11234456",
-            "language": "en"
-        }
-    }
+    "expected": [
+      {
+        "original_text": "3714578",
+        "value": "3714578",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "check my pnr status for 11234456.",
+      "entity_name": "pnr"
+    },
+    "expected": [
+      {
+        "original_text": "11234456",
+        "value": "11234456",
+        "language": "en"
+      }
+    ]
+  }
 ]

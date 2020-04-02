@@ -1,38 +1,44 @@
 [
-    {
-        "input": {
-            "message": "my contact number is 08877665543",
-            "entity_name": "phone_number"
-        },
-        "expected": {
-            "original_text": "08877665543",
-            "country_calling_code": "91",
-            "value": "8877665543",
-            "language": "en"
-        }
+  {
+    "input": {
+      "message": "my contact number is 08877665543",
+      "entity_name": "phone_number"
     },
-    {
-        "input": {
-            "message": "My phone number would be 9930341387",
-            "entity_name": "phone_number"
-        },
-        "expected": {
-            "original_text": "9930341387",
-            "country_calling_code": "91",
-            "value": "9930341387",
-            "language": "en"
-        }
+    "expected": [
+      {
+        "original_text": "08877665543",
+        "country_calling_code": "91",
+        "value": "8877665543",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "My phone number would be 9930341387",
+      "entity_name": "phone_number"
     },
-    {
-        "input": {
-            "message": "You can call me on +919920231234",
-            "entity_name": "phone_number"
-        },
-        "expected": {
-            "original_text": "919920231234",
-            "country_calling_code": "91",
-            "value": "9920231234",
-            "language": "en"
-        }
-    }
+    "expected": [
+      {
+        "original_text": "9930341387",
+        "country_calling_code": "91",
+        "value": "9930341387",
+        "language": "en"
+      }
+    ]
+  },
+  {
+    "input": {
+      "message": "You can call me on +919920231234",
+      "entity_name": "phone_number"
+    },
+    "expected": [
+      {
+        "original_text": "919920231234",
+        "country_calling_code": "91",
+        "value": "9920231234",
+        "language": "en"
+      }
+    ]
+  }
 ]
