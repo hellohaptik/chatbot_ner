@@ -722,6 +722,9 @@ tests:
         hh: 0
         mm: 5
         nn: "df"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "in 5 mins"
   - id: en_56
     message: "check back in 5 hrs"
@@ -732,6 +735,9 @@ tests:
         hh: 5
         mm: 0
         nn: "df"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "in 5 hrs"
   - id: en_57
     message: "try 4 minutes later"
@@ -742,6 +748,9 @@ tests:
         hh: 0
         mm: 4
         nn: "df"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "4 minutes later"
   - id: en_58
     message: "try 10 hours later"
@@ -752,6 +761,9 @@ tests:
         hh: 10
         mm: 0
         nn: "df"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "10 hours later"
   - id: en_59
     message: "repeat every 16 minutes"
@@ -762,6 +774,9 @@ tests:
         hh: 0
         mm: 16
         nn: "ev"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "every 16 minutes"
   - id: en_60
     message: "repeat evry 21 hrs"
@@ -772,6 +787,9 @@ tests:
         hh: 21
         mm: 0
         nn: "ev"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "evry 21 hrs"
   - id: en_61
     message: "set it for once in 3 days"
@@ -782,6 +800,9 @@ tests:
         hh: 72
         mm: 0
         nn: "ev"
+        tz: "UTC"
+        range: null
+        time_type: null
         original_text: "once in 3 days"
 
   hi:
