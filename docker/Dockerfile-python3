@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y wget build-essential curl nginx supervi
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
     apt-get install nodejs && \
     npm install -g newman && \
-    npm install -g newman-reporter-html
+    npm install -g newman-reporter-htmlextra
 
 WORKDIR /app
 
