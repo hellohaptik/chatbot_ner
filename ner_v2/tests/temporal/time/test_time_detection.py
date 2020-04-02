@@ -66,6 +66,7 @@ class TimeDetectionTestMeta(type):
             time_dicts, spans = time_detector.detect_entity(text=message, range_enabled=range_enabled, **kwargs)
 
             for time_dict in time_dicts:
+                # TODO: This is not correct! actual output should not modified instead expected output should be
                 if "range" not in time_dict:
                     time_dict.update({"range": None})
                 if "time_type" not in time_dict:
