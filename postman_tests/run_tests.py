@@ -6,7 +6,7 @@ from lib import newman
 from lib import es
 
 
-postman_tests_directory = 'postman_tests/'
+postman_tests_directory = 'postman_tests'
 entities_data_path = 'data/entities/'
 newman_data_path = 'data/newman_data.json'
 collection_data_path = 'data/ner_collection.json'
