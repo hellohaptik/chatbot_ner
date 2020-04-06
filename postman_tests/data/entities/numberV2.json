@@ -15,19 +15,6 @@
     },
     {
         "input": {
-            "message": "i want to purchase soy milk",
-            "entity_name": "number",
-            "min_digits": 1,
-            "max_digits": 3
-        },
-        "expected": [
-            {
-                "data": null
-            }
-        ]
-    },
-    {
-        "input": {
             "message": "Can I buy cheese",
             "entity_name": "number",
             "min_digits": 1,
@@ -37,7 +24,7 @@
             {
                 "data": null
             }
-        ]    
+        ]
     },
     {
         "input": {
@@ -91,19 +78,6 @@
             {
                 "original_text": "1",
                 "value": "1"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "Please add 1.5 soy sauce,",
-            "entity_name": "number",
-            "min_digits": 1,
-            "max_digits": 3
-        },
-        "expected": [
-            {
-                "data": null
             }
         ]
     },
@@ -265,9 +239,9 @@
             "max_digits": 3
         },
         "expected": [
-           {
-               "data": null
-           }
+            {
+                "data": null
+            }
         ]
     },
     {
@@ -278,9 +252,9 @@
             "max_digits": 3
         },
         "expected": [
-           {
-               "data": null
-           }
+            {
+                "data": null
+            }
         ]
     },
     {
@@ -448,42 +422,29 @@
     },
     {
         "input": {
-            "message": "000123765 is not a valid pin code",
+            "message": "My order id is AWB6754321",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 12
+        },
+        "expected": [
+            {
+                "original_text": "6754321",
+                "value": "6754321"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Google gives you a salary of 28,00,000 per annum",
             "entity_name": "number",
             "min_digits": 1,
             "max_digits": 9
         },
         "expected": [
             {
-                "original_text": "000123765",
-                "value": "000123765"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "98765432126 is not a valid phone number",
-            "entity_name": "number",
-            "min_digits": 1,
-            "max_digits": 14
-        },
-        "expected": [
-            {
-                "original_text": "98765432126",
-                "value": "98765432126"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "98765432126 is not a valid pin code",
-            "entity_name": "number",
-            "min_digits": 1,
-            "max_digits": 3
-        },
-        "expected": [
-            {
-                "data": null
+                "original_text": "28,00,000",
+                "value": "2800000"
             }
         ]
     },

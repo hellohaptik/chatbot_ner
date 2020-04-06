@@ -198,23 +198,7 @@
             "message": "I live in Paschim Punropara", 
             "entity_name": "city_list"
         }
-    }, 
-    {
-        "expected": [
-            {
-                "original_text": "Sandi", 
-                "value": "Sandi"
-            },
-            {
-              "original_text": "Kanpur", 
-              "value": "Kanpur"
-            }
-        ], 
-        "input": {
-            "message": "show me directions from Kanpur to Sandi", 
-            "entity_name": "city_list"
-        }
-    }, 
+    },
     {
         "expected": [
             {
@@ -228,54 +212,6 @@
         ], 
         "input": {
             "message": "Fastest route of going from patiala to ludhiana", 
-            "entity_name": "city_list"
-        }
-    }, 
-    {
-        "expected": [
-            {
-                "original_text": "Udaipur", 
-                "value": "Udaipur"
-            },
-            {
-              "original_text": "Jaipur", 
-              "value": "Jaipur"
-            }
-        ], 
-        "input": {
-            "message": "Jaipur to Udaipur distance?", 
-            "entity_name": "city_list"
-        }
-    }, 
-    {
-        "expected": [
-            {
-                "original_text": "Karjat", 
-                "value": "Karjat"
-            }, 
-            {
-                "original_text": "Kasara", 
-                "value": "Kasara"
-            }
-        ], 
-        "input": {
-            "message": "How far is Karjat from Kasara", 
-            "entity_name": "city_list"
-        }
-    }, 
-    {
-        "expected": [
-            {
-                "original_text": "Palampur", 
-                "value": "Palampur"
-            }, 
-            {
-                "original_text": "Amalapuram", 
-                "value": "Amalapuram"
-            }
-        ], 
-        "input": {
-            "message": "How do I reach from Palampur to Amalapuram", 
             "entity_name": "city_list"
         }
     }
