@@ -18,7 +18,7 @@ def get_es_api_url(config_path):
     return f"http://{base_url}/entities/data/v1"
 
 
-def index_data(es_data_path, config_path):
+def sync(es_data_path, config_path, mode):
     """
     Index data for every entity being tested into ElasticSearch
 
@@ -30,34 +30,14 @@ def index_data(es_data_path, config_path):
     """
     for file_path in glob.glob(os.path.join(es_data_path, '*.csv')):
         entity_name = common.get_entity_name(file_path)
-        print(f"Indexing {entity_name}")
-        contents = convert_csv_to_json(file_path)
+        print(f"Syncing {entity_name}, mode: {mode}")
+        contents = convert_csv_to_dict(file_path, mode)
         url = get_es_api_url(config_path)
-        req = requests.post(f"{url}/{entity_name}", data=contents)
+        req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
         print(req.text)
 
 
-def clear_data(es_data_path, config_path):
-    """
-    Clear the data for every entity that was indexed for testing from ElasticSearch
-
-    Parameters:
-    es_data_path (string): Path to the data/elastic_search directory.
-
-    Returns:
-    None
-    """
-    for file_path in glob.glob(os.path.join(es_data_path, '*.csv')):
-        entity_name = common.get_entity_name(file_path)
-        print(f"Clearing ES data for {entity_name}")
-        contents = convert_csv_to_json(file_path)
-        contents = contents.replace("\"edited\":", "\"deleted\":")
-        url = get_es_api_url(config_path)
-        req = requests.post(f"{url}/{entity_name}", data=contents)
-        print(req.text)
-
-
-def convert_csv_to_json(file_path):
+def convert_csv_to_dict(file_path, mode):
     """
     Read the csv file at file_path and convert its data to json
 
@@ -67,7 +47,13 @@ def convert_csv_to_json(file_path):
     Returns:
     string: The JSON representation of the csv data in the file
     """
-    data = {'replace': True, 'edited': []}
+    if mode == 'create':
+        data = {'replace': True, 'edited': []}
+        key = 'edited'
+    elif mode == 'delete':
+        data = {'replace': True, 'deleted': []}
+        key = 'deleted'
+
     with open(file_path, 'r') as file:
         csv_data = csv.DictReader(file)
         for row in csv_data:
@@ -78,8 +64,8 @@ def convert_csv_to_json(file_path):
                     'value': get_variants(row['variants'])
                 }
             }
-            data['edited'].append(record)
-    return json.dumps(data)
+            data[key].append(record)
+    return data
 
 
 def get_variants(str):

@@ -38,13 +38,13 @@ if(os.path.basename(os.getcwd()) != postman_tests_directory):
 
 if newman.check_if_data_valid(entities_data_path):
     try:
-        es.index_data(es_data_path, config_path)
+        es.sync(es_data_path, config_path, 'create')
         newman_data = newman.generate_newman_data(entities_data_path)
         with open(newman_data_path, 'w') as fp:
-            json.dump(newman_data, fp, indent=4)
+            json.dump(newman_data, fp)
         newman_command = get_newman_command()
         subprocess.Popen(newman_command, shell=True).wait()
-        es.clear_data(es_data_path, config_path)
+        es.sync(es_data_path, config_path, 'delete')
     except Exception as e:
         traceback.print_exc(file=sys.stdout)
         print(str(e))
