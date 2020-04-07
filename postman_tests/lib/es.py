@@ -69,14 +69,13 @@ def convert_csv_to_json(file_path):
     """
     data = {'replace': True, 'edited': []}
     with open(file_path, 'r') as file:
-        csv_data = csv.reader(file)
-        next(file)  # Omit header row
+        csv_data = csv.DictReader(file)
         for row in csv_data:
-            record = {'word': row[0]}
+            record = {'word': row['value']}
             record['variants'] = {
                 'en': {
                     '_id': None,
-                    'value': get_variants(row[1])
+                    'value': get_variants(row['variants'])
                 }
             }
             data['edited'].append(record)
