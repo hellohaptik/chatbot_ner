@@ -94,4 +94,4 @@ def get_variants(str):
     list: List of strings where each string is a variant name.
     """
     arr = str.split('|')
-    return [item.strip() for item in arr if item]
+    return [item.strip() for item in arr if item.strip()]
