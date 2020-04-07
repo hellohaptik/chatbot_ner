@@ -1,0 +1,360 @@
+[
+    {
+        "input": {
+            "message": "Where is Coffee On Canvas",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "coffee on canvas",
+                "value": "Coffee On Canvas"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Find me fine dining restaurants near Novotel",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "novotel",
+                "value": "Novotel"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Fastest route of going to the farm",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "the farm",
+                "value": "The Farm"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "i would like to go to Shudh Vegetarian Food Court someday",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "shudh vegetarian food court",
+                "value": "Shudh Vegetarian Food Court"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to go to SP's Biryani",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "sp's biryani",
+                "value": "SP's Biryani"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I work in The Rasoi",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "the rasoi",
+                "value": "The Rasoi"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Where is Gokul Chaat located ?",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "gokul chaat",
+                "value": "Gokul Chaat"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I wish to go to Tatva - Country Inn & Suites by Carlson one day",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "tatva - country inn & suites by carlson",
+                "value": "Tatva - Country Inn & Suites by Carlson"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "How far is Deja Vu from Eatmosphere",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "deja vu, eatmosphere",
+                "value": "Deja Vu, Eatmosphere"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "What are some must visit places in and around By The Way",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "by the way",
+                "value": "By the way"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Search for Cafes with free WiFi between Andheri & Bandra",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+               "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I have been to The Fisherman's Deck",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "the fisherman's deck",
+                "value": "The Fisherman's Deck"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can I get best momos in N Asian",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "n asian",
+                "value": "N Asian"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Find me fine dining restaurants in and around L'amandier",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "l'amandier",
+                "value": "L'amandier"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "where is the nearest gas station",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "My favorite restaurant is High",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "high",
+                "value": "High"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "is there an age limit in Kebab-e-Que",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "kebab-e-que",
+                "value": "Kebab-e-Que"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Lets go to K.F.C.",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "kfc",
+                "value": "kfc"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Why not go to Gossip",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "gossip",
+                "value": "Gossip"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Zafrani is famous for biryani",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "zafrani",
+                "value": "Zafrani"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "BottleRock serves alcohol ?",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "bottlerock",
+                "value": "BottleRock"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "blueFROG, has an amazing ambience",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "bluefrog",
+                "value": "blueFROG"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Shangri-La is famous for spanish food",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "shangri-la",
+                "value": "Shangri-La"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Sattvik serves best meal in Goregaon",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "sattvik",
+                "value": "Sattvik"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Hippie@Heart is only for adults",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "hippie@heart",
+                "value": "Hippie@Heart"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "PizzaTito is the only place that delivers pizzas",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "pizzavito",
+                "value": "PizzaVito"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "show me directions from 18 James Long to Rassaa - Jasa Hava Tassaa",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "18 james long",
+                "value": "18 James Long"
+            },
+            {
+                "original_text": "rassaa - jasa hava tassaa",
+                "value": "Rassa - Jasa Hava Tassaa"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Kadambam Iyengar Cuisine to The Post Office Cafe distance?",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "kadambam iyengar cuisine",
+                "value": "Kadambam Iyengar Cuisine"
+            },
+            {
+                "original_text": "the post office cafe",
+                "value": "The Post Office Cafe"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "How do I reach from Metro to DEPOT29",
+            "entity_name": "restaurant_list"
+        },
+        "expected": [
+            {
+                "original_text": "metro",
+                "value": "Metro"
+            },
+            {
+                "original_text": "depot29",
+                "value": "DEPOT29"
+            }
+        ]
+    }
+]
