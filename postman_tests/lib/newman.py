@@ -74,8 +74,7 @@ def generate_newman_data(entities_data_path):
     """
     data = []
     entities_data = read_entities_data(entities_data_path)
-    for k in entities_data:
-        data.append(entities_data[k])
+    data = list(entities_data.values())
     newman_data = []
     while True:
         found = False
