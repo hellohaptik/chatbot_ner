@@ -8,12 +8,12 @@ import sys
 import traceback
 
 
-postman_tests_directory = 'postman_tests'
-entities_data_path = 'data/entities/'
-newman_data_path = 'data/newman_data.json'
-collection_data_path = 'data/ner_collection.json'
-es_data_path = 'data/elastic_search/'
-config_path = 'config'
+postman_tests_directory = os.path.dirname(os.path.abspath(__file__))
+entities_data_path = os.path.join(postman_tests_directory, 'data', 'entities')
+newman_data_path = os.path.join(postman_tests_directory, 'data', 'newman_data.json')
+collection_data_path = os.path.join(postman_tests_directory, 'data', 'ner_collection.json')
+es_data_path = os.path.join(postman_tests_directory, 'data', 'elastic_search')
+config_path = os.path.join(postman_tests_directory, 'config')
 
 
 def get_newman_command():
@@ -29,11 +29,6 @@ def get_newman_command():
             f'newman run {collection_data_path} -d {newman_data_path}'
             f' -e {environment_file_path}'
         )
-
-
-# Switch to postman_tests if not already in that directory
-if(os.path.basename(os.getcwd()) != postman_tests_directory):
-    os.chdir(postman_tests_directory)
 
 
 if newman.check_if_data_valid(entities_data_path):
