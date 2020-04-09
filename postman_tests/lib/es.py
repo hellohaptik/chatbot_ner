@@ -33,8 +33,11 @@ def sync(es_data_path, config_path, mode):
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)
         url = get_es_api_url(config_path)
-        req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
-        print(req.text)
+        try:
+            req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
+            req.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            raise e
 
 
 def convert_csv_to_dict(file_path, mode):

@@ -30,7 +30,7 @@ def check_if_data_valid(entities_data_path):
     except Exception as e:
         print('Invalid json data in ' + path
               + '\n' + str(e))
-        return False
+        raise e
 
 
 def read_entities_data(entities_data_path):

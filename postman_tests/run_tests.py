@@ -4,8 +4,7 @@ import os
 import json
 from lib import newman
 from lib import es
-import sys
-import traceback
+
 
 
 postman_tests_directory = os.path.dirname(os.path.abspath(__file__))
@@ -31,15 +30,16 @@ def get_newman_command():
         )
 
 
-if newman.check_if_data_valid(entities_data_path):
-    try:
-        es.sync(es_data_path, config_path, 'create')
-        newman_data = newman.generate_newman_data(entities_data_path)
-        with open(newman_data_path, 'w') as fp:
-            json.dump(newman_data, fp)
-        newman_command = get_newman_command()
-        subprocess.Popen(newman_command, shell=True).wait()
-        es.sync(es_data_path, config_path, 'delete')
-    except Exception as e:
-        traceback.print_exc(file=sys.stdout)
-        print(str(e))
+try:
+    newman.check_if_data_valid(entities_data_path)
+    es.sync(es_data_path, config_path, 'create')
+    newman_data = newman.generate_newman_data(entities_data_path)
+    with open(newman_data_path, 'w') as fp:
+        json.dump(newman_data, fp)
+    newman_command = get_newman_command()
+    subprocess.Popen(newman_command, shell=True).wait()
+    os.remove(newman_data_path)
+except Exception as e:
+    raise e
+finally:
+    es.sync(es_data_path, config_path, 'delete')
