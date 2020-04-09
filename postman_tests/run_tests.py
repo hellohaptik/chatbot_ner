@@ -3,7 +3,7 @@ import subprocess
 import os
 import json
 from lib import newman
-from lib import es
+from lib import datastore
 
 
 
@@ -32,7 +32,7 @@ def get_newman_command():
 
 try:
     newman.check_if_data_valid(entities_data_path)
-    es.sync(es_data_path, config_path, 'create')
+    datastore.sync(es_data_path, config_path, 'create')
     newman_data = newman.generate_newman_data(entities_data_path)
     with open(newman_data_path, 'w') as fp:
         json.dump(newman_data, fp)
@@ -42,4 +42,4 @@ try:
 except Exception as e:
     raise e
 finally:
-    es.sync(es_data_path, config_path, 'delete')
+    datastore.sync(es_data_path, config_path, 'delete')
