@@ -62,7 +62,7 @@ disable=invalid-name,
         import-error,
         too-few-public-methods
 
-enable=
+enable=unused-import
 
 
 [REPORTS]
