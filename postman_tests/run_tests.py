@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import subprocess
+from subprocess import Popen,PIPE
 import os
 import json
 from lib import newman
@@ -36,9 +36,11 @@ try:
     with open(newman_data_path, 'w') as fp:
         json.dump(newman_data, fp)
     newman_command = get_newman_command()
-    subprocess.Popen(newman_command, shell=True).wait()
-    os.remove(newman_data_path)
+    process = Popen(newman_command, shell=True)
+    (out, err) = process.communicate()
+    print(process.returncode)
 except Exception as e:
     raise e
 finally:
+    os.remove(newman_data_path)
     datastore.sync(es_data_path, config_path, 'delete')
