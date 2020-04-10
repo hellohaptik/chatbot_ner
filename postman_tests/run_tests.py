@@ -45,7 +45,7 @@ def run_tests():
         None
 
     Returns:
-        (str): The return code of the newman command
+        (int): The return code of the newman command
     """
     entities_data_path = os.path.join(postman_tests_directory, 'data', 'entities')
     es_data_path = os.path.join(postman_tests_directory, 'data', 'elastic_search')
