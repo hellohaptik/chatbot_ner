@@ -11,7 +11,7 @@ A shortcut for running the above is available. Just run ```./run_postman_tests.s
 
 **Viewing the test results in dev**
 
-Running the above command in dev will create a ```newman/``` directory in the ```postman_tests/``` folder. The newman command will generate a new timestamped html file everytime the tests are run. This html file contains a graphical dashboard which can be used to see the status of running the tests, failures etc, and yes you can use dark mode as well ;-).
+Running the above command in dev will create a ```newman_reports/``` directory in the ```postman_tests/``` folder. The newman command will generate a new timestamped html file in that directory everytime the tests are run. This html file contains a graphical dashboard which can be used to see the status of running the tests, failures etc, and yes you can use dark mode as well ;-).
 
 ![newman dashboard](newman.png)
 
@@ -24,20 +24,39 @@ The format should follow the below structure:
 ```
 [
     "input": {
-
+        "message": "The text sent in url",
+        "entity_name": "Name of the entity e.g. time"
     },
 
     "expected": [
         {
-
+            <Put your expected key and values here>
         }
     ]
 ]
 ```
 
-input contains the parameters that we pass as query parameters in the GET rquest.
+input contains the parameters that we pass as query parameters in the GET rquest. It must **mandatorily** contain two keys,
+message and entity_name.
 
-expected is an array of objects that we get in the response.
+expected is an array of objects that we get in the response. If expected contains multiple objects then the order of those should be exactly as the expected order in the response.
+
+If you want to create a test case where the output of a request is expected to be null, then specify the test case as follows:
+
+```
+[
+    "input": {
+        "message": "The text sent in url",
+        "entity_name": "Name of the entity e.g. time"
+    },
+
+    "expected": [
+        {
+            "data": null
+        }
+    ]
+]
+```
 
 Add tests for the new entity using steps given below in this document and send a PR containing the new collection and data.
 
@@ -66,4 +85,13 @@ Use the below steps:
 
 **Adding data to be indexed into ElasticSearch**
 
-Add the csv file for the particular entity in postman_tests/data/elastic_search/ and send a PR.
+1. Add the csv file for the particular entity in postman_tests/data/elastic_search/.
+
+2. Make sure all the required data being used in the tests is present in the csv file and all tests are passing.
+
+3. Send a PR.
+
+
+**Future Roadmap**
+
+1. Some test cases are failing for various entities and we are maintaining a list of the same. These will need to be integrated into the test-suite once fixed.
