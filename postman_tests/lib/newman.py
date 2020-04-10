@@ -2,19 +2,24 @@ from __future__ import absolute_import
 import json
 import os
 import glob
+import itertools
 from . import common
 
 
 def check_if_data_valid(entities_data_path):
+    # type: (str) ->  boolean
     """
     Doing basic sanity checking here.
     Check that every test case is valid json and has the keys: input and expected
 
-    Parameters:
-    entities_data_path (string): Path to the data/entities directory
+    Args:
+        entities_data_path (str): Path to the data/entities directory
 
     Returns:
-    boolean: Returns True if all files contain valid json.
+        (boolean): Returns True if all files contain valid json.
+
+    Raises:
+        Exception if data is invalid
     """
     try:
         path = ''
@@ -34,15 +39,15 @@ def check_if_data_valid(entities_data_path):
 
 
 def read_entities_data(entities_data_path):
-    """
-    Read all the files in data/entities and generate a single dictionary containing
+    # type: (str) -> Dict
+    """Read all the files in data/entities and generate a single dictionary containing
     data for every entity.
 
-    Parameters:
-    entities_data_path (string): Path to the data/entities directory.
+    Args:
+        entities_data_path (string): Path to the data/entities directory.
 
     Returns:
-    dictionary: Dict containing data read from the data files for every entity.
+        dictionary (dict): Dict containing data read from the data files for every entity.
     """
     entities_data = {}
     for file_path in glob.glob(os.path.join(entities_data_path, '*.json')):
@@ -53,8 +58,8 @@ def read_entities_data(entities_data_path):
             modified_data = []
             for d in data:
                 d1 = {}
-                for k, v in d['input'].items():
-                    d1[entity + '_' + k] = d['input'][k]
+                for key, _ in d['input'].items():
+                    d1[entity + '_' + key] = d['input'][key]
                 d1[entity + '_expected'] = d['expected']
                 modified_data.append(d1)
             entities_data[entity] = modified_data
@@ -62,32 +67,23 @@ def read_entities_data(entities_data_path):
 
 
 def generate_newman_data(entities_data_path):
-    """
-    Generate data in a format that can be passed to the command-line tool
+    # type: (str) -> List[Dict[str, any]]
+    """Generate data in a format that can be passed to the command-line tool
     newman for runing the tests.
 
-    Parameters:
-    entities_data_path (string): Path to the data/entities directory.
+    Args:
+        entities_data_path (string): Path to the data/entities directory.
 
     Returns:
-    list: List of dictionaries where each dictionary is data for a single test iteration.
+        newman_data (list): List of dictionaries where each dictionary is data for a single test iteration.
     """
     data = []
     entities_data = read_entities_data(entities_data_path)
     data = list(entities_data.values())
     newman_data = []
-    while True:
-        found = False
-        iteration_data = []
-        for item in data:
-            if item:
-                iteration_data.append(item.pop(0))
-                found = True
-        if not found:
-            break
-        else:
-            temp = {}
-            for item in iteration_data:
-                temp.update(item)
-            newman_data.append(temp)
+    for iteration_data in itertools.zip_longest(*data, fillvalue={}):
+        temp = {}
+        for item in iteration_data:
+            temp.update(item)
+        newman_data.append(temp)
     return newman_data
