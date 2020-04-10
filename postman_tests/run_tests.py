@@ -22,11 +22,13 @@ def get_newman_command():
         (str): The shell command to be used for running the tests
     """
     collection_data_path = os.path.join(postman_tests_directory, 'data', 'ner_collection.json')
+    report_path = os.path.join(postman_tests_directory, 'newman_reports')
     if os.path.exists(f"{config_path}/dev.json"):
         environment_file_path = f'{config_path}/dev.json'
         return (
             f'newman run {collection_data_path} -d {newman_data_path}'
             f' -e {environment_file_path} -r cli,htmlextra --reporter-htmlextra-logs'
+            f' --reporter-htmlextra-export {report_path}'
         )
     else:
         environment_file_path = f'{config_path}/prod.json'
