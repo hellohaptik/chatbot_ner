@@ -2,7 +2,7 @@
     {
         "input": {
             "message": "Where is Coffee On Canvas",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -14,7 +14,7 @@
     {
         "input": {
             "message": "Find me fine dining restaurants near Novotel",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -26,7 +26,7 @@
     {
         "input": {
             "message": "Fastest route of going to the farm",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -38,7 +38,7 @@
     {
         "input": {
             "message": "i would like to go to Shudh Vegetarian Food Court someday",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -50,7 +50,7 @@
     {
         "input": {
             "message": "I want to go to SP's Biryani",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -62,7 +62,7 @@
     {
         "input": {
             "message": "I work in The Rasoi",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -74,7 +74,7 @@
     {
         "input": {
             "message": "Where is Gokul Chaat located ?",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -85,32 +85,8 @@
     },
     {
         "input": {
-            "message": "I wish to go to Tatva - Country Inn & Suites by Carlson one day",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "tatva - country inn & suites by carlson",
-                "value": "Tatva - Country Inn & Suites by Carlson"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "How far is Deja Vu from Eatmosphere",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "deja vu, eatmosphere",
-                "value": "Deja Vu, Eatmosphere"
-            }
-        ]
-    },
-    {
-        "input": {
             "message": "What are some must visit places in and around By The Way",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -122,7 +98,7 @@
     {
         "input": {
             "message": "Search for Cafes with free WiFi between Andheri & Bandra",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -133,7 +109,7 @@
     {
         "input": {
             "message": "I have been to The Fisherman's Deck",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -145,7 +121,7 @@
     {
         "input": {
             "message": "Can I get best momos in N Asian",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -157,7 +133,7 @@
     {
         "input": {
             "message": "Find me fine dining restaurants in and around L'amandier",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -169,7 +145,7 @@
     {
         "input": {
             "message": "where is the nearest gas station",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -180,7 +156,7 @@
     {
         "input": {
             "message": "My favorite restaurant is High",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -192,7 +168,7 @@
     {
         "input": {
             "message": "is there an age limit in Kebab-e-Que",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -203,20 +179,8 @@
     },
     {
         "input": {
-            "message": "Lets go to K.F.C.",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "kfc",
-                "value": "kfc"
-            }
-        ]
-    },
-    {
-        "input": {
             "message": "Why not go to Gossip",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -228,7 +192,7 @@
     {
         "input": {
             "message": "Zafrani is famous for biryani",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -240,7 +204,7 @@
     {
         "input": {
             "message": "BottleRock serves alcohol ?",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -251,20 +215,8 @@
     },
     {
         "input": {
-            "message": "blueFROG, has an amazing ambience",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "bluefrog",
-                "value": "blueFROG"
-            }
-        ]
-    },
-    {
-        "input": {
             "message": "Shangri-La is famous for spanish food",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -276,7 +228,7 @@
     {
         "input": {
             "message": "Sattvik serves best meal in Goregaon",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -288,7 +240,7 @@
     {
         "input": {
             "message": "Hippie@Heart is only for adults",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
             {
@@ -299,61 +251,17 @@
     },
     {
         "input": {
-            "message": "PizzaTito is the only place that delivers pizzas",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "pizzavito",
-                "value": "PizzaVito"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "show me directions from 18 James Long to Rassaa - Jasa Hava Tassaa",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "18 james long",
-                "value": "18 James Long"
-            },
-            {
-                "original_text": "rassaa - jasa hava tassaa",
-                "value": "Rassa - Jasa Hava Tassaa"
-            }
-        ]
-    },
-    {
-        "input": {
             "message": "Kadambam Iyengar Cuisine to The Post Office Cafe distance?",
-            "entity_name": "restaurant_list"
+            "entity_name": "restaurant"
         },
         "expected": [
-            {
-                "original_text": "kadambam iyengar cuisine",
-                "value": "Kadambam Iyengar Cuisine"
-            },
             {
                 "original_text": "the post office cafe",
                 "value": "The Post Office Cafe"
-            }
-        ]
-    },
-    {
-        "input": {
-            "message": "How do I reach from Metro to DEPOT29",
-            "entity_name": "restaurant_list"
-        },
-        "expected": [
-            {
-                "original_text": "metro",
-                "value": "Metro"
             },
             {
-                "original_text": "depot29",
-                "value": "DEPOT29"
+                "original_text": "kadambam iyengar cuisine",
+                "value": "Kadambam Iyengar Cuisine"
             }
         ]
     }
