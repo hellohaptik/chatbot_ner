@@ -6,7 +6,6 @@ from lib import newman
 from lib import datastore
 
 
-
 postman_tests_directory = os.path.dirname(os.path.abspath(__file__))
 entities_data_path = os.path.join(postman_tests_directory, 'data', 'entities')
 newman_data_path = os.path.join(postman_tests_directory, 'data', 'newman_data.json')

@@ -7,7 +7,7 @@ import requests
 from . import common
 
 
-def get_es_api_url(config_path):
+def get_api_url(config_path):
     if os.path.exists(f"{config_path}/dev.json"):
         config_file_path = f"{config_path}/dev.json"
     else:
@@ -32,7 +32,7 @@ def sync(es_data_path, config_path, mode):
         entity_name = common.get_entity_name(file_path)
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)
-        url = get_es_api_url(config_path)
+        url = get_api_url(config_path)
         try:
             req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
