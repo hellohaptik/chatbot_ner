@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 from __future__ import absolute_import
 import os
 import sys
+import structlog
+from chatbot_ner.setup_logs import configure_structlog_and_django_structlog, FOREIGN_PRE_CHAIN_PROCESSORS
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -52,7 +54,58 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_structlog.middlewares.RequestMiddleware',
 ]
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+            "foreign_pre_chain": FOREIGN_PRE_CHAIN_PROCESSORS,
+        },
+        "plain_console": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.dev.ConsoleRenderer(),
+
+        },
+        "key_value": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.KeyValueRenderer(key_order=['timestamp', 'level', 'event', 'logger']),
+            "foreign_pre_chain": FOREIGN_PRE_CHAIN_PROCESSORS,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "plain_console",
+        },
+        "json_file": {
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": "logs/json.log",
+            "formatter": "json_formatter",
+        },
+        "flat_line_file": {
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": "logs/flat_line.log",
+            "formatter": "key_value",
+        },
+    },
+    "loggers": {
+        "django_structlog": {
+            "handlers": ["console", "flat_line_file", "json_file"],
+            "level": "INFO",
+        },
+        "django_structlog_demo_project": {
+            "handlers": ["console", "flat_line_file", "json_file"],
+            "level": "INFO",
+        },
+    }
+}
+
+configure_structlog_and_django_structlog()
 
 ROOT_URLCONF = 'chatbot_ner.urls'
 
