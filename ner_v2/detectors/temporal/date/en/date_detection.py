@@ -320,8 +320,8 @@ class DateDetector(object):
                 if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                         < self.now_date:
                     yy += 1
-            except:
-                return date_list, original_list
+            except Exception:
+                continue
 
             date = {
                 'dd': int(dd),
@@ -377,8 +377,8 @@ class DateDetector(object):
                 if not pattern[3] and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                         < self.now_date:
                     yy += 1
-            except:
-                return date_list, original_list
+            except Exception:
+                continue
 
             date = {
                 'dd': int(dd),
@@ -698,8 +698,9 @@ class DateDetector(object):
                     if not yy1 and not yy2 and self.timezone.localize(datetime.datetime(year=yy, month=mm, day=dd)) \
                             < self.now_date:
                         yy += 1
-                except:
-                    return date_list, original_list
+                except Exception:
+                    continue
+
                 date = {
                     'dd': int(dd),
                     'mm': int(mm),
@@ -747,17 +748,16 @@ class DateDetector(object):
             dd = pattern[2]
             probable_mm = pattern[1]
             mm = self.__get_month_index(probable_mm)
-            if dd:
+            if dd and mm:
                 dd = int(dd)
-            if mm:
                 mm = int(mm)
-            if self.now_date.month > mm:
-                yy = self.now_date.year + 1
-            elif self.now_date.day > dd and self.now_date.month == mm:
-                yy = self.now_date.year + 1
-            else:
-                yy = self.now_date.year
-            if mm:
+                if self.now_date.month > mm:
+                    yy = self.now_date.year + 1
+                elif self.now_date.day > dd and self.now_date.month == mm:
+                    yy = self.now_date.year + 1
+                else:
+                    yy = self.now_date.year
+
                 date_dict = {
                     'dd': int(dd),
                     'mm': int(mm),
@@ -804,17 +804,15 @@ class DateDetector(object):
             dd = pattern[1]
             probable_mm = pattern[2]
             mm = self.__get_month_index(probable_mm)
-            if dd:
+            if dd and mm:
                 dd = int(dd)
-            if mm:
                 mm = int(mm)
-            if self.now_date.month > mm:
-                yy = self.now_date.year + 1
-            elif self.now_date.day > dd and self.now_date.month == mm:
-                yy = self.now_date.year + 1
-            else:
-                yy = self.now_date.year
-            if mm:
+                if self.now_date.month > mm:
+                    yy = self.now_date.year + 1
+                elif self.now_date.day > dd and self.now_date.month == mm:
+                    yy = self.now_date.year + 1
+                else:
+                    yy = self.now_date.year
                 date_dict = {
                     'dd': int(dd),
                     'mm': int(mm),
