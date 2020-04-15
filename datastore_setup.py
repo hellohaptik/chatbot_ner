@@ -1,8 +1,12 @@
+import os
+
 from chatbot_ner.config import ES_INDEX_NAME, ES_ALIAS
 from datastore import DataStore
 from datastore.constants import DEFAULT_ENTITY_DATA_DIRECTORY
 from datastore.elastic_search.connect import get_es_url
 from datastore.elastic_search.transfer import ESTransfer
+
+BASE_DIR = os.path.dirname(__file__)
 
 
 # Below needs to be committed if you want to use existing data in the Elasticsearch Setup

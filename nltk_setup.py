@@ -1,10 +1,10 @@
 from __future__ import absolute_import
 
-import os
+
 
 import nltk
 
-BASE_DIR = os.path.dirname(__file__)
+
 
 NLTK_RESOURCES = ['punkt', 'wordnet', 'maxent_treebank_pos_tagger', 'averaged_perceptron_tagger']
 
