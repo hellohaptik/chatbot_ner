@@ -80,7 +80,7 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if
                 'analysis': {
                     'analyzer': {
                         'my_analyzer': {
-                            'tokenizer': 'whitespace',
+                            'tokenizer': 'standard',
                             'filter': ['standard', 'lowercase', 'my_stemmer']
                         }
                     },
