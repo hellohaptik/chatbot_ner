@@ -120,7 +120,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
             ]
             for (required, index_name_key, doc_type_key, alias_name, doc_type_checker, create_fn) in create_map:
                 index_name = self._connection_settings.get(index_name_key)
-                doc_type = self._client_or_connection.get(doc_type_key)
+                doc_type = self._connection_settings.get(doc_type_key)
                 if not index_name:
                     if required:
                         raise DataStoreSettingsImproperlyConfiguredException(
