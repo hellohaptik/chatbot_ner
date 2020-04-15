@@ -27,7 +27,7 @@ def delete_index(connection, index_name, logger, **kwargs):
         logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
 
 
-def _create_index(connection, index_name, doc_type, logger, mapping_body, **kwargs):
+def _create_index(connection, index_name, doc_type, logger, mapping_body, ignore_if_exists=False, **kwargs):
     """
     Creates an Elasticsearch index needed for similarity based searching
     Args:
@@ -51,6 +51,12 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, **kwar
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
     """
+    if exists(connection=connection, index_name=index_name):
+        if ignore_if_exists:
+            return
+        else:
+            raise Exception('Failed to create index {}. it already exists. Please check and delete it using '
+                            'Datastore().delete()')
     try:
         body = {
             'index': {

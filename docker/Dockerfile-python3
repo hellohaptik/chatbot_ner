@@ -11,7 +11,7 @@ RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
 
 WORKDIR /app
 
-COPY docker/install.sh initial_setup.py /app/
+COPY docker/install.sh nltk_setup.py datastore_setup.py /app/
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # cython is installed because pandas build fails otherwise
