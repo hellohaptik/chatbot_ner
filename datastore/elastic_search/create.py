@@ -3,7 +3,21 @@ from .utils import filter_kwargs
 log_prefix = 'datastore.elastic_search.create'
 
 
-def delete_index(connection, index_name, logger, **kwargs):
+def exists(connection, index_name):
+    """
+    Checks if index_name exists
+
+    Args:
+        connection: Elasticsearch client object
+        index_name: The name of the index
+
+    Returns:
+        boolean, True if index exists , False otherwise
+    """
+    return connection.indices.exists(index_name)
+
+
+def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **kwargs):
     """
     Deletes the index named index_name
 
@@ -20,14 +34,17 @@ def delete_index(connection, index_name, logger, **kwargs):
 
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
     """
-    try:
-        connection.indices.delete(index=index_name, **kwargs)
-        logger.debug('%s: Delete Index: Operation successfully completed' % log_prefix)
-    except Exception as e:
-        logger.exception('%s: Exception in deleting index %s ' % (log_prefix, e))
+    if not exists(connection, index_name):
+        if err_if_does_not_exist:
+            raise Exception('Failed to delete index {}. It does not exist!'.format(index_name))
+        else:
+            return
+
+    connection.indices.delete(index=index_name, **kwargs)
+    logger.debug('%s: Delete Index %s: Operation successfully completed', log_prefix, index_name)
 
 
-def _create_index(connection, index_name, doc_type, logger, mapping_body, ignore_if_exists=False, **kwargs):
+def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if_exists=True, **kwargs):
     """
     Creates an Elasticsearch index needed for similarity based searching
     Args:
@@ -52,11 +69,11 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, ignore
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
     """
     if exists(connection=connection, index_name=index_name):
-        if ignore_if_exists:
-            return
-        else:
+        if err_if_exists:
             raise Exception('Failed to create index {}. it already exists. Please check and delete it using '
-                            'Datastore().delete()')
+                            'Datastore().delete()'.format(index_name))
+        else:
+            return
     try:
         body = {
             'index': {
@@ -93,24 +110,11 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, ignore
                                            **put_mapping_kwargs)
         else:
             logger.debug('%s: doc_type not in arguments, skipping put_mapping on index ...' % log_prefix)
-        logger.debug('%s: Create Index: Operation successfully completed' % log_prefix)
+        logger.debug('%s: Create Index %s: Operation successfully completed', log_prefix, index_name)
     except Exception as e:
-        logger.exception('%s:Exception: while creating index, Rolling back \n %s' % (log_prefix, e))
+        logger.exception('%s: Exception while creating index %s, Rolling back \n %s', log_prefix, index_name, e)
         delete_index(connection=connection, index_name=index_name, logger=logger)
-
-
-def exists(connection, index_name):
-    """
-    Checks if index_name exists
-
-    Args:
-        connection: Elasticsearch client object
-        index_name: The name of the index
-
-    Returns:
-        boolean, True if index exists , False otherwise
-    """
-    return connection.indices.exists(index_name)
+        raise e
 
 
 def create_entity_index(connection, index_name, doc_type, logger, **kwargs):

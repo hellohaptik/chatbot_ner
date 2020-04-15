@@ -75,7 +75,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
         if self._client_or_connection is None:
             raise EngineConnectionException(engine=self._engine)
 
-    def create(self, ignore_if_exists=False, **kwargs):
+    def create(self, err_if_exists=True, **kwargs):
         """
         Creates the schema/structure for the datastore depending on the engine configured in the environment.
 
@@ -110,36 +110,36 @@ class DataStore(six.with_metaclass(Singleton, object)):
         if self._engine == ELASTICSEARCH:
             es_url = elastic_search.connect.get_es_url()
             es_object = ESTransfer(source=es_url, destination=None)
-            self._check_doc_type_for_elasticsearch()
-            elastic_search.create.create_entity_index(connection=self._client_or_connection,
-                                                      index_name=self._connection_settings[ELASTICSEARCH_INDEX_1],
-                                                      doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                                                      logger=ner_logger,
-                                                      ignore_if_exists=ignore_if_exists,
-                                                      **kwargs)
-            es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
-                                              index_name=self._connection_settings[ELASTICSEARCH_INDEX_1])
+            create_map = [  # TODO: use namedtuples
+                (True, ELASTICSEARCH_INDEX_1, ELASTICSEARCH_DOC_TYPE, self._store_name,
+                 self._check_doc_type_for_elasticsearch, elastic_search.create.create_entity_index),
+                (False, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_DOC_TYPE, self._store_name,
+                 self._check_doc_type_for_elasticsearch, elastic_search.create.create_entity_index),
+                (False, ELASTICSEARCH_CRF_DATA_INDEX_NAME, ELASTICSEARCH_CRF_DATA_DOC_TYPE, None,
+                 self._check_doc_type_for_crf_data_elasticsearch, elastic_search.create.create_crf_index),
+            ]
+            for (required, index_name_key, doc_type_key, alias_name, doc_type_checker, create_fn) in create_map:
+                index_name = self._connection_settings.get(index_name_key)
+                doc_type = self._client_or_connection.get(doc_type_key)
+                if not index_name:
+                    if required:
+                        raise DataStoreSettingsImproperlyConfiguredException(
+                            '{} key is required in datastore settings for elastic_search')
+                    else:
+                        continue
 
-            if self._connection_settings.get(ELASTICSEARCH_INDEX_2):
-                elastic_search.create.create_entity_index(connection=self._client_or_connection,
-                                                          index_name=self._connection_settings[ELASTICSEARCH_INDEX_2],
-                                                          doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
-                                                          logger=ner_logger,
-                                                          ignore_if_exists=ignore_if_exists,
-                                                          **kwargs)
-                es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
-                                                  index_name=self._connection_settings[ELASTICSEARCH_INDEX_2])
-
-            if self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME):
-                self._check_doc_type_for_crf_data_elasticsearch()
-                elastic_search.create.create_crf_index(
+                doc_type_checker()
+                create_fn(
                     connection=self._client_or_connection,
-                    index_name=self._connection_settings.get[ELASTICSEARCH_CRF_DATA_INDEX_NAME],
-                    doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
+                    index_name=index_name,
+                    doc_type=doc_type,
                     logger=ner_logger,
-                    ignore_if_exists=ignore_if_exists,
+                    err_if_exists=err_if_exists,
                     **kwargs
                 )
+                if alias_name:
+                    es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
+                                                      index_name=index_name)
 
     # FIXME: repopulate does not consider language of the variants
     def populate(self, entity_data_directory_path=None, csv_file_paths=None, **kwargs):
@@ -178,11 +178,12 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                                logger=ner_logger,
                                                                **kwargs)
 
-    def delete(self, **kwargs):
+    def delete(self, err_if_does_not_exist=True, **kwargs):
         """
         Deletes all data including the structure of the datastore. Note that this is equivalent to DROP not TRUNCATE
 
         Args:
+            err_if_does_not_exist (bool): if to raise index does not exist errors, default True
             kwargs:
                 For Elasticsearch:
                     body: The configuration for the index (settings and mappings)
@@ -207,6 +208,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
                     elastic_search.create.delete_index(connection=self._client_or_connection,
                                                        index_name=self._store_name,
                                                        logger=ner_logger,
+                                                       err_if_does_not_exist=err_if_does_not_exist,
                                                        **kwargs)
             # TODO: cleanup aliases ?
 
