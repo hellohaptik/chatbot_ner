@@ -8,7 +8,7 @@ export PYTHONPATH=$DJANGODIR:$PYTHONPATH
 # Initial setup.py - Datastore lines need to be commented for using previously create data
 
 python /app/nltk_setup.py || { echo 'nltk setup failed'; exit 1; }
-sleep 3
+sleep 10
 python /app/datastore_setup.py || { echo 'datastore setup failed'; exit 1; }
 
 # Using supervisor as we want to use Nginx and Uwsgi both, Settings specified in supervisord.conf, any update to that will need build
