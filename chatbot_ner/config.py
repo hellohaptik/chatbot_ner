@@ -89,7 +89,7 @@ DESTINATION_URL = '{scheme}://{host}:{port}'.format(**{'scheme': DESTINATION_ES_
                                                        'host': DESTINATION_HOST,
                                                        'port': DESTINATION_PORT})
 ES_ALIAS = os.environ.get('ES_ALIAS')
-ES_SCHEME = os.environ.get('ES_SCHEME')
+ES_SCHEME = os.environ.get('ES_SCHEME', 'http')
 ELASTICSEARCH_CRF_DATA_INDEX_NAME = os.environ.get('ELASTICSEARCH_CRF_DATA_INDEX_NAME')
 ELASTICSEARCH_CRF_DATA_DOC_TYPE = os.environ.get('ELASTICSEARCH_CRF_DATA_DOC_TYPE')
 
