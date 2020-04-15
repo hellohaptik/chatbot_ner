@@ -2,15 +2,17 @@ from __future__ import absolute_import
 
 import warnings
 
+import six
+
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import elastic_search
-from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_INDEX_NAME,
-                                 ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
+from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_ALIAS, ELASTICSEARCH_INDEX_1,
+                                 ELASTICSEARCH_INDEX_2, ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
                                  ELASTICSEARCH_CRF_DATA_DOC_TYPE)
+from datastore.elastic_search.transfer import ESTransfer
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 from lib.singleton import Singleton
-import six
 
 
 class DataStore(six.with_metaclass(Singleton, object)):
@@ -64,7 +66,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
             All other exceptions raised by elasticsearch-py library
         """
         if self._engine == ELASTICSEARCH:
-            self._store_name = self._connection_settings.get(ELASTICSEARCH_INDEX_NAME, '_all')
+            self._store_name = self._connection_settings[ELASTICSEARCH_ALIAS]
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None
@@ -73,11 +75,12 @@ class DataStore(six.with_metaclass(Singleton, object)):
         if self._client_or_connection is None:
             raise EngineConnectionException(engine=self._engine)
 
-    def create(self, **kwargs):
+    def create(self, ignore_if_exists=False, **kwargs):
         """
         Creates the schema/structure for the datastore depending on the engine configured in the environment.
 
         Args:
+            ignore_if_exists (bool): if to ignore index already exists errors, default False
             kwargs:
                 For Elasticsearch:
                     master_timeout: Specify timeout for connection to master
@@ -105,23 +108,36 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
+            es_url = elastic_search.connect.get_es_url()
+            es_object = ESTransfer(source=es_url, destination=None)
             self._check_doc_type_for_elasticsearch()
             elastic_search.create.create_entity_index(connection=self._client_or_connection,
-                                                      index_name=self._store_name,
+                                                      index_name=self._connection_settings[ELASTICSEARCH_INDEX_1],
                                                       doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
                                                       logger=ner_logger,
-                                                      ignore=[400, 404],
+                                                      ignore_if_exists=ignore_if_exists,
                                                       **kwargs)
-            crf_data_index = self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME)
-            if crf_data_index is not None:
-                self._check_doc_type_for_crf_data_elasticsearch()
+            es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
+                                              index_name=self._connection_settings[ELASTICSEARCH_INDEX_1])
 
+            if self._connection_settings.get(ELASTICSEARCH_INDEX_2):
+                elastic_search.create.create_entity_index(connection=self._client_or_connection,
+                                                          index_name=self._connection_settings[ELASTICSEARCH_INDEX_2],
+                                                          doc_type=self._connection_settings[ELASTICSEARCH_DOC_TYPE],
+                                                          logger=ner_logger,
+                                                          ignore_if_exists=ignore_if_exists,
+                                                          **kwargs)
+                es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
+                                                  index_name=self._connection_settings[ELASTICSEARCH_INDEX_2])
+
+            if self._connection_settings.get(ELASTICSEARCH_CRF_DATA_INDEX_NAME):
+                self._check_doc_type_for_crf_data_elasticsearch()
                 elastic_search.create.create_crf_index(
                     connection=self._client_or_connection,
-                    index_name=crf_data_index,
+                    index_name=self._connection_settings.get[ELASTICSEARCH_CRF_DATA_INDEX_NAME],
                     doc_type=self._connection_settings[ELASTICSEARCH_CRF_DATA_DOC_TYPE],
                     logger=ner_logger,
-                    ignore=[400, 404],
+                    ignore_if_exists=ignore_if_exists,
                     **kwargs
                 )
 
@@ -186,11 +202,13 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            elastic_search.create.delete_index(connection=self._client_or_connection,
-                                               index_name=self._store_name,
-                                               logger=ner_logger,
-                                               ignore=[400, 404],
-                                               **kwargs)
+            for index_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
+                if self._connection_settings.get(index_key):
+                    elastic_search.create.delete_index(connection=self._client_or_connection,
+                                                       index_name=self._store_name,
+                                                       logger=ner_logger,
+                                                       **kwargs)
+            # TODO: cleanup aliases ?
 
     # FIXME: Deprecated, remove
     def get_entity_dictionary(self, entity_name, **kwargs):
@@ -318,7 +336,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                               ELASTICSEARCH_DOC_TYPE],
                                                           entity_name=entity_name,
                                                           logger=ner_logger,
-                                                          ignore=[400, 404],
                                                           **kwargs)
 
     # FIXME: repopulate does not consider language of the variants
@@ -357,7 +374,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                                  entity_data_directory_path=entity_data_directory_path,
                                                                  csv_file_paths=csv_file_paths,
                                                                  logger=ner_logger,
-                                                                 ignore=[400, 404],
                                                                  **kwargs)
             # TODO: repopulate code for crf index missing
 
