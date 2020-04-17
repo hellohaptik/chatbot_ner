@@ -9,12 +9,15 @@ from datastore import elastic_search
 from datastore.constants import (ELASTICSEARCH, ENGINE, ELASTICSEARCH_ALIAS, ELASTICSEARCH_INDEX_1,
                                  ELASTICSEARCH_INDEX_2, ELASTICSEARCH_DOC_TYPE, ELASTICSEARCH_CRF_DATA_INDEX_NAME,
                                  ELASTICSEARCH_CRF_DATA_DOC_TYPE)
-from datastore.elastic_search.transfer import ESTransfer
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
                                   EngineConnectionException, NonESEngineTransferException, IndexNotFoundException)
 from lib.singleton import Singleton
 
 
+# TODO: Bad design, rethink the API, write an abstract class DataStore implement ElasticSearchDataStore,
+# cleanup deprecated and buggy code and write tests for CRUD operations. Maybe even remove multi engine support
+# Reduce three different formats of data - dict, csv and json to one and use that everywhere
+# Implement proper migrations for indices
 class DataStore(six.with_metaclass(Singleton, object)):
     """
     Singleton class to connect to engine storing entity related data
@@ -75,12 +78,51 @@ class DataStore(six.with_metaclass(Singleton, object)):
         if self._client_or_connection is None:
             raise EngineConnectionException(engine=self._engine)
 
+    def _check_doc_type_for_elasticsearch(self):
+        """
+        Checks if doc_type is present in connection settings, if not an exception is raised
+
+        Raises:
+             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
+        """
+        # TODO: This check should be during init or boot
+        if ELASTICSEARCH_DOC_TYPE not in self._connection_settings:
+            raise DataStoreSettingsImproperlyConfiguredException(
+                'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
+
+    def _check_doc_type_for_crf_data_elasticsearch(self):
+        """
+        Checks if doc_type is present in connection settings, if not an exception is raised
+
+        Raises:
+             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
+        """
+        # TODO: This check should be during init or boot
+        if ELASTICSEARCH_CRF_DATA_DOC_TYPE not in self._connection_settings:
+            raise DataStoreSettingsImproperlyConfiguredException(
+                'Elasticsearch training data needs doc_type. Please configure '
+                'ES_TRAINING_DATA_DOC_TYPE in your environment')
+
+    def exists(self):
+        """
+        Checks if DataStore is already created
+        Returns:
+             boolean, True if DataStore structure exists, False otherwise
+        """
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            return elastic_search.create.exists(connection=self._client_or_connection, index_name=self._store_name)
+
+        return False
+
     def create(self, err_if_exists=True, **kwargs):
         """
         Creates the schema/structure for the datastore depending on the engine configured in the environment.
 
         Args:
-            ignore_if_exists (bool): if to ignore index already exists errors, default False
+            err_if_exists (bool): if to throw error when index already exists, default True
             kwargs:
                 For Elasticsearch:
                     master_timeout: Specify timeout for connection to master
@@ -109,7 +151,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
 
         if self._engine == ELASTICSEARCH:
             es_url = elastic_search.connect.get_es_url()
-            es_object = ESTransfer(source=es_url, destination=None)
+            es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=None)
             create_map = [  # TODO: use namedtuples
                 (True, ELASTICSEARCH_INDEX_1, ELASTICSEARCH_DOC_TYPE, self._store_name,
                  self._check_doc_type_for_elasticsearch, elastic_search.create.create_entity_index),
@@ -140,6 +182,42 @@ class DataStore(six.with_metaclass(Singleton, object)):
                 if alias_name:
                     es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
                                                       index_name=index_name)
+
+    def delete(self, err_if_does_not_exist=True, **kwargs):
+        """
+        Deletes all data including the structure of the datastore. Note that this is equivalent to DROP not TRUNCATE
+
+        Args:
+            err_if_does_not_exist (bool): if to raise index does not exist errors, default True
+            kwargs:
+                For Elasticsearch:
+                    body: The configuration for the index (settings and mappings)
+                    master_timeout: Specify timeout for connection to master
+                    timeout: Explicit operation timeout
+                    update_all_types: Whether to update the mapping for all fields with the same name across all types
+                                      or not
+                    wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
+
+            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
+
+        Raises:
+            All exceptions raised by elasticsearch-py library
+
+        """
+        if self._client_or_connection is None:
+            self._connect()
+
+        if self._engine == ELASTICSEARCH:
+            for index_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
+                if self._connection_settings.get(index_key):
+                    elastic_search.create.delete_index(connection=self._client_or_connection,
+                                                       index_name=self._store_name,
+                                                       logger=ner_logger,
+                                                       err_if_does_not_exist=err_if_does_not_exist,
+                                                       **kwargs)
+            # TODO: cleanup aliases ?
+
+    # === Incompatible or deprecated/duplicate APIs
 
     # FIXME: repopulate does not consider language of the variants
     def populate(self, entity_data_directory_path=None, csv_file_paths=None, **kwargs):
@@ -177,40 +255,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                                csv_file_paths=csv_file_paths,
                                                                logger=ner_logger,
                                                                **kwargs)
-
-    def delete(self, err_if_does_not_exist=True, **kwargs):
-        """
-        Deletes all data including the structure of the datastore. Note that this is equivalent to DROP not TRUNCATE
-
-        Args:
-            err_if_does_not_exist (bool): if to raise index does not exist errors, default True
-            kwargs:
-                For Elasticsearch:
-                    body: The configuration for the index (settings and mappings)
-                    master_timeout: Specify timeout for connection to master
-                    timeout: Explicit operation timeout
-                    update_all_types: Whether to update the mapping for all fields with the same name across all types
-                                      or not
-                    wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
-
-            Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
-
-        Raises:
-            All exceptions raised by elasticsearch-py library
-
-        """
-        if self._client_or_connection is None:
-            self._connect()
-
-        if self._engine == ELASTICSEARCH:
-            for index_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
-                if self._connection_settings.get(index_key):
-                    elastic_search.create.delete_index(connection=self._client_or_connection,
-                                                       index_name=self._store_name,
-                                                       logger=ner_logger,
-                                                       err_if_does_not_exist=err_if_does_not_exist,
-                                                       **kwargs)
-            # TODO: cleanup aliases ?
 
     # FIXME: Deprecated, remove
     def get_entity_dictionary(self, entity_name, **kwargs):
@@ -263,58 +307,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
 
         return results_dictionary
 
-    def get_similar_dictionary(self, entity_name, texts, fuzziness_threshold="auto:4,7",
-                               search_language_script=None, **kwargs):
-        """
-        Args:
-            entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
-            texts(list of strings): the text for which variants need to be find out
-            fuzziness_threshold: fuzziness allowed for search results on entity value variants
-            search_language_script: language of elasticsearch documents which are eligible for match
-            kwargs:
-                For Elasticsearch:
-                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
-
-        Returns:
-            list of collections.OrderedDict: dictionary mapping entity value variants to their entity value
-
-        Example:
-            db = DataStore()
-            ngrams_list = ['Pune', 'Mumbai', 'Goa', 'Bangalore']
-            db.get_similar_ngrams_dictionary(entity_name='city', ngrams_list=ngrams_list, fuzziness_threshold=2)
-
-            Output:
-                [
-                    {u'Bangalore': u'Bangalore',
-                     u'Mulbagal': u'Mulbagal',
-                     u'Multai': u'Multai',
-                     u'Mumbai': u'Mumbai',
-                     u'Pune': u'Pune',
-                     u'Puri': u'Puri',
-                     u'bangalore': u'bengaluru',
-                     u'goa': u'goa',
-                     u'mumbai': u'mumbai',
-                     u'pune': u'pune'}
-                 ]
-        """
-        results_list = []
-        if self._client_or_connection is None:
-            self._connect()
-        if self._engine == ELASTICSEARCH:
-            self._check_doc_type_for_elasticsearch()
-            request_timeout = self._connection_settings.get('request_timeout', 20)
-            results_list = elastic_search.query.full_text_query(connection=self._client_or_connection,
-                                                                index_name=self._store_name,
-                                                                doc_type=self._connection_settings[
-                                                                    ELASTICSEARCH_DOC_TYPE],
-                                                                entity_name=entity_name,
-                                                                sentences=texts,
-                                                                fuzziness_threshold=fuzziness_threshold,
-                                                                search_language_script=search_language_script,
-                                                                request_timeout=request_timeout,
-                                                                **kwargs)
-        return results_list
-
+    # FIXME: Deprecated, remove
     def delete_entity(self, entity_name, **kwargs):
         """
         Deletes the entity data for entity named entity_named from the datastore
@@ -379,43 +372,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                                  **kwargs)
             # TODO: repopulate code for crf index missing
 
-    def _check_doc_type_for_elasticsearch(self):
-        """
-        Checks if doc_type is present in connection settings, if not an exception is raised
-
-        Raises:
-             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
-        """
-        if ELASTICSEARCH_DOC_TYPE not in self._connection_settings:
-            raise DataStoreSettingsImproperlyConfiguredException(
-                'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
-
-    def _check_doc_type_for_crf_data_elasticsearch(self):
-        """
-        Checks if doc_type is present in connection settings, if not an exception is raised
-
-        Raises:
-             DataStoreSettingsImproperlyConfiguredException if doc_type was not found in connection settings
-        """
-        if ELASTICSEARCH_CRF_DATA_DOC_TYPE not in self._connection_settings:
-            raise DataStoreSettingsImproperlyConfiguredException(
-                'Elasticsearch training data needs doc_type. Please configure '
-                'ES_TRAINING_DATA_DOC_TYPE in your environment')
-
-    def exists(self):
-        """
-        Checks if DataStore is already created
-        Returns:
-             boolean, True if DataStore structure exists, False otherwise
-        """
-        if self._client_or_connection is None:
-            self._connect()
-
-        if self._engine == ELASTICSEARCH:
-            return elastic_search.create.exists(connection=self._client_or_connection, index_name=self._store_name)
-
-        return False
-
     # FIXME: Deprecated, remove
     def update_entity_data(self, entity_name, entity_data, language_script, **kwargs):
         """
@@ -444,6 +400,60 @@ class DataStore(six.with_metaclass(Singleton, object)):
                                                        entity_name=entity_name,
                                                        language_script=language_script,
                                                        **kwargs)
+
+    # === New Style CRUD APIs that support languages and partial updates ===
+
+    def get_similar_dictionary(self, entity_name, texts, fuzziness_threshold="auto:4,7",
+                               search_language_script=None, **kwargs):
+        """
+        Args:
+            entity_name: the name of the entity to lookup in the datastore for getting entity values and their variants
+            texts(list of strings): the text for which variants need to be find out
+            fuzziness_threshold: fuzziness allowed for search results on entity value variants
+            search_language_script: language of elasticsearch documents which are eligible for match
+            kwargs:
+                For Elasticsearch:
+                    Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.search
+
+        Returns:
+            list of collections.OrderedDict: dictionary mapping entity value variants to their entity value
+
+        Example:
+            db = DataStore()
+            ngrams_list = ['Pune', 'Mumbai', 'Goa', 'Bangalore']
+            db.get_similar_ngrams_dictionary(entity_name='city', ngrams_list=ngrams_list, fuzziness_threshold=2)
+
+            Output:
+                [
+                    {u'Bangalore': u'Bangalore',
+                     u'Mulbagal': u'Mulbagal',
+                     u'Multai': u'Multai',
+                     u'Mumbai': u'Mumbai',
+                     u'Pune': u'Pune',
+                     u'Puri': u'Puri',
+                     u'bangalore': u'bengaluru',
+                     u'goa': u'goa',
+                     u'mumbai': u'mumbai',
+                     u'pune': u'pune'}
+                 ]
+        """
+        results_list = []
+        if self._client_or_connection is None:
+            self._connect()
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_list = elastic_search.query.full_text_query(connection=self._client_or_connection,
+                                                                index_name=self._store_name,
+                                                                doc_type=self._connection_settings[
+                                                                    ELASTICSEARCH_DOC_TYPE],
+                                                                entity_name=entity_name,
+                                                                sentences=texts,
+                                                                fuzziness_threshold=fuzziness_threshold,
+                                                                search_language_script=search_language_script,
+                                                                request_timeout=request_timeout,
+                                                                **kwargs)
+        return results_list
 
     def get_entity_supported_languages(self, entity_name, **kwargs):
         """
@@ -650,6 +660,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
             ner_logger.debug('Datastore, get_entity_training_data, results_dictionary %s' % str(entity_name))
         return results_dictionary
 
+    # FIXME: Inconsistent data format with other APIs or confusing parameter names!
     def update_entity_crf_data(self, entity_name, sentences, **kwargs):
         """
         This method is used to populate the training data for a given entity
@@ -657,6 +668,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
         Args:
             entity_name (str): Name of the entity for which the training data has to be populated
             sentences (Dict[str, List[Dict[str, str]]]: sentences mapped against their languages
+                E.g. {"en": [{"sentence": "hello abc", "entities": ["abc"],}, ...], ...}
             **kwargs: For Elasticsearch:
                 Refer http://elasticsearch-py.readthedocs.io/en/master/helpers.html#elasticsearch.helpers.bulk
 
