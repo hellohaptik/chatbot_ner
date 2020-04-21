@@ -2,7 +2,7 @@
     {
         "input": {
             "message": "Where is Coffee On Canvas",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -14,7 +14,7 @@
     {
         "input": {
             "message": "Find me fine dining restaurants near Novotel",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -26,7 +26,7 @@
     {
         "input": {
             "message": "Fastest route of going to the farm",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -38,7 +38,7 @@
     {
         "input": {
             "message": "i would like to go to Shudh Vegetarian Food Court someday",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -50,7 +50,7 @@
     {
         "input": {
             "message": "I want to go to SP's Biryani",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -62,7 +62,7 @@
     {
         "input": {
             "message": "I work in The Rasoi",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -74,7 +74,7 @@
     {
         "input": {
             "message": "Where is Gokul Chaat located ?",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -86,7 +86,7 @@
     {
         "input": {
             "message": "What are some must visit places in and around By The Way",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -98,7 +98,7 @@
     {
         "input": {
             "message": "Search for Cafes with free WiFi between Andheri & Bandra",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -109,7 +109,7 @@
     {
         "input": {
             "message": "I have been to The Fisherman's Deck",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -121,7 +121,7 @@
     {
         "input": {
             "message": "Can I get best momos in N Asian",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -133,7 +133,7 @@
     {
         "input": {
             "message": "Find me fine dining restaurants in and around L'amandier",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -145,7 +145,7 @@
     {
         "input": {
             "message": "where is the nearest gas station",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -156,7 +156,7 @@
     {
         "input": {
             "message": "My favorite restaurant is High",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -168,7 +168,7 @@
     {
         "input": {
             "message": "is there an age limit in Kebab-e-Que",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -180,7 +180,7 @@
     {
         "input": {
             "message": "Why not go to Gossip",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -192,7 +192,7 @@
     {
         "input": {
             "message": "Zafrani is famous for biryani",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -204,7 +204,7 @@
     {
         "input": {
             "message": "BottleRock serves alcohol ?",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -216,7 +216,7 @@
     {
         "input": {
             "message": "Shangri-La is famous for spanish food",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -228,7 +228,7 @@
     {
         "input": {
             "message": "Sattvik serves best meal in Goregaon",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -240,7 +240,7 @@
     {
         "input": {
             "message": "Hippie@Heart is only for adults",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {
@@ -252,7 +252,7 @@
     {
         "input": {
             "message": "Kadambam Iyengar Cuisine to The Post Office Cafe distance?",
-            "entity_name": "restaurant"
+            "entity_name": "ner_ptest_restaurant"
         },
         "expected": [
             {

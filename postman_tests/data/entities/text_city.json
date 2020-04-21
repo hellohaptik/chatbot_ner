@@ -8,7 +8,7 @@
         ], 
         "input": {
             "message": "Where can I get best Biryani in kochi", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -20,7 +20,7 @@
         ], 
         "input": {
             "message": "Find me fine dining restaurants in and around safipur", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -31,7 +31,7 @@
         ], 
         "input": {
             "message": "i would like to go to punjab someday", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -43,7 +43,7 @@
         ], 
         "input": {
             "message": "I want to go to Ahmedabad", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -55,7 +55,7 @@
         ], 
         "input": {
             "message": "I reside in varanasi", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -67,7 +67,7 @@
         ], 
         "input": {
             "message": "i grew up in phagwara", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -79,7 +79,7 @@
         ], 
         "input": {
             "message": "I wish to go to Fatehpur Bikri one day", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -91,7 +91,7 @@
         ], 
         "input": {
             "message": "What are some must visit places in and around Amritsar?", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -102,7 +102,7 @@
         ], 
         "input": {
             "message": "Search for Cafes with free WiFi between Andheri & Bandra", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -113,7 +113,7 @@
         ], 
         "input": {
             "message": "I have been to L.A,USA", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -125,7 +125,7 @@
         ], 
         "input": {
             "message": "Where can I get best momos around Muzafarpur", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -137,7 +137,7 @@
         ], 
         "input": {
             "message": "Find me fine dining restaurants in and around Meerut", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -148,7 +148,7 @@
         ], 
         "input": {
             "message": "where is the nearest gas station", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -160,7 +160,7 @@
         ], 
         "input": {
             "message": "My hometown is Mumbai, Maharashtra", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -172,7 +172,7 @@
         ], 
         "input": {
             "message": "I was born in Delhi", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -184,7 +184,7 @@
         ], 
         "input": {
             "message": "I went to a destination wedding at New Delhi", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }, 
     {
@@ -196,7 +196,7 @@
         ], 
         "input": {
             "message": "I live in Paschim Punropara", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     },
     {
@@ -212,7 +212,7 @@
         ], 
         "input": {
             "message": "Fastest route of going from patiala to ludhiana", 
-            "entity_name": "city_list"
+            "entity_name": "ner_ptest_city_list"
         }
     }
 ]

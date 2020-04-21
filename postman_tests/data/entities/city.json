@@ -2,7 +2,7 @@
   {
     "input": {
       "message": "i want to go to mumbai",
-      "entity_name": "city_list"
+      "entity_name": "ner_ptest_city_list"
     },
     "expected": [
       {
@@ -17,7 +17,7 @@
   {
     "input": {
       "message": "i want to go to delhi",
-      "entity_name": "city_list"
+      "entity_name": "ner_ptest_city_list"
     },
     "expected": [
       {
@@ -32,7 +32,7 @@
   {
     "input": {
       "message": "i want to go to chennai",
-      "entity_name": "city_list"
+      "entity_name": "ner_ptest_city_list"
     },
     "expected": [
       {
