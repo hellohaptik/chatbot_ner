@@ -202,12 +202,12 @@
     {
         "expected": [
             {
-                "original_text": "ludhiana", 
-                "value": "Ludhiana"
-            },
-            {
               "original_text": "patiala", 
               "value": "Patiala"
+            },
+            {
+                "original_text": "ludhiana", 
+                "value": "Ludhiana"
             }
         ], 
         "input": {
