@@ -39,7 +39,7 @@ The format should follow the below structure:
 input contains the parameters that we pass as query parameters in the GET rquest. It must **mandatorily** contain two keys,
 message and entity_name.
 
-expected is an array of objects that we get in the response. If expected contains multiple objects then the order of those should be exactly as the expected order in the response.
+expected is an array of objects that we get in the response.
 
 If you want to create a test case where the output of a request is expected to be null, then specify the test case as follows:
 
@@ -47,7 +47,7 @@ If you want to create a test case where the output of a request is expected to b
 [
     "input": {
         "message": "The text sent in url",
-        "entity_name": "Name of the entity e.g. time"
+        "entity_name": "Name of the entity. If this entity uses ES indexing then the name should be prefixed by ner_ptest e.g. ner_ptest_restuarant"
     },
 
     "expected": [
@@ -76,7 +76,7 @@ Use the below steps:
 
 1. First import postman_tests/data/ner_collection.json into postman
 
-2. After adding new tests or modifying existing ones, export the modified collection into ner_collection.json.
+2. After adding new tests or modifying existing ones, export the modified collection into ner_collection.json in postman_tests/data folder in ner.
 
 3. Run the test suite using the process given in this Readme above to make sure all pass.
 
@@ -85,7 +85,7 @@ Use the below steps:
 
 **Adding data to be indexed into ElasticSearch**
 
-1. Add the csv file for the particular entity in postman_tests/data/elastic_search/.
+1. Add the csv file with a filename preceded by ner_ptest for the particular entity in postman_tests/data/elastic_search/, e.g. ner_ptest_restaurant.csv.
 
 2. Make sure all the required data being used in the tests is present in the csv file and all tests are passing.
 
