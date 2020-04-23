@@ -70,11 +70,15 @@ def run_tests():
         newman_command = get_newman_command()
         process = Popen(newman_command, shell=True)
         process.communicate()
-        os.remove(newman_data_path)
         return process.returncode
     except Exception as e:
         raise e
     finally:
+        try:
+            os.remove(newman_data_path)
+        except OSError as e:
+            if e.errno != 2: # raise all except "No suck file or directory" error
+                raise
         datastore.sync(datastore_data_path, config_file_path, 'delete')
 
 
