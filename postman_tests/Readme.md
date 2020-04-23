@@ -28,16 +28,18 @@ The format should follow the below structure:
 
 ```
 [
-    "input": {
-        "message": "The text sent in url",
-        "entity_name": "Name of the entity e.g. time"
-    },
+    {
+        "input": {
+            "message": "The text sent in url",
+            "entity_name": "Name of the entity e.g. time"
+        },
 
-    "expected": [
-        {
-            <Put your expected key and values here>
-        }
-    ]
+        "expected": [
+            {
+                <Put your expected key and values here>
+            }
+        ]
+    }
 ]
 ```
 
@@ -50,16 +52,18 @@ If you want to create a test case where the output of a request is expected to b
 
 ```
 [
-    "input": {
-        "message": "The text sent in url",
-        "entity_name": "Name of the entity. If this entity uses ES indexing then the name should be prefixed by ner_ptest e.g. ner_ptest_restuarant"
-    },
+    {
+        "input": {
+            "message": "The text sent in url",
+            "entity_name": "Name of the entity. If this entity uses ES indexing then the name should be prefixed by ner_ptest e.g. ner_ptest_restuarant"
+        },
 
-    "expected": [
-        {
-            "data": null
-        }
-    ]
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    }
 ]
 ```
 
