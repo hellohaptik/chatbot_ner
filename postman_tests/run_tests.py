@@ -3,7 +3,6 @@ from subprocess import Popen
 import os
 import json
 import sys
-import argparse
 from lib import newman
 from lib import datastore
 
@@ -33,12 +32,7 @@ def get_newman_command():
         str: The shell command to be used for running the tests.
     """
     collection_data_path = os.path.join(postman_tests_directory, 'data', 'ner_collection.json')
-    # Check if --html is passed as argument
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--html', action='store_true')
-    args = parser.parse_args()
-    # Generate and return the command
-    if args.html:
+    if len(sys.argv) > 1 and sys.argv[1] == '--html':
         report_path = os.path.join(postman_tests_directory, 'newman_reports')
         create_reports_directory_if_not_exists(report_path)
         return (
