@@ -14,21 +14,21 @@ def get_api_url(config_path):
         config_file_path = f"{config_path}/prod.json"
     with open(config_file_path, 'r') as f:
         data = json.load(f)
-    base_url = data["es_host"]
+    base_url = data["datastore_host"]
     return f"http://{base_url}/entities/data/v1"
 
 
-def sync(es_data_path, config_path, mode):
+def sync(datastore_data_path, config_path, mode):
     """
-    Index data for every entity being tested into ElasticSearch
+    Index data for every entity being tested into DataStore
 
     Parameters:
-    es_data_path (string): Path to the data/elastic_search directory
+    datastore_data_path (string): Path to the data/elastic_search directory
 
     Returns:
     None
     """
-    for file_path in glob.glob(os.path.join(es_data_path, '*.csv')):
+    for file_path in glob.glob(os.path.join(datastore_data_path, '*.csv')):
         entity_name = common.get_entity_name(file_path)
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)

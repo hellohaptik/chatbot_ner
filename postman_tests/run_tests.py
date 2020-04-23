@@ -62,10 +62,10 @@ def run_tests():
         (int): The return code of the newman command
     """
     entities_data_path = os.path.join(postman_tests_directory, 'data', 'entities')
-    es_data_path = os.path.join(postman_tests_directory, 'data', 'elastic_search')
+    datastore_data_path = os.path.join(postman_tests_directory, 'data', 'data_store')
     try:
         newman.check_if_data_valid(entities_data_path)
-        datastore.sync(es_data_path, config_path, 'create')
+        datastore.sync(datastore_data_path, config_path, 'create')
         newman_data = newman.generate_newman_data(entities_data_path)
         with open(newman_data_path, 'w') as fp:
             json.dump(newman_data, fp)
@@ -77,7 +77,7 @@ def run_tests():
     except Exception as e:
         raise e
     finally:
-        datastore.sync(es_data_path, config_path, 'delete')
+        datastore.sync(datastore_data_path, config_path, 'delete')
 
 
 if __name__ == "__main__":
