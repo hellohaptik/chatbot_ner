@@ -71,7 +71,7 @@ def convert_csv_to_dict(file_path, mode):
     return data
 
 
-def get_variants(str):
+def get_variants(variants_line):
     """
     Convert the string containing all the variants into a list
 
@@ -81,5 +81,5 @@ def get_variants(str):
     Returns:
     list: List of strings where each string is a variant name.
     """
-    arr = str.split('|')
+    arr = variants_line.split('|')
     return [item.strip() for item in arr if item.strip()]
