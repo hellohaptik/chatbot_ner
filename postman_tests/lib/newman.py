@@ -8,18 +8,18 @@ from . import common
 
 def check_if_data_valid(entities_data_path):
     # type: (str) ->  boolean
-    """
-    Doing basic sanity checking here.
-    Check that every test case is valid json and has the keys: input and expected
+    """Doing basic sanity checking here.
+
+    Check that every test case is valid json and has the keys: input and expected.
 
     Args:
-        entities_data_path (str): Path to the data/entities directory
+        entities_data_path (str): Path to the data/entities directory.
 
     Returns:
-        (boolean): Returns True if all files contain valid json.
+        bool: Returns True if all files contain valid json.
 
     Raises:
-        Exception if data is invalid
+        Exception if data is invalid.
     """
     try:
         path = ''
@@ -39,15 +39,15 @@ def check_if_data_valid(entities_data_path):
 
 
 def read_entities_data(entities_data_path):
-    # type: (str) -> Dict
+    # type: (str) -> Dict[str, List[Dict[str, Any]]]
     """Read all the files in data/entities and generate a single dictionary containing
     data for every entity.
 
     Args:
-        entities_data_path (string): Path to the data/entities directory.
+        entities_data_path (str): Path to the data/entities directory.
 
     Returns:
-        dictionary (dict): Dict containing data read from the data files for every entity.
+        dict: Dict containing data read from the data files for every entity.
     """
     entities_data = {}
     for file_path in glob.glob(os.path.join(entities_data_path, '*.json')):
@@ -67,15 +67,14 @@ def read_entities_data(entities_data_path):
 
 
 def generate_newman_data(entities_data_path):
-    # type: (str) -> List[Dict[str, any]]
-    """Generate data in a format that can be passed to the command-line tool
-    newman for runing the tests.
+    # type: (str) -> List[Dict[str, Any]]
+    """Generate data in a format that can be passed to the command-line tool newman for runing the tests.
 
     Args:
-        entities_data_path (string): Path to the data/entities directory.
+        entities_data_path (str): Path to the data/entities directory.
 
     Returns:
-        newman_data (list): List of dictionaries where each dictionary is data for a single test iteration.
+        list: List of dictionaries where each dictionary is data for a single test iteration.
     """
     data = []
     entities_data = read_entities_data(entities_data_path)
