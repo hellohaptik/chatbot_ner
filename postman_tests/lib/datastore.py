@@ -31,7 +31,7 @@ def sync(datastore_data_path, config_file_path, mode):
         try:
             req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
-        except requests.exceptions.HTTPError as _:
+        except requests.exceptions.HTTPError as e:
             print(req.text)
 
 

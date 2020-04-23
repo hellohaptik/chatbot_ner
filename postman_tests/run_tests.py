@@ -77,7 +77,7 @@ def run_tests():
         try:
             os.remove(newman_data_path)
         except OSError as e:
-            if e.errno != 2: # raise all except "No suck file or directory" error
+            if e.errno != 2:  # raise all except "No suck file or directory" error
                 raise
         datastore.sync(datastore_data_path, config_file_path, 'delete')
 
