@@ -1,17 +1,22 @@
 **Running the tests**
 
-***Note:*** Before running the below command, if you are running this for the first time in dev environment, make sure you copy ```config/prod.json``` to ```config/dev.json``` and adjust the host urls in it,
-for chatbot-ner and ElasticSearch.
-
 ```
 docker exec -it docker_chatbot-ner_1 python postman_tests/run_tests.py
 ```
 
-A shortcut for running the above is available. Just run ```./run_postman_tests.sh``` in the root directory.
+Or
 
-**Viewing the test results in dev**
+```
+docker exec -it docker_chatbot-ner_1 python postman_tests/run_tests.py --html
+```
 
-Running the above command in dev will create a ```newman_reports/``` directory in the ```postman_tests/``` folder. The newman command will generate a new timestamped html file in that directory everytime the tests are run. This html file contains a graphical dashboard which can be used to see the status of running the tests, failures etc, and yes you can use dark mode as well ;-).
+The ```--html``` argument will generate a html report in ```postman_tests/newman_reports```
+
+A shortcut for running the above is available. Just run ```./run_postman_tests.sh``` or ```./run_postman_tests.sh --html``` in the root directory.
+
+**HTML Report**
+
+The html report is a timestamped html file and a new one is generated everytime tests are run. This html file contains a graphical dashboard which can be used to see the status of running the tests, failures etc, and yes you can use dark mode as well ;-).
 
 ![newman dashboard](newman.png)
 
