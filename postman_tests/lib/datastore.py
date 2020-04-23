@@ -7,18 +7,14 @@ import requests
 from . import common
 
 
-def get_api_url(config_path):
-    if os.path.exists(f"{config_path}/dev.json"):
-        config_file_path = f"{config_path}/dev.json"
-    else:
-        config_file_path = f"{config_path}/prod.json"
+def get_api_url(config_file_path):
     with open(config_file_path, 'r') as f:
         data = json.load(f)
     base_url = data["datastore_host"]
     return f"http://{base_url}/entities/data/v1"
 
 
-def sync(datastore_data_path, config_path, mode):
+def sync(datastore_data_path, config_file_path, mode):
     """Index data for every entity being tested into DataStore.
 
     Args:
@@ -31,7 +27,7 @@ def sync(datastore_data_path, config_path, mode):
         entity_name = common.get_entity_name(file_path)
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)
-        url = get_api_url(config_path)
+        url = get_api_url(config_file_path)
         try:
             req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
