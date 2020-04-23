@@ -39,7 +39,7 @@ def convert_csv_to_dict(file_path, mode):
     """Read the csv file at file_path and convert its data to json.
 
     Args:
-        file_path (str): Path of a file in the data/data_store directory.
+        file_path (str): Path of a file in the data/datastore directory.
 
     Returns:
         str: The JSON representation of the csv data in the file.

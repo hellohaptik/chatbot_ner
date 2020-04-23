@@ -60,7 +60,7 @@ def run_tests():
         int: The return code of the newman command.
     """
     entities_data_path = os.path.join(postman_tests_directory, 'data', 'entities')
-    datastore_data_path = os.path.join(postman_tests_directory, 'data', 'data_store')
+    datastore_data_path = os.path.join(postman_tests_directory, 'data', 'datastore')
     try:
         newman.check_if_data_valid(entities_data_path)
         datastore.sync(datastore_data_path, config_file_path, 'create')
