@@ -1,13 +1,13 @@
 **Running the tests**
 
 ```
-docker exec -it docker_chatbot-ner_1 python postman_tests/run_tests.py
+docker exec -it docker_chatbot-ner_1 python postman_tests/run_postman_tests.py
 ```
 
 Or
 
 ```
-docker exec -it docker_chatbot-ner_1 python postman_tests/run_tests.py --html
+docker exec -it docker_chatbot-ner_1 python postman_tests/run_postman_tests.py --html
 ```
 
 The ```--html``` argument will generate a html report in ```postman_tests/newman_reports```
