@@ -1,0 +1,35 @@
+[
+    {
+        "input": {
+            "message": "the time is 16:62 am",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+               "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "The lecture ends at 0 am",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "meet me at 22:33 am at the cafe",
+            "entity_name": "time"
+        },
+        "expected": [
+            {
+               "data": null
+            }
+        ]
+    }
+]

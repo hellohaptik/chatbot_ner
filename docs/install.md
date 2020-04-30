@@ -197,7 +197,7 @@ Output should be:
 
 
 
-**IMPORTANT NOTE:** If you bring down the container and bring it up again, `initial_setup.py` will run again. If you added some data and do not want it to get reset on ELASTICSEARCH, comment out DataStore section in `initial_setup.py`
+**IMPORTANT NOTE:** If you bring down the container and bring it up again, `datastore_setup.py` will run again. If you added some data and do not want it to get reset on ELASTICSEARCH, comment out DataStore section in `datastore_setup.py`
 
 ## To Create Custom Docker Images
 

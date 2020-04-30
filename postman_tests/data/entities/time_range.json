@@ -1,0 +1,80 @@
+[
+    {
+        "input": {
+            "message": "Set a drink water reminder for tomorrow from 5:00 AM to 9:00 PM",
+            "entity_name": "time_with_range"
+        },
+        "expected": [
+            {
+                "original_text": "5:00 am to 9:00 pm",
+                "mm": 0,
+                "hh": 5,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "5:00 am to 9:00 pm",
+                "mm": 0,
+                "hh": 9,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Set a drink water reminder for tomorrow from 8:30 am to 5:30 pm",
+            "entity_name": "time_with_range"
+        },
+        "expected": [
+            {
+                "original_text": "8:30 am to 5:30 pm",
+                "mm": 30,
+                "hh": 8,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "8:30 am to 5:30 pm",
+                "mm": 30,
+                "hh": 5,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Set a drink water reminder for tomorrow from 11:40 AM to 11:12 PM",
+            "entity_name": "time_with_range"
+        },
+        "expected": [
+            {
+                "original_text": "11:40 am to 11:12 pm",
+                "mm": 40,
+                "hh": 11,
+                "range": "start",
+                "nn": "am",
+                "time_type": null,
+                "language": "en"
+            },
+            {
+                "original_text": "11:40 am to 11:12 pm",
+                "mm": 12,
+                "hh": 11,
+                "range": "end",
+                "nn": "pm",
+                "time_type": null,
+                "language": "en"
+            }
+        ]
+    }
+]

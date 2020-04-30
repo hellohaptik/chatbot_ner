@@ -1,0 +1,241 @@
+[
+    {
+        "expected": [
+            {
+                "original_text": "3/3/1992", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 3, 
+                "dd": 3, 
+                "yy": 1992, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "my anniversary was on 3/3/1992", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "3rd aug 20", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 8, 
+                "dd": 3, 
+                "yy": 2020, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "Coronoa Virus will end on 3rd Aug 20", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "12.03.2016", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 3, 
+                "dd": 12, 
+                "yy": 2016, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "12.03.2016 is my nephew's birthday", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "12.4.2016", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 4, 
+                "dd": 12, 
+                "yy": 2016, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "12.4.2016 doesnt exist for me", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "3.3.12", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 3, 
+                "dd": 3, 
+                "yy": 2012, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "A date i wont forget is 3.3.12", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "3/2/17", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 2, 
+                "dd": 3, 
+                "yy": 2017, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "3/2/17 changed my life forever", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "12/12/12", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 12, 
+                "dd": 12, 
+                "yy": 2012, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "12/12/12 is a strange date isnt it ?", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "12-30-12", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 12, 
+                "dd": 30, 
+                "yy": 2012, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "we got married on 12-30-12", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "12/12", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 12, 
+                "dd": 12, 
+                "yy": 2020, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "12/12 is a bad day in american history", 
+            "entity_name": "date"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "october 2nd", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 10, 
+                "dd": 2, 
+                "yy": 2020, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "Gandhi Jayanti is on October 2nd", 
+            "entity_name": "date"
+        }
+    },
+    {
+        "expected": [
+            {
+                "original_text": "2019 may 21st", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 5, 
+                "dd": 21, 
+                "yy": 2019, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "2019 May 21st", 
+            "entity_name": "date"
+        }
+    },
+    {
+        "expected": [
+            {
+                "original_text": "2/3/2020", 
+                "end_range": false, 
+                "from": false, 
+                "mm": 3, 
+                "dd": 2, 
+                "yy": 2020, 
+                "to": false, 
+                "start_range": true, 
+                "type": "date"
+            }, 
+            {
+                "original_text": "5/6/2024", 
+                "end_range": true, 
+                "from": false, 
+                "mm": 6, 
+                "dd": 5, 
+                "yy": 2024, 
+                "to": false, 
+                "start_range": false, 
+                "type": "date"
+            }
+        ], 
+        "input": {
+            "message": "My meeting is 2/3/2020 to 5/6/2024", 
+            "entity_name": "date"
+        }
+    }
+]
