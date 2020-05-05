@@ -63,7 +63,7 @@ def index(mode='create'):
         contents = convert_csv_to_dict(file_path, mode)
         url = 'http://localhost:8081/entities/data/v1'
         try:
-            req = requests.post(f"{url}/ner_op_{entity_name}", data=json.dumps(contents))
+            req = requests.post(f"{url}/cb_ner_op_{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
             print(f"Done {entity_name}")
         except requests.exceptions.HTTPError as e:
