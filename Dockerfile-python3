@@ -1,0 +1,39 @@
+FROM python:3.6.10
+RUN apt-get update && apt-get install -y wget build-essential curl
+WORKDIR /app
+RUN mkdir -p ~/model_lib && \
+    mkdir -p /root/models && \
+    touch /app/config && touch /app/model_config && \
+    curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash && \
+    cd /tmp/ && \
+    wget ftp://ftp.netbsd.org/pub/pkgsrc/distfiles/CRF++-0.58.tar.gz && \
+    tar -xzf CRF++-0.58.tar.gz -C ~/model_lib/ && \
+    cd ~/model_lib/CRF++-0.58/ && \
+    ./configure && \
+    make && \
+    make install && \
+    echo "export LD_LIBRARY_PATH=/usr/local/lib" >> ~/.bashrc && \
+    cd python && \
+    python setup.py build && python setup.py install && \
+    pip install --no-cache-dir -I uwsgi && \
+    pip install cython && \
+    pip install newrelic==3.4.0.95
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+# From start_server.sh
+ENV NAME="chatbot_ner"
+ENV DJANGODIR=/app
+ENV NUM_WORKERS=4
+ENV DJANGO_SETTINGS_MODULE=chatbot_ner.settings
+ENV PORT=8081
+ENV TIMEOUT=600
+ENV MAX_REQUESTS=1000
+# From config.txt
+# ENV ENVKEY=
+# ENV NEWRELIC_LICENSE_KEY=
+EXPOSE 8081
+ADD . /app
+RUN python /app/setup.py
+RUN chmod +x /app/entrypoint.sh
+# Have to enable --single-interpreter in the entrypoint for Newrelic
+CMD /app/entrypoint.sh
