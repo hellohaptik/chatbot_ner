@@ -61,7 +61,7 @@ def index(mode='create'):
         entity_name = get_entity_name(file_path)
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)
-        url = 'http://devserverraza.hellohaptik.com:8004/entities/data/v1'
+        url = 'http://localhost:8004/entities/data/v1'
         try:
             req = requests.post(f"{url}/ner_op_{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
