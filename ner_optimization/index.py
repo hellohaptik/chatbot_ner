@@ -61,7 +61,7 @@ def index(mode='create'):
         entity_name = get_entity_name(file_path)
         print(f"Syncing {entity_name}, mode: {mode}")
         contents = convert_csv_to_dict(file_path, mode)
-        url = 'http://localhost:8004/entities/data/v1'
+        url = 'http://localhost:8081/entities/data/v1'
         try:
             req = requests.post(f"{url}/ner_op_{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
@@ -76,7 +76,7 @@ def generate_input_files(number_of_files):
 
 
 if __name__ == "__main__":
-    NUMBER_OF_FILES = 100
+    NUMBER_OF_FILES = 1 # Change this number to the number of files you want to generate
     generate_input_files(NUMBER_OF_FILES)
     index()
     print('All Done!')
