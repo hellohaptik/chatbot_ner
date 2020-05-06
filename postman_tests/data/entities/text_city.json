@@ -1,0 +1,218 @@
+[
+    {
+        "expected": [
+            {
+                "original_text": "kochi", 
+                "value": "Kochi"
+            }
+        ], 
+        "input": {
+            "message": "Where can I get best Biryani in kochi", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "safipur", 
+                "value": "safipur"
+            }
+        ], 
+        "input": {
+            "message": "Find me fine dining restaurants in and around safipur", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+               "data": null
+            }
+        ], 
+        "input": {
+            "message": "i would like to go to punjab someday", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "ahmedabad", 
+                "value": "Ahmedabad"
+            }
+        ], 
+        "input": {
+            "message": "I want to go to Ahmedabad", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "varanasi", 
+                "value": "Varanasi"
+            }
+        ], 
+        "input": {
+            "message": "I reside in varanasi", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "phagwara", 
+                "value": "Phagwara"
+            }
+        ], 
+        "input": {
+            "message": "i grew up in phagwara", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "fatehpur", 
+                "value": "Fatehpur Sikri"
+            }
+        ], 
+        "input": {
+            "message": "I wish to go to Fatehpur Bikri one day", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "amritsar?", 
+                "value": "Amritsar"
+            }
+        ], 
+        "input": {
+            "message": "What are some must visit places in and around Amritsar?", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "data": null
+            }
+        ], 
+        "input": {
+            "message": "Search for Cafes with free WiFi between Andheri & Bandra", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+               "data": null
+            }
+        ], 
+        "input": {
+            "message": "I have been to L.A,USA", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "muzafarpur", 
+                "value": "Muzaffarpur"
+            }
+        ], 
+        "input": {
+            "message": "Where can I get best momos around Muzafarpur", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "meerut", 
+                "value": "Meerut"
+            }
+        ], 
+        "input": {
+            "message": "Find me fine dining restaurants in and around Meerut", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "data": null
+            }
+        ], 
+        "input": {
+            "message": "where is the nearest gas station", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "mumbai,", 
+                "value": "mumbai"
+            }
+        ], 
+        "input": {
+            "message": "My hometown is Mumbai, Maharashtra", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "delhi", 
+                "value": "New Delhi"
+            }
+        ], 
+        "input": {
+            "message": "I was born in Delhi", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "new delhi", 
+                "value": "New Delhi"
+            }
+        ], 
+        "input": {
+            "message": "I went to a destination wedding at New Delhi", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }, 
+    {
+        "expected": [
+            {
+                "original_text": "paschim punropara", 
+                "value": "Paschim Punropara"
+            }
+        ], 
+        "input": {
+            "message": "I live in Paschim Punropara", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    },
+    {
+        "expected": [
+            {
+              "original_text": "patiala", 
+              "value": "Patiala"
+            },
+            {
+                "original_text": "ludhiana", 
+                "value": "Ludhiana"
+            }
+        ], 
+        "input": {
+            "message": "Fastest route of going from patiala to ludhiana", 
+            "entity_name": "ner_ptest_city_list"
+        }
+    }
+]

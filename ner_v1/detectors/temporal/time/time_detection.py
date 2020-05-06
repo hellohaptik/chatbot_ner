@@ -678,7 +678,7 @@ class TimeDetector(BaseDetector):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = 'df'
             time_list.append(time)
@@ -719,7 +719,7 @@ class TimeDetector(BaseDetector):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = 'df'
             time_list.append(time)
@@ -760,7 +760,7 @@ class TimeDetector(BaseDetector):
                 setter = "mm"
                 antisetter = "hh"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
             time_list.append(time)
@@ -792,7 +792,7 @@ class TimeDetector(BaseDetector):
             setter = "hh"
             antisetter = "mm"
             time = dict()
-            time[setter] = t1
+            time[setter] = int(t1)
             time[antisetter] = 0
             time['nn'] = EVERY_TIME_TYPE
             time_list.append(time)

@@ -1,0 +1,522 @@
+[
+    {
+        "input": {
+            "message": "I want to buy 3 kg onions",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "3",
+                "value": "3"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "i want to purchase soy milk",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can I buy cheese",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]    
+    },
+    {
+        "input": {
+            "message": "I want to buy 0 kg apples",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "0",
+                "value": "0"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to buy 1 kilo orange",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "1",
+                "value": "1"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to buy a dozen of apples",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can I get 1 bottle of milk,",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "1",
+                "value": "1"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Please add 1.5 soy sauce,",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Please add a couple of batteries to my shopping cart,",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Please remove 999 Dishwashing gel",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "999",
+                "value": "999"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I am looking for 25 bottles of pepsi",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "25",
+                "value": "25"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I need 2 kgs of Tomato",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "2",
+                "value": "2"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can you add half a dozen bananas to my cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to buy a dozen of eggs",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can u get me 30 boxes of tissues please",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "30",
+                "value": "30"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Please help me remove 750 gms of cheese block from my cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "750",
+                "value": "750"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Do me a favor and add 3 loaves of bread to my cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "3",
+                "value": "3"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want you to remove 5 pcs of Baby Diapers from the cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "5",
+                "value": "5"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Add half a kilo Mango to the cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I would like to cancel the vermicelli from my cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+           {
+               "data": null
+           }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can u remove all the shower gels from the cart,",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+           {
+               "data": null
+           }
+        ]
+    },
+    {
+        "input": {
+            "message": "Can u remove tea bags from my cart",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Where can I find Tooth Brush",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want to purchase 30 units of mobile and 40 units of Television",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "30",
+                "value": "30"
+            },
+            {
+                "original_text": "40",
+                "value": "40"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Want to purchase 12 units of banana and 15 units of apple",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "12",
+                "value": "12"
+            },
+            {
+                "original_text": "15",
+                "value": "15"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Need 99 units of spoon and 1 plate please",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "original_text": "99",
+                "value": "99"
+            },
+            {
+                "original_text": "1",
+                "value": "1"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I need 7000 kgs onion",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 6
+        },
+        "expected": [
+            {
+                "original_text": "7000",
+                "value": "7000"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "My pincode is 400043",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "400043",
+                "value": "400043"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Pincode of townside is 400001 i think",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "400001",
+                "value": "400001"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "98101 is the pincode for seattle",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "98101",
+                "value": "98101"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "Pincode for Australia is 2044",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "2044",
+                "value": "2044"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "98765432126 is not a valid pin code",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "000123765 is not a valid pin code",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "000123765",
+                "value": "000123765"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "98765432126 is not a valid phone number",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 14
+        },
+        "expected": [
+            {
+                "original_text": "98765432126",
+                "value": "98765432126"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "98765432126 is not a valid pin code",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 3
+        },
+        "expected": [
+            {
+                "data": null
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "My net take home is 5000 dollars Only",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 4
+        },
+        "expected": [
+            {
+                "original_text": "5000",
+                "value": "5000"
+            }
+        ]
+    },
+    {
+        "input": {
+            "message": "I want 9999999 tissues please and 777777 shoes",
+            "entity_name": "number",
+            "min_digits": 1,
+            "max_digits": 9
+        },
+        "expected": [
+            {
+                "original_text": "9999999",
+                "value": "9999999"
+            },
+            {
+                "original_text": "777777",
+                "value": "777777"
+            }
+        ]
+    }
+]
