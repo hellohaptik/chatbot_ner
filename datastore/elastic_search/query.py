@@ -15,6 +15,7 @@ from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 from six.moves import range
 from six.moves import zip
+from chatbot_ner.config import ner_logger
 
 # Local imports
 
@@ -290,7 +291,7 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    index_header = json.dumps({'index': index_name, 'type': doc_type})
+    index_header = json.dumps({'index': 'gogo_entity_data_v2', 'type': doc_type})
     data = []
     for sentence in sentences:
         query = _generate_es_search_dictionary(entity_name=entity_name,
@@ -300,8 +301,8 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
         data.append(index_header)
         data.append(json.dumps(query))
     data = '\n'.join(data)
-
-    kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, index='gogo_entity_data_v2')
+    ner_logger.info(f'^^^^^^^^^^^^^^^^kwargs is {kwargs}')
     results = _run_es_search(connection, msearch=True, **kwargs)
     results = _parse_es_search_results(results.get("responses"))
     return results

@@ -243,12 +243,15 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     ner_logger.info("Predetected values: {}".format(predetected_values))
     if isinstance(message, six.string_types):
+        ner_logger.debug(f'************Detect A************')
         entity_output = text_detector.detect(message=message,
                                              structured_value=structured_value,
                                              fallback_value=fallback_value,
                                              bot_message=bot_message,
                                              predetected_values=predetected_values)
+        ner_logger.debug(f'Entity output is {entity_output}')
     elif isinstance(message, (list, tuple)):
+        ner_logger.debug(f'************Detect 2************')
         entity_output = text_detector.detect_bulk(messages=message, fallback_values=fallback_value,
                                                   predetected_values=predetected_values)
     else:

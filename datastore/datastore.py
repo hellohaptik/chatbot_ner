@@ -68,8 +68,11 @@ class DataStore(six.with_metaclass(Singleton, object)):
             EngineConnectionException if DataStore is unable to connect to ENGINE service
             All other exceptions raised by elasticsearch-py library
         """
+        ner_logger.info('******Connecting')
         if self._engine == ELASTICSEARCH:
             self._store_name = self._connection_settings[ELASTICSEARCH_ALIAS]
+            ner_logger.info(f'{self._connection_settings}')
+            ner_logger.info(f'*************self._store_name is {self._store_name}')
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
             self._client_or_connection = None

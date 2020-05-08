@@ -432,7 +432,11 @@ class TextDetector(BaseDetector):
         original_final_list_ = []
         value_final_list_ = []
         texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.__processed_texts]
-
+        ner_logger.info('******Here we go to ElasticSearch*****')
+        ner_logger.info(f'entity_name={self.entity_name}')
+        ner_logger.info(f'texts={texts}')
+        ner_logger.info(f'fuzziness_threshold={self._fuzziness}')
+        ner_logger.info(f'search_language_script={self._target_language_script}')
         _variants_to_values_list = self.db.get_similar_dictionary(entity_name=self.entity_name,
                                                                   texts=texts,
                                                                   fuzziness_threshold=self._fuzziness,

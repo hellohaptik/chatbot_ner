@@ -12,6 +12,7 @@ from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_N
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from six.moves import range
+from chatbot_ner.config import ner_logger
 
 try:
     import regex as re
@@ -285,8 +286,10 @@ class BaseDetector(six.with_metaclass(abc.ABCMeta, object)):
         # Prior results from detection.
         if predetected_values is None:
             predetected_values = []
+        
         entity_list, original_text_list = self.detect_entity(text=text,
                                                              predetected_values=predetected_values)
+                                                             
 
         if structured_value:
             if entity_list:

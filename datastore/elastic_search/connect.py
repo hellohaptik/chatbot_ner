@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from elasticsearch import Elasticsearch
-from chatbot_ner.config import CHATBOT_NER_DATASTORE
+from chatbot_ner.config import CHATBOT_NER_DATASTORE, ner_logger
 from datastore.elastic_search.transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
@@ -55,9 +55,13 @@ def get_current_live_index(alias_name):
     Returns:
         current_live_index (str): The index to which the alias is pointing.
     """
+    ner_logger.info(f'alias_name={alias_name}')
     es_url = get_es_url()
+    ner_logger.info(f'es_url={es_url}')
     es_object = ESTransfer(source=es_url, destination=None)
+    ner_logger.info(f'es_object={es_object}')
     current_live_index = es_object.fetch_index_alias_points_to(es_url, alias_name)
+    ner_logger.info(f'current_live_index={current_live_index}')
     return current_live_index
 
 
