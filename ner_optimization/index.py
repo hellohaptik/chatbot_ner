@@ -14,7 +14,7 @@ def generate_random_word(word_length=0):
 
 
 def generate_file(num):
-    file_name = f"entity_{num}.csv"
+    file_name = f"cb_ner_op_entity_{num}.csv"
     print(f"Generating {file_name}")
     with open(f"input_data/{file_name}", mode='w') as csv_file:
         field_names = ['value', 'variants']
@@ -63,7 +63,7 @@ def index(mode='create'):
         contents = convert_csv_to_dict(file_path, mode)
         url = 'http://localhost:8081/entities/data/v1'
         try:
-            req = requests.post(f"{url}/cb_ner_op_{entity_name}", data=json.dumps(contents))
+            req = requests.post(f"{url}/{entity_name}", data=json.dumps(contents))
             req.raise_for_status()
             print(f"Done {entity_name}")
         except requests.exceptions.HTTPError as e:
@@ -76,7 +76,7 @@ def generate_input_files(number_of_files):
 
 
 if __name__ == "__main__":
-    NUMBER_OF_FILES = 1 # Change this number to the number of files you want to generate
+    NUMBER_OF_FILES = 100
     generate_input_files(NUMBER_OF_FILES)
     index()
     print('All Done!')
