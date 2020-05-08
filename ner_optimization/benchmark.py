@@ -1,7 +1,13 @@
+import django
+
+django.setup()
+
 import csv
 import os
-import json
 import glob
+import random
+from ares.models import *  #For GlobalEntityModel
+from ares.lib.entity_detection.entity_detection import EntityDetector
 
 # Returns the list of all entity names from every input file
 def get_entity_names():
@@ -29,11 +35,24 @@ def get_variant_names():
     variant_names = list(dict.fromkeys(variant_names)) # Remove duplicates
     return variant_names
 
-def detect_entities(number_of_entities, number_of_variants):
-    pass
+def detect_entities(number_of_entities):
+    entity_names_indices = random.sample(range(0, len(entity_names)), number_of_entities)
+    entities = []
+    variant_names_indices = random.sample(range(0, len(variant_names)), 50)
+    variants = []
+    # Get list of number_of_entities random entities
+    for index in entity_names_indices:
+        entity = GlobalEntityModel.objects.get(name=entity_names[index])
+        entities.append(entity)
+    # Generate text of length 50 from randomly selected variant names
+    for index in variant_names_indices:
+        variants.append(variant_names[index])
+    text = " ".join(variants)
+    ed = EntityDetector(entities, text)
+    return ed.start_detection()
+    
 
 
 entity_names = get_entity_names()
 variant_names = get_variant_names()
-print(variant_names)
-print(len(variant_names))
+print(detect_entities(2))
