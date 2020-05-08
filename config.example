@@ -5,7 +5,6 @@
 
 NAME=chatbot_ner
 DJANGODIR=/app
-DJANGO_DEBUG=False
 DJANGO_LOG_LEVEL=DEBUG
 DJANGO_SETTINGS_MODULE=chatbot_ner.settings
 DJANGO_WSGI_MODULE=chatbot_ner/wsgi.py
