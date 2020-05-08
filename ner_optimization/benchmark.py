@@ -29,6 +29,9 @@ def get_variant_names():
     variant_names = list(dict.fromkeys(variant_names)) # Remove duplicates
     return variant_names
 
+def detect_entities(number_of_entities, number_of_variants):
+    pass
+
 
 entity_names = get_entity_names()
 variant_names = get_variant_names()
