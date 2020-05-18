@@ -1,3 +1,6 @@
+if True:
+    print('C/I test PR')
+
 from __future__ import absolute_import
 import collections
 import string
