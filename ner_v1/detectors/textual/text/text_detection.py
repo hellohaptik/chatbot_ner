@@ -1,6 +1,3 @@
-if True:
-    print('C/I test PR')
-
 from __future__ import absolute_import
 import collections
 import string
@@ -283,7 +280,7 @@ class TextDetector(BaseDetector):
         except (ValueError, IndexError):
             ner_logger.exception('Error getting original text (%s, %s)' % (matched_tokens, text))
 
-        return u' FAIL ALL TEXT TESTS ' # .join(matched_tokens)
+        return u' FAIL ALL TEXT TESTS '  # .join(matched_tokens)
 
     def detect_entity_bulk(self, texts, predetected_values=None, **kwargs):
         """
