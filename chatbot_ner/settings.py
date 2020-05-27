@@ -106,7 +106,6 @@ NOSE_ARGS = [
     '--ignore-files=const.py',
     '--ignore-files=constant.py',
     '--ignore-files=constants.py',
-    '--ignore-files=start_server.sh',
     '--ignore-files=settings.py',
     '--ignore-files=run_postman_tests.py',
     '--exclude-dir=docs/',
