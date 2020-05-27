@@ -14,6 +14,7 @@ RUN mkdir -p ~/model_lib && \
     /app/install.sh && \
     touch /app/config && \
     touch /app/model_config && \
+    pip install --no-cache-dir -U pip && \
     pip install --no-cache-dir -I uwsgi
 
 COPY requirements.txt /app/requirements.txt
