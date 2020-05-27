@@ -6,15 +6,20 @@ uwsgi
 """
 
 from __future__ import absolute_import
+
+from typing import List
+
 from chatbot_ner.config import ner_logger
 
 try:
     import regex as re
+
     _re_flags = re.UNICODE | re.V1 | re.WORD
 
 except ImportError:
     ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
     import re
+
     _re_flags = re.UNICODE
 
 
@@ -33,6 +38,7 @@ class RegexDetector(object):
          matches (list of _sre.SRE_Match): re.finditer match objects
          pattern (raw str or str or unicode): pattern to be compiled into a re object
     """
+
     def __init__(self, entity_name, pattern, re_flags=DEFAULT_FLAGS, max_matches=50):
         """
         Args:
@@ -95,8 +101,8 @@ class RegexDetector(object):
         original_list = []  # type: List[str]
         match_list = []  # type: List[str]
         for match in self.pattern.finditer(self.processed_text):
-            match_text = match.group(0).strip()
-            if match_text:
+            if match.group(0).strip():
+                match_text = match.group(0)
                 match_list.append(match_text)
                 original_list.append(match_text)
             if len(match_list) >= self.max_matches:
@@ -116,4 +122,3 @@ class RegexDetector(object):
             self.tagged_text = self.tagged_text.replace(detected_text, RegexDetector.MATCH_PLACEHOLDER, 1)
             self.processed_text = self.processed_text.replace(detected_text, '', 1)
         self.tagged_text = self.tagged_text.replace(RegexDetector.MATCH_PLACEHOLDER, self.tag)
-
