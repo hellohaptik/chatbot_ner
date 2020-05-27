@@ -41,7 +41,7 @@ class TestRegexDetector(TestCase):
     def test_non_empty_matches(self):
         """Test if RegexDetector returns only non empty matches"""
         entity_name = 'test'
-        tag = '__{}__'.format(entity_name)
+        _ = '__{}__'.format(entity_name)
         pattern = '\\b(\\d+|)\\b'
         text = 'there are no numbers in this text! but the pattern is bad too, it matches empty string'
 
