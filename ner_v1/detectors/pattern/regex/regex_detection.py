@@ -92,18 +92,19 @@ class RegexDetector(object):
                 list: list containing substrings of text that matched the set pattern
                 list: list containing corresponding substrings of original text that were identified as entity values
         """
-        original_list = []
-        match_list = []
+        original_list = []  # type: List[str]
+        match_list = []  # type: List[str]
         for match in self.pattern.finditer(self.processed_text):
             match_text = match.group(0).strip()
             if match_text:
-                match_list.append(match_list)
-                original_list.append(match_list)
+                match_list.append(match_text)
+                original_list.append(match_text)
             if len(match_list) >= self.max_matches:
                 break
         return match_list, original_list
 
     def _update_processed_text(self, match_list):
+        # type: (List[str]) -> None
         """
         Update processed text by removing already found entity values and update tagged text to replace found
         values with the set tag
