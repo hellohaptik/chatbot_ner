@@ -1,7 +1,9 @@
 #!/bin/bash
 
+CONTAINER = $(docker ps -q -f name=chatbot-ner)
+
 if [ "$1" == "--html" ]; then
-    docker exec -it docker_chatbot-ner_1 python postman_tests/run_postman_tests.py --html
+    docker exec -it $CONTAINER python postman_tests/run_postman_tests.py --html
 else
-    docker exec -it docker_chatbot-ner_1 python postman_tests/run_postman_tests.py
+    docker exec -it $CONTAINER python postman_tests/run_postman_tests.py
 fi

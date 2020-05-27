@@ -4,11 +4,6 @@ FROM python:3.6.10
 
 RUN apt-get update && apt-get install -y wget build-essential curl nginx supervisor
 
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
-    apt-get install nodejs && \
-    npm install -g newman && \
-    npm install -g newman-reporter-htmlextra
-
 WORKDIR /app
 
 COPY docker/install.sh nltk_setup.py datastore_setup.py /app/
@@ -27,6 +22,7 @@ COPY requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
+# Do not remove these vars, supervisor reads some of them
 ENV NAME="chatbot_ner"
 ENV DJANGODIR=/app
 ENV NUM_WORKERS=4
@@ -41,6 +37,12 @@ ENV SECRET_KEY=!yqqcz-v@(s@kpygpvomcuu3il0q1&qtpz)e_g0ulo-sdv%c0c
 EXPOSE 8081
 
 ADD . /app
+
+# Newman for postman test suite. Probably should be included in a separate Dockerfile with multi stage build
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
+    apt-get install nodejs && \
+    npm install -g newman && \
+    npm install -g newman-reporter-htmlextra
 
 # entrypoint/cmd script
 CMD /app/docker/cmd.sh

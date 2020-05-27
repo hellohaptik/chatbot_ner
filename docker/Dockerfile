@@ -20,6 +20,7 @@ COPY requirements.txt /app/requirements.txt
 
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
+# Do not remove these vars, supervisor reads some of them
 ENV NAME="chatbot_ner"
 ENV DJANGODIR=/app
 ENV NUM_WORKERS=4
