@@ -22,8 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-_dj_debug = os.environ.get('DJANGO_DEBUG', 'false')
-DEBUG = (_dj_debug and _dj_debug.lower() == 'true')
+DEBUG = False
 
 TEMPLATE_DEBUG = False
 
@@ -107,7 +106,6 @@ NOSE_ARGS = [
     '--ignore-files=const.py',
     '--ignore-files=constant.py',
     '--ignore-files=constants.py',
-    '--ignore-files=start_server.sh',
     '--ignore-files=settings.py',
     '--ignore-files=run_postman_tests.py',
     '--exclude-dir=docs/',

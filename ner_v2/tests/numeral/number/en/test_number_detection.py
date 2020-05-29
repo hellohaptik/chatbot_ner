@@ -154,7 +154,7 @@ class NumberDetectorTestMeta(type):
     @classmethod
     def yaml_testsuite_generator(cls):
         for filepath in cls.yaml_test_files:
-            test_data = yaml.load(io.open(filepath, "r", encoding="utf-8"))
+            test_data = yaml.load(io.open(filepath, "r", encoding="utf-8"), Loader=yaml.SafeLoader)
             for language in test_data["tests"]:
                 for i, testcase in enumerate(test_data["tests"][language]):
                     yield (
