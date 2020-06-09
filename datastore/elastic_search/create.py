@@ -4,7 +4,7 @@ log_prefix = 'datastore.elastic_search.create'
 
 
 def exists(connection, index_name):
-    """
+    '''
     Checks if index_name exists
 
     Args:
@@ -13,12 +13,12 @@ def exists(connection, index_name):
 
     Returns:
         boolean, True if index exists , False otherwise
-    """
+    '''
     return connection.indices.exists(index_name)
 
 
 def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **kwargs):
-    """
+    '''
     Deletes the index named index_name
 
     Args:
@@ -33,7 +33,7 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
             wait_for_active_shards: Set the number of active shards to wait for before the operation returns.
 
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.delete
-    """
+    '''
     if not exists(connection, index_name):
         if err_if_does_not_exist:
             raise Exception('Failed to delete index {}. It does not exist!'.format(index_name))
@@ -45,7 +45,7 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
 
 
 def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if_exists=True, **kwargs):
-    """
+    '''
     Creates an Elasticsearch index needed for similarity based searching
     Args:
         connection: Elasticsearch client object
@@ -67,7 +67,7 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if
                                 (missing or closed)
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
-    """
+    '''
     if exists(connection=connection, index_name=index_name):
         if err_if_exists:
             raise Exception('Failed to create index {}. it already exists. Please check and delete it using '
@@ -118,7 +118,7 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if
 
 
 def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
-    """
+    '''
     Creates an mapping specific to entity storage in elasticsearch and makes a call to create_index
     to create the index with the given mapping body
     Args:
@@ -141,32 +141,36 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
 
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
-    """
+    '''
     mapping_body = {
         doc_type: {
             'properties': {
                 'language_script': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 },
                 'value': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 },
                 'variants': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                     'analyzer': 'my_analyzer',
-                    'norms': {
-                        'enabled': False  # Needed if we want to give longer variants higher scores
-                    },
+                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
                 },
                 # other removed/unused fields, kept only for backward compatibility
                 'dict_type': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 },
                 'entity_data': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 },
                 'source_language': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 }
             }
         }
@@ -176,7 +180,7 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
 
 
 def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
-    """
+    '''
     This method is used to create an index with mapping suited for story training_data
     Args:
         connection: Elasticsearch client object
@@ -198,7 +202,7 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
 
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.create
         Refer https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.client.IndicesClient.put_mapping
-    """
+    '''
     mapping_body = {
         doc_type: {
             'properties': {
@@ -222,7 +226,7 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
 
 
 def create_alias(connection, index_list, alias_name, logger, **kwargs):
-    """
+    '''
     This method is used to create alias for list of indices
     Args:
         connection:
@@ -232,7 +236,7 @@ def create_alias(connection, index_list, alias_name, logger, **kwargs):
 
         **kwargs:
             https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
-    """
+    '''
     logger.debug('Alias creation %s started %s' % alias_name)
     connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
     logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
