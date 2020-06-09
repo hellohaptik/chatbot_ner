@@ -208,10 +208,11 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            for index_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
-                if self._connection_settings.get(index_key):
+            for index_name_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
+                if self._connection_settings.get(index_name_key):
+                    index_name = self._connection_settings.get(index_name_key)
                     elastic_search.create.delete_index(connection=self._client_or_connection,
-                                                       index_name=self._store_name,
+                                                       index_name=index_name,
                                                        logger=ner_logger,
                                                        err_if_does_not_exist=err_if_does_not_exist,
                                                        **kwargs)
