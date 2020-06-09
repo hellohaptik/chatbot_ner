@@ -217,12 +217,15 @@ class DataStore(six.with_metaclass(Singleton, object)):
             for (index_name_key, alias_name) in delete_map:
                 if self._connection_settings.get(index_name_key):
                     index_name = self._connection_settings.get(index_name_key)
+                    if alias_name:
+                        elastic_search.create.delete_alias(connection=self._client_or_connection,
+                                                           index_list=[index_name],
+                                                           logger=ner_logger)
                     elastic_search.create.delete_index(connection=self._client_or_connection,
                                                        index_name=index_name,
                                                        logger=ner_logger,
                                                        err_if_does_not_exist=err_if_does_not_exist,
                                                        **kwargs)
-            # TODO: cleanup aliases ?
 
     # === Incompatible or deprecated/duplicate APIs
 
