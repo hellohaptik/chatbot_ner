@@ -220,6 +220,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
                     if alias_name:
                         elastic_search.create.delete_alias(connection=self._client_or_connection,
                                                            index_list=[index_name],
+                                                           alias_name=alias_name,
                                                            logger=ner_logger)
                     elastic_search.create.delete_index(connection=self._client_or_connection,
                                                        index_name=index_name,
