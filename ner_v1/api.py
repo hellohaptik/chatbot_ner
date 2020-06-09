@@ -8,7 +8,7 @@ from django.http import HttpResponse
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
-from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
+from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_ENTITY_NAMES, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX,
                            PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, PARAMETER_PRIOR_RESULTS)
 
@@ -23,6 +23,7 @@ from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZIN
                              PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
                              PARAMETER_LIVE_CRF_MODEL_PATH)
 from django.views.decorators.csrf import csrf_exempt
+from datastore import DataStore
 
 
 def to_bool(value):
@@ -55,7 +56,7 @@ def get_parameters_dictionary(request):
     """
     parameters_dict = {
         PARAMETER_MESSAGE: request.GET.get('message'),
-        PARAMETER_ENTITY_NAME: request.GET.get('entity_name'),
+        PARAMETER_ENTITY_NAMES: request.GET.get('text_entities'),
         PARAMETER_STRUCTURED_VALUE: request.GET.get('structured_value'),
         PARAMETER_FALLBACK_VALUE: request.GET.get('fallback_value'),
         PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
@@ -110,6 +111,17 @@ def parse_post_request(request):
 
     return parameters_dict
 
+@csrf_exempt
+def text1(request):
+    ner_logger.debug('Inside text1')
+    ner_logger.debug(request.GET.get('message'))
+    ner_logger.debug(request.GET.get('text_entities'))
+    parameters_dict = get_parameters_dictionary(request)
+    ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAMES])
+    entity_names = request.GET.get('text_entities')
+    message = request.GET.get('message')
+    db = DataStore()
+    return db.get_similar_dictionary_1(entity_names=entity_names, message=message)
 
 @csrf_exempt
 def text(request):

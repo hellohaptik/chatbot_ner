@@ -37,6 +37,7 @@ IF_POSSIBLE = 2
 # ************************ constants used as a key of request  ************************
 PARAMETER_MESSAGE = 'message'
 PARAMETER_ENTITY_NAME = 'entity_name'
+PARAMETER_ENTITY_NAMES = 'entity_names'
 PARAMETER_STRUCTURED_VALUE = 'structured_value'
 PARAMETER_STRUCTURED_VALUE_VERIFICATION = 'structured_value_verification'
 PARAMETER_FALLBACK_VALUE = 'fallback_value'

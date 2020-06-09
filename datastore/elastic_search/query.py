@@ -246,6 +246,27 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
         values = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
     return values
 
+def full_text_query_1(connection, index_name, doc_type, entity_names, message, fuzziness_threshold,
+                    search_language_script=None, **kwargs):
+    ner_logger.debug('Inside full_text_query_1')
+    ner_logger.debug(entity_names)
+    ner_logger.debug(message)
+    index_header = json.dumps({'index': 'gogo_entity_data_v2', 'type': doc_type})
+    data = []
+    query = _generate_es_search_dictionary_1(entity_names=entity_names,
+                                               message=message,
+                                               fuzziness_threshold=fuzziness_threshold,
+                                               language_script=search_language_script)
+    data.append(index_header)
+    data.append(json.dumps(query))
+    data = '\n'.join(data)
+    kwargs = dict(kwargs, body=data, doc_type=doc_type, index='gogo_entity_data_v2')
+    ner_logger.info(f'^^^^^^^^^^^^^^^^kwargs is {kwargs}')
+    results = _run_es_search(connection, msearch=True, **kwargs)
+    ner_logger.debug('Results are')
+    ner_logger.debug(results)
+    return _parse_es_search_results(results.get("responses"))
+
 
 def full_text_query(connection, index_name, doc_type, entity_name, sentences, fuzziness_threshold,
                     search_language_script=None, **kwargs):
@@ -369,6 +390,68 @@ def _get_dynamic_fuzziness_threshold(fuzzy_setting):
 
     return fuzzy_setting
 
+def _generate_es_search_dictionary_1(entity_names, message,
+                                   fuzziness_threshold=1,
+                                   language_script=ENGLISH_LANG,
+                                   size=constants.ELASTICSEARCH_SEARCH_SIZE,
+                                   as_json=False):
+    must_terms = []
+    terms_dict_entity_names = {
+        'terms': {
+            'entity_data': ['cb_ner_op_entity_1', 'cb_ner_op_entity_3']
+        }
+    }
+    must_terms.append(terms_dict_entity_names)
+
+    # search on language_script, add english as default search
+    term_dict_language = {
+        'terms': {
+            'language_script': [ENGLISH_LANG]
+        }
+    }
+
+    # if language_script != ENGLISH_LANG:
+    #     term_dict_language['terms']['language_script'].append(language_script)
+
+    must_terms.append(term_dict_language)
+
+    should_terms = []
+    query = {
+        'match': {
+            'variants': {
+                'query': message,
+                'fuzziness': _get_dynamic_fuzziness_threshold(fuzziness_threshold),
+                'prefix_length': 1
+            }
+        }
+    }
+    should_terms.append(query)
+
+    data = {
+        '_source': ['value'],
+        'query': {
+            'bool': {
+                'must': must_terms,
+                'should': should_terms,
+                'minimum_should_match': 1
+            },
+        },
+        'highlight': {
+            'fields': {
+                'variants': {
+                    'type': 'unified'  # experimental in 5.x, default in 6.x and 7.x. Faster than 'plain'
+                }
+            },
+            'order': 'score',
+            'number_of_fragments': 20
+        },
+        'size': size
+    }
+
+    if as_json:
+        data = json.dumps(data)
+
+    return data
 
 def _generate_es_search_dictionary(entity_name, text,
                                    fuzziness_threshold=1,

@@ -406,6 +406,29 @@ class DataStore(six.with_metaclass(Singleton, object)):
 
     # === New Style CRUD APIs that support languages and partial updates ===
 
+    def get_similar_dictionary_1(self, entity_names, message, fuzziness_threshold="auto:4,7",
+                               search_language_script=None, **kwargs):
+        ner_logger.debug('Inside get_similar_dictionary_1')
+        results_list = []
+        if self._client_or_connection is None:
+            self._connect()
+        if self._engine == ELASTICSEARCH:
+            self._check_doc_type_for_elasticsearch()
+            request_timeout = self._connection_settings.get('request_timeout', 20)
+            results_list = elastic_search.query.full_text_query_1(connection=self._client_or_connection,
+                                                                index_name=self._store_name,
+                                                                doc_type=self._connection_settings[
+                                                                    ELASTICSEARCH_DOC_TYPE],
+                                                                entity_names=entity_names,
+                                                                message=message,
+                                                                fuzziness_threshold=fuzziness_threshold,
+                                                                search_language_script=search_language_script,
+                                                                request_timeout=request_timeout,
+                                                                **kwargs)
+        ner_logger.info('hoooooooooooo')
+        ner_logger.info(results_list)
+        return results_list
+
     def get_similar_dictionary(self, entity_name, texts, fuzziness_threshold="auto:4,7",
                                search_language_script=None, **kwargs):
         """
