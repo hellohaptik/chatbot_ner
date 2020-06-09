@@ -144,13 +144,29 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     """
     mapping_body = {
         doc_type: {
-            'properties': {
-                'variants': {
-                    'type': 'text',
-                    'analyzer': 'my_analyzer',
-                    'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
-                }
-            }
+            'language_script': {
+                'type': 'text',
+            },
+            'value': {
+                'type': 'text',
+            },
+            'variants': {
+                'type': 'text',
+                'analyzer': 'my_analyzer',
+                'norms': {
+                    'enabled': False  # Needed if we want to give longer variants higher scores
+                },
+            },
+            # other removed/unused fields, kept only for backward compatibility
+            'dict_type': {
+                'type': 'text',
+            },
+            'entity_data': {
+                'type': 'text',
+            },
+            'source_language': {
+                'type': 'text',
+            },
         }
     }
 
@@ -184,17 +200,17 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
     mapping_body = {
         doc_type: {
             'properties': {
-                "entity_data": {
-                    "type": "text"
+                'entity_data': {
+                    'type': 'text'
                 },
-                "sentence": {
-                    "enabled": "false"
+                'sentence': {
+                    'enabled': 'false'
                 },
-                "entities": {
-                    "enabled": "false"
+                'entities': {
+                    'enabled': 'false'
                 },
-                "language_script": {
-                    "type": "text"
+                'language_script': {
+                    'type': 'text'
                 }
             }
         }
