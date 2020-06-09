@@ -206,10 +206,10 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
                     'type': 'text'
                 },
                 'sentence': {
-                    'enabled': 'false'
+                    'enabled': False
                 },
                 'entities': {
-                    'enabled': 'false'
+                    'enabled': False
                 },
                 'language_script': {
                     'type': 'text'
