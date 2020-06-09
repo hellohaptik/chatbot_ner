@@ -144,29 +144,31 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     """
     mapping_body = {
         doc_type: {
-            'language_script': {
-                'type': 'text',
-            },
-            'value': {
-                'type': 'text',
-            },
-            'variants': {
-                'type': 'text',
-                'analyzer': 'my_analyzer',
-                'norms': {
-                    'enabled': False  # Needed if we want to give longer variants higher scores
+            'properties': {
+                'language_script': {
+                    'type': 'text',
                 },
-            },
-            # other removed/unused fields, kept only for backward compatibility
-            'dict_type': {
-                'type': 'text',
-            },
-            'entity_data': {
-                'type': 'text',
-            },
-            'source_language': {
-                'type': 'text',
-            },
+                'value': {
+                    'type': 'text',
+                },
+                'variants': {
+                    'type': 'text',
+                    'analyzer': 'my_analyzer',
+                    'norms': {
+                        'enabled': False  # Needed if we want to give longer variants higher scores
+                    },
+                },
+                # other removed/unused fields, kept only for backward compatibility
+                'dict_type': {
+                    'type': 'text',
+                },
+                'entity_data': {
+                    'type': 'text',
+                },
+                'source_language': {
+                    'type': 'text',
+                }
+            }
         }
     }
 
