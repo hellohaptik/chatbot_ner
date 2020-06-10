@@ -209,25 +209,15 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            delete_map = [
-                (ELASTICSEARCH_INDEX_1, self._store_name),
-                (ELASTICSEARCH_INDEX_2, self._store_name),
-                (ELASTICSEARCH_CRF_DATA_INDEX_NAME, None),
-            ]
-            for (index_name_key, alias_name) in delete_map:
+            delete_map = [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]
+            for index_name_key in delete_map:
                 if self._connection_settings.get(index_name_key):
                     index_name = self._connection_settings.get(index_name_key)
-                    if alias_name:
-                        elastic_search.create.delete_alias(connection=self._client_or_connection,
-                                                           index_list=[index_name],
-                                                           alias_name=alias_name,
-                                                           logger=ner_logger)
                     elastic_search.create.delete_index(connection=self._client_or_connection,
                                                        index_name=index_name,
                                                        logger=ner_logger,
                                                        err_if_does_not_exist=err_if_does_not_exist,
                                                        **kwargs)
-
     # === Incompatible or deprecated/duplicate APIs
 
     # FIXME: repopulate does not consider language of the variants

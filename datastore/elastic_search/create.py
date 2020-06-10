@@ -48,6 +48,7 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
         else:
             return
 
+    delete_alias(connection=connection, index_list=[index_name], alias_name='_all', logger=logger)
     connection.indices.delete(index=index_name, **kwargs)
     logger.debug('%s: Delete Index %s: Operation successfully completed', log_prefix, index_name)
 
