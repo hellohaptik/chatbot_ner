@@ -2,6 +2,7 @@ import logging
 from typing import List, Dict, Any
 
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 
 from .utils import filter_kwargs
 
@@ -48,7 +49,11 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
         else:
             return
 
-    delete_alias(connection=connection, index_list=[index_name], alias_name='_all', logger=logger)
+    try:
+        delete_alias(connection=connection, index_list=[index_name], alias_name='_all', logger=logger)
+    except NotFoundError:
+        logger.warning('No aliases found on on index %s', index_name)
+
     connection.indices.delete(index=index_name, **kwargs)
     logger.debug('%s: Delete Index %s: Operation successfully completed', log_prefix, index_name)
 
@@ -251,9 +256,9 @@ def create_alias(connection, index_list, alias_name, logger, **kwargs):
         **kwargs:
             https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
     """
-    logger.debug('Putting alias %s to indices: %s' % (alias_name, str(index_list)))
+    logger.debug('Putting alias %s to indices: %s', alias_name, str(index_list))
     connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
-    logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
+    logger.debug('Alias %s now points to indices %s', alias_name, str(index_list))
 
 
 def delete_alias(connection, index_list, alias_name, logger, **kwargs):
@@ -269,6 +274,6 @@ def delete_alias(connection, index_list, alias_name, logger, **kwargs):
         **kwargs:
             https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
     """
-    logger.debug('Removing alias %s from indices: %s' % (alias_name, str(index_list)))
+    logger.debug('Removing alias %s from indices: %s', alias_name, str(index_list))
     connection.indices.delete_alias(index=index_list, name=alias_name, **kwargs)
-    logger.debug('Alias %s removed from indices %s' % (alias_name, str(index_list)))
+    logger.debug('Alias %s removed from indices %s', alias_name, str(index_list))
