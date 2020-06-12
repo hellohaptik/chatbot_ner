@@ -6,7 +6,7 @@
     },
     "expected": [
       {
-        "original_text": "23 december",
+        "original_text": "23 december 2030g",
         "type": "date",
         "dd": 23,
         "mm": 12,
@@ -21,7 +21,7 @@
     },
     "expected": [
       {
-        "original_text": "2 may",
+        "original_text": "2 may 2030",
         "type": "date",
         "dd": 2,
         "mm": 5,
@@ -36,7 +36,7 @@
     },
     "expected": [
       {
-        "original_text": "3 june",
+        "original_text": "3 june 2030",
         "type": "date",
         "dd": 3,
         "mm": 6,
