@@ -398,7 +398,7 @@ def _generate_es_search_dictionary_1(entity_names, message,
     must_terms = []
     terms_dict_entity_names = {
         'terms': {
-            'entity_data': ['cb_ner_op_entity_1', 'cb_ner_op_entity_3']
+            'entity_data': entity_names
         }
     }
     must_terms.append(terms_dict_entity_names)

@@ -118,10 +118,12 @@ def text1(request):
     ner_logger.debug(request.GET.get('text_entities'))
     parameters_dict = get_parameters_dictionary(request)
     ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAMES])
-    entity_names = request.GET.get('text_entities')
+    entity_names = json.loads(request.GET.get('text_entities'))
+    ner_logger.debug(f'First element is {entity_names[0]}')
     message = request.GET.get('message')
     db = DataStore()
-    return db.get_similar_dictionary_1(entity_names=entity_names, message=message)
+    result = db.get_similar_dictionary_1(entity_names=entity_names, message=message)
+    return HttpResponse(json.dumps({'data': result}), content_type='application/json')
 
 @csrf_exempt
 def text(request):
