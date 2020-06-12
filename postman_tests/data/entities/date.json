@@ -6,7 +6,7 @@
     },
     "expected": [
       {
-        "original_text": "23 december 2030g",
+        "original_text": "23 december 2030",
         "type": "date",
         "dd": 23,
         "mm": 12,
