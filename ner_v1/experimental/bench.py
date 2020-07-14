@@ -112,6 +112,7 @@ class ET_1(Mode):
                     json.dumps({'index': es_index, 'type': doc_type}),
                     json.dumps(base_query(text=text, entities=[entity]))
                 ]
+                body.append('\n')
                 q.append('\n'.join(body))
         return q
 
@@ -126,6 +127,7 @@ class T_E(Mode):
             for entity in entities:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
+            body.append('\n')
             q.append('\n'.join(body))
         return q
 
@@ -140,6 +142,7 @@ class E_T(Mode):
             for text in texts:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
+            body.append('\n')
             q.append('\n'.join(body))
         return q
 
@@ -154,6 +157,8 @@ class One_ET(Mode):
             for text in texts:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
+
+        body.append('\n')
         q.append('\n'.join(body))
         return q
 
@@ -168,7 +173,9 @@ class One_T(Mode):
             body.append(json.dumps({'index': es_index, 'type': doc_type}))
             body.append(json.dumps(base_query(text=text, entities=entities)))
 
+        body.append('\n')
         q.append('\n'.join(body))
+        return q
 
 
 # modes are ET/1, T/E, E/T, 1/ET, 1/T
@@ -214,4 +221,3 @@ class Executor(object):
 # run n times for average
 # record outputs for each for raw comparison
 # run rest of the text detector code*
-
