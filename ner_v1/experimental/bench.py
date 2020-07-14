@@ -119,6 +119,23 @@ class Mode(object):
                 r.append([entity_name, entity_value, list(sorted(d[(entity_name, entity_value)]))])
         return es_took, r
 
+    @classmethod
+    def parse_multiplexed(cls, responses, len_t, len_e):
+        # responses is [R', ... size T]
+        es_took = 0
+        r = []
+        for es_r in responses:
+            d = collections.defaultdict(list)
+            es_took += es_r['took']
+            for hit in es_r['hits']['hits']:
+                entity_name = hit['_source']['entity_data']
+                entity_value = hit['_source']['value']
+                entity_variants = hit['highlight']['variants']
+                d[(entity_name, entity_value)].extend(entity_variants)
+            for (entity_name, entity_value) in sorted(d.keys()):
+                r.append([entity_name, entity_value, list(sorted(d[(entity_name, entity_value)]))])
+        return es_took, r
+
 
 class TE_One(Mode):
     # T * E network calls 1 search query each
@@ -224,20 +241,8 @@ class One_T(Mode):
 
     @classmethod
     def parse(cls, responses, len_t, len_e):
-        # responses is [R', ... size T]
-        es_took = 0
-        r = []
-        for es_r in responses:
-            d = collections.defaultdict(list)
-            es_took += es_r['took']
-            for hit in es_r['hits']['hits']:
-                entity_name = hit['_source']['entity_data']
-                entity_value = hit['_source']['value']
-                entity_variants = hit['highlight']['variants']
-                d[(entity_name, entity_value)].extend(entity_variants)
-            for (entity_name, entity_value) in sorted(d.keys()):
-                r.append([entity_name, entity_value, list(sorted(d[(entity_name, entity_value)]))])
-        return es_took, r
+        # responses is [[R', ... size T]]
+        return Mode.parse_multiplexed(responses[0], len_t, len_e)
 
 
 class T_One(Mode):
@@ -258,7 +263,7 @@ class T_One(Mode):
         # responses is [[R'], ... size T]
         # flatten
         responses = [response[0] for response in responses]
-        return One_T.parse(responses, len_t, len_e)
+        return Mode.parse_multiplexed(responses, len_t, len_e)
 
 
 # modes are TE/1, T/E, T/1, E/T, 1/TE, 1/T
