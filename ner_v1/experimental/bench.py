@@ -35,8 +35,10 @@ multiple entities E, multiple texts T
 """
 
 scheme = 'http'
+host = ''
+port = ''
 es_index = 'entity_index'
-es_url = f'{scheme}://.../{es_index}/_msearch/'
+es_url = f'{scheme}://{host}:{port}/{es_index}/_msearch/'
 doc_type = 'data_dictionary'
 es_size = 100
 
@@ -90,7 +92,16 @@ def base_query(text, entities):
     return q
 
 
-class ET_1:
+class Mode(object):
+    @classmethod
+    def parse(cls, response):
+        print('=' * 80)
+        print(cls.__name__)
+        print('=' * 80)
+        print(response)
+
+
+class ET_1(Mode):
     # E * T network calls 1 search query each
     @staticmethod
     def build(texts, entities):
@@ -104,12 +115,8 @@ class ET_1:
                 q.append('\n'.join(body))
         return q
 
-    @staticmethod
-    def parse(response):
-        ...
 
-
-class T_E:
+class T_E(Mode):
     # T network calls E search query each
     @staticmethod
     def build(texts, entities):
@@ -120,13 +127,10 @@ class T_E:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
             q.append('\n'.join(body))
-
-    @staticmethod
-    def parse(response):
-        ...
+        return q
 
 
-class E_T:
+class E_T(Mode):
     # E network calls T search query each
     @staticmethod
     def build(texts, entities):
@@ -137,13 +141,10 @@ class E_T:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
             q.append('\n'.join(body))
-
-    @staticmethod
-    def parse(response):
-        ...
+        return q
 
 
-class One_ET:
+class One_ET(Mode):
     # 1 network call with E * T search query each
     @staticmethod
     def build(texts, entities):
@@ -153,15 +154,11 @@ class One_ET:
             for text in texts:
                 body.append(json.dumps({'index': es_index, 'type': doc_type}))
                 body.append(json.dumps(base_query(text=text, entities=[entity])))
-
         q.append('\n'.join(body))
-
-    @staticmethod
-    def parse(response):
-        ...
+        return q
 
 
-class One_T:
+class One_T(Mode):
     # 1 network call with T search query each
     @staticmethod
     def build(texts, entities):
@@ -172,10 +169,6 @@ class One_T:
             body.append(json.dumps(base_query(text=text, entities=entities)))
 
         q.append('\n'.join(body))
-
-    @staticmethod
-    def parse(response):
-        ...
 
 
 # modes are ET/1, T/E, E/T, 1/ET, 1/T
@@ -192,6 +185,9 @@ class Executor(object):
             self.pool = ThreadPoolExecutor(max_workers=tpool_size)
 
     def _execute(self, q):
+        print('=' * 80)
+        print(q)
+        print('=' * 80)
         return requests.post(es_url, data=q, headers=json_headers).json()
 
     def execute(self, queries, parser_fn):
@@ -218,3 +214,4 @@ class Executor(object):
 # run n times for average
 # record outputs for each for raw comparison
 # run rest of the text detector code*
+
