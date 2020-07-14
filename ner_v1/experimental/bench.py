@@ -108,7 +108,7 @@ class Mode(object):
         for i in range(len_t):
             d = collections.defaultdict(list)
             for j in range(len_e):
-                es_r = responses[i * len_t + j][0]
+                es_r = responses[i * len_t + j]
                 es_took += es_r['took']
                 for hit in es_r['hits']['hits']:
                     entity_name = hit['_source']['entity_data']
@@ -268,11 +268,8 @@ json_headers = {'Content-type': 'application/json'}
 
 class Executor(object):
     def __init__(self, tpool_size=0):
+        self.tpool_size = tpool_size
         self.pool = None
-        if tpool_size:
-            # careful not to use ProcessPool in this place because child processes can stick around when script exits
-            # as we are not terminating the pool explicitly
-            self.pool = ThreadPoolExecutor(max_workers=tpool_size)
 
     def _execute(self, q):
         # print('=' * 80)
@@ -298,25 +295,51 @@ class Executor(object):
         es_time, parsed = mode_cls.parse(responses, len(texts), len(entities))
         return exe_time, es_time, parsed
 
-    def bench(self, texts, entities):
-        for mode_cls in QUERY_MODES:
-            exe_time, es_time, parsed = self.run_detection(texts, entities, mode_cls)
-            print("=" * 80)
-            print("-" * 80)
-            print(f'{mode_cls.__name__}, exec time: {exe_time}, es time: {es_time}')
-            print("-" * 80)
-            print(parsed)
-            print("-" * 80)
-            print("=" * 80)
+    def close(self):
+        if self.pool:
+            self.pool.shutdown()
+
+    def __enter__(self):
+        if self.tpool_size:
+            # careful not to use ProcessPool in this place because child processes can stick around when script exits
+            # as we are not terminating the pool explicitly
+            self.pool = ThreadPoolExecutor(max_workers=self.tpool_size)
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
 
 
 def make_expected_output(texts, entities):
-    e = Executor()
-    _, _, parsed = e.run_detection(texts, entities, TE_One)
+    with Executor() as e:
+        _, _, parsed = e.run_detection(texts, entities, TE_One)
     return parsed
 
-# for pool_size in [0, 2, 4, 8, 16, 32, 64]:
-# instrument ES execution and total
-# run n times for average
-# record outputs for each for raw comparison
-# run rest of the text detector code*
+
+def bench(texts, entities, n_runs=5, pool_sizes=(0,)):
+    expected_parsed = make_expected_output(texts, entities)
+    for mode_cls in QUERY_MODES:
+        for pool_size in pool_sizes:
+            exe_times, es_times, correct = [], [], []
+            for run_no in range(n_runs):
+                # TODO: Should executor be re-init everytime ?
+                with Executor(tpool_size=pool_size) as e:
+                    exe_time, es_time, parsed = e.run_detection(texts, entities, mode_cls)
+                    exe_times.append(exe_time)
+                    es_times.append(es_time)
+                    correct.append(int((parsed == expected_parsed)))
+
+            mexe_times = float(sum(exe_times)) / len(exe_times)
+            mes_times = float(sum(exe_times)) / len(exe_times)
+            print("=" * 80)
+            # print("-" * 80)
+            print(f'{mode_cls.__name__}, pool_size: {pool_size}, n_runs: {n_runs}, avg exec time: {mexe_times}, '
+                  f'avg es time: {mes_times}, correct: {sum(correct)}')
+            # print("-" * 80)
+            # print(parsed)
+            # print("-" * 80)
+            print("=" * 80)
+
+    # TODO:
+    # run rest of the text detector code*
+    # instrument ES execution and total
