@@ -160,8 +160,8 @@ class One_TE(Mode):
 
     @classmethod
     def parse(cls, responses, len_t, len_e):
-        # responses is [R, ... size T * E]
-        return Mode.parse(responses, len_t, len_e)
+        # responses is [[R, ... size T * E]]
+        return Mode.parse(responses[0], len_t, len_e)
 
 
 class T_E(Mode):
@@ -330,7 +330,7 @@ def bench(texts, entities, n_runs=5, pool_sizes=(0,)):
                     correct.append(int((parsed == expected_parsed)))
 
             mexe_times = float(sum(exe_times)) / len(exe_times)
-            mes_times = float(sum(exe_times)) / len(exe_times)
+            mes_times = float(sum(es_times)) / len(es_times)
             print("=" * 80)
             # print("-" * 80)
             print(f'{mode_cls.__name__}, pool_size: {pool_size}, n_runs: {n_runs}, avg exec time: {mexe_times}, '
