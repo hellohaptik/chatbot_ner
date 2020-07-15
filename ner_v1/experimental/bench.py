@@ -117,7 +117,7 @@ class Mode(object):
         for i in range(len_t):
             d = collections.defaultdict(list)
             for j in range(len_e):
-                es_r = responses[i * len_t + j]
+                es_r = responses[i * len_e + j]
                 es_took += es_r['took']
                 for hit in es_r['hits']['hits']:
                     entity_name = hit['_source']['entity_data']
@@ -296,7 +296,7 @@ class Executor(object):
         results = []
         use_pool = len(queries) > 1 and self.pool
         if use_pool:
-            results = self.pool.map(self._execute, queries)
+            results = list(self.pool.map(self._execute, queries))
         else:
             for q in queries:
                 results.append(self._execute(q))
@@ -349,6 +349,7 @@ def bench(texts, entities, bs=0, n_runs=3, pool_sizes=(0,)):
     expected_parsed = make_expected_output(texts, entities, bs)
     for mode_cls in QUERY_MODES:
         for pool_size in pool_sizes:
+            print(f'Running {mode_cls.__name__} with pool size {pool_size}')
             exe_times, es_times, acc = [], [], []
             for run_no in range(n_runs):
                 # TODO: Should executor be re-init everytime ?
@@ -398,6 +399,7 @@ def bench(texts, entities, bs=0, n_runs=3, pool_sizes=(0,)):
 
 
 def main(args):
+    import pdb
     global es_index, es_url
     es_index = args.es_index
     es_url = args.es_url
@@ -405,8 +407,11 @@ def main(args):
     entities = [line.strip() for line in open(args.entities_file)]
     tfile = pathlib.Path(args.texts_file).resolve()
     report_file = str(tfile.parent / f'{tfile.name}.{len(texts)}_texts.{len(entities)}_entities.out')
-    df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
-    df.to_csv(report_file, index=False)
+    try:
+        df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
+        df.to_csv(report_file, index=False)
+    except Exception:
+        pdb.post_mortem()
 
 
 if __name__ == '__main__':
