@@ -1,6 +1,6 @@
 # Notes:
 # This script assumes external service will make only 1 call with all texts and all entities provided.
-# Our goal mostly is too optimize for len(texts) == 1
+# Our goal mostly is to optimize for len(texts) == 1
 # We are keeping structured text, fallback text stuff etc on the side for now, those parts are simple
 # if else conditions that shouldn't be bottleneck
 
@@ -394,7 +394,6 @@ def bench(texts, entities, bs=0, n_runs=3, pool_sizes=(0,)):
     return df
     # TODO:
     # run rest of the text detector code*
-    # log
     # instrument total time
 
 
@@ -410,8 +409,10 @@ def main(args):
     try:
         df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
         df.to_csv(report_file, index=False)
+        print(report_file)
     except Exception:
         pdb.post_mortem()
+
 
 
 if __name__ == '__main__':
