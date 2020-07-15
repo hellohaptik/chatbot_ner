@@ -101,6 +101,15 @@ def base_query(text, entities):
 
 class Mode(object):
     @classmethod
+    def wrapped_parse(cls, *args, **kwargs):
+        try:
+            return cls.parse(*args, **kwargs)
+        except Exception as e:
+            print(f'Got error "{e}" while trying to parse for {cls.__name__}')
+
+        return 1e9, []
+
+    @classmethod
     def parse(cls, responses, len_t, len_e):
         # responses is [R, ... size T * E]
         es_took = 0
@@ -388,6 +397,18 @@ def bench(texts, entities, bs=0, n_runs=3, pool_sizes=(0,)):
     # instrument total time
 
 
+def main(args):
+    global es_index, es_url
+    es_index = args.es_index
+    es_url = args.es_url
+    texts = [line.strip() for line in open(args.texts_file)]
+    entities = [line.strip() for line in open(args.entities_file)]
+    tfile = pathlib.Path(args.texts_file).resolve()
+    report_file = str(tfile.parent / f'{tfile.name}.{len(texts)}_texts.{len(entities)}_entities.out')
+    df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
+    df.to_csv(report_file, index=False)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--es_index', type=str, required=True)
@@ -397,13 +418,5 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, required=False, default=0)
     parser.add_argument('--n_runs', type=int, required=False, default=3)
     parser.add_argument('--pool_sizes', type=int, nargs='+', required=False, default=[0])
-
-    args = parser.parse_args()
-    es_index = args.es_index
-    es_url = args.es_url
-    texts = [line.strip() for line in open(args.texts_file)]
-    entities = [line.strip() for line in open(args.entities_file)]
-    tfile = pathlib.Path(args.texts_file).resolve()
-    report_file = str(tfile.parent / f'{tfile.name}.out')
-    df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
-    df.to_csv(report_file, index=False)
+    cargs = parser.parse_args()
+    main(cargs)
