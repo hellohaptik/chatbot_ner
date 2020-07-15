@@ -315,15 +315,15 @@ class Executor(object):
         self.close()
 
 
-def chunks(texts_, bs=None):
+def chunks(texts_, bs):
     if bs:
         for i in range(0, len(texts_), bs):
             yield texts_[i:i + bs]
     else:
-        yield bs
+        yield texts_
 
 
-def make_expected_output(texts, entities, bs=None):
+def make_expected_output(texts, entities, bs=0):
     it = chunks(texts, bs)
     all_parsed = []
     with Executor() as e:
@@ -333,9 +333,7 @@ def make_expected_output(texts, entities, bs=None):
     return all_parsed
 
 
-def bench(texts, entities, bs=-1, n_runs=3, pool_sizes=(0,)):
-    if bs == -1:
-        bs = None
+def bench(texts, entities, bs=0, n_runs=3, pool_sizes=(0,)):
     report_data_cols = ['mode', 'pool_size', 'avg_exe_time', 'avg_es_time', 'correct']
     report_data = []
 
@@ -396,7 +394,7 @@ if __name__ == '__main__':
     parser.add_argument('--es_url', type=str, required=True)
     parser.add_argument('--texts_file', type=str, required=True)
     parser.add_argument('--entities_file', type=str, required=True)
-    parser.add_argument('--batch_size', type=int, required=False, default=-1)
+    parser.add_argument('--batch_size', type=int, required=False, default=0)
     parser.add_argument('--n_runs', type=int, required=False, default=3)
     parser.add_argument('--pool_sizes', type=int, nargs='+', required=False, default=[0])
 
