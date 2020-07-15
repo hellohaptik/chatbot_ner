@@ -9,11 +9,14 @@
 # in the tpool, how many ner web workers, tpool <-> ner throughput, ner workers <-> ES throughput
 # Also todo is to think how can caching be applied on top of single query method
 
+import argparse
 import collections
 import json
+import pathlib
 from concurrent.futures import ThreadPoolExecutor
 from timeit import default_timer as timer
 
+import pandas as pd
 import requests
 
 """
@@ -41,11 +44,8 @@ Output as:
 ]
 """
 
-scheme = 'http'
-host = ''
-port = ''
 es_index = 'entity_index'
-es_url = f'{scheme}://{host}:{port}/{es_index}/_msearch/'
+es_url = '...'
 doc_type = 'data_dictionary'
 es_size = 100
 
@@ -280,7 +280,7 @@ class Executor(object):
         # print('=' * 80)
         # print(q)
         # print('=' * 80)
-        return requests.post(es_url, data=q, headers=json_headers).json()['responses']
+        return requests.post(f'{es_url}/_msearch/', data=q, headers=json_headers).json()['responses']
 
     def execute(self, queries):
         start = timer()
@@ -315,36 +315,97 @@ class Executor(object):
         self.close()
 
 
-def make_expected_output(texts, entities):
+def chunks(texts_, bs=None):
+    if bs:
+        for i in range(0, len(texts_), bs):
+            yield texts_[i:i + bs]
+    else:
+        yield bs
+
+
+def make_expected_output(texts, entities, bs=None):
+    it = chunks(texts, bs)
+    all_parsed = []
     with Executor() as e:
-        _, _, parsed = e.run_detection(texts, entities, TE_One)
-    return parsed
+        for chunk in it:
+            _, _, parsed = e.run_detection(chunk, entities, TE_One)
+            all_parsed.append(parsed)
+    return all_parsed
 
 
-def bench(texts, entities, n_runs=5, pool_sizes=(0,)):
-    expected_parsed = make_expected_output(texts, entities)
+def bench(texts, entities, bs=-1, n_runs=3, pool_sizes=(0,)):
+    if bs == -1:
+        bs = None
+    report_data_cols = ['mode', 'pool_size', 'avg_exe_time', 'avg_es_time', 'correct']
+    report_data = []
+
+    expected_parsed = make_expected_output(texts, entities, bs)
     for mode_cls in QUERY_MODES:
         for pool_size in pool_sizes:
-            exe_times, es_times, correct = [], [], []
+            exe_times, es_times, acc = [], [], []
             for run_no in range(n_runs):
                 # TODO: Should executor be re-init everytime ?
+                exe_time, es_time, correct = 0, 0, True
+                it = chunks(texts, bs)
                 with Executor(tpool_size=pool_size) as e:
-                    exe_time, es_time, parsed = e.run_detection(texts, entities, mode_cls)
+                    for chunk, expected_parsed_chunk in zip(it, expected_parsed):
+                        exe_time_, es_time_, parsed_ = e.run_detection(chunk, entities, mode_cls)
+                        exe_time += exe_time_
+                        es_time += es_time_
+                        if parsed_ != expected_parsed_chunk:
+                            print('=' * 80)
+                            print('-' * 80)
+                            print(f'{mode_cls.__name__} has different output than expected')
+                            print('-' * 80)
+                            print(f'Got')
+                            print('-' * 80)
+                            print(parsed_)
+                            print('-' * 80)
+                            print(f'But expected')
+                            print('-' * 80)
+                            print(expected_parsed_chunk)
+                            print('-' * 80)
+                            print('=' * 80)
+                            correct = False
+                        # parsed += parsed_
                     exe_times.append(exe_time)
                     es_times.append(es_time)
-                    correct.append(int((parsed == expected_parsed)))
+                    acc.append(int(correct))
 
             mexe_times = float(sum(exe_times)) / len(exe_times)
             mes_times = float(sum(es_times)) / len(es_times)
-            print("=" * 80)
-            # print("-" * 80)
-            print(f'{mode_cls.__name__}, pool_size: {pool_size}, n_runs: {n_runs}, avg exec time: {mexe_times}, '
-                  f'avg es time: {mes_times}, correct: {sum(correct)}')
-            # print("-" * 80)
-            # print(parsed)
-            # print("-" * 80)
-            print("=" * 80)
+            report_data.append((
+                mode_cls.__name__,
+                pool_size,
+                mexe_times,
+                mes_times,
+                sum(acc),
+            ))
 
+    df = pd.DataFrame(report_data, columns=report_data_cols)
+    return df
     # TODO:
     # run rest of the text detector code*
-    # instrument ES execution and total
+    # log
+    # instrument total time
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--es_index', type=str, required=True)
+    parser.add_argument('--es_url', type=str, required=True)
+    parser.add_argument('--texts_file', type=str, required=True)
+    parser.add_argument('--entities_file', type=str, required=True)
+    parser.add_argument('--batch_size', type=int, required=False, default=-1)
+    parser.add_argument('--n_runs', type=int, required=False, default=3)
+    parser.add_argument('--pool_sizes', type=int, nargs='+', required=False, default=[0])
+
+    args = parser.parse_args()
+    es_index = args.es_index
+    es_url = args.es_url
+    texts = [line.strip() for line in open(args.texts_file)]
+    entities = [line.strip() for line in open(args.entities_file)]
+    tfile = pathlib.Path(args.texts_file).resolve()
+    report_file = str(tfile.parent / f'{tfile.name}.out')
+    df = bench(texts=texts, entities=entities, bs=args.batch_size, n_runs=args.n_runs, pool_sizes=args.pool_sizes)
+    df.to_csv(report_file, index=False)
