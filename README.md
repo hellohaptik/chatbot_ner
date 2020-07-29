@@ -42,7 +42,7 @@ built for ease of accessing it from conversational AI applications. However, it 
 ### **Framework Overview**
 
 In any conversational AI application, there are several entities to be identified and logic for detection on one entity
-might be different from other. We have organised this repository as shown below
+might be different from other. We have organised this repository as shown below.
 
 ![entity hierarchy](docs/images/entity_hierarchy.png)
 
