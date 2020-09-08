@@ -552,3 +552,12 @@ def phone_number(request):
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+
+
+@csrf_exempt
+def multi_entity_text(request):
+    """
+    Place holder for detecting multi entity text detection
+    :TODO: to be implemented
+    """
+    return HttpResponse(status=500)
