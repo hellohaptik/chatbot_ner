@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.test import TestCase
 from elasticsearch import Elasticsearch
 
-from es_datastore.elastic_search import ElasticSearchDataStore
+from ner_v2.detectors.textual.elastic_search import ElasticSearchDataStore
 from chatbot_ner.config import CHATBOT_NER_DATASTORE
 
 

@@ -555,7 +555,7 @@ def phone_number(request):
 
 
 @csrf_exempt
-def multi_entity_text(request):
+def text(request):
     """
     Place holder for detecting multi entity text detection
     :TODO: to be implemented

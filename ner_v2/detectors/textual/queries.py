@@ -222,7 +222,7 @@ def _parse_multi_entity_es_results(results_list):
                     entity_variants_to_values = collections.OrderedDict()
 
                     for value, variant in zip(entity_values, entity_variants):
-                        variant = re.sub('\s+', ' ', variant.strip())
+                        variant = re.sub(r'\s+', ' ', variant.strip())
                         variant_no_highlight_tags = variant.replace('<em>', '').replace('</em>', '').strip()
                         if variant.count('<em>') == len(TOKENIZER.tokenize(variant_no_highlight_tags)):
                             variant = variant_no_highlight_tags

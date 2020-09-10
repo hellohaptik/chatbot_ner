@@ -11,7 +11,7 @@ from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import constants
 from datastore.exceptions import DataStoreSettingsImproperlyConfiguredException
 
-from es_datastore.queries import _generate_multi_entity_es_query, \
+from ner_v2.detectors.textual.queries import _generate_multi_entity_es_query, \
     _parse_multi_entity_es_results
 
 
@@ -230,9 +230,9 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
                          otherwise the input is returned as it is
         """
         if isinstance(fuzzy_setting, six.string_types):
-            if constants.ELASTICSEARCH_VERSION_MAJOR > 6 or \
-                    (constants.ELASTICSEARCH_VERSION_MAJOR == 6 and
-                     constants.ELASTICSEARCH_VERSION_MINOR >= 2):
+            if constants.ELASTICSEARCH_VERSION_MAJOR > 6 \
+                    or (constants.ELASTICSEARCH_VERSION_MAJOR == 6
+                        and constants.ELASTICSEARCH_VERSION_MINOR >= 2):
                 return fuzzy_setting
             return 'auto'
 
