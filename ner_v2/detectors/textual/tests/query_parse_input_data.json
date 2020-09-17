@@ -1,0 +1,171 @@
+[
+  {
+    "took": 13,
+    "timed_out": false,
+    "_shards": {
+      "total": 5,
+      "successful": 5,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": 5,
+      "max_score": 6.4403224,
+      "hits": [
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpst4hee1DSR1e2_7_",
+          "_score": 6.4403224,
+          "_source": {
+            "entity_data": "city",
+            "value": "Mumbai"
+          },
+          "highlight": {
+            "variants": [
+              "<em>Mumbai</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpstzYee1DSR1e2_0I",
+          "_score": 6.3653703,
+          "_source": {
+            "entity_data": "city",
+            "value": "mumbai"
+          },
+          "highlight": {
+            "variants": [
+              "<em>mumbai</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttmee1DSR1e2_sI",
+          "_score": 6.3596706,
+          "_source": {
+            "entity_data": "city",
+            "value": "Wani"
+          },
+          "highlight": {
+            "variants": [
+              "<em>Wani</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttmee1DSR1e2_r9",
+          "_score": 4.420918,
+          "_source": {
+            "entity_data": "city",
+            "value": "East"
+          },
+          "highlight": {
+            "variants": [
+              "<em>east</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttnee1DSR1e2_wp",
+          "_score": 3.8191679,
+          "_source": {
+            "entity_data": "city",
+            "value": "goa"
+          },
+          "highlight": {
+            "variants": [
+              "<em>goa</em>"
+            ]
+          }
+        }
+      ]
+    },
+    "status": 200
+  },
+  {
+    "took": 12,
+    "timed_out": false,
+    "_shards": {
+      "total": 5,
+      "successful": 5,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": 4,
+      "max_score": 8.485634,
+      "hits": [
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpstzZee1DSR1e2_4u",
+          "_score": 8.485634,
+          "_source": {
+            "entity_data": "city",
+            "value": "Jabalpur"
+          },
+          "highlight": {
+            "variants": [
+              "<em>Jabalpur</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttnee1DSR1e2_yQ",
+          "_score": 7.418161,
+          "_source": {
+            "entity_data": "city",
+            "value": "Jamalpur"
+          },
+          "highlight": {
+            "variants": [
+              "<em>Jamalpur</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttmee1DSR1e2_sI",
+          "_score": 6.3596706,
+          "_source": {
+            "entity_data": "city",
+            "value": "Wani"
+          },
+          "highlight": {
+            "variants": [
+              "<em>Wani</em>"
+            ]
+          }
+        },
+        {
+          "_index": "entity_data_v1",
+          "_type": "data_dictionary",
+          "_id": "AXRpsttnee1DSR1e2_wp",
+          "_score": 3.8191679,
+          "_source": {
+            "entity_data": "city",
+            "value": "goa"
+          },
+          "highlight": {
+            "variants": [
+              "<em>goa</em>"
+            ]
+          }
+        }
+      ]
+    },
+    "status": 200
+  }
+]
