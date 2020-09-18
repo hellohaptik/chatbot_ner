@@ -11,6 +11,8 @@ from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
+
+from ner_v2.detectors.textual.utils import parse_text_request
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
@@ -556,8 +558,21 @@ def phone_number(request):
 
 @csrf_exempt
 def text(request):
-    """
-    Place holder for detecting multi entity text detection
-    :TODO: to be implemented
-    """
-    return HttpResponse(status=500)
+    data = []
+
+    if request.method == "GET":
+        response = {"success": False, "error": "Get method is not allowed"}
+        return HttpResponse(json.dumps(response), status=501)
+
+    elif request.method == "POST":
+        ner_logger.debug("Fetching result")
+        data = parse_text_request(request)
+        ner_logger.debug("Result Is:")
+        ner_logger.debug(data)
+
+    if data:
+        response = {"success": True, "error": None, "data": data}
+        return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+    else:
+        response = {"success": False, "error": "Some error while parsing"}
+        return HttpResponse(json.dumps(response), status=500)
