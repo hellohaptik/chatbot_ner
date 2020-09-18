@@ -143,17 +143,21 @@ def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
 
     for entity, value in entities_dict.items():
         fallback_value = value.get("fallback_value")
-        output[entity] = [
-            {
-                "entity_value": {
-                    "value": fallback_value,
-                    "datastore_verified": False,
-                    "model_verified": False
-                },
-                "detection": FROM_FALLBACK_VALUE,
-                "original_text": fallback_value,
-                "language": language
-            }
-        ]
+        
+        if fallback_value:
+            output[entity] = [
+                {
+                    "entity_value": {
+                        "value": fallback_value,
+                        "datastore_verified": False,
+                        "model_verified": False
+                    },
+                    "detection": FROM_FALLBACK_VALUE,
+                    "original_text": fallback_value,
+                    "language": language
+                }
+            ]
+        else:
+            output[entity] = []
 
     return output
