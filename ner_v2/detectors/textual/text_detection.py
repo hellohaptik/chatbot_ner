@@ -34,6 +34,32 @@ except ImportError:
 
 
 class TextDetector(object):
+    """
+    TextDetector detects multiple custom entities in text string by performing similarity searches against a list
+    fetched from elasticsearch datastore.
+
+    TextDetector detects text type custom entities that do not adhere to some strict/weak formats which other entities
+    like date, time, email, etc do. Examples of such types of entites can be city, food dish name, brand names etc
+
+    Attributes:
+        entities_dict_list (dict): dict with details of entities to be dected. Each entites will contailn:
+                                    `value`: name of the entity
+
+                                    `_fuzziness` (str or int): If this parameter is str, elasticsearch's
+                                             auto is used with low and high term distances. Default low and high
+                                            term distances are 3 and 6 for elasticsearch. For this module they are
+                                            set to 4 and 7 respectively.
+
+                                            In auto mode, if length of term is less than low it must match exactly,
+                                              if it is between [low, high) one insert/delete/substitution is allowed,
+                                              for anything higher than equal to high, two inserts/deletes/substitutions
+                                               are allowed
+
+                                    `_min_token_size_for_fuzziness (int)`: minimum number of letters a word must
+                                                have to be considered for calculating edit distance with similar
+                                                ngrams from the datastore
+        processed_text (str): string with detected text entities removed
+    """
 
     def __init__(self, entity_dict=None,
                  source_language_script=lang_constant.ENGLISH_LANG,
@@ -47,7 +73,6 @@ class TextDetector(object):
         self._fuzziness = "auto:4,7"
         self._fuzziness_lo, self._fuzziness_hi = 4, 7
         self._min_token_size_for_fuzziness = self._fuzziness_lo
-        # self.set_fuzziness_threshold(fuzziness=(self._fuzziness_lo, self._fuzziness_hi))
 
         # defaults for non-auto mode
         self.set_fuzziness_threshold(fuzziness=1)
@@ -236,6 +261,17 @@ class TextDetector(object):
         return u' '.join(matched_tokens)
 
     def _get_text_detection_with_variants(self):
+        """
+            This function will normalise the message by breaking it into trigrams, bigrams and unigrams. The generated
+            ngrams will be used to create query to retrieve search results from datastore. These results will contain list
+            of dictionary where for each item key will be variant and value will be entity value this will be further
+            processed to get the original text which has been identified and will return the results
+
+            Returns:
+             tuple:
+                list of lists: list of dict for each message with key as entity name
+                                containing the detected text entities and original message.
+        """
 
         texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for
                  processed_text in self.__processed_texts]
@@ -305,6 +341,27 @@ class TextDetector(object):
         return final_list
 
     def _get_entity_substring_from_text(self, text, variant, entity_name):
+        """
+            Check ngrams of the text for similarity against the variant (can be a ngram) using Levenshtein distance
+            and return the closest substring in the text that matches the variant.
+            For each entity fuziness and min_token_size_for_fuzziness is used from the entity details.
+            Args:
+              variant(str or unicode): string, ngram of variant to fuzzy detect in the text using
+                                       Levenshtein distance
+              text(str or unicode): sentence from self.processed on which detection is being done
+              entity_name (str): name of the entity to get fuzziness and min_token_lenght value
+            Returns:
+              str or unicode or None: part of the given text that was detected as entity given the variant,
+                                      None otherwise
+            Example:
+              >>> text_detector = TextDetector('city')
+              >>> text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
+              >>> text_detector.detect_entity(text)
+              >>> text_detector._get_entity_substring_from_text(variant='chennai')
+              'chennai'
+              >>> text_detector._get_entity_substring_from_text(variant='delhi')
+              'delehi'
+        """
         variant_tokens = TOKENIZER.tokenize(variant)
         text_tokens = TOKENIZER.tokenize(text)
         original_text_tokens = []
@@ -345,6 +402,19 @@ class TextDetector(object):
         return text_entity_verified_values
 
     def combine_results(self, values, original_texts, predetected_values):
+        """
+            This method is used to combine the results provided by the datastore search and the
+            crf_model if trained.
+            Args:
+                values (list): List of values detected by datastore
+                original_texts (list): List of original texts present in the texts for which value shave been
+                                       detected
+                predetected_values (list): Entities detected by the models like crf etc.
+            Returns:
+                combined_values (list): List of dicts each dict consisting of the entity value and additionally
+                                        the keys for the datastore and crf model detection
+                combined_original_texts (list): List of original texts detected by the datastore and the crf model.
+        """
         unprocessed_crf_original_texts = []
 
         combined_values = self._add_verification_source(
@@ -377,14 +447,47 @@ class TextDetector(object):
 
     def detect(self, message=None, structured_value=None, **kwargs):
         """
+            This method will detect all textual entities over the single message.
+            After detection it will combine the result and outputs list of dictionary
+            for all the entities detected over message
 
-        Args:
-            message:
-            structured_value:
-            **kwargs:
+            Args:
+                message (str): message on which textual entities needs to be detected
+                structured_value(str): if this present it will preferred over message
+            **kwargs: other keyword arguments if required
 
         Returns:
+            List of dict of all the entities with detected values of textual entites
 
+        Examples:
+
+
+            entity_dict = {
+                            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
+                            'restaurant': {'fallback_value': None, 'use_fallback': True}
+                            }
+
+            text_detection = TextDetector(entity_dict)
+            text_detection.detect('Buy ticket to Chennai from Mumbai)
+
+            output:
+                  [ {
+                    'city': [
+                                {'entity_value': {'value': 'Mumbai',
+                                                'datastore_verified': False,
+                                                'model_verified': False},
+                                'detection': 'fallback_value',
+                                'original_text': 'Mumbai',
+                                'language': 'en'},
+                                {'entity_value': {'value': 'Chennai',
+                                                'datastore_verified': False,
+                                                'model_verified': False},
+                                'detection': 'fallback_value',
+                                'original_text': 'Chennai',
+                                'language': 'en'}
+                            ],
+                    'restaurant': []
+                    }]
         """
 
         text = structured_value if structured_value else message
@@ -436,13 +539,60 @@ class TextDetector(object):
 
     def detect_bulk(self, messages=None, **kwargs):
         """
+            This method will detect all textual entities over the multiple message.
+            After detection it will combine the result and outputs list of dictionary
+            for all the entities detected over message
 
-        Args:
-            messages:
-            **kwargs:
+            Args:
 
-        Returns:
+                messages (list of str): list of message for which detection needs to be perform
+                **kwargs: other keyword arguments if required
 
+            Returns:
+                List of dict of all the entities with detected values of textual entites
+
+
+            example:
+
+            entity_dict = {
+                            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
+                            'restaurant': {'fallback_value': None, 'use_fallback': True}
+                            }
+
+            text_detection = TextDetector(entity_dict)
+            text_detection.detect(['Buy ticket to Chennai from Mumbai',
+                                    'I want to eat at dominoes'])
+
+            output:
+                  [ {
+                    'city': [
+                                {'entity_value': {'value': 'Mumbai',
+                                                'datastore_verified': False,
+                                                'model_verified': False},
+                                'detection': 'fallback_value',
+                                'original_text': 'Mumbai',
+                                'language': 'en'},
+                                {'entity_value': {'value': 'Chennai',
+                                                'datastore_verified': False,
+                                                'model_verified': False},
+                                'detection': 'fallback_value',
+                                'original_text': 'Chennai',
+                                'language': 'en'}
+                            ],
+                    'restaurant': []},
+                    {
+
+                    ,
+                    'city': [],
+                    'restaurant': [
+                                {'entity_value': {'value': 'Domminoe's Pizza',
+                                                'datastore_verified': False,
+                                                'model_verified': False},
+                                'detection': 'fallback_value',
+                                'original_text': 'dominoes',
+                                'language': 'en'}
+                            ]
+                    ]
         """
 
         texts = messages
@@ -490,16 +640,48 @@ class TextDetector(object):
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
                                 detection_method_list=None, detection_language=ENGLISH_LANG):
         """
-
+   Format detected entity values for bulk detection
         Args:
-            entity_value_list:
-            original_text_list:
-            detection_method:
-            detection_method_list:
-            detection_language:
+            entity_values_list (list of lists): containing list of entity values which are identified from given
+                                                detection logic
+            original_texts_list (list of lists): containing list original values or actual values from
+                                                messages which are identified
+            detection_method (str, optional): how the entity was detected
+                                              i.e. whether from message, structured_value
+                                                   or fallback, verified from model or not.
+                                              defaults to None
+            detection_method_list(list, optional): list containing how each entity was detected in the entity_value
+                                                list.If provided, this argument will be used over detection method
+                                                defaults to None
+            detection_language(str): ISO 639 code for language in which entity is detected
 
         Returns:
+            list of lists of dict: list of lists containing dictionaries, each containing entity_value,
+                                    original_text and detection;
+                                    entity_value is in itself a dict with its keys varying from entity to entity
+        Example Output:
+            [
+                [
+                    {
+                        "entity_value": entity_value_1,
+                        "detection": detection_method,
+                        "original_text": original_text_1
+                    },
+                    {
+                        "entity_value": entity_value_2,
+                        "detection": detection_method,
+                        "original_text": original_text_2
+                    }
 
+                ],
+                [
+                    {
+                        "entity_value": entity_value,
+                        "detection": detection_method,
+                        "original_text": original_text
+                    }
+                ]
+            ]
         """
         if detection_method_list is None:
             detection_method_list = []

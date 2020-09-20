@@ -100,8 +100,8 @@ class TestTextualUtils(TestCase):
 
         output = parse_text_request(request)
 
-        assert_output = [{'entities':
-            {'entities': {'city': [
+        assert_output = [{
+            'entities': {'entities': {'city': [
                 {'entity_value': {'value': 'Mumbai',
                                   'datastore_verified': True,
                                   'model_verified': False},

@@ -12,7 +12,7 @@ from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
-from ner_v2.detectors.textual.utils import parse_text_request
+from ner_v2.detectors.textual.utils import parse_text_request, verify_text_request
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
@@ -558,6 +558,111 @@ def phone_number(request):
 
 @csrf_exempt
 def text(request):
+    """
+    Uses TextDetector to the get the values of multiple text entity detection. This is used
+    for both single text message or multiple text message detection.
+
+    Currently only POST method is supported.
+
+    Args:
+        request: request for text detection
+
+    Request parameters
+
+        message (list of str): list of message string for which detection logic needs to be run on.
+
+        source_language (str): language for which the phone numbers have to be detected
+
+        bot_message (str): previous message from a bot/agent.
+
+        entities (dict): dictionary of entties to be detected, each entity dict will contain
+            following details:
+
+            entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                              if entity uses elastic-search lookup
+            structured_value (str): [Optional] Value obtained from any structured elements.
+
+             Note if structured value is detection is run on structured value instead of message
+                                   (For example, UI elements like form, payload, etc)
+
+            fallback_value (str): [Optional] If the detection logic fails to detect any value
+                  either from structured_value or message then we return a fallback_value as an output.
+
+            use_fallback (bool): Default as False, if this is present for a single message
+                                fallback value will be used.
+
+            fuzziness (int): [Optional] Fuzziness value for each entity
+
+            min_token_size_for_fuzziness (int): [Optional] minimum size for token match
+
+    Returns:
+         response (django.http.response.HttpResponse): HttpResponse object
+
+
+    Examples:
+
+        1) For single message:
+                input request:
+                        {
+                    "message": ["I want to go to Jabalpur"],
+                    "bot_message": null,
+                    "language_script": "en",
+                    "source_language": "en",
+                    "entities": {
+                        "city": {
+                            "structured_value": "Delhi",
+                            "fallback_value": null,
+                            "predetected_values": ["Mumbai"],
+                            "fuzziness": null,
+                            "min_token_len_fuzziness": null,
+                            "use_fallback": false
+                        },
+                        "restaurant": {
+                            "structured_value": null,
+                            "fallback_value": null,
+                            "predetected_values": null,
+                            "fuzziness": null,
+                            "min_token_len_fuzziness": null,
+                            "use_fallback": false
+                                }
+                             }
+                         }
+                output response:
+                    {
+                        "success": true,
+                        "error": null,
+                        "data": [
+                            {
+                            "entities": {
+                                "restaurant": [],
+                                "city": [
+                                    {
+                                        "entity_value": {
+                                            "value": "New Delhi",
+                                            "datastore_verified": true,
+                                            "model_verified": false
+                                        },
+                                        "detection": "structure_value_verified",
+                                        "original_text": "delhi",
+                                        "language": "en"
+                                    },
+                                    {
+                                        "entity_value": {
+                                            "value": "Mumbai",
+                                            "datastore_verified": false,
+                                            "model_verified": true
+                                        },
+                                        "detection": "structure_value_verified",
+                                        "original_text": "Mumbai",
+                                        "language": "en"
+                                    }
+                                ]
+                                },
+                                "language": "en"
+                            }
+                        ]
+                    }
+    """
     data = []
 
     if request.method == "GET":
@@ -566,13 +671,27 @@ def text(request):
 
     elif request.method == "POST":
         ner_logger.debug("Fetching result")
+
+        try:
+            verify_text_request(request)
+
+        except KeyError as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.debug(response)
+            return HttpResponse(json.dumps(response), content_type='application/json',
+                                status=400)
+        except TypeError as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.debug(response)
+            return HttpResponse(json.dumps(response), content_type='application/json',
+                                status=400)
+
+        # if verify success parse request and get data
         data = parse_text_request(request)
-        ner_logger.debug("Result Is:")
-        ner_logger.debug(data)
 
     if data:
         response = {"success": True, "error": None, "data": data}
         return HttpResponse(json.dumps(response), content_type='application/json', status=200)
     else:
         response = {"success": False, "error": "Some error while parsing"}
-        return HttpResponse(json.dumps(response), status=500)
+        return HttpResponse(json.dumps(response), status=400)

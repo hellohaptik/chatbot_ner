@@ -28,15 +28,19 @@ def verify_text_request(request):
     entities = request_data.get("entities")
 
     if not message:
+        ner_logger.exception("Message param is not passed")
         raise KeyError("Message is required")
 
     if not entities:
+        ner_logger.exception("Entities param is not passed")
         raise KeyError("Entities dict is required")
 
     if not isinstance(message, list):
+        ner_logger.exception("Message param is not in correct format")
         raise TypeError("Message should be in format of list of string")
 
     if not isinstance(entities, dict):
+        ner_logger.exception("Entities param is not in correct format")
         raise TypeError("Entities should be dict of entity details")
 
 
@@ -45,6 +49,9 @@ def get_text_detection(message, entity_dict, structured_value=None, bot_message=
     """
     Get text detection for given message on given entities dict using
     TextDetector module.
+
+    If the message is string type call TextDetector.detect() mwthod, if it is list
+    call TextDetector.detect_bulk() method. Else, it wol raise an error.
     Args:
         message: message to detect text on
         entity_dict: entity details dict
@@ -74,12 +81,73 @@ def get_text_detection(message, entity_dict, structured_value=None, bot_message=
 
 def parse_text_request(request):
     """
-    Parse text request coming from POST call on `/v2/text/`
+    Parse text request coming from POST call on `/v2/text/` and call the
+    get text detection.
+    Message to detect text can be:
+
+    1) Single entry in the list, for this we use `text_detector.detect` method.
+    Also for this case we check if the structured value or use_fallback is present.
+
+    2) For mulitple message, underlying code will call `text_detector.detect_bulk` method.
+    In this case we ignore structured valur or use_fallback for all the entities.
+
     Args:
         request: request object
-
     Returns:
-        output data
+        output data list for all the message
+    Examples:
+        Request Object:
+        {
+                    "message": ["I want to go to Jabalpur"],
+                    "bot_message": null,
+                    "language_script": "en",
+                    "source_language": "en",
+                    "entities": {
+                        "city": {
+                            "structured_value": "Delhi",
+                            "fallback_value": null,
+                            "predetected_values": ["Mumbai"],
+                            "fuzziness": null,
+                            "min_token_len_fuzziness": null,
+                            "use_fallback": false
+                        },
+                        "restaurant": {
+                            "structured_value": null,
+                            "fallback_value": null,
+                            "predetected_values": null,
+                            "fuzziness": null,
+                            "min_token_len_fuzziness": null,
+                            "use_fallback": false
+                                }
+                             }
+                         }
+            output response:
+                        [
+                            {
+                            "entities": {
+                                "restaurant": [],
+                                "city": [
+                                    {
+                                        "entity_value": {
+                                            "value": "New Delhi",
+                                            "datastore_verified": true,
+                                            "model_verified": false
+                                        },
+                                        "detection": "structure_value_verified",
+                                        "original_text": "delhi",
+                                        "language": "en"
+                                    },
+                                    {
+                                        "entity_value": {
+                                            "value": "Mumbai",
+                                            "datastore_verified": false,
+                                            "model_verified": true
+                                        },
+                                        "detection": "structure_value_verified",
+                                        "original_text": "Mumbai",
+                                        "language": "en"
+                                    }
+                        ]
     """
     request_data = json.loads(request.body)
     message = request_data.get("message", [])
@@ -156,12 +224,37 @@ def parse_text_request(request):
 def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
     """
     Generate default detection output for default fallback entities.
+    It will check if fallback_value is present if not it will return
+    empty list for that entity.
+
     Args:
         entities_dict: dict of entities details
         language: language to run
 
     Returns:
-        TextDetection output for default fallback
+        TextDetection output (list of dict) for default fallback values
+
+    Examples:
+        Input:
+        {
+            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
+            'restaurant': {'fallback_value': None, 'use_fallback': True}
+        }
+
+        Output:
+
+        {
+        'city': [
+                    {'entity_value': {'value': 'Mumbai',
+                                    'datastore_verified': False,
+                                    'model_verified': False},
+                    'detection': 'fallback_value',
+                    'original_text': 'Mumbai',
+                    'language': 'en'}
+                ],
+        'restaurant': []
+        }
+
     """
     output = {}
     if not entities_dict:
