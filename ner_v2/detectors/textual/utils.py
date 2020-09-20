@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import json
 import six
 
@@ -9,15 +11,37 @@ from ner_v2.detectors.textual.text_detection import TextDetector
 
 
 def verify_text_request(request):
+    """
+    Check the request object if proper message or entity is present in required
+    format. If not present raises appropriate error.
+    Args:
+        request: API request object
+
+    Returns:
+        Raises KeyError if message or entities are not present
+        Raises TypeError if message is not list or entities is not dict type
+        Else Return none
+    """
+
     request_data = json.loads(request.body)
-    queries = request_data.get("queries")
+    message = request_data.get("message")
+    entities = request_data.get("entities")
 
-    if not queries:
-        raise KeyError("Parameter queries is required")
+    if not message:
+        raise KeyError("Message is required")
+
+    if not entities:
+        raise KeyError("Entities dict is required")
+
+    if not isinstance(message, list):
+        raise TypeError("Message should be in format of list of string")
+
+    if not isinstance(entities, dict):
+        raise TypeError("Entities should be dict of entity details")
 
 
-def get_text_detection(message, entity_dict, structured_value, bot_message,
-                       language=ENGLISH_LANG, **kwargs):
+def get_text_detection(message, entity_dict, structured_value=None, bot_message=None,
+                       language=ENGLISH_LANG, target_language_script=ENGLISH_LANG, **kwargs):
     """
     Get text detection for given message on given entities dict using
     TextDetector module.
@@ -27,15 +51,15 @@ def get_text_detection(message, entity_dict, structured_value, bot_message,
         structured_value: structured value
         bot_message: bot message
         language: langugae for text detection
+        target_language_script: target language for detection default ENGLISH
         **kwargs: other kwargs
 
     Returns:
 
         detected entity output
-
     """
-    text_detector = TextDetector(entity_dict=entity_dict, source_language_script=language)
-
+    text_detector = TextDetector(entity_dict=entity_dict, source_language_script=language,
+                                 target_language_script=target_language_script)
     if isinstance(message, six.string_types):
         entity_output = text_detector.detect(message=message,
                                              structured_value=structured_value,
@@ -61,8 +85,8 @@ def parse_text_request(request):
     message = request_data.get("message", [])
     bot_message = request_data.get("bot_message")
     entities = request_data.get("entities", {})
-    language_script = request_data.get('language_script', ENGLISH_LANG)
-    source_language = request_data.get('source_language', ENGLISH_LANG)
+    target_language_script = request_data.get('language_script') or ENGLISH_LANG
+    source_language = request_data.get('source_language') or ENGLISH_LANG
 
     data = []
 
@@ -93,8 +117,9 @@ def parse_text_request(request):
 
         # get detection for normal text entities
         output = get_text_detection(message=message_str, entity_dict=text_value_entities,
-                                    structured_value=None, bot_message=bot_message)
-
+                                    structured_value=None, bot_message=bot_message,
+                                    language_script=source_language,
+                                    target_language_script=target_language_script)
         data[0]["entities"].update(output[0])
 
         # get detection for structured value text entities
@@ -102,9 +127,10 @@ def parse_text_request(request):
             for entity, value in structured_value_entities.items():
                 entity_dict = {entity: value}
                 sv = value.get("structured_value")
-                print(sv)
                 output = get_text_detection(message=message_str, entity_dict=entity_dict,
-                                            structured_value=sv, bot_message=bot_message)
+                                            structured_value=sv, bot_message=bot_message,
+                                            language_script=source_language,
+                                            target_language_script=target_language_script)
 
                 data[0]["entities"].update(output[0])
 
@@ -129,7 +155,7 @@ def parse_text_request(request):
 
 def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
     """
-    Generate detection output for default fallback entities.
+    Generate default detection output for default fallback entities.
     Args:
         entities_dict: dict of entities details
         language: language to run
@@ -143,8 +169,11 @@ def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
 
     for entity, value in entities_dict.items():
         fallback_value = value.get("fallback_value")
-        
-        if fallback_value:
+
+        if not fallback_value:
+            output[entity] = []
+
+        else:
             output[entity] = [
                 {
                     "entity_value": {
@@ -157,7 +186,4 @@ def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
                     "language": language
                 }
             ]
-        else:
-            output[entity] = []
-
     return output

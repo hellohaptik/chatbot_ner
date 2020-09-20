@@ -101,13 +101,14 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
 
     def get_multi_entity_results(self, entities, texts, fuzziness_threshold=1,
-                                 **kwargs):
+                                 search_language_script=None, **kwargs):
         """
         Args:
             entities: the list of entities to lookup in the datastore for getting entity values
              and their variants
             texts(list of strings): the text for which variants need to be find out
             fuzziness_threshold: fuzziness allowed for search results on entity value variants
+            search_language_script: language script for ES search
             kwargs:
 
         Returns:
@@ -157,7 +158,8 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
                                           json.dumps(_generate_multi_entity_es_query(
                                               entities=entities,
                                               text=each,
-                                              fuzziness_threshold=fuzziness_threshold))]
+                                              fuzziness_threshold=fuzziness_threshold,
+                                              language_script=search_language_script))]
                                          for each in texts]))
 
         # add `\n` for each index_header and text entry

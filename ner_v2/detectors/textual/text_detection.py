@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 import collections
 import string
 
@@ -35,7 +36,8 @@ except ImportError:
 class TextDetector(object):
 
     def __init__(self, entity_dict=None,
-                 source_language_script=lang_constant.ENGLISH_LANG):
+                 source_language_script=lang_constant.ENGLISH_LANG,
+                 target_language_script=ENGLISH_LANG):
 
         self.processed_text = None
         self.__texts = []
@@ -50,21 +52,40 @@ class TextDetector(object):
         # defaults for non-auto mode
         self.set_fuzziness_threshold(fuzziness=1)
         self._min_token_size_for_fuzziness = 4
+
+        # define data store and target languages
         self.esdb = ElasticSearchDataStore()
-
         self._source_language_script = source_language_script
-        self._target_language_script = ENGLISH_LANG
+        self._target_language_script = target_language_script
 
+        # define entities to detect
         self.entities_dict_list = entity_dict
 
     def _reset_state(self):
+        """
+        Reset all the intermediary states of detection class.
+        """
         self.tagged_text = None
         self.processed_text = None
         self.__texts = []
         self.__processed_texts = []
 
     def set_fuzziness_threshold(self, fuzziness):
+        """
+        Sets the fuzziness thresholds for similarity searches. The fuzziness threshold corresponds to the
+        maximum Levenshtein's distance allowed during similarity matching
 
+        Args:
+
+            fuzziness (iterable or int): If this parameter is int, elasticsearch's auto is used with
+            low and high term distances.
+
+            Please make sure the iterable has only two integers like (4, 7).
+            This will generate "auto:4,7"
+
+            Note that this also sets _min_token_size_for_fuzziness to first value of the iterable
+            If this argument is int, elasticsearch will set fuzziness as min(2, fuzziness)
+    """
         try:
             iter(fuzziness)
             if len(fuzziness) == 2:
@@ -80,19 +101,24 @@ class TextDetector(object):
             else:
                 raise TypeError('Fuziness has to be either an iterable of length 2 or an int')
 
-    def _get_fuzziness_threshold_for_token(self, token):
+    def _get_fuzziness_threshold_for_token(self, token, fuzziness=None):
         """
         Return dynamic fuzziness threshold for damerau-levenshtein check based on length of token if elasticsearch
         fuzziness was set to auto mode
 
         Args:
             token (str or unicode): the string to calculate fuzziness threshold for
+            fuzziness (int): fuzziness value provided
 
         Returns:
             int: fuzziness threshold for ngram matching on elastic search results
         """
-        if type(self._fuzziness) == int:
-            return self._fuzziness
+
+        if not fuzziness:
+            fuzziness = self._fuzziness
+
+        if type(fuzziness) == int:
+            return fuzziness
         else:
             if len(token) < self._fuzziness_lo:
                 return 0  # strict match
@@ -118,9 +144,6 @@ class TextDetector(object):
             text = text.lower()
             text = text.decode('utf-8') if isinstance(text, bytes) else text
             self.__texts.append(text)
-            # Note: following rules have been disabled because cause problem with generating original text
-            # regex_to_process = RegexReplace([(r'[\'\/]', r''), (r'\s+', r' ')])
-            # processed_text = self.regx_to_process.text_substitute(processed_text)
             self.__processed_texts.append(u' ' + text + u' ')
 
     @staticmethod
@@ -213,15 +236,18 @@ class TextDetector(object):
         return u' '.join(matched_tokens)
 
     def _get_text_detection_with_variants(self):
-        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for processed_text in self.__processed_texts]
+
+        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for
+                 processed_text in self.__processed_texts]
 
         entities_dict_list = self.entities_dict_list
-        new = self.esdb.get_multi_entity_results(entities=list(entities_dict_list),
-                                                 texts=texts,
-                                                 fuzziness_threshold=self._fuzziness
-                                                 )
+        es_results = self.esdb.get_multi_entity_results(entities=list(entities_dict_list),
+                                                        texts=texts,
+                                                        fuzziness_threshold=self._fuzziness,
+                                                        search_language_script=self._target_language_script
+                                                        )
         final_list = []
-        for index, entity_result in enumerate(new):
+        for index, entity_result in enumerate(es_results):
             result_list = {}
             for each_key in entities_dict_list.keys():
 
@@ -257,11 +283,11 @@ class TextDetector(object):
                 variants_list = exact_matches + fuzzy_variants
                 for variant in variants_list:
 
-                    original_text = self._get_entity_substring_from_text(self.__processed_texts[index], variant)
+                    original_text = self._get_entity_substring_from_text(self.__processed_texts[index],
+                                                                         variant, each_key)
                     if original_text:
                         value_final_list.append(variants_to_values[variant])
                         original_final_list.append(original_text)
-
                         boundary_punct_pattern = re.compile(
                             r'(^[{0}]+)|([{0}]+$)'.format(re.escape(string.punctuation)))
                         original_text_ = boundary_punct_pattern.sub("", original_text)
@@ -278,7 +304,7 @@ class TextDetector(object):
 
         return final_list
 
-    def _get_entity_substring_from_text(self, text, variant):
+    def _get_entity_substring_from_text(self, text, variant, entity_name):
         variant_tokens = TOKENIZER.tokenize(variant)
         text_tokens = TOKENIZER.tokenize(text)
         original_text_tokens = []
@@ -286,8 +312,17 @@ class TextDetector(object):
         for text_token in text_tokens:
             variant_token = variant_tokens[variant_token_i]
             same = variant_token == text_token
-            ft = self._get_fuzziness_threshold_for_token(text_token)
-            if same or (len(text_token) > self._min_token_size_for_fuzziness
+
+            # get fuzziness and min_token_size_for_fuziness value from entity dict
+            entity_dict = self.entities_dict_list.get(entity_name, {})
+            fuzziness = entity_dict.get('fuzziness')
+            min_token_size_for_fuzziness = entity_dict.get('min_token_len_fuzziness')
+
+            if not min_token_size_for_fuzziness:
+                min_token_size_for_fuzziness = self._min_token_size_for_fuzziness
+
+            ft = self._get_fuzziness_threshold_for_token(token=text_token, fuzziness=fuzziness)
+            if same or (len(text_token) > min_token_size_for_fuzziness
                         and edit_distance(string1=variant_token,
                                           string2=text_token,
                                           max_distance=ft + 1) <= ft):
@@ -341,6 +376,16 @@ class TextDetector(object):
         return combined_values, combined_original_texts
 
     def detect(self, message=None, structured_value=None, **kwargs):
+        """
+
+        Args:
+            message:
+            structured_value:
+            **kwargs:
+
+        Returns:
+
+        """
 
         text = structured_value if structured_value else message
         self._process_text([text])
@@ -389,32 +434,16 @@ class TextDetector(object):
 
         return data_list
 
-    @staticmethod
-    def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
-                                detection_method_list=None, detection_language=ENGLISH_LANG):
-        if detection_method_list is None:
-            detection_method_list = []
-        if entity_value_list is None:
-            entity_value_list = []
-
-        entity_list = []
-        for i, entity_value in enumerate(entity_value_list):
-            if type(entity_value) in [str, six.text_type]:
-                entity_value = {
-                    ENTITY_VALUE_DICT_KEY: entity_value
-                }
-            method = detection_method_list[i] if detection_method_list else detection_method
-            entity_list.append(
-                {
-                    ENTITY_VALUE: entity_value,
-                    DETECTION_METHOD: method,
-                    ORIGINAL_TEXT: original_text_list[i],
-                    DETECTION_LANGUAGE: detection_language
-                }
-            )
-        return entity_list
-
     def detect_bulk(self, messages=None, **kwargs):
+        """
+
+        Args:
+            messages:
+            **kwargs:
+
+        Returns:
+
+        """
 
         texts = messages
         self._process_text(texts)
@@ -456,3 +485,40 @@ class TextDetector(object):
             data_list.append(entities)
 
         return data_list
+
+    @staticmethod
+    def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
+                                detection_method_list=None, detection_language=ENGLISH_LANG):
+        """
+
+        Args:
+            entity_value_list:
+            original_text_list:
+            detection_method:
+            detection_method_list:
+            detection_language:
+
+        Returns:
+
+        """
+        if detection_method_list is None:
+            detection_method_list = []
+        if entity_value_list is None:
+            entity_value_list = []
+
+        entity_list = []
+        for i, entity_value in enumerate(entity_value_list):
+            if type(entity_value) in [str, six.text_type]:
+                entity_value = {
+                    ENTITY_VALUE_DICT_KEY: entity_value
+                }
+            method = detection_method_list[i] if detection_method_list else detection_method
+            entity_list.append(
+                {
+                    ENTITY_VALUE: entity_value,
+                    DETECTION_METHOD: method,
+                    ORIGINAL_TEXT: original_text_list[i],
+                    DETECTION_LANGUAGE: detection_language
+                }
+            )
+        return entity_list
