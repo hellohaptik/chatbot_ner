@@ -62,3 +62,22 @@ class TestESDataStore(TestCase):
         fuzzy_threshold = ElasticSearchDataStore._get_dynamic_fuzziness_threshold(fuzzy)
 
         self.assertEqual(fuzzy_threshold, 'auto')
+
+    def test_add_query(self):
+        es = ElasticSearchDataStore()
+
+        entity_list_1 = ['city', 'restaurant']
+        text_1 = "I want to go to mumbai"
+
+        query_data = es.generate_query_data(entities=entity_list_1, texts=text_1)
+
+        assert_data = ['{"index": "entity_data", "type": "data_dictionary"}',
+                       '{"_source": ["value", "entity_data"], '
+                       '"query": {"bool": {"filter": [{"terms": {"entity_data":'
+                       ' ["city", "restaurant"]}}, {"terms": {"language_script": ["en"]}}],'
+                       ' "should": [{"match": {"variants": {"query": "I want to go to mumbai",'
+                       ' "fuzziness": 1, "prefix_length": 1}}}], "minimum_should_match": 1}},'
+                       ' "highlight": {"fields": {"variants": {"type": "unified"}},'
+                       ' "order": "score", "number_of_fragments": 20}, "size": 10000}']
+
+        self.assertListEqual(query_data, assert_data)

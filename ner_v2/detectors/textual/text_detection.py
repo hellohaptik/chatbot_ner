@@ -15,9 +15,10 @@ from lib.nlp.const import TOKENIZER, whitespace_tokenizer
 from lib.nlp.levenshtein_distance import edit_distance
 from six.moves import range
 
-from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
-                           FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
-                           DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED,
+                           FROM_MESSAGE, FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE,
+                           DETECTION_METHOD, DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 
 from language_utilities.constant import ENGLISH_LANG
@@ -83,6 +84,7 @@ class TextDetector(object):
 
         # define data store and target languages
         self.esdb = ElasticSearchDataStore()
+
         self._source_language_script = source_language_script
         self._target_language_script = target_language_script
 
@@ -90,7 +92,6 @@ class TextDetector(object):
         """
         Reset all the intermediary states of detection class.
         """
-        self.tagged_text = None
         self.processed_text = None
         self.__texts = []
         self.__processed_texts = []
@@ -164,6 +165,11 @@ class TextDetector(object):
         self._min_token_size_for_fuzziness = min_size
 
     def _process_text(self, texts):
+        """
+        This will pre-process texts for detection
+        Args:
+            texts: list of message strings
+        """
         self._reset_state()
         for text in texts:
             text = text.lower()
@@ -261,14 +267,159 @@ class TextDetector(object):
 
         return u' '.join(matched_tokens)
 
-    def _get_text_detection_with_variants(self):
+    def _process_es_result(self, entity_result, entity_list, text,
+                           processed_text):
+        """
+        Process ElasticSearch results which will contain list of dictionary where for
+        each item key will be variant and value will be entity value this will be
+        processed to get the original text which has been identified and will
+        return the results dictionary for each entity detected
+
+        Args:
+            entity_result: ES result for entity
+            entity_list: List of entity for which ES query ran
+            text: original text message
+            processed_text: processed text on which detection ran
+
+        Returns:
+            result_dict: dictionary with detected text and original text for
+                         each entity
+
+        """
+        result_dict = {}
+
+        for each_key in entity_list:
+            original_final_list = []
+            value_final_list = []
+            variants_to_values = collections.OrderedDict()
+            original_final_list_ = []
+            value_final_list_ = []
+
+            _variants_to_values = entity_result.get(each_key, [])
+
+            if not _variants_to_values:
+                result_dict[each_key] = ([], [])
+                continue
+
+            for variant, value in iteritems(_variants_to_values):
+                variant = variant.lower()
+                if isinstance(variant, bytes):
+                    variant = variant.decode('utf-8')
+
+                variants_to_values[variant] = value
+            variants_list = list(variants_to_values.keys())
+
+            exact_matches, fuzzy_variants = [], []
+
+            for variant in variants_list:
+                if u' '.join(TOKENIZER.tokenize(variant)) in text:
+                    exact_matches.append(variant)
+                else:
+                    fuzzy_variants.append(variant)
+
+            exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+            fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
+
+            variants_list = exact_matches + fuzzy_variants
+            for variant in variants_list:
+
+                original_text = self._get_entity_substring_from_text(processed_text,
+                                                                     variant, each_key)
+                if original_text:
+                    value_final_list.append(variants_to_values[variant])
+                    original_final_list.append(original_text)
+                    boundary_punct_pattern = re.compile(
+                        r'(^[{0}]+)|([{0}]+$)'.format(re.escape(string.punctuation)))
+                    original_text_ = boundary_punct_pattern.sub("", original_text)
+
+                    _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), flags=_re_flags)
+                    tag = '__' + each_key + '__'
+                    processed_text = _pattern.sub(tag, processed_text)
+
+            value_final_list_.append(value_final_list)
+            original_final_list_.append(original_final_list)
+
+            result_dict[each_key] = (value_final_list_, original_final_list_)
+
+        return result_dict
+
+    def _get_single_text_detection_with_variants(self, message):
+        """
+        This function will normalise the message by breaking it into trigrams,
+        bigrams and unigrams.
+
+        The generated ngrams will be used to create query to retrieve search results from datastore.
+
+        These results will contain list of dictionary where for each item key will be variant and
+        value will be entity value this will be further processed to get the original text which has
+        been identified and will return the results
+
+        Returns:
+            list of dict: list of dict for each message with key as entity name
+                            containing the detected text entities and original message.
         """
 
+        entities_dict = self.entities_dict
+        es_entity_list = []
+        structured_value_entities_list = []
+        text_value_entities_list = []
+        texts = []
+
+        for each_entity, value in entities_dict.items():
+            structured_value = value.get('structured_value')
+
+            if structured_value:
+                # add entity list and text for each structured entity
+                # for ES query
+                es_entity_list.append([each_entity])
+                structured_value_entities_list.append(each_entity)
+                texts.append(structured_value)
+            else:
+                text_value_entities_list.append(each_entity)
+
+        if text_value_entities_list:
+            # add entity list and text for all other textual
+            # entity for ES query
+            es_entity_list.append(text_value_entities_list)
+            texts.append(message)
+
+        # pre-process text
+        self._process_text(texts)
+        texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for
+                 processed_text in self.__processed_texts]
+
+        # fetch ES datastore search result
+        es_results = self.esdb.get_multi_entity_results(entities=es_entity_list,
+                                                        texts=texts,
+                                                        fuzziness_threshold=self._fuzziness,
+                                                        search_language_script=self._target_language_script
+                                                        )
+
+        final_list = []
+        result_dict = {}
+
+        for index, entity_result in enumerate(es_results):
+            processed_text = self.__processed_texts[index]
+            text = texts[index]
+            entity_list = es_entity_list[index]
+            result_dict.update(self._process_es_result(entity_result=entity_result,
+                                                       entity_list=entity_list,
+                                                       text=text, processed_text=processed_text))
+
+        final_list.append(result_dict)
+
+        return final_list
+
+    def _get_bulk_text_detection_with_variants(self, messages):
+        """
         This function will normalise the message by breaking it into trigrams, bigrams and unigrams.
         The generated ngrams will be used to create query to retrieve search results from datastore.
         These results will contain list of dictionary where for each item key will be variant and
         value will be entity value this will be further processed to get the original text which has
         been identified and will return the results
+
+        Args:
+            messages (list of str): list of message for which detection needs to be perform
 
         Returns:
          tuple:
@@ -276,69 +427,33 @@ class TextDetector(object):
                             containing the detected text entities and original message.
         """
 
+        self._process_text(messages)
+
         texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for
                  processed_text in self.__processed_texts]
 
-        entities_dict = self.entities_dict
-        es_results = self.esdb.get_multi_entity_results(entities=list(entities_dict),
-                                                        texts=texts,
+        entity_list = list(self.entities_dict)
+
+        # entity list for ES search should be list of entities
+        # for all list of texts
+        es_entity_list = [entity_list]
+        es_texts = [texts]
+
+        # fetch ES datastore search result
+        es_results = self.esdb.get_multi_entity_results(entities=es_entity_list,
+                                                        texts=es_texts,
                                                         fuzziness_threshold=self._fuzziness,
                                                         search_language_script=self._target_language_script
                                                         )
+
         final_list = []
+
         for index, entity_result in enumerate(es_results):
-            result_list = {}
-            for each_key in entities_dict.keys():
-
-                original_final_list = []
-                value_final_list = []
-                variants_to_values = collections.OrderedDict()
-                original_final_list_ = []
-                value_final_list_ = []
-
-                _variants_to_values = entity_result.get(each_key, [])
-
-                if not _variants_to_values:
-                    result_list[each_key] = ([], [])
-                    continue
-                for variant, value in iteritems(_variants_to_values):
-                    variant = variant.lower()
-                    if isinstance(variant, bytes):
-                        variant = variant.decode('utf-8')
-
-                    variants_to_values[variant] = value
-                variants_list = list(variants_to_values.keys())
-
-                exact_matches, fuzzy_variants = [], []
-                _text = texts
-                for variant in variants_list:
-                    if u' '.join(TOKENIZER.tokenize(variant)) in _text[index]:
-                        exact_matches.append(variant)
-                    else:
-                        fuzzy_variants.append(variant)
-                exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-                fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-
-                variants_list = exact_matches + fuzzy_variants
-                for variant in variants_list:
-
-                    original_text = self._get_entity_substring_from_text(self.__processed_texts[index],
-                                                                         variant, each_key)
-                    if original_text:
-                        value_final_list.append(variants_to_values[variant])
-                        original_final_list.append(original_text)
-                        boundary_punct_pattern = re.compile(
-                            r'(^[{0}]+)|([{0}]+$)'.format(re.escape(string.punctuation)))
-                        original_text_ = boundary_punct_pattern.sub("", original_text)
-
-                        _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), flags=_re_flags)
-                        tag = '__' + each_key + '__'
-                        self.__processed_texts[index] = _pattern.sub(tag, self.__processed_texts[index])
-                value_final_list_.append(value_final_list)
-                original_final_list_.append(original_final_list)
-
-                result_list[each_key] = (value_final_list_, original_final_list_)
-
+            processed_text = self.__processed_texts[index]
+            text = texts[index]
+            result_list = self._process_es_result(entity_result=entity_result,
+                                                  entity_list=entity_list,
+                                                  text=text, processed_text=processed_text)
             final_list.append(result_list)
 
         return final_list
@@ -405,17 +520,17 @@ class TextDetector(object):
 
     def combine_results(self, values, original_texts, predetected_values):
         """
-            This method is used to combine the results provided by the datastore search and the
-            crf_model if trained.
-            Args:
-                values (list): List of values detected by datastore
-                original_texts (list): List of original texts present in the texts for which value shave been
-                                       detected
-                predetected_values (list): Entities detected by the models like crf etc.
-            Returns:
-                combined_values (list): List of dicts each dict consisting of the entity value and additionally
-                                        the keys for the datastore and crf model detection
-                combined_original_texts (list): List of original texts detected by the datastore and the crf model.
+        This method is used to combine the results provided by the datastore search and the
+        crf_model if trained.
+        Args:
+            values (list): List of values detected by datastore
+            original_texts (list): List of original texts present in the texts for which value shave been
+                                   detected
+            predetected_values (list): Entities detected by the models like crf etc.
+        Returns:
+            combined_values (list): List of dicts each dict consisting of the entity value and additionally
+                                    the keys for the datastore and crf model detection
+            combined_original_texts (list): List of original texts detected by the datastore and the crf model.
         """
         unprocessed_crf_original_texts = []
 
@@ -423,15 +538,17 @@ class TextDetector(object):
             values=values, verification_source_dict={DATASTORE_VERIFIED: True, MODEL_VERIFIED: False}
         )
         combined_original_texts = original_texts
+
         for i in range(len(predetected_values)):
             match = False
             for j in range(len(original_texts)):
-                if predetected_values[i] == original_texts[j]:
+                if predetected_values[i].lower() == original_texts[j]:
                     combined_values[j][MODEL_VERIFIED] = True
                     match = True
                     break
                 elif re.findall(r'\b%s\b' % re.escape(predetected_values[i]), original_texts[j]):
-                    # If predetected value is a substring of some value detected by datastore, skip it from output
+                    # If predetected value is a substring of some value detected by datastore,
+                    # skip it from output
                     match = True
                     break
             if not match:
@@ -447,15 +564,18 @@ class TextDetector(object):
 
         return combined_values, combined_original_texts
 
-    def detect(self, message=None, structured_value=None, **kwargs):
+    def detect(self, message=None, **kwargs):
         """
-            This method will detect all textual entities over the single message.
-            After detection it will combine the result and outputs list of dictionary
-            for all the entities detected over message
+        This method will detect all textual entities over the single message.
 
-            Args:
-                message (str): message on which textual entities needs to be detected
-                structured_value(str): if this present it will preferred over message
+        If structured value is present for any given entity it will be preferred
+        over message and a new ES query is added with text as structured value.
+
+        After detection it will combine the result and outputs list of dictionary
+        for all the entities detected over message
+
+        Args:
+            message (str): message on which textual entities needs to be detected
             **kwargs: other keyword arguments if required
 
         Returns:
@@ -463,14 +583,15 @@ class TextDetector(object):
 
         Examples:
 
-
             entity_dict = {
-                            'city': {'fallback_value': 'Mumbai', 'use_fallback': False},
-                            'restaurant': {'fallback_value': None, 'use_fallback': False}
+                            'city': {'structured_value': None, 'fallback_value': None},
+                            'restaurant': {'structured_value': None, 'fallback_value': None},
+                            'brand' : {'structured_value': 'Nike', 'fallback_value': None},
                             }
 
             text_detection = TextDetector(entity_dict)
-            text_detection.detect('Buy ticket to Chennai from Mumbai)
+
+            text_detection.detect('Buy ticket to Chennai from Mumbai')
 
             output:
                   [ {
@@ -481,6 +602,7 @@ class TextDetector(object):
                                 'detection': 'message',
                                 'original_text': 'Mumbai',
                                 'language': 'en'},
+
                                 {'entity_value': {'value': 'Chennai',
                                                 'datastore_verified': True,
                                                 'model_verified': False},
@@ -488,30 +610,39 @@ class TextDetector(object):
                                 'original_text': 'Chennai',
                                 'language': 'en'}
                             ],
-                    'restaurant': []
+                    'restaurant': [],
+                    'brand': [
+                                {'entity_value': {'value': 'Nike',
+                                                'datastore_verified': True,
+                                                'model_verified': False},
+                                "detection": "structure_value_verified",
+                                'original_text': 'Nike',
+                                'language': 'en'}]
                     }]
         """
 
-        text = structured_value if structured_value else message
-        self._process_text([text])
-        res_list = self._get_text_detection_with_variants()
+        res_list = self._get_single_text_detection_with_variants(message)
         data_list = []
 
         for index, res in enumerate(res_list):
             entities = {}
+
             for entity, value in res.items():
                 entities[entity] = []
                 values, texts = [], []
                 text_entity_values, original_texts = value
-                # get predetected value from entity dict
                 entity_dict = self.entities_dict.get(entity, {})
+
+                # get structured value from entity dict
+                structured_value = entity_dict.get('structured_value')
+
+                # get predetected value from entity dict
                 predetected_values = entity_dict.get('predetected_values') or []
 
                 # get fallback value from entity dict
                 fallback_value = entity_dict.get('fallback_value')
 
                 if text_entity_values and original_texts:
-                    self.processed_text = self.__processed_texts[0]
                     values, texts = text_entity_values[0], original_texts[0]
 
                 entity_list, original_text_list = self.combine_results(values=values, original_texts=texts,
@@ -595,10 +726,9 @@ class TextDetector(object):
                     ]
         """
 
-        texts = messages
-        self._process_text(texts)
-        res_list = self._get_text_detection_with_variants()
+        res_list = self._get_bulk_text_detection_with_variants(messages)
         data_list = []
+
         for index, res in enumerate(res_list):
             entities = {}
             for entity, value in res.items():
@@ -613,7 +743,6 @@ class TextDetector(object):
 
                 text_entity_values, original_texts = value
                 if text_entity_values and original_texts:
-                    self.processed_text = self.__processed_texts[0]
                     values, texts = text_entity_values[0], original_texts[0]
 
                 entity_list, original_text_list = self.combine_results(values=values, original_texts=texts,

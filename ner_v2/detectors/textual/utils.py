@@ -6,14 +6,20 @@ import six
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
 
-from ner_constants import FROM_FALLBACK_VALUE
+from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
+                           FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
+                           DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 from ner_v2.detectors.textual.text_detection import TextDetector
 
 
 def verify_text_request(request):
     """
-    Check the request object if proper message or entity is present in required
-    format. If not present raises appropriate error.
+    Check the request object
+    1. If proper message or entity is present in required
+    format.
+
+    2. If length of message or entity is in allowed range
+
     Args:
         request: API request object
 
@@ -43,9 +49,22 @@ def verify_text_request(request):
         ner_logger.exception("Entities param is not in correct format")
         raise TypeError("Entities should be dict of entity details")
 
+    if len(message) > 100:
+        ner_logger.exception("Maximum number of message can be 100 for "
+                             "bulk detection")
+        raise ValueError("Maximum number of message can be 100 for "
+                         "bulk detection")
 
-def get_text_detection(message, entity_dict, structured_value=None, bot_message=None,
-                       language=ENGLISH_LANG, target_language_script=ENGLISH_LANG, **kwargs):
+    if len(list(entities)) > 100:
+        ner_logger.exception("Maximum number of entities can be 100 for "
+                             " detection")
+        raise ValueError("Maximum number of entities can be 100 for "
+                         "bulk detection")
+
+
+def get_text_detection(message, entity_dict, bot_message=None,
+                       language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
+                       **kwargs):
     """
     Get text detection for given message on given entities dict using
     TextDetector module.
@@ -69,7 +88,6 @@ def get_text_detection(message, entity_dict, structured_value=None, bot_message=
                                  target_language_script=target_language_script)
     if isinstance(message, six.string_types):
         entity_output = text_detector.detect(message=message,
-                                             structured_value=structured_value,
                                              bot_message=bot_message)
     elif isinstance(message, (list, tuple)):
         entity_output = text_detector.detect_bulk(messages=message)
@@ -86,10 +104,10 @@ def parse_text_request(request):
     Message to detect text can be:
 
     1) Single entry in the list, for this we use `text_detector.detect` method.
-    Also for this case we check if the structured value or use_fallback is present.
+    Also for this case we check `ignore_message` flag is present.
 
     2) For mulitple message, underlying code will call `text_detector.detect_bulk` method.
-    In this case we ignore structured valur or use_fallback for all the entities.
+    In this case we ignore flag for ignore_message for all the entities.
 
     Args:
         request: request object
@@ -109,7 +127,7 @@ def parse_text_request(request):
                             "predetected_values": ["Mumbai"],
                             "fuzziness": null,
                             "min_token_len_fuzziness": null,
-                            "use_fallback": false
+                            "ignore_message": false
                         },
                         "restaurant": {
                             "structured_value": null,
@@ -117,7 +135,7 @@ def parse_text_request(request):
                             "predetected_values": null,
                             "fuzziness": null,
                             "min_token_len_fuzziness": null,
-                            "use_fallback": false
+                            "ignore_message": false
                                 }
                              }
                          }
@@ -165,46 +183,30 @@ def parse_text_request(request):
         # get first message
         message_str = message[0]
 
-        structured_value_entities = {}
         fallback_value_entities = {}
         text_value_entities = {}
 
         data.append({"entities": {}, "language": source_language})
 
         for each_entity, value in entities.items():
-            structured_value = value.get('structured_value')
-            use_fallback = value.get('use_fallback', False)
+            ignore_message = value.get('ignore_message', False)
 
-            if use_fallback:
+            if ignore_message:
                 fallback_value_entities[each_entity] = value
-            elif structured_value:
-                structured_value_entities[each_entity] = value
             else:
                 text_value_entities[each_entity] = value
 
-        # get detection for normal text entities
+        # get detection for text entities which has ignore_message flag
+        if fallback_value_entities:
+            output = get_output_for_fallback_entities(fallback_value_entities, source_language)
+            data[0]["entities"].update(output)
+
+        # get detection for text entities
         output = get_text_detection(message=message_str, entity_dict=text_value_entities,
                                     structured_value=None, bot_message=bot_message,
                                     language_script=source_language,
                                     target_language_script=target_language_script)
         data[0]["entities"].update(output[0])
-
-        # get detection for structured value text entities
-        if structured_value_entities:
-            for entity, value in structured_value_entities.items():
-                entity_dict = {entity: value}
-                sv = value.get("structured_value")
-                output = get_text_detection(message=message_str, entity_dict=entity_dict,
-                                            structured_value=sv, bot_message=bot_message,
-                                            language_script=source_language,
-                                            target_language_script=target_language_script)
-
-                data[0]["entities"].update(output[0])
-
-        # get detection for fallback value text entities
-        if fallback_value_entities:
-            output = get_output_for_fallback_entities(fallback_value_entities, source_language)
-            data[0]["entities"].update(output)
 
     # check if more than one message
     elif len(message) > 1:
@@ -236,8 +238,8 @@ def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
     Examples:
         Input:
         {
-            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
-            'restaurant': {'fallback_value': None, 'use_fallback': True}
+            'city': {'fallback_value': 'Mumbai', 'ignore_message': True},
+            'restaurant': {'fallback_value': None, 'ignore_message': True}
         }
 
         Output:
@@ -268,14 +270,14 @@ def get_output_for_fallback_entities(entities_dict, language=ENGLISH_LANG):
         else:
             output[entity] = [
                 {
-                    "entity_value": {
-                        "value": fallback_value,
-                        "datastore_verified": False,
-                        "model_verified": False
+                    ENTITY_VALUE: {
+                        ENTITY_VALUE_DICT_KEY: fallback_value,
+                        DATASTORE_VERIFIED: False,
+                        MODEL_VERIFIED: False
                     },
-                    "detection": FROM_FALLBACK_VALUE,
-                    "original_text": fallback_value,
-                    "language": language
+                    DETECTION_METHOD: FROM_FALLBACK_VALUE,
+                    ORIGINAL_TEXT: fallback_value,
+                    DETECTION_LANGUAGE: language
                 }
             ]
     return output

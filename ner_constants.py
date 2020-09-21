@@ -25,6 +25,11 @@ DETECTION_LANGUAGE = 'language'
 
 ENTITY_VALUE_DICT_KEY = 'value'
 
+# datastore_verified a key to verify value from the datastore
+DATASTORE_VERIFIED = 'datastore_verified'
+# model_verified a key to verify value from the model
+MODEL_VERIFIED = 'model_verified'
+
 # ************************ constants tell us what to do with structured_value ************************
 # This will execute entity detection on the structured_value.
 STRUCTURED = 0

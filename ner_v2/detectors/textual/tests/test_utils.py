@@ -18,8 +18,8 @@ tests_directory = os.path.dirname(os.path.abspath(__file__))
 class TestTextualUtils(TestCase):
 
     def test_get_output_for_fallback_entities(self):
-        input_data = {'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
-                      'restaurant': {'fallback_value': None, 'use_fallback': True}}
+        input_data = {'city': {'fallback_value': 'Mumbai', 'ignore_message': True},
+                      'restaurant': {'fallback_value': None, 'ignore_message': True}}
 
         assert_output_data = {'city': [{'entity_value': {'value': 'Mumbai',
                                                          'datastore_verified': False,
@@ -72,7 +72,7 @@ class TestTextualUtils(TestCase):
                     "predetected_values": None,
                     "fuzziness": 4,
                     "min_token_len_fuzziness": 4,
-                    "use_fallback": None
+                    "ignore_message": None
                 },
 
                 "restaurant": {
@@ -81,7 +81,7 @@ class TestTextualUtils(TestCase):
                     "predetected_values": None,
                     "fuzziness": None,
                     "min_token_len_fuzziness": None,
-                    "use_fallback": True
+                    "ignore_message": True
                 },
             }
 
@@ -125,7 +125,7 @@ class TestTextualUtils(TestCase):
                     "predetected_values": None,
                     "fuzziness": 4,
                     "min_token_len_fuzziness": 4,
-                    "use_fallback": None
+                    "ignore_message": None
                 },
 
                 "restaurant": {
@@ -134,7 +134,7 @@ class TestTextualUtils(TestCase):
                     "predetected_values": None,
                     "fuzziness": None,
                     "min_token_len_fuzziness": None,
-                    "use_fallback": True
+                    "ignore_message": True
                 },
             }
 
@@ -165,7 +165,7 @@ class TestTextualUtils(TestCase):
                                 'predetected_values': None,
                                 'fuzziness': 4,
                                 'min_token_len_fuzziness': 4,
-                                'use_fallback': None}}
+                                'ignore_message': None}}
 
         message = "I want to go to Mumbai"
 
@@ -193,7 +193,7 @@ class TestTextualUtils(TestCase):
                                 'predetected_values': None,
                                 'fuzziness': 4,
                                 'min_token_len_fuzziness': 4,
-                                'use_fallback': None}}
+                                'ignore_message': None}}
 
         message = ["I want to go to Mumbai", "I want to go to Delhi"]
 
