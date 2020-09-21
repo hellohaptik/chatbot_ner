@@ -172,7 +172,6 @@ def parse_text_request(request):
         data.append({"entities": {}, "language": source_language})
 
         for each_entity, value in entities.items():
-
             structured_value = value.get('structured_value')
             use_fallback = value.get('use_fallback', False)
 

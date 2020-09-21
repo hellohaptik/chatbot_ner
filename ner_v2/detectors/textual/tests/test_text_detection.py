@@ -40,7 +40,7 @@ class TestTextualUtils(TestCase):
         self.assertEqual(language, text_detector._source_language_script)
         self.assertEqual(target_language_script, text_detector._target_language_script)
 
-        self.assertDictEqual(entity_dict, text_detector.entities_dict_list)
+        self.assertDictEqual(entity_dict, text_detector.entities_dict)
 
     @patch('ner_v2.detectors.textual.elastic_search.'
            'ElasticSearchDataStore.get_multi_entity_results')

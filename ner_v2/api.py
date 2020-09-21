@@ -674,6 +674,8 @@ def text(request):
 
         try:
             verify_text_request(request)
+            # if verify success parse request and get data
+            data = parse_text_request(request)
 
         except KeyError as err:
             response = {"success": False, "error": str(err)}
@@ -685,9 +687,11 @@ def text(request):
             ner_logger.debug(response)
             return HttpResponse(json.dumps(response), content_type='application/json',
                                 status=400)
-
-        # if verify success parse request and get data
-        data = parse_text_request(request)
+        except Exception as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.debug(response)
+            return HttpResponse(json.dumps(response), content_type='application/json',
+                                status=400)
 
     if data:
         response = {"success": True, "error": None, "data": data}

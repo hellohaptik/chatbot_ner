@@ -42,28 +42,31 @@ class TextDetector(object):
     like date, time, email, etc do. Examples of such types of entites can be city, food dish name, brand names etc
 
     Attributes:
-        entities_dict_list (dict): dict with details of entities to be dected. Each entites will contailn:
-                                    `value`: name of the entity
+        entities_dict (dict): dict with details of entities to be dected. Each entites will contailn:
+                    `value`: name of the entity
 
-                                    `_fuzziness` (str or int): If this parameter is str, elasticsearch's
-                                             auto is used with low and high term distances. Default low and high
-                                            term distances are 3 and 6 for elasticsearch. For this module they are
-                                            set to 4 and 7 respectively.
+                    `_fuzziness` (str or int): If this parameter is str, elasticsearch's
+                             auto is used with low and high term distances. Default low and high
+                            term distances are 3 and 6 for elasticsearch. For this module they are
+                            set to 4 and 7 respectively.
 
-                                            In auto mode, if length of term is less than low it must match exactly,
-                                              if it is between [low, high) one insert/delete/substitution is allowed,
-                                              for anything higher than equal to high, two inserts/deletes/substitutions
-                                               are allowed
+                            In auto mode, if length of term is less than low it must match exactly,
+                              if it is between [low, high) one insert/delete/substitution is allowed,
+                              for anything higher than equal to high, two inserts/deletes/substitutions
+                               are allowed
 
-                                    `_min_token_size_for_fuzziness (int)`: minimum number of letters a word must
-                                                have to be considered for calculating edit distance with similar
-                                                ngrams from the datastore
+                    `_min_token_size_for_fuzziness (int)`: minimum number of letters a word must
+                                have to be considered for calculating edit distance with similar
+                                ngrams from the datastore
         processed_text (str): string with detected text entities removed
     """
 
     def __init__(self, entity_dict=None,
                  source_language_script=lang_constant.ENGLISH_LANG,
                  target_language_script=ENGLISH_LANG):
+
+        # define entities to detect
+        self.entities_dict = entity_dict
 
         self.processed_text = None
         self.__texts = []
@@ -82,9 +85,6 @@ class TextDetector(object):
         self.esdb = ElasticSearchDataStore()
         self._source_language_script = source_language_script
         self._target_language_script = target_language_script
-
-        # define entities to detect
-        self.entities_dict_list = entity_dict
 
     def _reset_state(self):
         """
@@ -110,7 +110,7 @@ class TextDetector(object):
 
             Note that this also sets _min_token_size_for_fuzziness to first value of the iterable
             If this argument is int, elasticsearch will set fuzziness as min(2, fuzziness)
-    """
+        """
         try:
             iter(fuzziness)
             if len(fuzziness) == 2:
@@ -154,8 +154,8 @@ class TextDetector(object):
 
     def set_min_token_size_for_levenshtein(self, min_size):
         """
-        Sets the minimum number of letters a word must have to be considered for calculating edit distance with similar
-        ngrams from the datastore
+        Sets the minimum number of letters a word must have to be considered for calculating edit
+        distance with similar ngrams from the datastore
 
         Args:
             min_size: integer, maximum allowed Levenshtein's distance from the word/phrase being tested for
@@ -197,7 +197,8 @@ class TextDetector(object):
         In: matched_tokens = [u'1', u'pc', u'hot', u'crispy']
         Out: 1 pc hot & crispy
 
-        Notice that & is dropped during tokenization but when finding original text, we recover it from processed text
+        Notice that & is dropped during tokenization but when finding original text,
+        we recover it from processed text
         """
 
         def _get_tokens_and_indices(txt):
@@ -262,22 +263,24 @@ class TextDetector(object):
 
     def _get_text_detection_with_variants(self):
         """
-            This function will normalise the message by breaking it into trigrams, bigrams and unigrams. The generated
-            ngrams will be used to create query to retrieve search results from datastore. These results will contain list
-            of dictionary where for each item key will be variant and value will be entity value this will be further
-            processed to get the original text which has been identified and will return the results
 
-            Returns:
-             tuple:
-                list of lists: list of dict for each message with key as entity name
-                                containing the detected text entities and original message.
+        This function will normalise the message by breaking it into trigrams, bigrams and unigrams.
+        The generated ngrams will be used to create query to retrieve search results from datastore.
+        These results will contain list of dictionary where for each item key will be variant and
+        value will be entity value this will be further processed to get the original text which has
+        been identified and will return the results
+
+        Returns:
+         tuple:
+            list of lists: list of dict for each message with key as entity name
+                            containing the detected text entities and original message.
         """
 
         texts = [u' '.join(TOKENIZER.tokenize(processed_text)) for
                  processed_text in self.__processed_texts]
 
-        entities_dict_list = self.entities_dict_list
-        es_results = self.esdb.get_multi_entity_results(entities=list(entities_dict_list),
+        entities_dict = self.entities_dict
+        es_results = self.esdb.get_multi_entity_results(entities=list(entities_dict),
                                                         texts=texts,
                                                         fuzziness_threshold=self._fuzziness,
                                                         search_language_script=self._target_language_script
@@ -285,7 +288,7 @@ class TextDetector(object):
         final_list = []
         for index, entity_result in enumerate(es_results):
             result_list = {}
-            for each_key in entities_dict_list.keys():
+            for each_key in entities_dict.keys():
 
                 original_final_list = []
                 value_final_list = []
@@ -354,9 +357,8 @@ class TextDetector(object):
               str or unicode or None: part of the given text that was detected as entity given the variant,
                                       None otherwise
             Example:
-              >>> text_detector = TextDetector('city')
+              >>> text_detector = TextDetector(entity_dict={'city':{})
               >>> text = 'Come to Chennai, Tamil Nadu,  I will visit Delehi next year'.lower()
-              >>> text_detector.detect_entity(text)
               >>> text_detector._get_entity_substring_from_text(variant='chennai')
               'chennai'
               >>> text_detector._get_entity_substring_from_text(variant='delhi')
@@ -371,7 +373,7 @@ class TextDetector(object):
             same = variant_token == text_token
 
             # get fuzziness and min_token_size_for_fuziness value from entity dict
-            entity_dict = self.entities_dict_list.get(entity_name, {})
+            entity_dict = self.entities_dict.get(entity_name, {})
             fuzziness = entity_dict.get('fuzziness')
             min_token_size_for_fuzziness = entity_dict.get('min_token_len_fuzziness')
 
@@ -463,8 +465,8 @@ class TextDetector(object):
 
 
             entity_dict = {
-                            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
-                            'restaurant': {'fallback_value': None, 'use_fallback': True}
+                            'city': {'fallback_value': 'Mumbai', 'use_fallback': False},
+                            'restaurant': {'fallback_value': None, 'use_fallback': False}
                             }
 
             text_detection = TextDetector(entity_dict)
@@ -474,15 +476,15 @@ class TextDetector(object):
                   [ {
                     'city': [
                                 {'entity_value': {'value': 'Mumbai',
-                                                'datastore_verified': False,
+                                                'datastore_verified': True,
                                                 'model_verified': False},
-                                'detection': 'fallback_value',
+                                'detection': 'message',
                                 'original_text': 'Mumbai',
                                 'language': 'en'},
                                 {'entity_value': {'value': 'Chennai',
-                                                'datastore_verified': False,
+                                                'datastore_verified': True,
                                                 'model_verified': False},
-                                'detection': 'fallback_value',
+                                'detection': 'message',
                                 'original_text': 'Chennai',
                                 'language': 'en'}
                             ],
@@ -502,7 +504,7 @@ class TextDetector(object):
                 values, texts = [], []
                 text_entity_values, original_texts = value
                 # get predetected value from entity dict
-                entity_dict = self.entities_dict_list.get(entity, {})
+                entity_dict = self.entities_dict.get(entity, {})
                 predetected_values = entity_dict.get('predetected_values') or []
 
                 # get fallback value from entity dict
@@ -555,8 +557,8 @@ class TextDetector(object):
             example:
 
             entity_dict = {
-                            'city': {'fallback_value': 'Mumbai', 'use_fallback': True},
-                            'restaurant': {'fallback_value': None, 'use_fallback': True}
+                            'city': {'fallback_value': 'Mumbai', 'use_fallback': False},
+                            'restaurant': {'fallback_value': None, 'use_fallback': False}
                             }
 
             text_detection = TextDetector(entity_dict)
@@ -567,28 +569,26 @@ class TextDetector(object):
                   [ {
                     'city': [
                                 {'entity_value': {'value': 'Mumbai',
-                                                'datastore_verified': False,
+                                                'datastore_verified': True,
                                                 'model_verified': False},
-                                'detection': 'fallback_value',
+                                'detection': 'message',
                                 'original_text': 'Mumbai',
                                 'language': 'en'},
                                 {'entity_value': {'value': 'Chennai',
-                                                'datastore_verified': False,
+                                                'datastore_verified': True,
                                                 'model_verified': False},
-                                'detection': 'fallback_value',
+                                'detection': 'message',
                                 'original_text': 'Chennai',
                                 'language': 'en'}
                             ],
                     'restaurant': []},
                     {
-
-                    ,
                     'city': [],
                     'restaurant': [
                                 {'entity_value': {'value': 'Domminoe's Pizza',
-                                                'datastore_verified': False,
+                                                'datastore_verified': True,
                                                 'model_verified': False},
-                                'detection': 'fallback_value',
+                                'detection': 'message',
                                 'original_text': 'dominoes',
                                 'language': 'en'}
                             ]
@@ -597,7 +597,6 @@ class TextDetector(object):
 
         texts = messages
         self._process_text(texts)
-
         res_list = self._get_text_detection_with_variants()
         data_list = []
         for index, res in enumerate(res_list):
@@ -606,7 +605,7 @@ class TextDetector(object):
                 entities[entity] = []
                 values, texts = [], []
                 # get predetected value from entity dict
-                entity_dict = self.entities_dict_list.get(entity, {})
+                entity_dict = self.entities_dict.get(entity, {})
                 predetected_values = entity_dict.get('predetected_values') or []
 
                 # get fallback value from entity dict
@@ -640,8 +639,10 @@ class TextDetector(object):
     def output_entity_dict_list(entity_value_list, original_text_list, detection_method=None,
                                 detection_method_list=None, detection_language=ENGLISH_LANG):
         """
-   Format detected entity values for bulk detection
-        Args:
+            Format detected entity values for bulk detection
+
+            Args:
+
             entity_values_list (list of lists): containing list of entity values which are identified from given
                                                 detection logic
             original_texts_list (list of lists): containing list original values or actual values from
@@ -655,11 +656,12 @@ class TextDetector(object):
                                                 defaults to None
             detection_language(str): ISO 639 code for language in which entity is detected
 
-        Returns:
+            Returns:
+
             list of lists of dict: list of lists containing dictionaries, each containing entity_value,
                                     original_text and detection;
                                     entity_value is in itself a dict with its keys varying from entity to entity
-        Example Output:
+            Example Output:
             [
                 [
                     {
