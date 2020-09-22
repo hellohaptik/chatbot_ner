@@ -97,7 +97,7 @@ def get_text_detection(message, entity_dict, bot_message=None,
     return entity_output
 
 
-def parse_text_request(request):
+def get_text_entity_detection_data(request):
     """
     Parse text request coming from POST call on `/v2/text/` and call the
     get text detection.

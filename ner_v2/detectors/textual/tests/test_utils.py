@@ -9,7 +9,7 @@ from mock import patch
 from django.test import TestCase
 from django.http import HttpRequest
 
-from ner_v2.detectors.textual.utils import parse_text_request, verify_text_request, \
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request, \
     get_output_for_fallback_entities, get_text_detection
 
 tests_directory = os.path.dirname(os.path.abspath(__file__))
@@ -59,7 +59,7 @@ class TestTextualUtils(TestCase):
         self.assertRaises(TypeError, verify_text_request, request=request)
 
     @patch('ner_v2.detectors.textual.utils.get_text_detection')
-    def test_parse_text_request(self, mock_get_detection):
+    def test_get_text_entity_detection_data(self, mock_get_detection):
         input_data = {
             "message": ["I want to go to Mumbai"],
             "bot_message": None,
@@ -98,7 +98,7 @@ class TestTextualUtils(TestCase):
              'language': 'en'}], 'restaurant': []},
             'language': 'en'}]
 
-        output = parse_text_request(request)
+        output = get_text_entity_detection_data(request)
 
         assert_output = [{
             'entities': {'entities': {'city': [
@@ -112,7 +112,7 @@ class TestTextualUtils(TestCase):
         self.assertListEqual(output, assert_output)
 
     @patch('ner_v2.detectors.textual.utils.get_text_detection')
-    def test_parse_text_request_structured(self, mock_get_detection):
+    def test_get_text_entity_detection_data_structured(self, mock_get_detection):
         input_data = {
             "message": ["I want to go to Mumbai"],
             "bot_message": None,
@@ -148,7 +148,7 @@ class TestTextualUtils(TestCase):
             {'entity_value': {'value': 'New Delhi', 'datastore_verified': True, 'model_verified': False},
              'detection': 'structure_value_verified', 'original_text': 'delhi', 'language': 'en'}]}]
 
-        output = parse_text_request(request)
+        output = get_text_entity_detection_data(request)
 
         assert_output = [{'entities': {'city': [
             {'entity_value': {'value': 'New Delhi', 'datastore_verified': True, 'model_verified': False},

@@ -294,6 +294,7 @@ class TextDetector(object):
             variants_to_values = collections.OrderedDict()
             original_final_list_ = []
             value_final_list_ = []
+            _processed_text = processed_text
 
             _variants_to_values = entity_result.get(each_key, [])
 
@@ -323,7 +324,7 @@ class TextDetector(object):
             variants_list = exact_matches + fuzzy_variants
             for variant in variants_list:
 
-                original_text = self._get_entity_substring_from_text(processed_text,
+                original_text = self._get_entity_substring_from_text(_processed_text,
                                                                      variant, each_key)
                 if original_text:
                     value_final_list.append(variants_to_values[variant])
@@ -334,7 +335,7 @@ class TextDetector(object):
 
                     _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), flags=_re_flags)
                     tag = '__' + each_key + '__'
-                    processed_text = _pattern.sub(tag, processed_text)
+                    _processed_text = _pattern.sub(tag, _processed_text)
 
             value_final_list_.append(value_final_list)
             original_final_list_.append(original_final_list)

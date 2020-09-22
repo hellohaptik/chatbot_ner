@@ -12,7 +12,7 @@ from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
-from ner_v2.detectors.textual.utils import parse_text_request, verify_text_request
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
@@ -674,8 +674,8 @@ def text(request):
 
         try:
             verify_text_request(request)
-            # if verify success parse request and get data
-            data = parse_text_request(request)
+            # if verify success get detection data
+            data = get_text_entity_detection_data(request)
 
         except KeyError as err:
             response = {"success": False, "error": str(err)}
