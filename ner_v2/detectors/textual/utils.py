@@ -30,26 +30,26 @@ def verify_text_request(request):
     """
 
     request_data = json.loads(request.body)
-    message = request_data.get("message")
+    messages = request_data.get("messages")
     entities = request_data.get("entities")
 
-    if not message:
-        ner_logger.exception("Message param is not passed")
-        raise KeyError("Message is required")
+    if not messages:
+        ner_logger.exception("messages param is not passed")
+        raise KeyError("key messages is required")
 
     if not entities:
         ner_logger.exception("Entities param is not passed")
         raise KeyError("Entities dict is required")
 
-    if not isinstance(message, list):
-        ner_logger.exception("Message param is not in correct format")
-        raise TypeError("Message should be in format of list of string")
+    if not isinstance(messages, list):
+        ner_logger.exception("messages param is not in correct format")
+        raise TypeError("messages should be in format of list of string")
 
     if not isinstance(entities, dict):
         ner_logger.exception("Entities param is not in correct format")
         raise TypeError("Entities should be dict of entity details")
 
-    if len(message) > 100:
+    if len(messages) > 100:
         ner_logger.exception("Maximum number of message can be 100 for "
                              "bulk detection")
         raise ValueError("Maximum number of message can be 100 for "
@@ -117,7 +117,7 @@ def get_text_entity_detection_data(request):
     Examples:
         Request Object:
         {
-                    "message": ["I want to go to Jabalpur"],
+                    "messages": ["I want to go to Jabalpur"],
                     "bot_message": null,
                     "language_script": "en",
                     "source_language": "en",
@@ -169,7 +169,7 @@ def get_text_entity_detection_data(request):
                         ]
     """
     request_data = json.loads(request.body)
-    message = request_data.get("message", [])
+    messages = request_data.get("messages", [])
     bot_message = request_data.get("bot_message")
     entities = request_data.get("entities", {})
     target_language_script = request_data.get('language_script') or ENGLISH_LANG
@@ -177,12 +177,12 @@ def get_text_entity_detection_data(request):
 
     data = []
 
-    message_len = len(message)
+    message_len = len(messages)
 
     if message_len == 1:
 
         # get first message
-        message_str = message[0]
+        message_str = messages[0]
 
         fallback_value_entities = {}
         text_value_entities = {}
@@ -203,15 +203,16 @@ def get_text_entity_detection_data(request):
             data[0]["entities"].update(output)
 
         # get detection for text entities
-        output = get_detection(message=message_str, entity_dict=text_value_entities,
-                               structured_value=None, bot_message=bot_message,
-                               language_script=source_language,
-                               target_language_script=target_language_script)
-        data[0]["entities"].update(output[0])
+        if text_value_entities:
+            output = get_detection(message=message_str, entity_dict=text_value_entities,
+                                   structured_value=None, bot_message=bot_message,
+                                   language_script=source_language,
+                                   target_language_script=target_language_script)
+            data[0]["entities"].update(output[0])
 
     # check if more than one message
-    elif len(message) > 1:
-        text_detection_result = get_detection(message=message, entity_dict=entities,
+    elif len(messages) > 1:
+        text_detection_result = get_detection(message=messages, entity_dict=entities,
                                               structured_value=None, bot_message=bot_message)
 
         data = [{"entities": x, "language": source_language} for x in text_detection_result]

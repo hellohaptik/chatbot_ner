@@ -36,7 +36,7 @@ class TestTextualUtils(TestCase):
         request = HttpRequest()
 
         # test if everything is ok
-        request._body = b'{"message":["something"], "entities":{"something":""}}'
+        request._body = b'{"messages":["something"], "entities":{"something":""}}'
         verify_text_request(request)
 
     def test_verify_text_request_exceptions(self):
@@ -47,21 +47,21 @@ class TestTextualUtils(TestCase):
         self.assertRaises(KeyError, verify_text_request, request=request)
 
         # test if no entities
-        request._body = b'{"message": "something"}'
+        request._body = b'{"messages": "something"}'
         self.assertRaises(KeyError, verify_text_request, request=request)
 
         # test if message not in proper format
-        request._body = b'{"message":"something", "entities":"something"}'
+        request._body = b'{"messages":"something", "entities":"something"}'
         self.assertRaises(TypeError, verify_text_request, request=request)
 
         # test if entities not in proper format
-        request._body = b'{"message":["something"], "entities":"something"}'
+        request._body = b'{"messages":["something"], "entities":"something"}'
         self.assertRaises(TypeError, verify_text_request, request=request)
 
     @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data(self, mock_get_detection):
         input_data = {
-            "message": ["I want to go to Mumbai"],
+            "messages": ["I want to go to Mumbai"],
             "bot_message": None,
             "language_script": "en",
             "source_language": "en",
@@ -114,7 +114,7 @@ class TestTextualUtils(TestCase):
     @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data_structured(self, mock_get_detection):
         input_data = {
-            "message": ["I want to go to Mumbai"],
+            "messages": ["I want to go to Mumbai"],
             "bot_message": None,
             "language_script": "en",
             "source_language": "en",

@@ -637,8 +637,14 @@ class TextDetector(object):
                 # get structured value from entity dict
                 structured_value = entity_dict.get('structured_value')
 
-                # get predetected value from entity dict
-                predetected_values = entity_dict.get('predetected_values') or []
+                # get predetected value list from entity dict
+                predetected_values = entity_dict.get('predetected_values')
+
+                # get predetected value for message from index
+                if predetected_values:
+                    _predetected_value = predetected_values[index]
+                else:
+                    _predetected_value = []
 
                 # get fallback value from entity dict
                 fallback_value = entity_dict.get('fallback_value')
@@ -647,7 +653,7 @@ class TextDetector(object):
                     values, texts = text_entity_values[0], original_texts[0]
 
                 entity_list, original_text_list = self.combine_results(values=values, original_texts=texts,
-                                                                       predetected_values=predetected_values)
+                                                                       predetected_values=_predetected_value)
 
                 if structured_value:
                     if entity_list:
@@ -737,7 +743,13 @@ class TextDetector(object):
                 values, texts = [], []
                 # get predetected value from entity dict
                 entity_dict = self.entities_dict.get(entity, {})
-                predetected_values = entity_dict.get('predetected_values') or []
+                predetected_values = entity_dict.get('predetected_values')
+
+                # get predetected value for message from index
+                if predetected_values:
+                    _predetected_value = predetected_values[index]
+                else:
+                    _predetected_value = []
 
                 # get fallback value from entity dict
                 fallback_value = entity_dict.get('fallback_value')
@@ -747,7 +759,7 @@ class TextDetector(object):
                     values, texts = text_entity_values[0], original_texts[0]
 
                 entity_list, original_text_list = self.combine_results(values=values, original_texts=texts,
-                                                                       predetected_values=predetected_values)
+                                                                       predetected_values=_predetected_value)
 
                 if entity_list:
                     value, method, original_text = entity_list, FROM_MESSAGE, original_text_list

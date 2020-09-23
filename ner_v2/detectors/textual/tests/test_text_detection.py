@@ -17,7 +17,7 @@ class TestTextualUtils(TestCase):
     def test_text_detector_intialization(self):
         entity_dict = {'city': {'structured_value': None,
                                 'fallback_value': None,
-                                'predetected_values': None,
+                                'predetected_values': [[]],
                                 'fuzziness': 4,
                                 'min_token_len_fuzziness': 4,
                                 'use_fallback': None},
