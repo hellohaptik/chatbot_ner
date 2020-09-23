@@ -62,9 +62,9 @@ def verify_text_request(request):
                          "bulk detection")
 
 
-def get_text_detection(message, entity_dict, bot_message=None,
-                       language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
-                       **kwargs):
+def get_detection(message, entity_dict, bot_message=None,
+                  language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
+                  **kwargs):
     """
     Get text detection for given message on given entities dict using
     TextDetector module.
@@ -99,14 +99,15 @@ def get_text_detection(message, entity_dict, bot_message=None,
 
 def get_text_entity_detection_data(request):
     """
-    Parse text request coming from POST call on `/v2/text/` and call the
-    get text detection.
-    Message to detect text can be:
+    Get details of message and entities from request and call get_detection internally
+    to get the results.
 
-    1) Single entry in the list, for this we use `text_detector.detect` method.
-    Also for this case we check `ignore_message` flag is present.
+    Messages to detect text can be of two format:
 
-    2) For mulitple message, underlying code will call `text_detector.detect_bulk` method.
+    1) Single entry in the list of message, for this we use `text_detector.detect` method.
+    Also for this case we check if `ignore_message` flag is present.
+
+    2) For multiples message, underlying code will call `text_detector.detect_bulk` method.
     In this case we ignore flag for ignore_message for all the entities.
 
     Args:
@@ -202,16 +203,16 @@ def get_text_entity_detection_data(request):
             data[0]["entities"].update(output)
 
         # get detection for text entities
-        output = get_text_detection(message=message_str, entity_dict=text_value_entities,
-                                    structured_value=None, bot_message=bot_message,
-                                    language_script=source_language,
-                                    target_language_script=target_language_script)
+        output = get_detection(message=message_str, entity_dict=text_value_entities,
+                               structured_value=None, bot_message=bot_message,
+                               language_script=source_language,
+                               target_language_script=target_language_script)
         data[0]["entities"].update(output[0])
 
     # check if more than one message
     elif len(message) > 1:
-        text_detection_result = get_text_detection(message=message, entity_dict=entities,
-                                                   structured_value=None, bot_message=bot_message)
+        text_detection_result = get_detection(message=message, entity_dict=entities,
+                                              structured_value=None, bot_message=bot_message)
 
         data = [{"entities": x, "language": source_language} for x in text_detection_result]
 

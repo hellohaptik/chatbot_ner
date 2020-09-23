@@ -127,15 +127,20 @@ class TestTextualUtils(TestCase):
 
         result = text_detector.detect_bulk(messages=message)
 
-        assert_output = [{
-            'city': [{'entity_value': {'value': 'Mumbai', 'datastore_verified': True, 'model_verified': False},
-                      'detection': 'message', 'original_text': 'mumbai', 'language': 'en'}],
-            'restaurant': [{'entity_value': {'value': "Domino's Pizza", 'datastore_verified': True,
-                                             'model_verified': False},
-                            'detection': 'message', 'original_text': 'dominoes', 'language': 'en'}]},
+        assert_output = [{'city': [{
+            'entity_value': {'value': 'Mumbai', 'datastore_verified': True,
+                             'model_verified': False},
+            'detection': 'message', 'original_text': 'mumbai', 'language': 'en'}],
+            'restaurant': [{
+                'entity_value': {'value': "Domino's Pizza", 'datastore_verified': True,
+                                 'model_verified': False},
+                'detection': 'message', 'original_text': 'dominoes', 'language': 'en'}]},
             {'city': [{'entity_value': {'value': 'New Delhi', 'datastore_verified': True,
                                         'model_verified': False},
-                       'detection': 'message', 'original_text': 'delhi', 'language': 'en'}], 'restaurant': []}]
+                       'detection': 'message', 'original_text': 'delhi', 'language': 'en'}],
+             'restaurant': [{'entity_value': {'value': 'Deli', 'datastore_verified': True,
+                                              'model_verified': False},
+                             'detection': 'message', 'original_text': 'delhi', 'language': 'en'}]}]
 
         self.maxDiff = None
         self.assertListEqual(result, assert_output)

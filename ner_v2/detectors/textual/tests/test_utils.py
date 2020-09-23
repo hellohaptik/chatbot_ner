@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request, \
-    get_output_for_fallback_entities, get_text_detection
+    get_output_for_fallback_entities, get_detection
 
 tests_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,7 +58,7 @@ class TestTextualUtils(TestCase):
         request._body = b'{"message":["something"], "entities":"something"}'
         self.assertRaises(TypeError, verify_text_request, request=request)
 
-    @patch('ner_v2.detectors.textual.utils.get_text_detection')
+    @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data(self, mock_get_detection):
         input_data = {
             "message": ["I want to go to Mumbai"],
@@ -111,7 +111,7 @@ class TestTextualUtils(TestCase):
 
         self.assertListEqual(output, assert_output)
 
-    @patch('ner_v2.detectors.textual.utils.get_text_detection')
+    @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data_structured(self, mock_get_detection):
         input_data = {
             "message": ["I want to go to Mumbai"],
@@ -176,7 +176,7 @@ class TestTextualUtils(TestCase):
                                   ('goa', 'goa')])
              }]
 
-        output = get_text_detection(message, entity_dict)
+        output = get_detection(message, entity_dict)
         assert_output = [
             {'city': [{'entity_value': {'value': 'Mumbai', 'datastore_verified': True,
                                         'model_verified': False}, 'detection': 'message',
@@ -206,7 +206,7 @@ class TestTextualUtils(TestCase):
                                   ('Wani', 'Wani'),
                                   ('goa', 'goa')])}]
 
-        output = get_text_detection(message, entity_dict)
+        output = get_detection(message, entity_dict)
         assert_output = [{'city': [
             {'entity_value': {'value': 'Mumbai',
                               'datastore_verified': True,
