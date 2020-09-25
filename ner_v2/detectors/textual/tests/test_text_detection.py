@@ -18,13 +18,13 @@ class TestTextualUtils(TestCase):
         entity_dict = {'city': {'structured_value': None,
                                 'fallback_value': None,
                                 'predetected_values': [[]],
-                                'fuzziness': 4,
+                                'fuzziness': "4,7",
                                 'min_token_len_fuzziness': 4,
                                 'use_fallback': None},
                        'restaurant': {'structured_value': None,
                                       'fallback_value': None,
                                       'predetected_values': None,
-                                      'fuzziness': 4,
+                                      'fuzziness': "4,7",
                                       'min_token_len_fuzziness': 4,
                                       'use_fallback': None}
                        }
@@ -48,13 +48,13 @@ class TestTextualUtils(TestCase):
         entity_dict = {'city': {'structured_value': None,
                                 'fallback_value': None,
                                 'predetected_values': None,
-                                'fuzziness': 4,
+                                'fuzziness': "4,7",
                                 'min_token_len_fuzziness': 4,
                                 'use_fallback': None},
                        'restaurant': {'structured_value': None,
                                       'fallback_value': None,
                                       'predetected_values': None,
-                                      'fuzziness': 4,
+                                      'fuzziness': "4,7",
                                       'min_token_len_fuzziness': 4,
                                       'use_fallback': None}
                        }
@@ -93,13 +93,13 @@ class TestTextualUtils(TestCase):
         entity_dict = {'city': {'structured_value': None,
                                 'fallback_value': None,
                                 'predetected_values': None,
-                                'fuzziness': 4,
+                                'fuzziness': "4,7",
                                 'min_token_len_fuzziness': 4,
                                 'use_fallback': None},
                        'restaurant': {'structured_value': None,
                                       'fallback_value': None,
                                       'predetected_values': None,
-                                      'fuzziness': 4,
+                                      'fuzziness': "4,7",
                                       'min_token_len_fuzziness': 4,
                                       'use_fallback': None}
                        }

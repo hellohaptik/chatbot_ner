@@ -74,12 +74,12 @@ class TextDetector(object):
         self.__processed_texts = []
 
         # defaults for auto mode
-        self._fuzziness = "auto:4,7"
+        self._fuzziness = "4,7"
+
         self._fuzziness_lo, self._fuzziness_hi = 4, 7
         self._min_token_size_for_fuzziness = self._fuzziness_lo
 
         # defaults for non-auto mode
-        self.set_fuzziness_threshold(fuzziness=1)
         self._min_token_size_for_fuzziness = 4
 
         # define data store and target languages
@@ -87,6 +87,9 @@ class TextDetector(object):
 
         self._source_language_script = source_language_script
         self._target_language_script = target_language_script
+
+        # set default ES query fuzziness as `auto`
+        self._es_fuzziness = "auto"
 
     def _reset_state(self):
         """
@@ -96,11 +99,11 @@ class TextDetector(object):
         self.__texts = []
         self.__processed_texts = []
 
-    def set_fuzziness_threshold(self, fuzziness):
+    def set_fuzziness_low_high_threshold(self, fuzziness):
         """
-        Sets the fuzziness thresholds for similarity searches. The fuzziness threshold corresponds to the
-        maximum Levenshtein's distance allowed during similarity matching
-
+        Sets the fuzziness thresholds high and low threshold for similarity searches.
+        The fuzziness threshold corresponds to the maximum Levenshtein's distance
+        allowed during similarity matching
         Args:
 
             fuzziness (iterable or int): If this parameter is int, elasticsearch's auto is used with
@@ -114,20 +117,15 @@ class TextDetector(object):
         """
         try:
             iter(fuzziness)
-            if len(fuzziness) == 2:
-                lo, hi = fuzziness
+            if len(fuzziness) == 3:
+                lo, hi = fuzziness.split(",")
                 self._fuzziness_lo, self._fuzziness_hi = int(lo), int(hi)
-                self._fuzziness = "auto:" + str(self._fuzziness_lo) + "," + str(self._fuzziness_hi)
-                self._min_token_size_for_fuzziness = lo
-            else:
-                self._fuzziness = "auto"
+                self._min_token_size_for_fuzziness = self._fuzziness_lo
         except TypeError:
-            if type(fuzziness) == int or type(fuzziness) == float:
-                self._fuzziness = int(fuzziness)  # Note that elasticsearch would take min(2, self._fuzziness)
-            else:
-                raise TypeError('Fuziness has to be either an iterable of length 2 or an int')
+            ner_logger.exception(f"Fuzziness not in correct format, got {fuzziness}")
+            raise TypeError('Fuzziness has to be an iterable of length 2 ')
 
-    def _get_fuzziness_threshold_for_token(self, token, fuzziness=None):
+    def _get_fuzziness_threshold_for_token(self, token):
         """
         Return dynamic fuzziness threshold for damerau-levenshtein check based on length of token if elasticsearch
         fuzziness was set to auto mode
@@ -140,18 +138,12 @@ class TextDetector(object):
             int: fuzziness threshold for ngram matching on elastic search results
         """
 
-        if not fuzziness:
-            fuzziness = self._fuzziness
-
-        if type(fuzziness) == int:
-            return fuzziness
+        if len(token) < self._fuzziness_lo:
+            return 0  # strict match
+        elif len(token) >= self._fuzziness_hi:
+            return 2  # Allow upto two inserts/deletes and one substitution
         else:
-            if len(token) < self._fuzziness_lo:
-                return 0  # strict match
-            elif len(token) >= self._fuzziness_hi:
-                return 2  # Allow upto two inserts/deletes and one substitution
-            else:
-                return 1  # lo <= len < hi Allow only insert/delete
+            return 1  # lo <= len < hi Allow only insert/delete
 
     def set_min_token_size_for_levenshtein(self, min_size):
         """
@@ -392,7 +384,7 @@ class TextDetector(object):
         # fetch ES datastore search result
         es_results = self.esdb.get_multi_entity_results(entities=es_entity_list,
                                                         texts=texts,
-                                                        fuzziness_threshold=self._fuzziness,
+                                                        fuzziness_threshold=self._es_fuzziness,
                                                         search_language_script=self._target_language_script
                                                         )
 
@@ -443,7 +435,7 @@ class TextDetector(object):
         # fetch ES datastore search result
         es_results = self.esdb.get_multi_entity_results(entities=es_entity_list,
                                                         texts=es_texts,
-                                                        fuzziness_threshold=self._fuzziness,
+                                                        fuzziness_threshold=self._es_fuzziness,
                                                         search_language_script=self._target_language_script
                                                         )
 
@@ -490,16 +482,24 @@ class TextDetector(object):
 
             # get fuzziness and min_token_size_for_fuziness value from entity dict
             entity_dict = self.entities_dict.get(entity_name, {})
-            fuzziness = entity_dict.get('fuzziness')
+
+            # get fuzziness from entity if not set default
+            fuzziness = entity_dict.get('fuzziness') or self._fuzziness
+
+            self.set_fuzziness_low_high_threshold(fuzziness)
+
             min_token_size_for_fuzziness = entity_dict.get('min_token_len_fuzziness')
 
             if not min_token_size_for_fuzziness:
                 min_token_size_for_fuzziness = self._min_token_size_for_fuzziness
 
-            ft = self._get_fuzziness_threshold_for_token(token=text_token, fuzziness=fuzziness)
+            ft = self._get_fuzziness_threshold_for_token(token=text_token)
+
+            # set substitution cost to one
             if same or (len(text_token) > min_token_size_for_fuzziness
                         and edit_distance(string1=variant_token,
                                           string2=text_token,
+                                          substitution_cost=1,
                                           max_distance=ft + 1) <= ft):
                 original_text_tokens.append(text_token)
                 variant_token_i += 1
