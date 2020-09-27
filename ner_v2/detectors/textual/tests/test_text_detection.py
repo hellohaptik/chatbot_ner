@@ -144,3 +144,45 @@ class TestTextualUtils(TestCase):
 
         self.maxDiff = None
         self.assertListEqual(result, assert_output)
+
+    def test_text_detection_set_fuzziness_hi_lo_threshold(self):
+
+        entity_dict = {'city': {'structured_value': None,
+                                'fallback_value': None,
+                                'predetected_values': [[]],
+                                'fuzziness': "5,8",
+                                'min_token_len_fuzziness': 4,
+                                'use_fallback': None}}
+        language = 'en'
+        target_language_script = 'en'
+
+        text_detector = TextDetector(entity_dict=entity_dict, source_language_script=language,
+                                     target_language_script=target_language_script)
+
+        fuzziness = entity_dict['city']['fuzziness']
+
+        # assert for default fuzziness hi and low i.e. 4,7
+        self.assertEqual(text_detector._fuzziness_lo, 4)
+        self.assertEqual(text_detector._fuzziness_hi, 7)
+
+        # set new threshold and assert\
+        text_detector.set_fuzziness_low_high_threshold(fuzziness)
+        self.assertEqual(text_detector._fuzziness_lo, 5)
+        self.assertEqual(text_detector._fuzziness_hi, 8)
+
+    def test_text_detection_get_substring(self):
+        entity_dict = {'city': {'structured_value': None,
+                                'fallback_value': None,
+                                'predetected_values': [[]],
+                                'fuzziness': "2,4",
+                                'min_token_len_fuzziness': 4,
+                                'use_fallback': None}}
+        language = 'en'
+        target_language_script = 'en'
+
+        text_detector = TextDetector(entity_dict=entity_dict, source_language_script=language,
+                                     target_language_script=target_language_script)
+
+        substring = text_detector._get_entity_substring_from_text('Mmsbai', 'Mumbai', 'city')
+
+        self.assertEqual(substring, 'Mmsbai')
