@@ -10,6 +10,7 @@ from lib.singleton import Singleton
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import constants
 from datastore.exceptions import DataStoreSettingsImproperlyConfiguredException
+from language_utilities.constant import ENGLISH_LANG
 
 from ner_v2.detectors.textual.queries import _generate_multi_entity_es_query, \
     _parse_multi_entity_es_results
@@ -30,8 +31,14 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         self._connection = None
         self._index_name = None
 
+        self.query_data = []
+
         # configure variables and connection
         self._configure_store()
+
+        # define doc type
+        self.doc_type = self._connection_settings[
+            constants.ELASTICSEARCH_DOC_TYPE]
 
     def _configure_store(self, **kwargs):
         """
@@ -100,16 +107,28 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
             raise DataStoreSettingsImproperlyConfiguredException(
                 'Elasticsearch needs doc_type. Please configure ES_DOC_TYPE in your environment')
 
-    def get_multi_entity_results(self, entities, texts, fuzziness_threshold=1,
-                                 **kwargs):
-        """
-        Args:
-            entities: the list of entities to lookup in the datastore for getting entity values
-             and their variants
-            texts(list of strings): the text for which variants need to be find out
-            fuzziness_threshold: fuzziness allowed for search results on entity value variants
-            kwargs:
+    def generate_query_data(self, entities, texts, fuzziness_threshold=1,
+                            search_language_script=ENGLISH_LANG):
 
+        # check if text is string
+        if isinstance(texts, str):
+            texts = [texts]
+
+        index_header = json.dumps({'index': self._index_name, 'type': self.doc_type})
+
+        data = list(chain.from_iterable([[index_header,
+                                          json.dumps(_generate_multi_entity_es_query(
+                                              entities=entities,
+                                              text=each,
+                                              fuzziness_threshold=fuzziness_threshold,
+                                              language_script=search_language_script))]
+                                         for each in texts]))
+
+        return data
+
+    def get_multi_entity_results(self, entities, texts, fuzziness_threshold=1,
+                                 search_language_script=ENGLISH_LANG, **kwargs):
+        """
         Returns:
             list of collections.OrderedDict: dictionary mapping each entity for each text
             with their value variants to entity value
@@ -148,22 +167,15 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         request_timeout = self._connection_settings.get('request_timeout', 20)
         index_name = self._index_name
 
-        doc_type = self._connection_settings[
-            constants.ELASTICSEARCH_DOC_TYPE]
+        data = []
+        for entity_list, text_list in zip(entities, texts):
+            data.extend(self.generate_query_data(entity_list, text_list, fuzziness_threshold,
+                                                 search_language_script))
 
-        index_header = json.dumps({'index': self._index_name, 'type': doc_type})
+        # add `\n` for each index_header and query data text entry
+        query_data = '\n'.join(data)
 
-        data = list(chain.from_iterable([[index_header,
-                                          json.dumps(_generate_multi_entity_es_query(
-                                              entities=entities,
-                                              text=each,
-                                              fuzziness_threshold=fuzziness_threshold))]
-                                         for each in texts]))
-
-        # add `\n` for each index_header and text entry
-        data = '\n'.join(data)
-
-        kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name,
+        kwargs = dict(body=query_data, doc_type=self.doc_type, index=index_name,
                       request_timeout=request_timeout)
 
         results = self._run_es_search(self._connection, **kwargs)
