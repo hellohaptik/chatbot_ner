@@ -1,9 +1,16 @@
+import logging
+from typing import List, Dict, Any
+
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
+
 from .utils import filter_kwargs
 
 log_prefix = 'datastore.elastic_search.create'
 
 
 def exists(connection, index_name):
+    # type: (Elasticsearch, str) -> bool
     """
     Checks if index_name exists
 
@@ -18,6 +25,7 @@ def exists(connection, index_name):
 
 
 def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **kwargs):
+    # type: (Elasticsearch, str, logging.Logger, bool, **Any) -> None
     """
     Deletes the index named index_name
 
@@ -25,6 +33,7 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
         connection: Elasticsearch client object
         index_name: The name of the index
         logger: logging object to log at debug and exception level
+        err_if_does_not_exist: if to raise error if index does not exist already, defaults to True
         kwargs:
             body: The configuration for the index (settings and mappings)
             master_timeout: Specify timeout for connection to master
@@ -40,11 +49,17 @@ def delete_index(connection, index_name, logger, err_if_does_not_exist=True, **k
         else:
             return
 
+    try:
+        delete_alias(connection=connection, index_list=[index_name], alias_name='_all', logger=logger)
+    except NotFoundError:
+        logger.warning('No aliases found on on index %s', index_name)
+
     connection.indices.delete(index=index_name, **kwargs)
     logger.debug('%s: Delete Index %s: Operation successfully completed', log_prefix, index_name)
 
 
 def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if_exists=True, **kwargs):
+    # type: (Elasticsearch, str, str, logging.Logger, Dict[str, Any], bool, **Any) -> None
     """
     Creates an Elasticsearch index needed for similarity based searching
     Args:
@@ -53,6 +68,7 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if
         doc_type:  The type of the documents that will be indexed
         logger: logging object to log at debug and exception level
         mapping_body: dict, mappings to put on the index
+        err_if_exists: if to raise error if the index already exists, defaults to True
         kwargs:
             master_timeout: Specify timeout for connection to master
             timeout: Explicit operation timeout
@@ -118,6 +134,7 @@ def _create_index(connection, index_name, doc_type, logger, mapping_body, err_if
 
 
 def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
+    # type: (Elasticsearch, str, str, logging.Logger, **Any) -> None
     """
     Creates an mapping specific to entity storage in elasticsearch and makes a call to create_index
     to create the index with the given mapping body
@@ -145,10 +162,32 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
     mapping_body = {
         doc_type: {
             'properties': {
+                'language_script': {
+                    'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
+                },
+                'value': {
+                    'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
+                },
                 'variants': {
                     'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                     'analyzer': 'my_analyzer',
                     'norms': {'enabled': False},  # Needed if we want to give longer variants higher scores
+                },
+                # other removed/unused fields, kept only for backward compatibility
+                'dict_type': {
+                    'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
+                },
+                'entity_data': {
+                    'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
+                },
+                'source_language': {
+                    'type': 'text',
+                    'fields': {'keyword': {'type': 'keyword', 'ignore_above': 256}},
                 }
             }
         }
@@ -158,6 +197,7 @@ def create_entity_index(connection, index_name, doc_type, logger, **kwargs):
 
 
 def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
+    # type: (Elasticsearch, str, str, logging.Logger, **Any) -> None
     """
     This method is used to create an index with mapping suited for story training_data
     Args:
@@ -184,17 +224,17 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
     mapping_body = {
         doc_type: {
             'properties': {
-                "entity_data": {
-                    "type": "text"
+                'entity_data': {
+                    'type': 'text'
                 },
-                "sentence": {
-                    "enabled": "false"
+                'sentence': {
+                    'enabled': False
                 },
-                "entities": {
-                    "enabled": "false"
+                'entities': {
+                    'enabled': False
                 },
-                "language_script": {
-                    "type": "text"
+                'language_script': {
+                    'type': 'text'
                 }
             }
         }
@@ -204,10 +244,11 @@ def create_crf_index(connection, index_name, doc_type, logger, **kwargs):
 
 
 def create_alias(connection, index_list, alias_name, logger, **kwargs):
+    # type: (Elasticsearch, List[str], str, logging.Logger, **Any) -> None
     """
     This method is used to create alias for list of indices
     Args:
-        connection:
+        connection: Elasticsearch client object
         index_list (list): List of indices the alias has to point to
         alias_name (str): Name of the alias
         logger: logging object to log at debug and exception level
@@ -215,6 +256,24 @@ def create_alias(connection, index_list, alias_name, logger, **kwargs):
         **kwargs:
             https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
     """
-    logger.debug('Alias creation %s started %s' % alias_name)
+    logger.debug('Putting alias %s to indices: %s', alias_name, str(index_list))
     connection.indices.put_alias(index=index_list, name=alias_name, **kwargs)
-    logger.debug('Alias %s now points to indices %s' % (alias_name, str(index_list)))
+    logger.debug('Alias %s now points to indices %s', alias_name, str(index_list))
+
+
+def delete_alias(connection, index_list, alias_name, logger, **kwargs):
+    # type: (Elasticsearch, List[str], str, logging.Logger, **Any) -> None
+    """
+    Delete alias `alias_name` from list of indices in `index_list`
+    Args:
+        connection: Elasticsearch client object
+        index_list (list): List of indices the alias has to point to
+        alias_name (str): Name of the alias
+        logger: logging object to log at debug and exception level
+
+        **kwargs:
+            https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html
+    """
+    logger.debug('Removing alias %s from indices: %s', alias_name, str(index_list))
+    connection.indices.delete_alias(index=index_list, name=alias_name, **kwargs)
+    logger.debug('Alias %s removed from indices %s', alias_name, str(index_list))

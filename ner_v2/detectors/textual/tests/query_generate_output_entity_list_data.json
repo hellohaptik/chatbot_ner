@@ -1,0 +1,49 @@
+{
+  "_source": [
+    "value",
+    "entity_data"
+  ],
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "terms": {
+            "entity_data": [
+              "city",
+              "restaurant"
+            ]
+          }
+        },
+        {
+          "terms": {
+            "language_script": [
+              "en"
+            ]
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "variants": {
+              "query": "I want to go to mumbai",
+              "fuzziness": 1,
+              "prefix_length": 1
+            }
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  },
+  "highlight": {
+    "fields": {
+      "variants": {
+        "type": "unified"
+      }
+    },
+    "order": "score",
+    "number_of_fragments": 20
+  },
+  "size": 10000
+}
