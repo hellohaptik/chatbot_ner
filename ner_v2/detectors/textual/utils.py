@@ -8,7 +8,8 @@ from language_utilities.constant import ENGLISH_LANG
 
 from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
-                           DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
+                           DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY, MAX_NUMBER_BULK_MESSAGE,
+                           MAX_NUMBER_MULTI_ENTITIES)
 from ner_v2.detectors.textual.text_detection import TextDetector
 
 
@@ -49,16 +50,16 @@ def verify_text_request(request):
         ner_logger.exception("Entities param is not in correct format")
         raise TypeError("Entities should be dict of entity details")
 
-    if len(messages) > 100:
-        ner_logger.exception("Maximum number of message can be 100 for "
+    if len(messages) > MAX_NUMBER_BULK_MESSAGE:
+        ner_logger.exception(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
                              "bulk detection")
-        raise ValueError("Maximum number of message can be 100 for "
+        raise ValueError(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
                          "bulk detection")
 
-    if len(list(entities)) > 100:
-        ner_logger.exception("Maximum number of entities can be 100 for "
+    if len(list(entities)) > MAX_NUMBER_MULTI_ENTITIES:
+        ner_logger.exception(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
                              " detection")
-        raise ValueError("Maximum number of entities can be 100 for "
+        raise ValueError(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
                          "bulk detection")
 
 
