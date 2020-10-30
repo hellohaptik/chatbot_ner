@@ -679,17 +679,18 @@ def text(request):
 
         except KeyError as err:
             response = {"success": False, "error": str(err)}
-            ner_logger.debug(response)
+            # TODO: move to ner_logger.error
+            ner_logger.exception(response)
             return HttpResponse(json.dumps(response), content_type='application/json',
                                 status=400)
         except TypeError as err:
             response = {"success": False, "error": str(err)}
-            ner_logger.debug(response)
+            ner_logger.exception(response)
             return HttpResponse(json.dumps(response), content_type='application/json',
                                 status=400)
         except Exception as err:
             response = {"success": False, "error": str(err)}
-            ner_logger.debug(response)
+            ner_logger.exception(response)
             return HttpResponse(json.dumps(response), content_type='application/json',
                                 status=400)
 
