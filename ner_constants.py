@@ -67,3 +67,7 @@ PARAMETER_PRIOR_RESULTS = "predetected_values"
 
 # Locale for Date and Phone Number detection
 PARAMETER_LOCALE = 'locale'
+
+# ********************** constant for values in multi entity *********************
+MAX_NUMBER_MULTI_ENTITIES = 150
+MAX_NUMBER_BULK_MESSAGE = 100
