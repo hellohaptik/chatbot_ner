@@ -8,9 +8,9 @@ from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
+from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
                                                        HINDI_STOPWORDS, NAME_VARIATIONS,
-                                                       COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
+                                                       COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from six.moves import range
 
@@ -96,7 +96,6 @@ class NameDetector(object):
             original_text.append(name_text)
         return entity_value, original_text
 
-
     def get_name_using_pos_tagger(self, text):
         """
         First checks if the text contains cardinals or interrogation.
@@ -112,36 +111,16 @@ class NameDetector(object):
 
         entity_value, original_text = [], []
         pos_tagger_object = POS()
-        pattern1 = re.compile(r"name\s+(?:is\s+)?([\w\s]+)")
-        pattern2 = re.compile(r"myself\s+([\w\s]+)")
-        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
-        pattern4 = re.compile(r"i\s+am\s+([\w\s]+)")
         name_tokens = text.split()
         # Passing empty tokens to tag will cause IndexError
         tagged_names = pos_tagger_object.tag(name_tokens)
-        pattern1_match = pattern1.findall(text)
-        pattern2_match = pattern2.findall(text)
-        pattern3_match = pattern3.findall(text)
-        pattern4_match = pattern4.findall(text)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
             return entity_value, original_text
 
-        if pattern1_match:
-            entity_value, original_text = self.get_format_name(pattern1_match[0].split(), self.text)
-
-        elif pattern2_match:
-            entity_value, original_text = self.get_format_name(pattern2_match[0].split(), self.text)
-
-        elif pattern3_match:
-            entity_value, original_text = self.get_format_name(pattern3_match[0].split(), self.text)
-
-        elif pattern4_match:
-            entity_value, original_text = self.get_format_name(pattern4_match[0].split(), self.text)
-
-        elif len(name_tokens) < 4 and self.bot_message:
+        if len(name_tokens) < 4 and self.bot_message:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
@@ -392,7 +371,7 @@ class NameDetector(object):
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
-        for variant in NAME_VARIATIONS:
+        for variant in NAME_VARIATIONS[self.language]:
             if " " + variant + " " in botmessage:
                 return True
         return False
@@ -443,7 +422,8 @@ class NameDetector(object):
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
         """
         text = self.replace_stopwords_hindi(text)
-        text = " ".join([word for word in text.split(" ") if word not in COMMON_HINDI_WORDS_OCCURING_WITH_NAME])
+        text = " ".join(
+            [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
         if not text.strip():
             return [], []
         original_text_list = text.strip().split()
@@ -510,7 +490,7 @@ class NameDetector(object):
             status (bool): returns if the text consists of abuses
         """
         text = ' ' + text + ' '
-        for abuse in HINDI_BADWORDS:
+        for abuse in INDIC_BADWORDS[self.language]:
             if ' ' + abuse + ' ' in text:
                 return True
         return False
@@ -537,7 +517,7 @@ class NameDetector(object):
             status (bool): returns if the text has a question in it
         """
         for word in text.split():
-            if word in HINDI_QUESTIONWORDS:
+            if word in INDIC_QUESTIONWORDS[self.language]:
                 return True
         return False
 
