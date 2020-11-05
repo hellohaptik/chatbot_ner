@@ -3,8 +3,7 @@ from __future__ import absolute_import
 import re
 import string
 
-from language_utilities.constant import (ENGLISH_LANG, HINDI_LANG, MARATHI_LANG, GUJARATI_LANG,
-                                         TAMIL_LANG, TELEGU_LANG, KANNADA_LANG)
+from language_utilities.constant import (ENGLISH_LANG, HINDI_LANG, INDIC_LANGUAGES_SET)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS #,SpacyTagger
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
@@ -164,7 +163,7 @@ class NameDetector(object):
                     return [], []
             if self.language == ENGLISH_LANG:
                 entity_value, original_text = self.detect_english_name()
-            elif self.language in [HINDI_LANG, TAMIL_LANG, MARATHI_LANG, GUJARATI_LANG, KANNADA_LANG, TELEGU_LANG]:
+            elif self.language in INDIC_LANGUAGES_SET:
                 entity_value, original_text = self.detect_hindi_name()
 
             for entity_value_dict in entity_value:
@@ -317,7 +316,7 @@ class NameDetector(object):
         replaced_text_tokens = []
         if self.language == ENGLISH_LANG:
             replaced_text_tokens = nltk_tokenizer.tokenize(text.lower())
-        elif self.language == HINDI_LANG:
+        elif self.language in INDIC_LANGUAGES_SET:
             replaced_text_tokens = text.lower().strip().split()
 
         for detected_original_text in (text_detection_result[1]):
