@@ -9,7 +9,7 @@ from lib.nlp.pos import POS #,SpacyTagger
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
-                                                       INDIC_STOPWORDS, NAME_VARIATIONS,
+                                                       INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
                                                        COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from six.moves import range
@@ -221,7 +221,7 @@ class NameDetector(object):
 
         text = self.remove_emojis(text=self.text)
         text_before_hindi_regex_operations = text
-        regex = re.compile(u'[^\u0900-\u097F\\s]+', re.U)
+        regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=''), re.U)
         text = regex.sub(string=text, repl='')
 
         regex_detection_result = self.get_hindi_names_from_regex(text=text)
