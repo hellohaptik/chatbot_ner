@@ -5,7 +5,7 @@ import string
 
 from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
-from lib.nlp.pos import POS
+from lib.nlp.pos import POS #,SpacyTagger
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
@@ -110,17 +110,26 @@ class NameDetector(object):
         """
 
         entity_value, original_text = [], []
-        pos_tagger_object = POS()
-        name_tokens = text.split()
-        # Passing empty tokens to tag will cause IndexError
-        tagged_names = pos_tagger_object.tag(name_tokens)
+
+        if self.language == ENGLISH_LANG:
+            pos_tagger_object = POS()
+            name_tokens = text.split()
+            # Passing empty tokens to tag will cause IndexError
+            tagged_names = pos_tagger_object.tag(name_tokens)
+
+        else:
+            pass
+            # spacy_tagger = SpacyTagger()
+            # tagged_names = spacy_tagger.tag(text=text.strip(), language=self.language)
+
+        num_tokens = len(tagged_names)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
             return entity_value, original_text
 
-        if len(name_tokens) < 4 and self.bot_message:
+        if num_tokens < 4 and self.bot_message:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:

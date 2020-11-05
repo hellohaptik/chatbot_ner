@@ -12,5 +12,10 @@ ORIYA_LANG = 'or'
 MALAYALAM_LANG = 'ml'
 PUNJABI_LANG = 'pa'
 
+SPANISH_LANG = 'es'
+DUTCH_LANG = 'nl'
+FRENCH_LANG = 'fr'
+GERMAN_LANG = 'de'
+
 # language translation status
 TRANSLATED_TEXT = 'translated_text'
