@@ -123,14 +123,12 @@ class NameDetector(object):
             # spacy_tagger = SpacyTagger()
             # tagged_names = spacy_tagger.tag(text=text.strip(), language=self.language)
 
-        num_tokens = len(tagged_names)
-
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
             return entity_value, original_text
 
-        if num_tokens < 4 and self.bot_message:
+        if len(tagged_names) < 4 and self.bot_message:
             pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
                          word[1].startswith('JJ')]
             if pos_words:
@@ -233,7 +231,7 @@ class NameDetector(object):
             entity_value, original_text = self.get_hindi_names_without_regex(text=text)
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
-            english_present_regex = re.compile(u'[a-zA-Z\\s]+', re.U)
+            english_present_regex = re.compile(u'[a-zA-Z]+', re.U)
             if english_present_regex.search(text_before_hindi_regex_operations):
                 remove_everything_except_english = re.compile(u'[^a-zA-Z\\s]+', re.U)
                 text_only_english = remove_everything_except_english.sub(
@@ -434,9 +432,12 @@ class NameDetector(object):
         text = self.replace_stopwords_hindi(text)
         text = " ".join(
             [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
+        print(text)
         if not text.strip():
             return [], []
+        print(text)
         original_text_list = text.strip().split()
+        print(original_text_list)
         if len(original_text_list) > 4:
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
