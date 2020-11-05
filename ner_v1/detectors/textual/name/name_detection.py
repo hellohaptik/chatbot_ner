@@ -9,7 +9,7 @@ from lib.nlp.pos import POS #,SpacyTagger
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
-                                                       HINDI_STOPWORDS, NAME_VARIATIONS,
+                                                       INDIC_STOPWORDS, NAME_VARIATIONS,
                                                        COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 from six.moves import range
@@ -483,7 +483,7 @@ class NameDetector(object):
             clean_text (str): text from which hindi stop words have been removed
         """
         split_list = text.split(" ")
-        split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
+        split_list = [word for word in split_list if word not in INDIC_STOPWORDS[self.language]]
         if split_list:
             return " ".join(split_list)
 
