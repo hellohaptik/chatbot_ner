@@ -221,7 +221,7 @@ class NameDetector(object):
 
         text = self.remove_emojis(text=self.text)
         text_before_hindi_regex_operations = text
-        regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=''), re.U)
+        regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=INDIC_UNICODE_RANGE[self.language]), re.U)
         text = regex.sub(string=text, repl='')
 
         regex_detection_result = self.get_hindi_names_from_regex(text=text)
