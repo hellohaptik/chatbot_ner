@@ -3,10 +3,16 @@ from __future__ import absolute_import
 import re
 import string
 
+<<<<<<< HEAD
 from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from lib.nlp.spacy_utils import spacy_utils
+=======
+from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET)
+from lib.nlp.const import nltk_tokenizer
+from lib.nlp.pos import POS
+>>>>>>> Language_support_person_name
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
@@ -121,6 +127,7 @@ class NameDetector(object):
         elif self.language in EUROPEAN_LANGUAGES_SET:
             tagged_names = spacy_utils.tag(text=text.strip(), language=self.language)
 
+
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
@@ -134,6 +141,7 @@ class NameDetector(object):
             elif self.language in EUROPEAN_LANGUAGES_SET:
                 pos_words = [word[0] for word in tagged_names if word[1].startswith('NOUN') or
                              word[1].startswith('ADJ') or word[1].startswith('PROPN')]
+
             if pos_words:
                 entity_value, original_text = self.get_format_name(pos_words, self.text)
 
@@ -437,9 +445,18 @@ class NameDetector(object):
         text = self.replace_stopwords_hindi(text)
         text = " ".join(
             [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
+<<<<<<< HEAD
         if not text.strip():
             return [], []
         original_text_list = text.strip().split()
+=======
+
+        if not text.strip():
+            return [], []
+
+        original_text_list = text.strip().split()
+
+>>>>>>> Language_support_person_name
         if len(original_text_list) > 4:
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
