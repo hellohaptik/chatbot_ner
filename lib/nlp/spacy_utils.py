@@ -33,7 +33,7 @@ class SpacyUtils(six.with_metaclass(Singleton, object)):
         spacy_doc = nlp(text)
         tokens = []
         for spacy_token in spacy_doc:
-            token = (spacy_token.text, spacy_token.pos_)
+            token = (spacy_token.text, spacy_token.tag)
             tokens.append(token)
         return tokens
 
