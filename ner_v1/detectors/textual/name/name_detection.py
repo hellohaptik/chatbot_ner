@@ -439,7 +439,6 @@ class NameDetector(object):
         text = " ".join(
             [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
 
-
         if not text.strip():
             return [], []
 
