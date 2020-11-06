@@ -231,7 +231,12 @@ NAME_VARIATIONS = {'en': ["enter your full name again",
                    'ta': ['பெயர்', 'பெயர்', '*பெயர்*', '*பெயர்*'],
                    'gu': ['નામ', 'નામ', '*નામ*', '*નામ*'],
                    'kn': ['ಹೆಸರು', 'ಹೆಸರು', '*ಹೆಸರು*', '*ಹೆಸರು*'],
-                   'hi': ['नाम', 'नेम', '*नाम*', '*नेम*']}
+                   'hi': ['नाम', 'नेम', '*नाम*', '*नेम*'],
+                   'de': ['name'],
+                   'fr': ['nom'],
+                   'nl': ['naam'],
+                   'es': ['nombre']
+                   }
 
 # Common indic words occurring in context to a name
 COMMON_INDIC_WORDS_OCCURRING_WITH_NAME = {
