@@ -88,4 +88,4 @@ class TestESDataStore(TestCase):
                                       'number_of_fragments': 20},
                         'size': ES_SEARCH_SIZE}]
 
-        self.asserEqual(query_data, assert_data)
+        self.assertEqual(query_data, assert_data)
