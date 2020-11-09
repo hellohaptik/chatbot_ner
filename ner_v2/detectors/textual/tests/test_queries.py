@@ -45,6 +45,7 @@ class TestESDataStoreQueries(TestCase):
 
         with open(output_test_file, "r") as f:
             output_data = json.load(f)
+            output_data['size'] = ES_SEARCH_SIZE
 
         # set max diff to None
         self.maxDiff = None
