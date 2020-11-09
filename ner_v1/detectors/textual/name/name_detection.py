@@ -126,13 +126,12 @@ class NameDetector(object):
             return entity_value, original_text
 
         if len(tagged_names) < 4 and self.bot_message:
-            pos_words = []
-            if self.language == ENGLISH_LANG:
-                pos_words = [word[0] for word in tagged_names if word[1].startswith('NN')
-                             or word[1].startswith('JJ')]
-            elif self.language in EUROPEAN_LANGUAGES_SET:
+            if self.language in EUROPEAN_LANGUAGES_SET:
                 pos_words = [word[0] for word in tagged_names if word[1].startswith('NOUN')
                              or word[1].startswith('ADJ') or word[1].startswith('PROPN')]
+            else:
+                pos_words = [word[0] for word in tagged_names if word[1].startswith('NN')
+                             or word[1].startswith('JJ')]
 
             if pos_words:
                 entity_value, original_text = self.get_format_name(pos_words, self.text)
