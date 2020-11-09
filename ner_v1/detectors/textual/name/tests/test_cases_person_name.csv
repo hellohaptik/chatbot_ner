@@ -1,9 +1,5 @@
 language,message,first_name,middle_name,last_name,original_entities,mocked_values
-en,my name is pratik sridatt jayarao,pratik,sridatt,jayarao,pratik sridatt jayarao,"[[""jayarao"", ""pratik"", ""shridatt""], [""jayarao"", ""pratik"", ""sridatt""]]"
-en,my name is pratik jayarao,pratik,None,jayarao,pratik jayarao,"[[""jayarao"", ""pratik""], [""jayarao"", ""pratik""]]"
-en,my name is pratik,pratik,None,None,pratik,"[[""pratik""], [""pratik""]]"
-en,myself pratik sridatt jayarao,pratik,sridatt,jayarao,pratik sridatt jayarao,"[[""jayarao"", ""pratik"", ""shridatt""], [""jayarao"", ""pratik"", ""sridatt""]]"
-en,call me pratik sridatt jayarao,pratik,sridatt,jayarao,pratik sridatt jayarao,"[[""jayarao"", ""pratik"", ""shridatt""], [""jayarao"", ""pratik"", ""sridatt""]]"
+en,pratik sridatt jayarao,pratik,sridatt,jayarao,pratik sridatt jayarao,"[[""jayarao"", ""pratik"", ""shridatt""], [""jayarao"", ""pratik"", ""sridatt""]]"
 en,Pratik Jayarao,Pratik,None,Jayarao,Pratik Jayarao,"[[""jayarao"", ""pratik""], [""jayarao"", ""pratik""]]"
 en,Pratik,Pratik,None,None,Pratik,"[[""pratik""], [""pratik""]]"
 hi,मेरा नाम प्रतिक श्रीदत्त जयराओ है,प्रतिक,श्रीदत्त,जयराओ,प्रतिक श्रीदत्त जयराओ,"[[""प्रतिक"", ""श्रीदत्त"", ""जयराओ""], [""प्रतिक"", ""श्रीदत्त"", ""जयराओ""]]"
