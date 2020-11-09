@@ -112,14 +112,13 @@ class NameDetector(object):
 
         entity_value, original_text = [], []
 
-        if self.language == ENGLISH_LANG:
+        if self.language in EUROPEAN_LANGUAGES_SET:
+            tagged_names = spacy_utils.tag(text=text.strip(), language=self.language)
+        else:
             pos_tagger_object = POS()
             name_tokens = text.split()
             # Passing empty tokens to tag will cause IndexError
             tagged_names = pos_tagger_object.tag(name_tokens)
-
-        elif self.language in EUROPEAN_LANGUAGES_SET:
-            tagged_names = spacy_utils.tag(text=text.strip(), language=self.language)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
