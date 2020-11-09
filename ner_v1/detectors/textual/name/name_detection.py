@@ -12,7 +12,6 @@ from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
                                                        INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
                                                        COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
-from ner_v1.detectors.textual.text.text_detection import TextDetector
 from six.moves import range
 
 

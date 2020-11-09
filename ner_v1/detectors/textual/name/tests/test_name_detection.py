@@ -26,16 +26,12 @@ class NameDetectionTest(TestCase):
             'expected_value': [],
             'mocked_values': [],
         }
-        for (language, bot_message, message, first_name, middle_name, last_name,
-             original_entity, mocked_values) in zip(
-            self.data['language'],
-            self.data['bot_message'],
-            self.data['message'],
-            self.data['first_name'],
-            self.data['middle_name'],
-            self.data['last_name'],
-            self.data['original_entities'],
-            self.data['mocked_values']):
+        for (
+                language, bot_message, message, first_name, middle_name, last_name, original_entity, mocked_values
+        ) in zip(self.data['language'], self.data['bot_message'], self.data['message'], self.data['first_name'],
+                 self.data['middle_name'], self.data['last_name'], self.data['original_entities'],
+                 self.data['mocked_values']):
+
             fn = []
             mn = []
             ln = []
