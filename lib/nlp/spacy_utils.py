@@ -25,6 +25,15 @@ class SpacyUtils(six.with_metaclass(Singleton, object)):
         }
 
     def tag(self, text, language):
+        """
+        Pos tag using spacy model for given languages
+        Args:
+            text: text to run pos tagging for
+            language: source language of text
+
+        Returns:
+            List[Tuples(str, str)]: Returns a list of tuples of (token, pos_tag)
+        """
         spacy_model_name = self.spacy_language_to_model[language]['name']
         nlp = self.spacy_language_to_model[language]['model']
         if not nlp:
@@ -38,6 +47,16 @@ class SpacyUtils(six.with_metaclass(Singleton, object)):
         return tokens
 
     def tokenize(self, text, language):
+        """
+        Creates Tokenizer instance for each supported language to prevent redundant processing(eg tagging)
+        and uses that to tokenize the sentences
+        Args:
+            text: text to run tokenization on
+            language: source language of text
+
+        Returns:
+            List[str]: Returns a list of tokens
+        """
         tokenizer = self.tokenizers[language]
 
         if not tokenizer:
