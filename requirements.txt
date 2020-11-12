@@ -24,3 +24,6 @@ flake8==3.4.1
 pyaml==19.4.1
 coverage==4.5.3
 nose-exclude==0.5.0
+sentry-sdk==0.14.1
+structlog-sentry==1.2.2
+django-structlog==1.5.2

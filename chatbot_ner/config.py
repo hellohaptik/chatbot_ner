@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import logging.handlers
 import os
+import sys
 
 import dotenv
 from elasticsearch import RequestsHttpConnection
@@ -38,6 +39,35 @@ handler = logging.handlers.WatchedFileHandler(NER_LOG_FILENAME)
 handler.setFormatter(formatter)
 ner_logger.addHandler(handler)
 ner_logger.addHandler(handler_stdout)
+
+# HAPTIK Environment and CAS name
+CLIENT_APPLICATIONS_SETUP_NAME = os.environ.get('CLIENT_APPLICATIONS_SETUP_NAME')
+HAPTIK_ENV = os.environ.get('HAPTIK_ENV')
+
+# Support for Sentry DSN
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+SENTRY_ENABLED = os.environ.get('SENTRY_ENABLED')
+SENTRY_ENABLED = True if SENTRY_ENABLED == 'True' and 'test' not in sys.argv else False
+SENTRY_ALLOWED_LOGGERS = os.environ.get('SENTRY_ALLOWED_LOGGERS')
+SENTRY_ALLOWED_LOGGERS = [sentry_allowed_logger.strip() for sentry_allowed_logger
+                          in SENTRY_ALLOWED_LOGGERS.split(',')] if SENTRY_ALLOWED_LOGGERS else []
+
+if SENTRY_ENABLED:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
+
+    def before_sentry_send(event, hint):
+        event.setdefault("tags", {})["cas_name"] = CLIENT_APPLICATIONS_SETUP_NAME
+        return event
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration(), LoggingIntegration()],
+        environment=HAPTIK_ENV,
+        sample_rate=0.1,
+        before_send=before_sentry_send
+    )
 
 # SETUP NLP LIB LOGGING
 NLP_LIB_LOG_FILENAME = os.path.join(LOG_PATH, 'nlp_log.log')
