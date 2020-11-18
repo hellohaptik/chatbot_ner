@@ -5,7 +5,7 @@ import sys
 
 # HAPTIK Environment and CAS name
 ENVIRONMENT = os.environ.get('ENVIRONMENT') or os.environ.get('HAPTIK_ENV')
-CLIENT_APPLICATIONS_SETUP_NAME = os.environ.get('CLIENT_APPLICATIONS_SETUP_NAME')
+CLIENT_APPLICATIONS_SETUP_NAME = os.environ.get('CLIENT_APPLICATIONS_SETUP_NAME') or 'DEFAULT_CAS'
 
 # Support for Sentry DSN
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
