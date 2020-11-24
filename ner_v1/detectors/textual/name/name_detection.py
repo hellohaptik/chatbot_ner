@@ -224,12 +224,7 @@ class NameDetector(object):
         regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=INDIC_UNICODE_RANGE[self.language]), re.U)
         text = regex.sub(string=text, repl='')
 
-        regex_detection_result = self.get_hindi_names_from_regex(text=text)
-        replaced_text = self.replace_detected_text(regex_detection_result, text=text)
-        entity_value, original_text = self.detect_person_name_entity(replaced_text)
-
-        if not entity_value:
-            entity_value, original_text = self.get_hindi_names_without_regex(text=text)
+        entity_value, original_text = self.get_hindi_names_without_regex(text=text)
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
             english_present_regex = re.compile(u'[a-zA-Z]+', re.U)
@@ -387,34 +382,6 @@ class NameDetector(object):
                 return True
         return False
 
-    def get_hindi_names_from_regex(self, text):
-        """
-        This method is used to detect hindi names which obey the regexes
-        Args:
-            text (str): text from which hindi names obeying the regex have to be extracted
-
-        Returns:
-            detect_text_lists (tuple): two dimensional tuple
-            1. text_list (list): representing the detected text
-            2. text_list (list): representing the original text
-
-        Examples:
-            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
-            get_hindi_text_from_regex(text=text)
-            >>([u'प्रतिक', u'श्रीदत्त', u'जयराओ'], [u'प्रतिक', u'श्रीदत्त', u'जयराओ'])
-
-        """
-        text_list = self.get_hindi_text_from_regex(text=text)
-
-        detected_names = []
-        if text_list:
-            for each in text_list:
-                if each:
-                    detected_names.extend(each.split())
-
-        text_list = detected_names
-        return text_list, text_list
-
     def get_hindi_names_without_regex(self, text):
         """
         This method is used to get detect hindi names without any regex pattern (This method is called only if
@@ -445,38 +412,6 @@ class NameDetector(object):
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
-
-    def get_hindi_text_from_regex(self, text):
-        """
-        This method is used to detect hindi names using regexes from the given text
-        Args:
-            text (str): text from which hindi names which follow the regex pattern have to be extracted
-
-        Returns:
-            pattern_match (list): list consisting of detected words
-
-        Examples:
-            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
-            get_hindi_text_from_regex(text=text)
-            >>[u'प्रतिक श्रीदत्त जयराओ']
-
-        """
-        regex_list = [u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+(?:लोग)\\s+([\u0900-\u097F\\s]+)"
-                      u"\\s+(?:नाम\\sसे)\\s+(?:कहते|बुलाते|बुलाओ)",
-                      u"(?:नाम|मैं|हम|मै)\\s+([\u0900-\u097F\\s]+)",
-                      u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+([\u0900-\u097F\\s]+)(?:कहते|बुलाते|बुलाओ)",
-                      u"\\s*([\u0900-\u097F\\s]+)(?:मुझे|मैं|मै)(?:कहते|बुलाते|बुलाओ)?"
-                      ]
-
-        for regex in regex_list:
-            regex_ = re.compile(regex, re.U)
-            pattern_match = regex_.findall(text)
-            pattern_match = [self.replace_stopwords_hindi(x) for x in pattern_match if x]
-            if pattern_match:
-                if pattern_match[0]:
-                    return pattern_match
-
-        return None
 
     def replace_stopwords_hindi(self, text):
         """
