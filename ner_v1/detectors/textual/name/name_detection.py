@@ -399,6 +399,7 @@ class NameDetector(object):
             get_hindi_names_without_regex(text=text)
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
         """
+        text_original = text
         text = self.replace_stopwords_hindi(text)
         text = " ".join(
             [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
@@ -408,7 +409,7 @@ class NameDetector(object):
 
         original_text_list = text.strip().split()
 
-        if len(original_text_list) > 4:
+        if len(original_text_list) > 4 or not ' '.join(original_text_list) in text_original:
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
