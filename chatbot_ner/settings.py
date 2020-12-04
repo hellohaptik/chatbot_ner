@@ -13,6 +13,8 @@ from __future__ import absolute_import
 import os
 import sys
 
+from chatbot_ner.setup_sentry import setup_sentry
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
@@ -27,6 +29,10 @@ DEBUG = False
 TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+
+# setup sentry
+
+setup_sentry()
 
 # Application definition
 
