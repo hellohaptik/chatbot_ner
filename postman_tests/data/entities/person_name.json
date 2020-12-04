@@ -1,8 +1,9 @@
 [
   {
     "input": {
-      "message": "my name is yash doshi",
-      "entity_name": "person_name"
+      "message": "yash doshi",
+      "entity_name": "person_name",
+      "bot_message": "what is your name"
     },
     "expected": [
       {
@@ -17,8 +18,9 @@
   },
   {
     "input": {
-      "message": "my name is Deep Viral Baweja",
-      "entity_name": "person_name"
+      "message": "Deep Viral Baweja",
+      "entity_name": "person_name",
+      "bot_message": "what is your name"
     },
     "expected": [
       {
@@ -33,8 +35,9 @@
   },
   {
     "input": {
-      "message": "His name is amaan srivastava",
-      "entity_name": "person_name"
+      "message": "amaan srivastava",
+      "entity_name": "person_name",
+      "bot_message": "what is your name"
     },
     "expected": [
       {
