@@ -207,7 +207,6 @@ def time(request):
                 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}}]
     """
     try:
-        import pdb;pdb.set_trace()
         parameters_dict = {}
         if request.method == "POST":
             parameters_dict = parse_post_request(request)
