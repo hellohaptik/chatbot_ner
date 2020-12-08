@@ -2,9 +2,10 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from elasticsearch import Elasticsearch
+import json
 
 from ner_v2.detectors.textual.elastic_search import ElasticSearchDataStore
-from chatbot_ner.config import CHATBOT_NER_DATASTORE
+from chatbot_ner.config import CHATBOT_NER_DATASTORE, ES_SEARCH_SIZE, ES_ALIAS, ES_DOC_TYPE
 
 
 class TestESDataStore(TestCase):
@@ -71,13 +72,20 @@ class TestESDataStore(TestCase):
 
         query_data = es.generate_query_data(entities=entity_list_1, texts=text_1)
 
-        assert_data = ['{"index": "entity_data", "type": "data_dictionary"}',
-                       '{"_source": ["value", "entity_data"], '
-                       '"query": {"bool": {"filter": [{"terms": {"entity_data":'
-                       ' ["city", "restaurant"]}}, {"terms": {"language_script": ["en"]}}],'
-                       ' "should": [{"match": {"variants": {"query": "I want to go to mumbai",'
-                       ' "fuzziness": 1, "prefix_length": 1}}}], "minimum_should_match": 1}},'
-                       ' "highlight": {"fields": {"variants": {"type": "unified"}},'
-                       ' "order": "score", "number_of_fragments": 20}, "size": 10000}']
+        query_data = [json.loads(x) for x in query_data]
 
-        self.assertListEqual(query_data, assert_data)
+        assert_data = [{'index': ES_ALIAS, 'type': ES_DOC_TYPE},
+                       {'_source': ['value', 'entity_data'],
+                        'query': {'bool': {'filter': [{'terms': {'entity_data': ['city',
+                                                                                 'restaurant']}},
+                                                      {'terms': {'language_script': ['en']}}],
+                                           'should': [{'match': {'variants': {'query': 'I want to go to mumbai',
+                                                                              'fuzziness': 1,
+                                                                              'prefix_length': 1}}}],
+                                           'minimum_should_match': 1}},
+                        'highlight': {'fields': {'variants': {'type': 'unified'}},
+                                      'order': 'score',
+                                      'number_of_fragments': 20},
+                        'size': ES_SEARCH_SIZE}]
+
+        self.assertEqual(query_data, assert_data)

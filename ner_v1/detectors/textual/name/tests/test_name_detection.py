@@ -22,17 +22,16 @@ class NameDetectionTest(TestCase):
         test_dict = {
             'language': [],
             'message': [],
+            'bot_message': [],
             'expected_value': [],
             'mocked_values': [],
         }
-        for (language, message, first_name, middle_name, last_name, original_entity, mocked_values) in zip(
-                self.data['language'],
-                self.data['message'],
-                self.data['first_name'],
-                self.data['middle_name'],
-                self.data['last_name'],
-                self.data['original_entities'],
-                self.data['mocked_values']):
+        for (
+                language, bot_message, message, first_name, middle_name, last_name, original_entity, mocked_values
+        ) in zip(self.data['language'], self.data['bot_message'], self.data['message'], self.data['first_name'],
+                 self.data['middle_name'], self.data['last_name'], self.data['original_entities'],
+                 self.data['mocked_values']):
+
             fn = []
             mn = []
             ln = []
@@ -51,6 +50,7 @@ class NameDetectionTest(TestCase):
                     'last_name': l
                 }), o))
             test_dict['language'].append(language)
+            test_dict['bot_message'].append(bot_message)
             test_dict['message'].append(message)
             test_dict['expected_value'].append(temp)
             test_dict['mocked_values'].append(mocked_values)
@@ -60,10 +60,11 @@ class NameDetectionTest(TestCase):
     def test_person_name_detection(self):
         for i in range(len(self.data)):
             message = self.test_dict['message'][i]
+            bot_message = self.test_dict['bot_message'][i]
             expected_value = self.test_dict['expected_value'][i]
             name_detector = NameDetector(language=self.test_dict['language'][i], entity_name='person_name')
             detected_texts, original_texts = name_detector.detect_entity(text=message,
-                                                                         bot_message='what is your name')
+                                                                         bot_message=bot_message)
             for d in detected_texts:
                 d.pop(MODEL_VERIFIED)
                 d.pop(DATASTORE_VERIFIED)

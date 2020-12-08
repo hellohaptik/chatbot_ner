@@ -296,7 +296,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://{{url}}/v1/person_name/?message={{person_name_message}}&entity_name={{person_name_entity_name}}",
+					"raw": "http://{{url}}/v1/person_name/?message={{person_name_message}}&entity_name={{person_name_entity_name}}&&bot_message={{person_name_bot_message}}",
 					"protocol": "http",
 					"host": [
 						"{{url}}"
@@ -314,6 +314,10 @@
 						{
 							"key": "entity_name",
 							"value": "{{person_name_entity_name}}"
+						},
+						{
+							"key": "bot_message",
+							"value": "{{person_name_bot_message}}"
 						}
 					]
 				}

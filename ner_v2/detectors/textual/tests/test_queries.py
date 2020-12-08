@@ -6,6 +6,7 @@ from django.test import TestCase
 
 from ner_v2.detectors.textual.queries import _parse_multi_entity_es_results, \
     _generate_multi_entity_es_query
+from chatbot_ner.config import ES_SEARCH_SIZE
 
 
 es_tests_directory = os.path.dirname(os.path.abspath(__file__))
@@ -44,6 +45,7 @@ class TestESDataStoreQueries(TestCase):
 
         with open(output_test_file, "r") as f:
             output_data = json.load(f)
+            output_data['size'] = ES_SEARCH_SIZE
 
         # set max diff to None
         self.maxDiff = None
@@ -61,6 +63,7 @@ class TestESDataStoreQueries(TestCase):
 
         with open(output_test_file, "r") as f:
             output_data = json.load(f)
+            output_data['size'] = ES_SEARCH_SIZE
 
         # set max diff to None
         self.maxDiff = None

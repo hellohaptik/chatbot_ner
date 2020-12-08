@@ -3,15 +3,15 @@ from __future__ import absolute_import
 import re
 import string
 
-from language_utilities.constant import ENGLISH_LANG, HINDI_LANG
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
+from lib.nlp.spacy_utils import spacy_utils
+from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from ner_v1.detectors.textual.name.hindi_const import (HINDI_BADWORDS, HINDI_QUESTIONWORDS,
-                                                       HINDI_STOPWORDS, NAME_VARIATIONS,
-                                                       COMMON_HINDI_WORDS_OCCURING_WITH_NAME)
-from ner_v1.detectors.textual.text.text_detection import TextDetector
+from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
+                                                       INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
+                                                       COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
 from six.moves import range
 
 
@@ -96,7 +96,6 @@ class NameDetector(object):
             original_text.append(name_text)
         return entity_value, original_text
 
-
     def get_name_using_pos_tagger(self, text):
         """
         First checks if the text contains cardinals or interrogation.
@@ -111,39 +110,28 @@ class NameDetector(object):
         """
 
         entity_value, original_text = [], []
-        pos_tagger_object = POS()
-        pattern1 = re.compile(r"name\s+(?:is\s+)?([\w\s]+)")
-        pattern2 = re.compile(r"myself\s+([\w\s]+)")
-        pattern3 = re.compile(r"call\s+me\s+([\w\s]+)")
-        pattern4 = re.compile(r"i\s+am\s+([\w\s]+)")
-        name_tokens = text.split()
-        # Passing empty tokens to tag will cause IndexError
-        tagged_names = pos_tagger_object.tag(name_tokens)
-        pattern1_match = pattern1.findall(text)
-        pattern2_match = pattern2.findall(text)
-        pattern3_match = pattern3.findall(text)
-        pattern4_match = pattern4.findall(text)
+
+        if self.language in EUROPEAN_LANGUAGES_SET:
+            tagged_names = spacy_utils.tag(text=text.strip(), language=self.language)
+        else:
+            pos_tagger_object = POS()
+            name_tokens = text.split()
+            # Passing empty tokens to tag will cause IndexError
+            tagged_names = pos_tagger_object.tag(name_tokens)
 
         is_question = [word[0] for word in tagged_names if word[1].startswith('WR') or
                        word[1].startswith('WP') or word[1].startswith('CD')]
         if is_question:
             return entity_value, original_text
 
-        if pattern1_match:
-            entity_value, original_text = self.get_format_name(pattern1_match[0].split(), self.text)
+        if len(tagged_names) < 4 and self.bot_message:
+            if self.language in EUROPEAN_LANGUAGES_SET:
+                pos_words = [word[0] for word in tagged_names if word[1].startswith('NOUN')
+                             or word[1].startswith('ADJ') or word[1].startswith('PROPN')]
+            else:
+                pos_words = [word[0] for word in tagged_names if word[1].startswith('NN')
+                             or word[1].startswith('JJ')]
 
-        elif pattern2_match:
-            entity_value, original_text = self.get_format_name(pattern2_match[0].split(), self.text)
-
-        elif pattern3_match:
-            entity_value, original_text = self.get_format_name(pattern3_match[0].split(), self.text)
-
-        elif pattern4_match:
-            entity_value, original_text = self.get_format_name(pattern4_match[0].split(), self.text)
-
-        elif len(name_tokens) < 4 and self.bot_message:
-            pos_words = [word[0] for word in tagged_names if word[1].startswith('NN') or
-                         word[1].startswith('JJ')]
             if pos_words:
                 entity_value, original_text = self.get_format_name(pos_words, self.text)
 
@@ -175,9 +163,9 @@ class NameDetector(object):
             if self.bot_message:
                 if not self.context_check_botmessage(self.bot_message):
                     return [], []
-            if self.language == ENGLISH_LANG:
+            if self.language in EUROPEAN_LANGUAGES_SET | {ENGLISH_LANG}:
                 entity_value, original_text = self.detect_english_name()
-            elif self.language == HINDI_LANG:
+            elif self.language in INDIC_LANGUAGES_SET:
                 entity_value, original_text = self.detect_hindi_name()
 
             for entity_value_dict in entity_value:
@@ -233,18 +221,13 @@ class NameDetector(object):
 
         text = self.remove_emojis(text=self.text)
         text_before_hindi_regex_operations = text
-        regex = re.compile(u'[^\u0900-\u097F\\s]+', re.U)
+        regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=INDIC_UNICODE_RANGE[self.language]), re.U)
         text = regex.sub(string=text, repl='')
 
-        regex_detection_result = self.get_hindi_names_from_regex(text=text)
-        replaced_text = self.replace_detected_text(regex_detection_result, text=text)
-        entity_value, original_text = self.detect_person_name_entity(replaced_text)
-
-        if not entity_value:
-            entity_value, original_text = self.get_hindi_names_without_regex(text=text)
+        entity_value, original_text = self.get_hindi_names_without_regex(text=text)
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
-            english_present_regex = re.compile(u'[a-zA-Z\\s]+', re.U)
+            english_present_regex = re.compile(u'[a-zA-Z]+', re.U)
             if english_present_regex.search(text_before_hindi_regex_operations):
                 remove_everything_except_english = re.compile(u'[^a-zA-Z\\s]+', re.U)
                 text_only_english = remove_everything_except_english.sub(
@@ -330,7 +313,9 @@ class NameDetector(object):
         replaced_text_tokens = []
         if self.language == ENGLISH_LANG:
             replaced_text_tokens = nltk_tokenizer.tokenize(text.lower())
-        elif self.language == HINDI_LANG:
+        elif self.language in EUROPEAN_LANGUAGES_SET:
+            replaced_text_tokens = spacy_utils.tokenize(text.lower())
+        elif self.language in INDIC_LANGUAGES_SET:
             replaced_text_tokens = text.lower().strip().split()
 
         for detected_original_text in (text_detection_result[1]):
@@ -392,38 +377,10 @@ class NameDetector(object):
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
-        for variant in NAME_VARIATIONS:
+        for variant in NAME_VARIATIONS[self.language]:
             if " " + variant + " " in botmessage:
                 return True
         return False
-
-    def get_hindi_names_from_regex(self, text):
-        """
-        This method is used to detect hindi names which obey the regexes
-        Args:
-            text (str): text from which hindi names obeying the regex have to be extracted
-
-        Returns:
-            detect_text_lists (tuple): two dimensional tuple
-            1. text_list (list): representing the detected text
-            2. text_list (list): representing the original text
-
-        Examples:
-            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
-            get_hindi_text_from_regex(text=text)
-            >>([u'प्रतिक', u'श्रीदत्त', u'जयराओ'], [u'प्रतिक', u'श्रीदत्त', u'जयराओ'])
-
-        """
-        text_list = self.get_hindi_text_from_regex(text=text)
-
-        detected_names = []
-        if text_list:
-            for each in text_list:
-                if each:
-                    detected_names.extend(each.split())
-
-        text_list = detected_names
-        return text_list, text_list
 
     def get_hindi_names_without_regex(self, text):
         """
@@ -442,47 +399,20 @@ class NameDetector(object):
             get_hindi_names_without_regex(text=text)
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
         """
+        text_original = text
         text = self.replace_stopwords_hindi(text)
-        text = " ".join([word for word in text.split(" ") if word not in COMMON_HINDI_WORDS_OCCURING_WITH_NAME])
+        text = " ".join(
+            [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
+
         if not text.strip():
             return [], []
+
         original_text_list = text.strip().split()
-        if len(original_text_list) > 4:
+
+        if len(original_text_list) > 4 or not ' '.join(original_text_list) in text_original:
             original_text_list = []
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
-
-    def get_hindi_text_from_regex(self, text):
-        """
-        This method is used to detect hindi names using regexes from the given text
-        Args:
-            text (str): text from which hindi names which follow the regex pattern have to be extracted
-
-        Returns:
-            pattern_match (list): list consisting of detected words
-
-        Examples:
-            text = u'मेरा नाम प्रतिक श्रीदत्त जयराओ है'
-            get_hindi_text_from_regex(text=text)
-            >>[u'प्रतिक श्रीदत्त जयराओ']
-
-        """
-        regex_list = [u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+(?:लोग)\\s+([\u0900-\u097F\\s]+)"
-                      u"\\s+(?:नाम\\sसे)\\s+(?:कहते|बुलाते|बुलाओ)",
-                      u"(?:नाम|मैं|हम|मै)\\s+([\u0900-\u097F\\s]+)",
-                      u"(?:मुझे|हमें|मुझको|हमको|हमे)\\s+([\u0900-\u097F\\s]+)(?:कहते|बुलाते|बुलाओ)",
-                      u"\\s*([\u0900-\u097F\\s]+)(?:मुझे|मैं|मै)(?:कहते|बुलाते|बुलाओ)?"
-                      ]
-
-        for regex in regex_list:
-            regex_ = re.compile(regex, re.U)
-            pattern_match = regex_.findall(text)
-            pattern_match = [self.replace_stopwords_hindi(x) for x in pattern_match if x]
-            if pattern_match:
-                if pattern_match[0]:
-                    return pattern_match
-
-        return None
 
     def replace_stopwords_hindi(self, text):
         """
@@ -494,7 +424,7 @@ class NameDetector(object):
             clean_text (str): text from which hindi stop words have been removed
         """
         split_list = text.split(" ")
-        split_list = [word for word in split_list if word not in HINDI_STOPWORDS]
+        split_list = [word for word in split_list if word not in INDIC_STOPWORDS[self.language]]
         if split_list:
             return " ".join(split_list)
 
@@ -510,7 +440,7 @@ class NameDetector(object):
             status (bool): returns if the text consists of abuses
         """
         text = ' ' + text + ' '
-        for abuse in HINDI_BADWORDS:
+        for abuse in INDIC_BADWORDS[self.language]:
             if ' ' + abuse + ' ' in text:
                 return True
         return False
@@ -537,7 +467,7 @@ class NameDetector(object):
             status (bool): returns if the text has a question in it
         """
         for word in text.split():
-            if word in HINDI_QUESTIONWORDS:
+            if word in INDIC_QUESTIONWORDS[self.language]:
                 return True
         return False
 
