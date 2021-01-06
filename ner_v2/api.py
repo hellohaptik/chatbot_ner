@@ -72,6 +72,7 @@ def parse_post_request(request):
         PARAMETER_TIMEZONE: request_data.get('timezone'),
         PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
         PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
+        PARAMETER_PAST_DATE_REFERENCED: request_data.get('date_past_reference', 'False'),
         PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
         PARAMETER_NUMBER_UNIT_TYPE: request_data.get('unit_type'),

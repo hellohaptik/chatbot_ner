@@ -108,6 +108,8 @@ def parse_post_request(request):
         PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
+    ner_logger.info("parameters dict - {}".format(parameters_dict))
+
     return parameters_dict
 
 
