@@ -288,7 +288,7 @@ def location(request):
 
     """
     try:
-        parameters_dict = parameters_dict = parse_parameters_from_request(request)
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_location(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
