@@ -73,7 +73,7 @@ def get_parameters_dictionary(request):
         PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
         PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("predetected_values", '[]'))
     }
-    ner_logger.info("parameters dict - {}".format(parameters_dict))
+    ner_logger.debug("parameters dict - {}".format(parameters_dict))
     return parameters_dict
 
 
@@ -109,7 +109,7 @@ def parse_post_request(request):
         PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
-    ner_logger.info("parameters dict - {}".format(parameters_dict))
+    ner_logger.debug("parameters dict - {}".format(parameters_dict))
 
     return parameters_dict
 
