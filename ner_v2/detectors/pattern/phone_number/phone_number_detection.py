@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from language_utilities.constant import ENGLISH_LANG
-import re
+import regex
 import phonenumbers
 from six.moves import zip
 
@@ -50,7 +50,8 @@ class PhoneDetector(BaseDetector):
         """
         This method sets self.country_code from given locale
         """
-        regex_pattern = re.compile('[-_](.*$)', re.U)
+        regex_pattern = regex.compile('[-_](.*$)', regex.U)
+        self.locale=regex.sub("p{Pd}","-",self.locale)  # This will replace all types of dashes(em or en) by hyphen.
         match = regex_pattern.findall(self.locale)
         if match:
             return match[0].upper()
@@ -106,7 +107,7 @@ class PhoneDetector(BaseDetector):
         validated_phone = []
         validated_original_text = []
         for phone, original in zip(self.phone, self.original_phone_text):
-            if re.search(r'\W' + re.escape(original) + r'\W', self.text, re.UNICODE):
+            if regex.search(r'\W' + regex.escape(original) + r'\W', self.text, regex.UNICODE):
                 validated_phone.append(phone)
                 validated_original_text.append(original)
         return validated_phone, validated_original_text
@@ -123,12 +124,12 @@ class PhoneDetector(BaseDetector):
         phone_dict = {}
 
         if len(phone_num) > 10:
-            check_country_regex = re.compile(r'^({country_code})\d{length}$'.
-                                             format(country_code='911|1|011 91|91', length='{10}'), re.U)
+            check_country_regex = regex.compile(r'^({country_code})\d{length}$'.
+                                             format(country_code='911|1|011 91|91', length='{10}'), regex.U)
             p = check_country_regex.findall(phone_num)
             if len(p) == 1:
                 phone_dict['country_calling_code'] = p[0]
-                country_code_sub_regex = re.compile(r'^{detected_code}'.format(detected_code=p[0]))
+                country_code_sub_regex = regex.compile(r'^{detected_code}'.format(detected_code=p[0]))
                 phone_dict['value'] = country_code_sub_regex.sub(string=phone_num, repl='')
             else:
                 phone_dict['country_calling_code'] = str(phonenumbers.country_code_for_region(self.country_code))
