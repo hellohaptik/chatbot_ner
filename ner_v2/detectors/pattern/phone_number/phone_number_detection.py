@@ -51,7 +51,7 @@ class PhoneDetector(BaseDetector):
         This method sets self.country_code from given locale
         """
         regex_pattern = regex.compile('[-_](.*$)', regex.U)
-        self.locale=regex.sub("p{Pd}","-",self.locale)  # This will replace all types of dashes(em or en) by hyphen.
+        self.locale=regex.sub("\\p{Pd}","-",self.locale)  # This will replace all types of dashes(em or en) by hyphen.
         match = regex_pattern.findall(self.locale)
         if match:
             return match[0].upper()
