@@ -42,7 +42,7 @@ ELASTIC_APM_SERVER_URL = os.environ.get('ELASTIC_APM_SERVER_URL')
 if ELASTIC_APM_ENABLED:
     ELASTIC_APM = {
         'DEBUG': DEBUG,
-        'SERVICE_NAME': 'haptik_api',
+        'SERVICE_NAME': 'chatbot_ner',
         'SERVER_URL': ELASTIC_APM_SERVER_URL,
         'SPAN_FRAMES_MIN_DURATION': '5ms',
         'STACK_TRACE_LIMIT': 500,
