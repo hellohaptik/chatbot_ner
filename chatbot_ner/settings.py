@@ -16,6 +16,7 @@ import sys
 from chatbot_ner.setup_sentry import setup_sentry
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+HAPTIK_ENV = os.environ.get('HAPTIK_ENV')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -34,6 +35,26 @@ ALLOWED_HOSTS = ['*']
 
 setup_sentry()
 
+# APM
+ELASTIC_APM_ENABLED = os.environ.get('ELASTIC_APM_ENABLED')
+ELASTIC_APM_ENABLED = True if ELASTIC_APM_ENABLED == 'True' and 'test' not in sys.argv else False
+ELASTIC_APM_SERVER_URL = os.environ.get('ELASTIC_APM_SERVER_URL')
+if ELASTIC_APM_ENABLED:
+    ELASTIC_APM = {
+        'DEBUG': DEBUG,
+        'SERVICE_NAME': 'haptik_api',
+        'SERVER_URL': ELASTIC_APM_SERVER_URL,
+        'SPAN_FRAMES_MIN_DURATION': '5ms',
+        'STACK_TRACE_LIMIT': 500,
+        'ENVIRONMENT': HAPTIK_ENV,
+        'TRANSACTION_SAMPLE_RATE': '0.1',
+        'TRANSACTION_MAX_SPANS': 500,
+        'INSTRUMENT': 'True',
+        'DISABLE_SEND': 'False',
+        'CAPTURE_BODY': 'off',
+        'SERVER_TIMEOUT': '2s',
+    }
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -50,6 +71,9 @@ INSTALLED_APPS = [
     'django_nose'
 ]
 
+if ELASTIC_APM_ENABLED:
+    INSTALLED_APPS.append('elasticapm.contrib.django')
+
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -58,6 +82,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if ELASTIC_APM_ENABLED:
+    MIDDLEWARE.append('elasticapm.contrib.django.middleware.TracingMiddleware')
 
 ROOT_URLCONF = 'chatbot_ner.urls'
 
