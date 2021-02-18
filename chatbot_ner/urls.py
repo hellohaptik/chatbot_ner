@@ -38,7 +38,7 @@ urlpatterns = [
 
     url(r'^experimental/detect/', detect_entities),
 
-    # V2 bulk detectors
+    # V2 Bulk detectors
     url(r'^v2/date_bulk/$', api_v2.date),
     url(r'^v2/time_bulk/$', api_v2.time),
     url(r'^v2/number_bulk/$', api_v2.number),
