@@ -12,12 +12,12 @@ from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
 
-from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, validate_text_request
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import json
 import six
 
@@ -674,26 +674,16 @@ def text(request):
         ner_logger.debug("Fetching result")
 
         try:
-            verify_text_request(request)
-            # if verify success get detection data
+            validate_text_request(request)
             data = get_text_entity_detection_data(request)
-
-        except KeyError as err:
-            response = {"success": False, "error": str(err)}
-            # TODO: move to ner_logger.error
-            ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
-        except TypeError as err:
+        except (KeyError, TypeError) as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
+            return JsonResponse(response, status=400)
         except Exception as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
+            return JsonResponse(response, status=400)
 
     if data:
         response = {"success": True, "error": None, "data": data}

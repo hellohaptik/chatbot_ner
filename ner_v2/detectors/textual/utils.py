@@ -13,7 +13,7 @@ from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
 from ner_v2.detectors.textual.text_detection import TextDetector
 
 
-def verify_text_request(request):
+def validate_text_request(request):
     """
     Check the request object
     1. If proper message or entity is present in required
@@ -35,37 +35,26 @@ def verify_text_request(request):
     entities = request_data.get("entities")
 
     if not messages:
-        ner_logger.exception("messages param is not passed")
-        raise KeyError("key messages is required")
+        raise KeyError("Key `messages` is required")
 
     if not entities:
-        ner_logger.exception("Entities param is not passed")
-        raise KeyError("Entities dict is required")
+        raise KeyError("Key `entities` is required")
 
     if not isinstance(messages, list):
-        ner_logger.exception("messages param is not in correct format")
-        raise TypeError("messages should be in format of list of string")
+        raise TypeError(f"`messages` should be of type List[str], but got {type(messages)}")
 
     if not isinstance(entities, dict):
-        ner_logger.exception("Entities param is not in correct format")
-        raise TypeError("Entities should be dict of entity details")
+        raise TypeError(f"`entities` should be of type Dict[str, Any], but got {type(dict)}")
 
     if len(messages) > MAX_NUMBER_BULK_MESSAGE:
-        ner_logger.exception(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
-                             "bulk detection")
-        raise ValueError(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
-                         "bulk detection")
+        raise ValueError(f"`messages` length should be at most {MAX_NUMBER_BULK_MESSAGE}, but got {len(messages)}")
 
-    if len(list(entities)) > MAX_NUMBER_MULTI_ENTITIES:
-        ner_logger.exception(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
-                             " detection")
-        raise ValueError(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
-                         "bulk detection")
+    if len(entities) > MAX_NUMBER_MULTI_ENTITIES:
+        raise ValueError(f"`entities` length should be at most {MAX_NUMBER_MULTI_ENTITIES}, but got {len(entities)}")
 
 
 def get_detection(message, entity_dict, bot_message=None,
-                  language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
-                  **kwargs):
+                  language=ENGLISH_LANG, target_language_script=ENGLISH_LANG, **kwargs):
     """
     Get text detection for given message on given entities dict using
     TextDetector module.
@@ -181,18 +170,13 @@ def get_text_entity_detection_data(request):
     message_len = len(messages)
 
     if message_len == 1:
-
-        # get first message
         message_str = messages[0]
-
         fallback_value_entities = {}
         text_value_entities = {}
-
         data.append({"entities": {}, "language": source_language})
 
         for each_entity, value in entities.items():
             ignore_message = value.get('ignore_message', False)
-
             if ignore_message:
                 fallback_value_entities[each_entity] = value
             else:

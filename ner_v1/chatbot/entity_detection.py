@@ -241,7 +241,6 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
         min_token_len_fuzziness = int(min_token_len_fuzziness)
         text_detector.set_min_token_size_for_levenshtein(min_size=min_token_len_fuzziness)
 
-    ner_logger.info("Predetected values: {}".format(predetected_values))
     if isinstance(message, six.string_types):
         entity_output = text_detector.detect(message=message,
                                              structured_value=structured_value,

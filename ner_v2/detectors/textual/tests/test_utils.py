@@ -9,7 +9,7 @@ from mock import patch
 from django.test import TestCase
 from django.http import HttpRequest
 
-from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request, \
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, validate_text_request, \
     get_output_for_fallback_entities, get_detection
 
 tests_directory = os.path.dirname(os.path.abspath(__file__))
@@ -37,26 +37,26 @@ class TestTextualUtils(TestCase):
 
         # test if everything is ok
         request._body = b'{"messages":["something"], "entities":{"something":""}}'
-        verify_text_request(request)
+        validate_text_request(request)
 
     def test_verify_text_request_exceptions(self):
         request = HttpRequest()
 
         # test if no message
         request._body = b'{}'
-        self.assertRaises(KeyError, verify_text_request, request=request)
+        self.assertRaises(KeyError, validate_text_request, request=request)
 
         # test if no entities
         request._body = b'{"messages": "something"}'
-        self.assertRaises(KeyError, verify_text_request, request=request)
+        self.assertRaises(KeyError, validate_text_request, request=request)
 
         # test if message not in proper format
         request._body = b'{"messages":"something", "entities":"something"}'
-        self.assertRaises(TypeError, verify_text_request, request=request)
+        self.assertRaises(TypeError, validate_text_request, request=request)
 
         # test if entities not in proper format
         request._body = b'{"messages":["something"], "entities":"something"}'
-        self.assertRaises(TypeError, verify_text_request, request=request)
+        self.assertRaises(TypeError, validate_text_request, request=request)
 
     @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data(self, mock_get_detection):
