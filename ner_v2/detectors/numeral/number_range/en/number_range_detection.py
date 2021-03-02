@@ -24,8 +24,7 @@ class NumberRangeDetector(BaseNumberRangeDetector):
                                      self._detect_min_num_range_with_suffix_variants,
                                      self._detect_max_num_range_with_prefix_variants,
                                      self._detect_max_num_range_with_suffix_variants,
-                                     self._detect_absolute_number
-                                     ]
+                                     self._detect_absolute_number]
 
     def _custom_num_range_between_num_and_num(self, number_range_list=None, original_list=None):
         """Detects number range of text of pattern between number1 to number2
@@ -42,7 +41,7 @@ class NumberRangeDetector(BaseNumberRangeDetector):
         """
         number_range_list = number_range_list or []
         original_list = original_list or []
-        between_range_pattern = re.compile(r'(between\s+({number}\d+__)(?:\s+and|-)'
+        between_range_pattern = re.compile(r'(between\s+({number}\d+__)\s+(?:and|-)'
                                            r'\s+({number}\d+__))'.format(number=NUMBER_REPLACE_TEXT), re.UNICODE)
         number_range_matches = between_range_pattern.findall(self.processed_text)
         for match in number_range_matches:

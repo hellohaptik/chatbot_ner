@@ -160,16 +160,16 @@ tests:
       unit: rupees
       abs_value: null
     unit_type: currency
-#  - id: en_17
-#    message: "200 – 300 rupees"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 – 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
+  - id: en_17
+    message: "200 - 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 - 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
   - id: en_18
     message: "200-300 rupees"
     outputs:
@@ -200,26 +200,26 @@ tests:
       unit: rupees
       abs_value: null
     unit_type: currency
-#  - id: en_21
-#    message: "200 rupees – 300"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 rupees – 300"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
-#  - id: en_22
-#    message: "200 rupees – 300 rupees"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 rupees – 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
+  - id: en_21
+    message: "200 rupees - 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees - 300"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: en_22
+    message: "200 rupees - 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees - 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
   - id: en_23
     message: "200-300 rupees"
     outputs:
@@ -262,16 +262,16 @@ tests:
       unit: null
       abs_value: null
     unit_type: null
-#  - id: en_26
-#    message: "between 2000 and 3000"
-#    outputs:
-#    - max_value: "3000"
-#      min_value: "2000"
-#      original_text: "between 2000 and 3000"
-#      output_id: 1
-#      unit: null
-#      abs_value: null
-#    unit_type: null
+  - id: en_26
+    message: "between 2000 and 3000"
+    outputs:
+    - max_value: "3000"
+      min_value: "2000"
+      original_text: "between 2000 and 3000"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: en_27
     message: "My name is Chirag Jain. The date is 28th Feb, 28/02/2021 next Monday 9:30 pm. This morning next weekday, tomorrow evening. emails are jain@abc.com chirag@example.com. yes no 1 2 3 12 123 1234 12345 123456 1234567890 918097678009 ALWPG5809L. My number is +911234567890. other number is 7123456789. The city is Mumbai, Maharashtra and Lucknow Delhi. jio phone more Rs. 10. 500 - 1000 rupees. less than 50000 rupees and 3 children. prod01 pillows https://haptik.ai a-b 1-2 a ab active"
     unit_type: null
@@ -405,16 +405,16 @@ tests:
       unit: null
       abs_value: null
     unit_type: null
-#  - id: hi_2
-#    message: "2k se upar"
-#    outputs:
-#    - max_value: null
-#      min_value: "2000"
-#      original_text: "2k se upar"
-#      output_id: 1
-#      unit: null
-#      abs_value: null
-#    unit_type: null
+  - id: hi_2
+    message: "2k se upar"
+    outputs:
+    - max_value: null
+      min_value: "2000"
+      original_text: "2k se upar"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_3
     message: "jada se jada 2500"
     outputs:
@@ -465,16 +465,16 @@ tests:
       unit: null
       abs_value: null
     unit_type: null
-#  - id: hi_11
-#    message: "200 – 300"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 – 300"
-#      output_id: 1
-#      unit: null
-#      abs_value: null
-#    unit_type: null
+  - id: hi_11
+    message: "200 - 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 - 300"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_12
     message: "200-300"
     outputs:
@@ -525,16 +525,16 @@ tests:
       unit: rupees
       abs_value: null
     unit_type: currency
-#  - id: hi_17
-#    message: "200 – 300 rupees"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 – 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
+  - id: hi_17
+    message: "200 - 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 - 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
   - id: hi_18
     message: "200-300 rupees"
     outputs:
@@ -565,26 +565,26 @@ tests:
       unit: rupees
       abs_value: null
     unit_type: currency
-#  - id: hi_21
-#    message: "200 rupees – 300"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 rupees – 300"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
-#  - id: hi_22
-#    message: "200 rupees – 300 rupees"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "200 rupees – 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#      abs_value: null
-#    unit_type: currency
+  - id: hi_21
+    message: "200 rupees - 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees - 300"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_22
+    message: "200 rupees - 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees - 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
   - id: hi_23
     message: "200-300 rupees"
     outputs:
@@ -695,16 +695,16 @@ tests:
       unit: null
       abs_value: null
     unit_type: null
-#  - id: hi_34
-#    message: "२०० – ३००"
-#    outputs:
-#    - max_value: "300"
-#      min_value: "200"
-#      original_text: "२०० – ३००"
-#      output_id: 1
-#      unit: null
-#      abs_value: null
-#    unit_type: null
+  - id: hi_34
+    message: "२०० - ३००"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० - ३००"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_35
     message: "२००-३००"
     outputs:
