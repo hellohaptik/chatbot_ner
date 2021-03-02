@@ -116,7 +116,6 @@ NOSE_ARGS = [
     '--cover-erase',
     '--cover-package=datastore,external_api,language_utilities,lib,models,ner_v1,ner_v2',
     '--cover-inclusive',
-    '--cover-config-file=.coveragerc',
 ]
 
 # Internationalization
