@@ -25,6 +25,11 @@ DETECTION_LANGUAGE = 'language'
 
 ENTITY_VALUE_DICT_KEY = 'value'
 
+# datastore_verified a key to verify value from the datastore
+DATASTORE_VERIFIED = 'datastore_verified'
+# model_verified a key to verify value from the model
+MODEL_VERIFIED = 'model_verified'
+
 # ************************ constants tell us what to do with structured_value ************************
 # This will execute entity detection on the structured_value.
 STRUCTURED = 0
@@ -62,3 +67,7 @@ PARAMETER_PRIOR_RESULTS = "predetected_values"
 
 # Locale for Date and Phone Number detection
 PARAMETER_LOCALE = 'locale'
+
+# ********************** constant for values in multi entity *********************
+MAX_NUMBER_MULTI_ENTITIES = 150
+MAX_NUMBER_BULK_MESSAGE = 100

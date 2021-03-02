@@ -151,7 +151,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
 
         if self._engine == ELASTICSEARCH:
             es_url = elastic_search.connect.get_es_url()
-            es_object = elastic_search.transfer.ESTransfer(source=es_url, destination=None)
             create_map = [  # TODO: use namedtuples
                 (True, ELASTICSEARCH_INDEX_1, ELASTICSEARCH_DOC_TYPE, self._store_name,
                  self._check_doc_type_for_elasticsearch, elastic_search.create.create_entity_index),
@@ -180,8 +179,10 @@ class DataStore(six.with_metaclass(Singleton, object)):
                     **kwargs
                 )
                 if alias_name:
-                    es_object.point_an_alias_to_index(es_url=es_url, alias_name=self._store_name,
-                                                      index_name=index_name)
+                    elastic_search.create.create_alias(connection=self._client_or_connection,
+                                                       index_list=[index_name],
+                                                       alias_name=alias_name,
+                                                       logger=ner_logger)
 
     def delete(self, err_if_does_not_exist=True, **kwargs):
         """
@@ -208,15 +209,15 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            for index_key in [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]:
-                if self._connection_settings.get(index_key):
+            delete_map = [ELASTICSEARCH_INDEX_1, ELASTICSEARCH_INDEX_2, ELASTICSEARCH_CRF_DATA_INDEX_NAME]
+            for index_name_key in delete_map:
+                if self._connection_settings.get(index_name_key):
+                    index_name = self._connection_settings.get(index_name_key)
                     elastic_search.create.delete_index(connection=self._client_or_connection,
-                                                       index_name=self._store_name,
+                                                       index_name=index_name,
                                                        logger=ner_logger,
                                                        err_if_does_not_exist=err_if_does_not_exist,
                                                        **kwargs)
-            # TODO: cleanup aliases ?
-
     # === Incompatible or deprecated/duplicate APIs
 
     # FIXME: repopulate does not consider language of the variants

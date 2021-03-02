@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^v2/number/$', api_v2.number),
     url(r'^v2/phone_number/$', api_v2.phone_number),
     url(r'^v2/number_range/$', api_v2.number_range),
+    url(r'^v2/text/$', api_v2.text),
 
     # V2 bulk detectors
     url(r'^v2/date_bulk/$', api_v2.date),

@@ -1,0 +1,19 @@
+[
+  {
+    "city": {
+      "Mumbai": "Mumbai",
+      "mumbai": "mumbai",
+      "Wani": "Wani",
+      "east": "East",
+      "goa": "goa"
+    }
+  },
+  {
+    "city": {
+      "Jabalpur": "Jabalpur",
+      "Jamalpur": "Jamalpur",
+      "Wani": "Wani",
+      "goa": "goa"
+    }
+  }
+]

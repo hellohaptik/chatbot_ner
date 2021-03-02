@@ -23,6 +23,7 @@ from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZIN
                              PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
                              PARAMETER_LIVE_CRF_MODEL_PATH)
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 
 def to_bool(value):
@@ -72,7 +73,7 @@ def get_parameters_dictionary(request):
         PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
         PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("predetected_values", '[]'))
     }
-    ner_logger.info("parameters dict - {}".format(parameters_dict))
+    ner_logger.debug("parameters dict - {}".format(parameters_dict))
     return parameters_dict
 
 
@@ -108,9 +109,34 @@ def parse_post_request(request):
         PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
+    ner_logger.debug("parameters dict - {}".format(parameters_dict))
+
     return parameters_dict
 
 
+def parse_parameters_from_request(request):
+    """
+    Parse parameters from request based on the method type.
+    It will return a parameters dict.
+
+    Args:
+        request (django.http.HttpRequest): HTTP response from url
+
+    Returns:
+       dict: parameters from the request
+    """
+    parameters_dict = {}
+    if request.method == "POST":
+        parameters_dict = parse_post_request(request)
+        ner_logger.debug('Start POST : %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+    elif request.method == "GET":
+        parameters_dict = get_parameters_dictionary(request)
+        ner_logger.debug('Start GET : %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+
+    return parameters_dict
+
+
+@require_http_methods(["GET", "POST"])
 @csrf_exempt
 def text(request):
     """
@@ -230,13 +256,7 @@ def text(request):
             ]
     """
     try:
-        parameters_dict = {}
-        if request.method == "POST":
-            parameters_dict = parse_post_request(request)
-            ner_logger.debug('Start Bulk Detection: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
-        elif request.method == "GET":
-            parameters_dict = get_parameters_dictionary(request)
-            ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_text(
             message=parameters_dict[PARAMETER_MESSAGE],
             entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
@@ -258,6 +278,8 @@ def text(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def location(request):
     """This functionality calls the get_location() functionality to detect location. It is called through api call
 
@@ -266,8 +288,7 @@ def location(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_location(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                      parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                      parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -281,6 +302,8 @@ def location(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def phone_number(request):
     """This functionality calls the get_phone_number() functionality to detect phone numbers. It is called through
     api call
@@ -290,8 +313,8 @@ def phone_number(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_phone_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                          parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                          parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -304,6 +327,8 @@ def phone_number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def regex(request):
     """This functionality calls the get_regex() functionality to detect text those abide by the specified regex.
     It is called through api call
@@ -313,8 +338,7 @@ def regex(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_regex(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -328,6 +352,8 @@ def regex(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def email(request):
     """This functionality calls the get_email() functionality to detect email. It is called through api call
 
@@ -336,8 +362,7 @@ def email(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_email(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -350,6 +375,8 @@ def email(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def person_name(request):
     """This functionality calls the get_name() functionality to detect name. It is called through api call
 
@@ -358,8 +385,7 @@ def person_name(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_person_name(message=parameters_dict[PARAMETER_MESSAGE],
                                         entity_name=parameters_dict[PARAMETER_ENTITY_NAME],
                                         structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
@@ -375,6 +401,8 @@ def person_name(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def city(request):
     """This functionality calls the get_city() functionality to detect city. It is called through api call
 
@@ -383,8 +411,7 @@ def city(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_city(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -399,6 +426,8 @@ def city(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def pnr(request):
     """This functionality calls the get_pnr() functionality to detect pnr. It is called through api call
 
@@ -407,8 +436,7 @@ def pnr(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_pnr(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                 parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                 parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -421,6 +449,8 @@ def pnr(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def shopping_size(request):
     """This functionality calls the get_shopping_size() functionality to detect size. It is called through api call
 
@@ -429,8 +459,7 @@ def shopping_size(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_shopping_size(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                           parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                           parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -443,6 +472,8 @@ def shopping_size(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def number(request):
     """This functionality calls the get_numeric() functionality to detect numbers. It is called through api call
 
@@ -451,8 +482,7 @@ def number(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_number(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -468,6 +498,8 @@ def number(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def passenger_count(request):
     """This functionality calls the get_passenger_count() functionality to detect passenger count.
     It is called through api call
@@ -480,8 +512,7 @@ def passenger_count(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_passenger_count(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                             parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                             parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -495,6 +526,8 @@ def passenger_count(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def time(request):
     """This functionality calls the get_time() functionality to detect time. It is called through api call
 
@@ -504,8 +537,7 @@ def time(request):
         response (django.http.response.HttpResponse): HttpResponse object
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_time(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -519,6 +551,8 @@ def time(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def time_with_range(request):
     """This functionality calls the get_time_with_range() functionality to detect time. It is called through api call
 
@@ -528,8 +562,7 @@ def time_with_range(request):
         response (django.http.response.HttpResponse): HttpResponse object
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_time_with_range(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                             parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                             parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -543,6 +576,8 @@ def time_with_range(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def date(request):
     """This functionality calls the get_date() functionality to detect date. It is called through api call
 
@@ -551,8 +586,7 @@ def date(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_date(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                  parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                  parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -566,6 +600,8 @@ def date(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
 def budget(request):
     """This functionality calls the get_budget() functionality to detect budget. It is called through api call
 
@@ -574,8 +610,7 @@ def budget(request):
 
     """
     try:
-        parameters_dict = get_parameters_dictionary(request)
-        ner_logger.debug('Start: %s ' % parameters_dict[PARAMETER_ENTITY_NAME])
+        parameters_dict = parse_parameters_from_request(request)
         entity_output = get_budget(parameters_dict[PARAMETER_MESSAGE], parameters_dict[PARAMETER_ENTITY_NAME],
                                    parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                    parameters_dict[PARAMETER_FALLBACK_VALUE],
@@ -590,6 +625,7 @@ def budget(request):
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
 def ner(request):
     """This functionality calls the run_ner() functionality to tag the message .
     It is called through api call
@@ -609,6 +645,7 @@ def ner(request):
     return HttpResponse(json.dumps({'data': output}), content_type='application/json')
 
 
+@require_http_methods(["GET", "POST"])
 def combine_output(request):
     """This functionality calls the combine_output_of_detection_logic_and_tag()  through api call
 

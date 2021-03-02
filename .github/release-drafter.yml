@@ -19,5 +19,5 @@ categories:
     label: packages-updated
   - title: 👺 Miscellaneous 
     label: miscellaneous
-exclude-labels:
-  - miscellaneous
+# exclude-labels:
+#  - miscellaneous
