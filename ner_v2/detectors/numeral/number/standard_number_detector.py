@@ -310,12 +310,13 @@ class BaseNumberDetector(object):
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
                 _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
-                processed_text = _pattern.sub(self.tag, processed_text)
-                number_list.append({
-                    NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
-                    NUMBER_DETECTION_RETURN_DICT_UNIT: unit
-                })
-                original_list.append(original_text)
+                if _pattern.search(_pattern):
+                    processed_text = _pattern.sub(self.tag, processed_text)
+                    number_list.append({
+                        NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
+                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit
+                    })
+                    original_list.append(original_text)
 
         return number_list, original_list
 
