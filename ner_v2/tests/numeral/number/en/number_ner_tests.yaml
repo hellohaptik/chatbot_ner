@@ -72,3 +72,27 @@ tests:
         value: null
         unit: null
         original_text: null
+  - id: en_10
+    message: "my alpha numeric code is 123ABC678DEF012, got it?"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: null
+        unit: null
+        original_text: null
+  - id: en_11
+    message: "my alpha numeric code is 123 ABC 678 DEF 012, got it?"
+    unit_type: null
+    outputs:
+      - output_id: 1
+        value: 123
+        unit: null
+        original_text: "123"
+      - output_id: 2
+        value: 678
+        unit: null
+        original_text: "678"
+      - output_id: 3
+        value: 12
+        unit: null
+        original_text: "012"
