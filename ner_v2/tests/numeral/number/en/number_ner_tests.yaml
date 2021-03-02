@@ -5,7 +5,7 @@ tests:
     unit_type: null
     outputs:
       - output_id: 1
-        value: 100
+        value: "100"
         unit: null
         original_text: "100"
   - id: en_2
@@ -13,7 +13,7 @@ tests:
     unit_type: currency
     outputs:
       - output_id: 1
-        value: 100
+        value: "100"
         unit: rupees
         original_text: "rs.100"
   - id: en_3
@@ -21,7 +21,7 @@ tests:
     unit_type: null
     outputs:
       - output_id: 1
-        value: 11.2
+        value: "11.2"
         unit: null
         original_text: "11.2"
   - id: en_4
@@ -29,7 +29,7 @@ tests:
     unit_type: currency
     outputs:
       - output_id: 1
-        value: 10120
+        value: "10120"
         unit: rupees
         original_text: "10.12k rupees"
   - id: en_5
@@ -37,7 +37,7 @@ tests:
     unit_type: null
     outputs:
       - output_id: 1
-        value: 1000
+        value: "1000"
         unit: null
         original_text: "1 thousand"
   - id: en_6
@@ -45,7 +45,7 @@ tests:
     unit_type: currency
     outputs:
       - output_id: 1
-        value: 1000
+        value: "1000"
         unit: rupees
         original_text: "1 thousand rupees"
   - id: en_7
@@ -53,7 +53,7 @@ tests:
     unit_type: null
     outputs:
       - output_id: 1
-        value: 2200
+        value: "2200"
         unit: null
         original_text: "2.2k"
   - id: en_8
@@ -61,7 +61,7 @@ tests:
     unit_type: currency
     outputs:
       - output_id: 1
-        value: 2300
+        value: "2300"
         unit: rupees
         original_text: "2.3k rupees"
   - id: en_9
@@ -85,14 +85,94 @@ tests:
     unit_type: null
     outputs:
       - output_id: 1
-        value: 123
+        value: "123"
         unit: null
         original_text: "123"
       - output_id: 2
-        value: 678
+        value: "678"
         unit: null
         original_text: "678"
       - output_id: 3
-        value: 12
+        value: "12"
         unit: null
         original_text: "012"
+  - id: en_12
+    message: "My name is Chirag Jain. The date is 28th Feb, 28/02/2021 next Monday 9:30 pm. This morning next weekday, tomorrow evening. emails are jain@abc.com chirag@example.com. yes no 1 2 3 12 123 1234 12345 123456 1234567890 918097678009 ALWPG5809L. My number is +911234567890. other number is 7123456789. The city is Mumbai, Maharashtra and Lucknow Delhi. jio phone more Rs. 10. 500 - 1000 rupees. less than 50000 rupees and 3 children. prod01 pillows https://haptik.ai a-b 1-2 a ab active"
+    unit_type: null
+    outputs:
+      - original_text: "1"
+        output_id: 1
+        unit: null
+        value: "1"
+      - original_text: "2"
+        output_id: 2
+        unit: null
+        value: "2"
+      - original_text: "3"
+        output_id: 3
+        unit: null
+        value: "3"
+      - original_text: "12"
+        output_id: 4
+        unit: null
+        value: "12"
+      - original_text: "123"
+        output_id: 5
+        unit: null
+        value: "123"
+      - original_text: "1234"
+        output_id: 6
+        unit: null
+        value: "1234"
+      - original_text: "12345"
+        output_id: 7
+        unit: null
+        value: "12345"
+      - original_text: "123456"
+        output_id: 8
+        unit: null
+        value: "123456"
+      - original_text: "10"
+        output_id: 9
+        unit: null
+        value: "10"
+      - original_text: "500"
+        output_id: 10
+        unit: null
+        value: "500"
+      - original_text: "1000"
+        output_id: 11
+        unit: null
+        value: "1000"
+      - original_text: "50000"
+        output_id: 12
+        unit: null
+        value: "50000"
+      - original_text: "3"
+        output_id: 13
+        unit: null
+        value: "3"
+      - original_text: "1"
+        output_id: 14
+        unit: null
+        value: "1"
+      - original_text: "2"
+        output_id: 15
+        unit: null
+        value: "2"
+  - id: en_13
+    message: "My name is Chirag Jain. The date is 28th Feb, 28/02/2021 next Monday 9:30 pm. This morning next weekday, tomorrow evening. emails are jain@abc.com chirag@example.com. yes no 1 2 3 12 123 1234 12345 123456 1234567890 918097678009 ALWPG5809L. My number is +911234567890. other number is 7123456789. The city is Mumbai, Maharashtra and Lucknow Delhi. jio phone more Rs. 10. 500 - 1000 rupees. less than 50000 rupees and 3 children. prod01 pillows https://haptik.ai a-b 1-2 a ab active"
+    unit_type: currency
+    outputs:
+      - original_text: "rs. 10"
+        output_id: 1
+        unit: rupees
+        value: "10"
+      - original_text: "1000 rupees"
+        output_id: 2
+        unit: rupees
+        value: "1000"
+      - original_text: "50000 rupees"
+        output_id: 3
+        unit: rupees
+        value: "50000"

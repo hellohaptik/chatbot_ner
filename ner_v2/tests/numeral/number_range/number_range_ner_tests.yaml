@@ -4,7 +4,7 @@ tests:
     message: "I want more than 200 banana"
     outputs:
     - max_value: null
-      min_value: '200'
+      min_value: "200"
       original_text: "more than 200"
       output_id: 1
       unit: null
@@ -14,7 +14,7 @@ tests:
     message: "My monthly salary will be more than 2k per month"
     outputs:
     - max_value: null
-      min_value: '2000'
+      min_value: "2000"
       original_text: "more than 2k"
       output_id: 1
       unit: null
@@ -24,7 +24,7 @@ tests:
     message: "more than 2.5k people in the stadium"
     outputs:
     - max_value: null
-      min_value: '2500'
+      min_value: "2500"
       original_text: "more than 2.5k"
       output_id: 1
       unit: null
@@ -64,7 +64,7 @@ tests:
     message: "more than 200 rupees"
     outputs:
     - max_value: null
-      min_value: '200'
+      min_value: "200"
       original_text: "more than 200 rupees"
       output_id: 1
       unit: rupees
@@ -74,7 +74,7 @@ tests:
     message: "more than 2k rupees"
     outputs:
     - max_value: null
-      min_value: '2000'
+      min_value: "2000"
       original_text: "more than 2k rupees"
       output_id: 1
       unit: rupees
@@ -84,7 +84,7 @@ tests:
     message: "more than 2.5k rupees"
     outputs:
     - max_value: null
-      min_value: '2500'
+      min_value: "2500"
       original_text: "more than 2.5k rupees"
       output_id: 1
       unit: rupees
@@ -93,8 +93,8 @@ tests:
   - id: en_10
     message: "200 to 300"
     outputs:
-    - max_value: '300'
-      min_value: '200'
+    - max_value: "300"
+      min_value: "200"
       original_text: "200 to 300"
       output_id: 1
       unit: null
@@ -103,8 +103,8 @@ tests:
   - id: en_11
     message: "200 - 300"
     outputs:
-    - max_value: '300'
-      min_value: '200'
+    - max_value: "300"
+      min_value: "200"
       original_text: "200 - 300"
       output_id: 1
       unit: null
@@ -113,8 +113,8 @@ tests:
   - id: en_12
     message: "200-300"
     outputs:
-    - max_value: '300'
-      min_value: '200'
+    - max_value: "300"
+      min_value: "200"
       original_text: "200-300"
       output_id: 1
       unit: null
@@ -150,197 +150,341 @@ tests:
       unit: null
       abs_value: null
     unit_type: currency
-#  - id: en_16
-#    message: "200 to 300 ruppes"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 to 300 ruppes"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
+  - id: en_16
+    message: "200 to 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 to 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
 #  - id: en_17
 #    message: "200 – 300 rupees"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 – 300 rupees"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
-#  - id: en_18
-#    message: "200-300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200-300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: en_19
-#    message: "200 rupees to 300"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 rupees to 300"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: en_20
-#    message: "200 rupees to 300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 rupees to 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
+  - id: en_18
+    message: "200-300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200-300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: en_19
+    message: "200 rupees to 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees to 300"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: en_20
+    message: "200 rupees to 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees to 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
 #  - id: en_21
 #    message: "200 rupees – 300"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 rupees – 300"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
 #  - id: en_22
 #    message: "200 rupees – 300 rupees"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 rupees – 300 rupees"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
-#  - id: en_23
-#    message: "200-300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200-300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: en_24
-#    message: "200k-300k men and around 400 women"
-#    outputs:
-#    - max_value: 300000
-#      min_value: 200000
-#      original_text: "200k-300k"
-#      output_id: 1
-#      unit: null
-#    - max_value: 400
-#      min_value: null
-#      original_text: "around 400"
-#      output_id: 2
-#      unit: null
-#    unit_type: null
-#  - id: en_25
-#    message: "200k-300k men and around 300k women"
-#    outputs:
-#    - max_value: 300000
-#      min_value: 200000
-#      original_text: "200k-300k"
-#      output_id: 1
-#      unit: null
-#    - max_value: 300000
-#      min_value: null
-#      original_text:  "around 300k"
-#      output_id: 2
-#      unit: null
-#    unit_type: null
+  - id: en_23
+    message: "200-300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200-300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: en_24
+    message: "200k-300k men and around 400 women"
+    outputs:
+    - max_value: "300000"
+      min_value: "200000"
+      original_text: "200k-300k"
+      output_id: 1
+      unit: null
+      abs_value: null
+    - max_value: "400"
+      min_value: null
+      original_text: "around 400"
+      output_id: 2
+      unit: null
+      abs_value: null
+    unit_type: null
+  - id: en_25
+    message: "200k-300k men and around 300k women"
+    outputs:
+    - max_value: "300000"
+      min_value: "200000"
+      original_text: "200k-300k"
+      output_id: 1
+      unit: null
+      abs_value: null
+    - max_value: "300000"
+      min_value: null
+      original_text:  "around 300k"
+      output_id: 2
+      unit: null
+      abs_value: null
+    unit_type: null
 #  - id: en_26
 #    message: "between 2000 and 3000"
 #    outputs:
-#    - max_value: 3000
-#      min_value: 2000
+#    - max_value: "3000"
+#      min_value: "2000"
 #      original_text: "between 2000 and 3000"
 #      output_id: 1
 #      unit: null
+#      abs_value: null
 #    unit_type: null
+  - id: en_27
+    message: "My name is Chirag Jain. The date is 28th Feb, 28/02/2021 next Monday 9:30 pm. This morning next weekday, tomorrow evening. emails are jain@abc.com chirag@example.com. yes no 1 2 3 12 123 1234 12345 123456 1234567890 918097678009 ALWPG5809L. My number is +911234567890. other number is 7123456789. The city is Mumbai, Maharashtra and Lucknow Delhi. jio phone more Rs. 10. 500 - 1000 rupees. less than 50000 rupees and 3 children. prod01 pillows https://haptik.ai a-b 1-2 a ab active"
+    unit_type: null
+    outputs:
+      - abs_value: null
+        max_value: "1000"
+        min_value: "500"
+        original_text: "500 - 1000"
+        output_id: 1
+        unit: null
+      - abs_value: null
+        max_value: "2"
+        min_value: "1"
+        original_text: "1-2"
+        output_id: 2
+        unit: null
+      - abs_value: null
+        max_value: "50000"
+        min_value: null
+        original_text: "less than 50000"
+        output_id: 3
+        unit: null
+      - abs_value: "1"
+        max_value: null
+        min_value: null
+        original_text: "1"
+        output_id: 4
+        unit: null
+      - abs_value: "2"
+        max_value: null
+        min_value: null
+        original_text: "2"
+        output_id: 5
+        unit: null
+      - abs_value: "3"
+        max_value: null
+        min_value: null
+        original_text: "3"
+        output_id: 6
+        unit: null
+      - abs_value: "12"
+        max_value: null
+        min_value: null
+        original_text: "12"
+        output_id: 7
+        unit: null
+      - abs_value: "123"
+        max_value: null
+        min_value: null
+        original_text: "123"
+        output_id: 8
+        unit: null
+      - abs_value: "1234"
+        max_value: null
+        min_value: null
+        original_text: "1234"
+        output_id: 9
+        unit: null
+      - abs_value: "12345"
+        max_value: null
+        min_value: null
+        original_text: "12345"
+        output_id: 10
+        unit: null
+      - abs_value: "123456"
+        max_value: null
+        min_value: null
+        original_text: "123456"
+        output_id: 11
+        unit: null
+      - abs_value: "1234567890"
+        max_value: null
+        min_value: null
+        original_text: "1234567890"
+        output_id: 12
+        unit: null
+      - abs_value: "918097678009"
+        max_value: null
+        min_value: null
+        original_text: "918097678009"
+        output_id: 13
+        unit: null
+      - abs_value: "7123456789"
+        max_value: null
+        min_value: null
+        original_text: "7123456789"
+        output_id: 14
+        unit: null
+      - abs_value: "10"
+        max_value: null
+        min_value: null
+        original_text: "10"
+        output_id: 15
+        unit: null
+      - abs_value: "3"
+        max_value: null
+        min_value: null
+        original_text: "3"
+        output_id: 16
+        unit: null
+  - id: en_28
+    message: "My name is Chirag Jain. The date is 28th Feb, 28/02/2021 next Monday 9:30 pm. This morning next weekday, tomorrow evening. emails are jain@abc.com chirag@example.com. yes no 1 2 3 12 123 1234 12345 123456 1234567890 918097678009 ALWPG5809L. My number is +911234567890. other number is 7123456789. The city is Mumbai, Maharashtra and Lucknow Delhi. jio phone more Rs. 10. 500 - 1000 rupees. less than 50000 rupees and 3 children. prod01 pillows https://haptik.ai a-b 1-2 a ab active"
+    unit_type: currency
+    outputs:
+      - abs_value: null
+        max_value: "1000"
+        min_value: "500"
+        original_text: "500 - 1000 rupees"
+        output_id: 1
+        unit: rupees
+      - abs_value: null
+        max_value: "50000"
+        min_value: null
+        original_text: "less than 50000 rupees"
+        output_id: 2
+        unit: rupees
+      - abs_value: "10"
+        max_value: null
+        min_value: null
+        original_text: "rs. 10"
+        output_id: 3
+        unit: rupees
   hi:
-#  - id: hi_1
-#    message: "200 se jyada"
-#    outputs:
-#    - max_value: null
-#      min_value: 200
-#      original_text: "200 se jyada"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_1
+    message: "200 se jyada"
+    outputs:
+    - max_value: null
+      min_value: "200"
+      original_text: "200 se jyada"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
 #  - id: hi_2
 #    message: "2k se upar"
 #    outputs:
 #    - max_value: null
-#      min_value: 2000
+#      min_value: "2000"
 #      original_text: "2k se upar"
 #      output_id: 1
 #      unit: null
+#      abs_value: null
 #    unit_type: null
-#  - id: hi_3
-#    message: "jada se jada 2500"
-#    outputs:
-#    - max_value: 2500
-#      min_value: null
-#      original_text: "jada se jada 2500"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
-#  - id: hi_7
-#    message: "200 rupees se jyada"
-#    outputs:
-#    - max_value: null
-#      min_value: 200
-#      original_text: "200 rupees se jyada"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_8
-#    message: "Rupees 2000 se upar"
-#    outputs:
-#    - max_value: null
-#      min_value: 2000
-#      original_text: "Rupees 2000 se upar"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_9
-#    message: "jada se jada 2500 rupees"
-#    outputs:
-#    - max_value: 2500
-#      min_value: null
-#      original_text: "jada se jada 2500 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_10
-#    message: "200 se 300"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 se 300"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_3
+    message: "jada se jada 2500"
+    outputs:
+    - max_value: "2500"
+      min_value: null
+      original_text: "jada se jada 2500"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
+  - id: hi_7
+    message: "200 rupees se jyada"
+    outputs:
+    - max_value: null
+      min_value: "200"
+      original_text: "200 rupees se jyada"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_8
+    message: "Rupees 2000 se upar"
+    outputs:
+    - max_value: null
+      min_value: "2000"
+      original_text: "Rupees 2000 se upar"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_9
+    message: "jada se jada 2500 rupees"
+    outputs:
+    - max_value: "2500"
+      min_value: null
+      original_text: "jada se jada 2500 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_10
+    message: "200 se 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 se 300"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
 #  - id: hi_11
 #    message: "200 – 300"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 – 300"
 #      output_id: 1
 #      unit: null
+#      abs_value: null
 #    unit_type: null
-#  - id: hi_12
-#    message: "200-300"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200-300"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_12
+    message: "200-300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200-300"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_13
     message: "200 se 300"
     outputs:
@@ -371,105 +515,116 @@ tests:
       unit: null
       abs_value: null
     unit_type: currency
-#  - id: hi_16
-#    message: "200 se 300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 se 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
+  - id: hi_16
+    message: "200 se 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 se 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
 #  - id: hi_17
 #    message: "200 – 300 rupees"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 – 300 rupees"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
-#  - id: hi_18
-#    message: "200-300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200-300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_19
-#    message: "200 rupees se 300"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 rupees se 300"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_20
-#    message: "200 rupees se 300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200 rupees se 300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
+  - id: hi_18
+    message: "200-300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200-300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_19
+    message: "200 rupees se 300"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees se 300"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_20
+    message: "200 rupees se 300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200 rupees se 300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
 #  - id: hi_21
 #    message: "200 rupees – 300"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 rupees – 300"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
 #  - id: hi_22
 #    message: "200 rupees – 300 rupees"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "200 rupees – 300 rupees"
 #      output_id: 1
 #      unit: rupees
+#      abs_value: null
 #    unit_type: currency
-#  - id: hi_23
-#    message: "200-300 rupees"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "200-300 rupees"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_24
-#    message: "२०० से ज्यादा"
-#    outputs:
-#    - max_value: null
-#      min_value: 200
-#      original_text: "२०० से ज्यादा"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
-#  - id: hi_25
-#    message: "२ हजार से ऊपर"
-#    outputs:
-#    - max_value: null
-#      min_value: 2000
-#      original_text: "२ हजार से ऊपर"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
-#  - id: hi_26
-#    message: "ज्यादा से ज्यादा २ हजार"
-#    outputs:
-#    - max_value: 2000
-#      min_value: null
-#      original_text: "ज्यादा से ज्यादा २ हजार"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_23
+    message: "200-300 rupees"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "200-300 rupees"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_24
+    message: "२०० से ज्यादा"
+    outputs:
+    - max_value: null
+      min_value: "200"
+      original_text: "२०० से ज्यादा"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
+  - id: hi_25
+    message: "२ हजार से ऊपर"
+    outputs:
+    - max_value: null
+      min_value: "2000"
+      original_text: "२ हजार से ऊपर"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
+  - id: hi_26
+    message: "ज्यादा से ज्यादा २ हजार"
+    outputs:
+    - max_value: "2000"
+      min_value: null
+      original_text: "ज्यादा से ज्यादा २ हजार"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_27
     message: "२०० से ज्यादा"
     outputs:
@@ -500,60 +655,66 @@ tests:
       unit: null
       abs_value: null
     unit_type: currency
-#  - id: hi_30
-#    message: "२०० रूपीस से ज्यादा"
-#    outputs:
-#    - max_value: null
-#      min_value: 200
-#      original_text: "२०० रूपीस से ज्यादा"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_31
-#    message: "रूपीस २ हजार से ऊपर"
-#    outputs:
-#    - max_value: null
-#      min_value: 2000
-#      original_text: रूपीस २ हजार से ऊपर
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_32
-#    message: "ज्यादा से ज्यादा ५ हजार रुपया"
-#    outputs:
-#    - max_value: 5000
-#      min_value: null
-#      original_text: ज्यादा से ज्यादा ५ हजार रुपया
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_33
-#    message: "२०० से  ३००"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: २०० से  ३००
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_30
+    message: "२०० रूपीस से ज्यादा"
+    outputs:
+    - max_value: null
+      min_value: "200"
+      original_text: "२०० रूपीस से ज्यादा"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_31
+    message: "रूपीस २ हजार से ऊपर"
+    outputs:
+    - max_value: null
+      min_value: "2000"
+      original_text: रूपीस २ हजार से ऊपर
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_32
+    message: "ज्यादा से ज्यादा ५ हजार रुपया"
+    outputs:
+    - max_value: "5000"
+      min_value: null
+      original_text: ज्यादा से ज्यादा ५ हजार रुपया
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_33
+    message: "२०० से  ३००"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: २०० से  ३००
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
 #  - id: hi_34
 #    message: "२०० – ३००"
 #    outputs:
-#    - max_value: 300
-#      min_value: 200
+#    - max_value: "300"
+#      min_value: "200"
 #      original_text: "२०० – ३००"
 #      output_id: 1
 #      unit: null
+#      abs_value: null
 #    unit_type: null
-#  - id: hi_35
-#    message: "२००-३००"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२००-३००"
-#      output_id: 1
-#      unit: null
-#    unit_type: null
+  - id: hi_35
+    message: "२००-३००"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२००-३००"
+      output_id: 1
+      unit: null
+      abs_value: null
+    unit_type: null
   - id: hi_36
     message: "२०० से  ३००"
     outputs:
@@ -584,75 +745,83 @@ tests:
       unit: null
       abs_value: null
     unit_type: currency
-#  - id: hi_39
-#    message: "२०० से  ३००  रुपया"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० से  ३००  रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_40
-#    message: "२००-३००  रुपया"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२००-३००  रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_41
-#    message: "२०० रुपया से ३००"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० रुपया से ३००"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_42
-#    message: "२०० रुपया से ३०० रुपया"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० रुपया से ३०० रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_43
-#    message: "२०० -  ३००  रुपया"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० -  ३००  रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_44
-#    message: "२०० रुपया -  ३००"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० रुपया -  ३००"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_45
-#    message: "२०० रुपया -  ३०० रुपया "
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२०० रुपया -  ३०० रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
-#  - id: hi_46
-#    message: "२००-३०० रुपया"
-#    outputs:
-#    - max_value: 300
-#      min_value: 200
-#      original_text: "२००-३०० रुपया"
-#      output_id: 1
-#      unit: rupees
-#    unit_type: currency
+  - id: hi_39
+    message: "२०० से  ३००  रुपया"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० से  ३००  रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_40
+    message: "२००-३००  रुपया"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२००-३००  रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_41
+    message: "२०० रुपया से ३००"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० रुपया से ३००"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_42
+    message: "२०० रुपया से ३०० रुपया"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० रुपया से ३०० रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_43
+    message: "२०० -  ३००  रुपया"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० -  ३००  रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_44
+    message: "२०० रुपया -  ३००"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० रुपया -  ३००"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_45
+    message: "२०० रुपया -  ३०० रुपया "
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२०० रुपया -  ३०० रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency
+  - id: hi_46
+    message: "२००-३०० रुपया"
+    outputs:
+    - max_value: "300"
+      min_value: "200"
+      original_text: "२००-३०० रुपया"
+      output_id: 1
+      unit: rupees
+      abs_value: null
+    unit_type: currency

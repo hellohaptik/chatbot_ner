@@ -30,6 +30,8 @@ NumberUnit = collections.namedtuple('NumberUnit', ['value', 'type'])
 
 
 class BaseNumberDetector(object):
+    _SPAN_BOUNDARY_TEMPLATE = r'(?:^|(?<=[\s\"\'\,\-\?])){}(?=[\s\!\"\%\'\,\?\.\-]|$)'
+
     def __init__(self, entity_name, data_directory_path, unit_type=None):
         """
         Standard Number detection class, read data from language data path and help to detect number and numbers words
@@ -225,23 +227,19 @@ class BaseNumberDetector(object):
         for numeral_text in numeral_text_list:
             numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
             full_list = list(zip(numbers, original_texts))
-            """
-            list() is added to above zip as in python 3, zip() returns a zip object instead of zip function and
-                our lint checker is matching it for python 3
-            """
             sorted_full_list = sorted(full_list, key=lambda kv: len(kv[1]), reverse=True)
             for number, original_text in sorted_full_list:
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, numeral_text)
-                # numeral_text = numeral_text.replace(original_text, self.tag)
-                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
-                numeral_text = _pattern.sub(self.tag, numeral_text)
-                number_list.append({
-                    NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
-                    NUMBER_DETECTION_RETURN_DICT_UNIT: unit
-                })
-                original_list.append(original_text)
+                _pattern = re.compile(self._SPAN_BOUNDARY_TEMPLATE.format(re.escape(original_text)), flags=_re_flags)
+                if _pattern.search(numeral_text):
+                    numeral_text = _pattern.sub(self.tag, numeral_text, 1)
+                    number_list.append({
+                        NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
+                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit
+                    })
+                    original_list.append(original_text)
         return number_list, original_list
 
     def _detect_number_from_digit(self, number_list=None, original_list=None):
@@ -295,12 +293,12 @@ class BaseNumberDetector(object):
             number, scale, original_text = None, None, None
             if pattern[1] and pattern[1].replace(',', '').replace('.', '').isdigit():
                 number = pattern[1].replace(',', '')
-                original_text = pattern[0].strip()
+                original_text = pattern[0].strip().strip(',.').strip()
                 scale = self.scale_map[pattern[2].strip()]
 
             elif pattern[3] and pattern[3].replace(',', '').replace('.', '').isdigit():
                 number = pattern[3].replace(',', '')
-                original_text = pattern[3].strip()
+                original_text = pattern[3].strip().strip(',.').strip()
                 scale = 1
 
             if number:
@@ -309,9 +307,9 @@ class BaseNumberDetector(object):
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)
-                _pattern = re.compile(r'\b%s\b' % re.escape(original_text), flags=_re_flags)
+                _pattern = re.compile(self._SPAN_BOUNDARY_TEMPLATE.format(re.escape(original_text)), flags=_re_flags)
                 if _pattern.search(processed_text):
-                    processed_text = _pattern.sub(self.tag, processed_text)
+                    processed_text = _pattern.sub(self.tag, processed_text, 1)
                     number_list.append({
                         NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
                         NUMBER_DETECTION_RETURN_DICT_UNIT: unit
@@ -332,9 +330,9 @@ class BaseNumberDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
-            self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
-            self.processed_text = _pattern.sub('', self.processed_text)
+            _pattern = re.compile(self._SPAN_BOUNDARY_TEMPLATE.format(re.escape(detected_text)), flags=_re_flags)
+            self.tagged_text = _pattern.sub(self.tag, self.tagged_text, 1)
+            self.processed_text = _pattern.sub('', self.processed_text, 1)
 
 
 class NumberDetector(BaseNumberDetector):
