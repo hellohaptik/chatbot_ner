@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from __future__ import absolute_import
+
 import os
 import sys
 
@@ -96,27 +97,26 @@ if 'test' in sys.argv:
         'CONN_MAX_AGE': 60
     }
 
-#    MIGRATION_MODULES = DisableMigrations()
-
-
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--nocapture',
     '--nologcapture',
     '--verbosity=3',
-    '--ignore-files=urls.py',
-    '--ignore-files=wsgi.py',
+    '--exclude-dir=chatbot_ner/',
+    '--exclude-dir=docs/',
+    '--exclude-dir=docker/',
+    '--exclude-dir=data/',
     '--ignore-files=manage.py',
     '--ignore-files=nltk_setup.py',
     '--ignore-files=__init__.py',
     '--ignore-files=const.py',
     '--ignore-files=constant.py',
     '--ignore-files=constants.py',
-    '--ignore-files=settings.py',
     '--ignore-files=run_postman_tests.py',
-    '--exclude-dir=docs/',
-    '--exclude-dir=docker/',
-    '--exclude-dir=data/',
+    '--cover-erase',
+    '--cover-package=datastore,external_api,language_utilities,lib,models,ner_v1,ner_v2',
+    '--cover-inclusive',
+    '--cover-config-file=.coveragerc',
 ]
 
 # Internationalization

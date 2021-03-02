@@ -1,0 +1,3 @@
+[report]
+skip_empty = True
+sort = Cover
