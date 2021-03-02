@@ -1,8 +1,10 @@
 # coding=utf-8
 from __future__ import absolute_import
-import pandas as pd
+
 import collections
 import os
+
+import pandas as pd
 from six.moves import zip
 
 try:
@@ -62,8 +64,7 @@ class BaseNumberDetector(object):
 
         # Variable to define default order in which detector will work
         self.detector_preferences = [self._detect_number_from_digit,
-                                     self._detect_number_from_words
-                                     ]
+                                     self._detect_number_from_words]
 
     def detect_number(self, text):
         """
