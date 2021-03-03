@@ -1,9 +1,41 @@
 [run]
+source = .
 omit =
+    *.pyc
+    *.pyo
     */site-packages/*
     */distutils/*
+    docs/
+    docker/
+    logs/
+    postman_tests/
     */tests/*
+    */test.py
+    */tests.py
+    manage.py
+    */settings.py
+    */urls.py
+    */migrations/*
+    *wsgi.py
+    *__init__.py
 
 [report]
 skip_empty = True
 sort = Cover
+exclude_lines =
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+    if self\.debug
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if 0:
+    if __name__ == .__main__.:
+
+    __author__ = 'haptik'
+show_missing = True
