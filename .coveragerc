@@ -1,3 +1,9 @@
+[run]
+omit =
+    */site-packages/*
+    */distutils/*
+    */tests/*
+
 [report]
 skip_empty = True
 sort = Cover
