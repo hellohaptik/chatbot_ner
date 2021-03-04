@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
+import json
+
+import six
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
 from chatbot_ner.config import ner_logger
+from language_utilities.constant import ENGLISH_LANG
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
     PARAMETER_PAST_DATE_REFERENCED, PARAMETER_MIN_DIGITS, PARAMETER_MAX_DIGITS, PARAMETER_NUMBER_UNIT_TYPE, \
     PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED
-
-from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
-from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
-
-from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request
-from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
-
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-import json
-import six
+from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
+from ner_v2.detectors.temporal.time.time_detection import TimeDetector
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request
 
 
 def get_parameters_dictionary(request):
@@ -163,7 +163,7 @@ def date(request):
         ner_logger.exception('Exception for date: %s ' % e)
         return HttpResponse(status=500)
 
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+    return JsonResponse({'data': entity_output})
 
 
 @csrf_exempt
@@ -242,7 +242,7 @@ def time(request):
         ner_logger.exception('Exception for time: %s ' % e)
         return HttpResponse(status=500)
 
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+    return JsonResponse({'data': entity_output})
 
 
 @csrf_exempt
@@ -338,7 +338,7 @@ def number(request):
         ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
 
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+    return JsonResponse({'data': entity_output})
 
 
 @csrf_exempt
@@ -409,7 +409,7 @@ def number_range(request):
         ner_logger.exception('Exception for numeric: %s ' % e)
         return HttpResponse(status=500)
 
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+    return JsonResponse({'data': entity_output})
 
 
 @csrf_exempt
@@ -554,7 +554,7 @@ def phone_number(request):
         ner_logger.exception('Exception for phone_number: %s ' % e)
         return HttpResponse(status=500)
 
-    return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
+    return JsonResponse({'data': entity_output})
 
 
 @csrf_exempt
@@ -668,7 +668,7 @@ def text(request):
 
     if request.method == "GET":
         response = {"success": False, "error": "Get method is not allowed"}
-        return HttpResponse(json.dumps(response), status=501)
+        return JsonResponse(response, status=405)
 
     elif request.method == "POST":
         ner_logger.debug("Fetching result")
@@ -682,22 +682,18 @@ def text(request):
             response = {"success": False, "error": str(err)}
             # TODO: move to ner_logger.error
             ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
+            return JsonResponse(response, status=400)
         except TypeError as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
+            return JsonResponse(response, status=400)
         except Exception as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)
-            return HttpResponse(json.dumps(response), content_type='application/json',
-                                status=400)
-
+            return JsonResponse(response, status=500)
     if data:
         response = {"success": True, "error": None, "data": data}
-        return HttpResponse(json.dumps(response), content_type='application/json', status=200)
+        return JsonResponse(response, status=200)
     else:
         response = {"success": False, "error": "Some error while parsing"}
-        return HttpResponse(json.dumps(response), status=400)
+        return JsonResponse(response, status=500)

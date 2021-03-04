@@ -804,6 +804,19 @@ tests:
         range: null
         time_type: null
         original_text: "once in 3 days"
+  - id: en_62
+    message: "your three digit code is 145 and 4 digit code is 1230. Please enter this on the app. 12 is the two digit code"
+    bot_message: null
+    range_enabled: false
+    outputs:
+      - hh: null
+        mm: null
+        nn: null
+        tz: null
+        original_text: null
+        output_id: 1
+        range: null
+        time_type: null
 
   hi:
   - id: hi_1

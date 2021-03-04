@@ -147,6 +147,9 @@ class NumberDetectorTestMeta(type):
 
     def __new__(cls, name, bases, attrs):
         for test_name, test_fn in cls.yaml_testsuite_generator():
+            if test_name in attrs:
+                raise ValueError('Got duplicate test name {test_name}, please make sure all tests have unique "id"'
+                                 .format(test_name=test_name))
             attrs[test_name] = test_fn
 
         return super(NumberDetectorTestMeta, cls).__new__(cls, name, bases, attrs)
