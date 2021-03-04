@@ -5,7 +5,6 @@ __pycache__/
 
 # haptik ner config file
 config
-model_config
 
 # C extensions
 *.so
