@@ -1,5 +1,8 @@
 from __future__ import absolute_import
 
+import six
+
+from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD, ENTITY_VALUE_DICT_KEY)
@@ -16,8 +19,6 @@ from ner_v1.detectors.temporal.time.time_detection import TimeDetector
 from ner_v1.detectors.textual.city.city_detection import CityDetector
 from ner_v1.detectors.textual.name.name_detection import NameDetector
 from ner_v1.detectors.textual.text.text_detection import TextDetector
-from chatbot_ner.config import ner_logger
-import six
 
 """
 This file contains functionality that performs entity detection over a chatbot.
@@ -92,7 +93,7 @@ The output is stored in a list of dictionary contains the following structure
 
 
 def get_text(message, entity_name, structured_value, fallback_value, bot_message, language=ENGLISH_LANG,
-             predetected_values=None, **kwargs):
+             predetected_values=None, fuzziness=None, min_token_len_fuzziness=None, **kwargs):
     """Use TextDetector (datastore/elasticsearch) to detect textual entities
 
     Args:
@@ -110,13 +111,9 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
                                                  we return a fallback_value as an output.
         bot_message (str or unicode or None): previous message from a bot/agent.
         language (str): ISO 639-1 code of language of message
-        **kwargs: extra configuration arguments for TextDetector
-            fuzziness (str or int or None): fuzziness to apply while detecting text entities
-            min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
-            live_crf_model_path (str) : path to the CRF model to use to detect entites. Defaults to None
-            read_model_from_s3 (bool): If True read CRF model from S3. Defaults to False
-            read_embeddings_from_remote_url (bool): if True read word embeddings from configured remote url. Defaults
-                                                    to False
+        fuzziness (str or int or None): fuzziness to apply while detecting text entities
+        min_token_len_fuzziness (str or int or None): minimum length of the token to be eligible for fuzziness
+         **kwargs: extra configuration arguments for TextDetector
 
 
 
@@ -228,8 +225,6 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
             ]
 
     """
-    fuzziness = kwargs.get('fuzziness', None)
-    min_token_len_fuzziness = kwargs.get('min_token_len_fuzziness', None)
     predetected_values = predetected_values or []
 
     text_detector = TextDetector(entity_name=entity_name, source_language_script=language)
@@ -505,7 +500,7 @@ def get_city(message, entity_name, structured_value, fallback_value, bot_message
                                            original_text_list=[structured_value],
                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_dict_list = city_detection.detect_entity(text=message, run_model=False)
+        entity_dict_list = city_detection.detect_entity(text=message)
         entity_list, original_text_list, detection_method_list = \
             city_detection.convert_city_dict_in_tuple(entity_dict_list=entity_dict_list)
         if entity_list:
@@ -980,14 +975,14 @@ def get_date(message, entity_name, structured_value, fallback_value, bot_message
                                            original_text_list=[structured_value],
                                            detection_method=FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
-        entity_dict_list = date_detection.detect_entity(text=message, run_model=False)
+        entity_dict_list = date_detection.detect_entity(text=message)
         entity_list, original_text_list, detection_method_list = \
             date_detection.unzip_convert_date_dictionaries(entity_dict_list=entity_dict_list)
         if entity_list:
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,
                                            detection_method_list=detection_method_list)
         elif fallback_value:
-            entity_dict_list = date_detection.detect_entity(text=fallback_value, run_model=False)
+            entity_dict_list = date_detection.detect_entity(text=fallback_value)
             entity_list, original_text_list, detection_method_list = \
                 date_detection.unzip_convert_date_dictionaries(entity_dict_list=entity_dict_list)
             return output_entity_dict_list(entity_value_list=entity_list, original_text_list=original_text_list,

@@ -11,11 +11,9 @@ from datastore.exceptions import IndexNotFoundException, InvalidESURLException, 
     FetchIndexForAliasException, DeleteIndexFromAliasException
 from chatbot_ner.config import ner_logger
 from external_api.constants import ENTITY_DATA, ENTITY_NAME, LANGUAGE_SCRIPT, ENTITY_LIST, \
-    EXTERNAL_API_DATA, SENTENCE_LIST, READ_MODEL_FROM_S3, ES_CONFIG, READ_EMBEDDINGS_FROM_REMOTE_URL, \
-    LIVE_CRF_MODEL_PATH, SENTENCES, LANGUAGES
+    EXTERNAL_API_DATA, SENTENCES, LANGUAGES
 
 from django.views.decorators.csrf import csrf_exempt
-from models.crf_v2.crf_train import CrfTrain
 
 from external_api.lib import dictionary_utils
 from external_api.response_utils import external_api_response_wrapper
@@ -208,60 +206,6 @@ def update_crf_training_data(request):
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-    return HttpResponse(json.dumps(response), content_type='application/json', status=200)
-
-
-@csrf_exempt
-def train_crf_model(request):
-    """
-    This method is used to train crf model.
-    Args:
-        request (HttpResponse): HTTP response from url
-    Returns:
-        HttpResponse : HttpResponse with appropriate status and error message.
-    Post Request Body:
-    key: "external_api_data"
-    value: {
-    "entity_name": "crf_test",
-    "read_model_from_s3": true,
-    "es_config": true,
-    "read_embeddings_from_remote_url": true
-    }
-    """
-    response = {"success": False, "error": "", "result": {}}
-    try:
-        external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
-        entity_name = external_api_data.get(ENTITY_NAME)
-        read_model_from_s3 = external_api_data.get(READ_MODEL_FROM_S3)
-        es_config = external_api_data.get(ES_CONFIG)
-        read_embeddings_from_remote_url = external_api_data.get(READ_EMBEDDINGS_FROM_REMOTE_URL)
-        crf_model = CrfTrain(entity_name=entity_name,
-                             read_model_from_s3=read_model_from_s3,
-                             read_embeddings_from_remote_url=read_embeddings_from_remote_url)
-
-        if es_config:
-            model_path = crf_model.train_model_from_es_data()
-        else:
-            sentence_list = external_api_data.get(SENTENCE_LIST)
-            entity_list = external_api_data.get(ENTITY_LIST)
-            model_path = crf_model.train_crf_model_from_list(sentence_list=sentence_list, entity_list=entity_list)
-
-        response['result'] = {LIVE_CRF_MODEL_PATH: model_path}
-        response['success'] = True
-
-    except (IndexNotFoundException, InvalidESURLException,
-            SourceDestinationSimilarException, InternalBackupException, AliasNotFoundException,
-            PointIndexToAliasException, FetchIndexForAliasException, DeleteIndexFromAliasException,
-            AliasForTransferException, IndexForTransferException, NonESEngineTransferException) as error_message:
-        response['error'] = str(error_message)
-        ner_logger.exception('Error: %s' % error_message)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
-    except BaseException as e:
-        response['error'] = str(e)
-        ner_logger.exception('Error: %s' % e)
-        return HttpResponse(json.dumps(response), content_type='application/json', status=500)
-
     return HttpResponse(json.dumps(response), content_type='application/json', status=200)
 
 

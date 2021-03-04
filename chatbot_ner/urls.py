@@ -54,9 +54,6 @@ urlpatterns = [
     url(r'^entities/get_crf_training_data', external_api.get_crf_training_data),
     url(r'^entities/update_crf_training_data', external_api.update_crf_training_data),
 
-    #  Train Crf Model
-    url(r'^entities/train_crf_model', external_api.train_crf_model),
-
     url(r'^entities/languages/v1/(?P<entity_name>.+)$', external_api.entity_language_view),
     url(r'^entities/data/v1/(?P<entity_name>.+)$', external_api.entity_data_view),
 

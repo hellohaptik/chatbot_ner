@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'datastore',
     'ner_v1',
     'ner_v2',
-    'models',
     'django_nose'
 ]
 
@@ -137,7 +136,7 @@ NOSE_ARGS = [
     '--ignore-files=constants.py',
     '--ignore-files=run_postman_tests.py',
     '--cover-erase',
-    '--cover-package=datastore,external_api,language_utilities,lib,models,ner_v1,ner_v2',
+    '--cover-package=datastore,external_api,language_utilities,lib,ner_v1,ner_v2',
     '--cover-inclusive',
 ]
 
