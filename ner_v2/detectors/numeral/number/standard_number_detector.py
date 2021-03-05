@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 import collections
 import os
+import decimal
 
 import pandas as pd
 from six.moves import zip
@@ -302,8 +303,12 @@ class BaseNumberDetector(object):
                 scale = 1
 
             if number:
-                number = float(number) * scale
-                number = int(number) if number.is_integer() else number
+                if '.' not in number:
+                    number = int(number) * scale
+                else:
+                    number = float(number) * scale
+                    # FIXME: this conversion from float -> int is lossy, consider using Decimal class
+                    number = int(number) if number.is_integer() else number
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, processed_text)

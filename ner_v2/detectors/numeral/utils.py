@@ -26,6 +26,7 @@ def get_number_from_number_word(text, number_word_dict):
         [In]  >> _get_number_from_numerals('two hundred three four hundred three',  number_word_dict)
         [Out] >> (['103', '403'], ['one hundred three', 'four hundred three'])
     """
+    # FIXME: conversion from float -> int is lossy, consider using Decimal class
     detected_number_list = []
     detected_original_text_list = []
 
