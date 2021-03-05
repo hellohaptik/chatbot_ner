@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import collections
 import os
-import decimal
 
 import pandas as pd
 from six.moves import zip
