@@ -5,51 +5,51 @@ number,name_variants,number_value,number_type
 २,दो|do|du,2,unit
 २.५,ढाई|ढ़ाई|धाइ|धाई|dhaai|daai|dhai|dai,2.5,unit
 ३,तीन|teen|tin,3,unit
-४,चार |char|chaar,4,unit
+४,चार|char|chaar,4,unit
 ५,पाँच|पांच|panch|paanch|paach,5,unit
-६,छह |chhe|chhah|chheh,6,unit
-७,सात |saat,7,unit
-८,आठ |ath|aath,8,unit
-९,नौ |nau|nao,9,unit
-१०,दस | dus|das,10,unit
-११,ग्यारह |gyareh|gyarah,11,unit
-१२,बारह | bareh|barah,12,unit
-१३,तेरह | terah|tereh,13,unit
-१४,चौदह |chaudeh|chaudah|chauda,14,unit
-१५,पन्द्रह | pandreh | pandrah|pehdrah|pendreh,15,unit
-१६,सोलह |solah|soleh|sholah|sholeh,16,unit
-१७,सत्रह |satreh|starah,17,unit
-१८,अठारह | athrah|athreh|aththarah|aththareh,18,unit
-१९,उन्नीस | unnis| unnish,19,unit
-२०,बीस | bis|bish|bees|beesh,20,unit
-२१,इक्कीस | ikkis|ikkish|ekkis|ekkish,21,unit
-२२,बाईस | bais| baish|bayis|bayish,22,unit
-२३,तेईस | teis|teish|teyis|teyish,23,unit
-२४,चौबीस | chaubis|chaubish|chaubees|chaubeesh,24,unit
-२५,पच्चीस |pachis|pachish|pachchis|pachchish|pachees|pacheesh|pachchees|pachcheesh,25,unit
-२६,छब्बीस | chhabis|chhabish|chhabees|chhabeesh|chhabbis|chhabbish|chhabbees|chhabbeesh,26,unit
-२७,सत्ताईस | sattais|sattaish|sattaees|sattaeesh,27,unit
-२८,अट्ठाईस | athais|athaish|athaees|athaeesh|aththais|aththaish|aththaees|aththaeesh,28,unit
-२९,उनतीस | untis|untish|untees|unteesh,29,unit
-३०,तीस | tis| tish|tees|teesh,30,unit
-३१,इकतीस |ikkatis|ikkatish|ikattis|ikattish|ikkattis|ikkattish|ekkatis|ekkatish|ekattis|ekattish|ekkattis|ekkattish,31,unit
+६,छह|chhe|chhah|chheh,6,unit
+७,सात|saat,7,unit
+८,आठ|ath|aath,8,unit
+९,नौ|nau|nao,9,unit
+१०,दस| dus|das,10,unit
+११,ग्यारह|gyareh|gyarah,11,unit
+१२,बारह| bareh|barah,12,unit
+१३,तेरह| terah|tereh,13,unit
+१४,चौदह|chaudeh|chaudah|chauda,14,unit
+१५,पन्द्रह| pandreh | pandrah|pehdrah|pendreh,15,unit
+१६,सोलह|solah|soleh|sholah|sholeh,16,unit
+१७,सत्रह|satreh|starah,17,unit
+१८,अठारह| athrah|athreh|aththarah|aththareh,18,unit
+१९,उन्नीस| unnis| unnish,19,unit
+२०,बीस| bis|bish|bees|beesh,20,unit
+२१,इक्कीस| ikkis|ikkish|ekkis|ekkish,21,unit
+२२,बाईस| bais| baish|bayis|bayish,22,unit
+२३,तेईस| teis|teish|teyis|teyish,23,unit
+२४,चौबीस| chaubis|chaubish|chaubees|chaubeesh,24,unit
+२५,पच्चीस|pachis|pachish|pachchis|pachchish|pachees|pacheesh|pachchees|pachcheesh,25,unit
+२६,छब्बीस| chhabis|chhabish|chhabees|chhabeesh|chhabbis|chhabbish|chhabbees|chhabbeesh,26,unit
+२७,सत्ताईस| sattais|sattaish|sattaees|sattaeesh,27,unit
+२८,अट्ठाईस| athais|athaish|athaees|athaeesh|aththais|aththaish|aththaees|aththaeesh,28,unit
+२९,उनतीस| untis|untish|untees|unteesh,29,unit
+३०,तीस| tis| tish|tees|teesh,30,unit
+३१,इकतीस|ikkatis|ikkatish|ikattis|ikattish|ikkattis|ikkattish|ekkatis|ekkatish|ekattis|ekattish|ekkattis|ekkattish,31,unit
 ३२,बत्तीस| batis|batish|battis|battish|batees|bateesh|battees|batteesh,32,unit
 ३३,तैंतीस|taitis|taitish|taitees|taiteesh|taintis|taintish|taintees|tainteesh,33,unit
-३४,चौंतीस | chautis|chautish|chautees|chauteesh|chauntis|chauntish|chauntees|chaunteesh,34,unit
+३४,चौंतीस| chautis|chautish|chautees|chauteesh|chauntis|chauntish|chauntees|chaunteesh,34,unit
 ३५,पैंतीस|paitis|paitish|paitees|paiteesh|paintis|paintish|paintees|painteesh,35,unit
 ३६,छत्तीस|chhatis|chhatish|chhatees|chhateesh|chhattis|chhattish|chhattees|chhatteesh,36,unit
 ३७,सैंतीस|saitis|saitish|saitees|saiteesh|saintis|saintish|saintees|sainteesh,37,unit
 ३८,अड़तीस|adtis|adtish|adtees|adteesh,38,unit
-३९,उनतालीस |unchalis|unchalish|unchalees|unchaleesh,39,unit
+३९,उनतालीस|unchalis|unchalish|unchalees|unchaleesh,39,unit
 ४०,चालीस|chalis|chalish|chalees|chaleesh,40,unit
 ४१,इकतालीस|iktalis|iktalish|iktalees|iktaleesh|ektalis|ektalish|ektalees|ektaleesh,41,unit
 ४२,बयालीस|bayalis|bayalish|bayalees|bayaleesh,42,unit
 ४३,तैंतालीस|taitalis|taitalish|taitalees|taitaleesh|taintalis|taintalish|taintalees|taintaleesh,43,unit
 ४४,चौंतालीस|चौवालिश|चौवालिस|chautalis|chautalish|chautalees|chautaleesh|chauntalis|chauntalish|chauntalees|chauntaleesh|chauvalis|chauvalish|chauvalees|chauvaleesh,44,unit
-४५,पैंतालीस |paitalis|paitalish|paitalees|paitaleesh|paintalis|paintalish|paintalees|paintaleesh,45,unit
+४५,पैंतालीस|paitalis|paitalish|paitalees|paitaleesh|paintalis|paintalish|paintalees|paintaleesh,45,unit
 ४६,छियालीस|chhiyalis|chhiyalish|chhiyalees|chhiyaleesh|chhialis|chhialish|chhialees|chhialeesh,46,unit
-४७,सैंतालीस |saitalis|saitalish|saitalees|saitaleesh|saintalis|saintalish|saintalees|saintaleesh,47,unit
-४८,अड़तालीस |adtalis|adtalish|adtalees|adtaleesh,48,unit
+४७,सैंतालीस|saitalis|saitalish|saitalees|saitaleesh|saintalis|saintalish|saintalees|saintaleesh,47,unit
+४८,अड़तालीस|adtalis|adtalish|adtalees|adtaleesh,48,unit
 ४९,उनचास|unchaas|unchaash|unchas|unchash,49,unit
 ५०,पचास|pachas|pachash|pachaas|pachaash,50,unit
 ५१,इक्याबन|इक्याबन|ikyavan|ikyawan|ekyavan|ekyawan,51,unit
@@ -102,6 +102,6 @@ number,name_variants,number_value,number_type
 ९८,अट्ठानवे|aththanve|aththanwe|aththanave|aththanawe|athanve|athanwe|athanave|athanawe,98,unit
 ९९,निन्यानवे|निन्यानबे|ninyanbe|ninyanabe|ninyanve|ninyanave|ninyanwe|ninyanawe,99,unit
 १००,सौ|sau|sao,100,scale
-१०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar,1000,scale
+१०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar|k,1000,scale
 १०००००,लाख|lakh|laakh|lac,100000,scale
 १०००००००,करोड़|crore|karor|caror,10000000,scale
