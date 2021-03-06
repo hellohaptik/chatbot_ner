@@ -176,3 +176,17 @@ tests:
         output_id: 3
         unit: rupees
         value: "50000"
+  - id: en_14
+    message: "here are some super large numbers 12345678901234567890 12345678 987654321012345678901 98765432101234567890123 "
+    unit_type: null
+    min_digit: 20
+    max_digit: 22
+    outputs:
+      - original_text: "12345678901234567890"
+        output_id: 1
+        unit: null
+        value: "12345678901234567890"
+      - original_text: "987654321012345678901"
+        output_id: 2
+        unit: null
+        value: "987654321012345678901"

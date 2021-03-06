@@ -194,6 +194,9 @@ class NumberDetectorTestMeta(type):
             message = testcase["message"]
             unit_type = testcase.get("unit_type", None)
             number_detector_object = NumberDetector(entity_name="number", language=language, unit_type=unit_type)
+            number_detector_object.set_min_max_digits(
+                min_digit=testcase.get('min_digit', number_detector_object.min_digit),
+                max_digit=testcase.get('max_digit', number_detector_object.max_digit))
             number_dicts, spans = number_detector_object.detect_entity(message)
 
             expected_number_dicts, expected_spans = parse_expected_outputs(testcase["outputs"])
