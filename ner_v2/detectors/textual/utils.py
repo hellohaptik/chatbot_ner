@@ -1,16 +1,20 @@
 from __future__ import absolute_import
 
 import json
+
 import six
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
-
 from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY, MAX_NUMBER_BULK_MESSAGE,
                            MAX_NUMBER_MULTI_ENTITIES)
 from ner_v2.detectors.textual.text_detection import TextDetector
+
+
+class InvalidTextRequest(Exception):
+    pass
 
 
 def verify_text_request(request):
@@ -25,46 +29,47 @@ def verify_text_request(request):
         request: API request object
 
     Returns:
-        Raises KeyError if message or entities are not present
-        Raises TypeError if message is not list or entities is not dict type
-        Else Return none
+        None
+
+    Raises:
+         InvalidTextRequest if
+            message or entities are not present
+            message is not list or entities is not dict type
+            number of messages or entities are above the supported limits
     """
 
     request_data = json.loads(request.body)
-    messages = request_data.get("messages")
-    entities = request_data.get("entities")
+    messages = request_data.get("messages", [])
+    entities = request_data.get("entities", {})
 
     if not messages:
-        ner_logger.exception("messages param is not passed")
-        raise KeyError("key messages is required")
+        ner_logger.error("messages param is not passed")
+        raise InvalidTextRequest("Key `messages` should be a non-empty list of strings")
 
     if not entities:
-        ner_logger.exception("Entities param is not passed")
-        raise KeyError("Entities dict is required")
+        ner_logger.error("Entities param is not passed")
+        raise InvalidTextRequest("Key `entities` should be a non-empty dict")
 
     if not isinstance(messages, list):
-        ner_logger.exception("messages param is not in correct format")
-        raise TypeError("messages should be in format of list of string")
+        ner_logger.error("messages param is not in correct format")
+        raise InvalidTextRequest("Key `messages` should be a non-empty list of strings")
 
     if not isinstance(entities, dict):
-        ner_logger.exception("Entities param is not in correct format")
-        raise TypeError("Entities should be dict of entity details")
+        ner_logger.error("Entities param is not in correct format")
+        raise InvalidTextRequest("Key `entities` should be a dict of entity details")
 
     if len(messages) > MAX_NUMBER_BULK_MESSAGE:
-        ner_logger.exception(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
-                             "bulk detection")
-        raise ValueError(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for "
-                         "bulk detection")
+        ner_logger.error(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for bulk detection")
+        raise InvalidTextRequest(f"Length of key `messages` can be at most {MAX_NUMBER_BULK_MESSAGE}"
+                                 f" for bulk detection but got {len(messages)}")
 
-    if len(list(entities)) > MAX_NUMBER_MULTI_ENTITIES:
-        ner_logger.exception(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
-                             " detection")
-        raise ValueError(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for "
-                         "bulk detection")
+    if len(entities) > MAX_NUMBER_MULTI_ENTITIES:
+        ner_logger.error(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for detection")
+        raise InvalidTextRequest(f"Length of key `entities` can be at most {MAX_NUMBER_MULTI_ENTITIES} "
+                                 f"for bulk detection but got {len(entities)}")
 
 
-def get_detection(message, entity_dict, bot_message=None,
-                  language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
+def get_detection(message, entity_dict, bot_message=None, language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
                   **kwargs):
     """
     Get text detection for given message on given entities dict using
@@ -75,9 +80,8 @@ def get_detection(message, entity_dict, bot_message=None,
     Args:
         message: message to detect text on
         entity_dict: entity details dict
-        structured_value: structured value
         bot_message: bot message
-        language: langugae for text detection
+        language: language for text detection
         target_language_script: target language for detection default ENGLISH
         **kwargs: other kwargs
 
@@ -93,7 +97,7 @@ def get_detection(message, entity_dict, bot_message=None,
     elif isinstance(message, (list, tuple)):
         entity_output = text_detector.detect_bulk(messages=message)
     else:
-        raise TypeError('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
+        raise InvalidTextRequest('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
 
     return entity_output
 
@@ -177,17 +181,12 @@ def get_text_entity_detection_data(request):
     source_language = request_data.get('source_language') or ENGLISH_LANG
 
     data = []
-
     message_len = len(messages)
 
     if message_len == 1:
-
-        # get first message
         message_str = messages[0]
-
         fallback_value_entities = {}
         text_value_entities = {}
-
         data.append({"entities": {}, "language": source_language})
 
         for each_entity, value in entities.items():
@@ -203,7 +202,6 @@ def get_text_entity_detection_data(request):
             output = get_output_for_fallback_entities(fallback_value_entities, source_language)
             data[0]["entities"].update(output)
 
-        # get detection for text entities
         if text_value_entities:
             output = get_detection(message=message_str, entity_dict=text_value_entities,
                                    structured_value=None, bot_message=bot_message,
@@ -211,16 +209,10 @@ def get_text_entity_detection_data(request):
                                    target_language_script=target_language_script)
             data[0]["entities"].update(output[0])
 
-    # check if more than one message
     elif len(messages) > 1:
         text_detection_result = get_detection(message=messages, entity_dict=entities,
                                               structured_value=None, bot_message=bot_message)
-
         data = [{"entities": x, "language": source_language} for x in text_detection_result]
-
-    else:
-        ner_logger.debug("No valid message provided")
-        raise KeyError("Message is required")
 
     return data
 

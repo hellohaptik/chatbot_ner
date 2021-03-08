@@ -19,7 +19,7 @@ from ner_v2.detectors.numeral.number_range.number_range_detection import NumberR
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
-from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request, InvalidTextRequest
 
 
 def get_parameters_dictionary(request):
@@ -671,25 +671,16 @@ def text(request):
         return JsonResponse(response, status=405)
 
     elif request.method == "POST":
-        ner_logger.debug("Fetching result")
-
         try:
             verify_text_request(request)
-            # if verify success get detection data
             data = get_text_entity_detection_data(request)
-
-        except KeyError as err:
+        except InvalidTextRequest as err:
             response = {"success": False, "error": str(err)}
-            # TODO: move to ner_logger.error
-            ner_logger.exception(response)
-            return JsonResponse(response, status=400)
-        except TypeError as err:
-            response = {"success": False, "error": str(err)}
-            ner_logger.exception(response)
+            ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
             return JsonResponse(response, status=400)
         except Exception as err:
             response = {"success": False, "error": str(err)}
-            ner_logger.exception(response)
+            ner_logger.exception(f"General exception for {request.path}, error: {err}")
             return JsonResponse(response, status=500)
     if data:
         response = {"success": True, "error": None, "data": data}
