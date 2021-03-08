@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
+
+import re
+
+import phonenumbers
+import regex
+from six.moves import zip
+
+from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
-from language_utilities.constant import ENGLISH_LANG
-import re
-import phonenumbers
-from six.moves import zip
 
 
 class PhoneDetector(BaseDetector):
@@ -51,6 +55,8 @@ class PhoneDetector(BaseDetector):
         This method sets self.country_code from given locale
         """
         regex_pattern = re.compile('[-_](.*$)', re.U)
+        self.locale = regex.sub("\\p{Pd}", "-",
+                                self.locale)  # This will replace all types of dashes(em or en) by hyphen.
         match = regex_pattern.findall(self.locale)
         if match:
             return match[0].upper()
