@@ -18,6 +18,9 @@ class TimeDetectionTestMeta(type):
 
     def __new__(cls, name, bases, attrs):
         for test_name, test_fn in cls.yaml_testsuite_generator():
+            if test_name in attrs:
+                raise ValueError('Got duplicate test name {test_name}, please make sure all tests have unique "id"'
+                                 .format(test_name=test_name))
             attrs[test_name] = test_fn
 
         return super(TimeDetectionTestMeta, cls).__new__(cls, name, bases, attrs)
@@ -45,7 +48,7 @@ class TimeDetectionTestMeta(type):
                     "hh": expected_output["hh"],
                     "mm": expected_output["mm"],
                     "nn": expected_output["nn"],
-                    'tz': expected_output["tz"],
+                    "tz": expected_output["tz"],
                     "range": expected_output["range"],
                     "time_type": expected_output["time_type"]
                 }

@@ -1246,7 +1246,7 @@ class TimeDetector(object):
             time_list = []
         if original_list is None:
             original_list = []
-        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]?([0-5][0-9])\s*({timezone})?)'
+        patterns = re.findall(r'\b(({timezone})?\s*(00?|0?[2-9]|0?1[0-9]?|2[0-3])[:.\s]([0-5][0-9])\s*({timezone})?)'
                               r'(?!\s*(?:am|pm|a\.m\.?|p\.m\.?|(?:{timezone})|\d))'
                               .format(timezone=self.timezone_choices),
                               self.processed_text.lower())
@@ -1364,11 +1364,10 @@ class TimeDetector(object):
                               r'({timezone})?)\b'.format(timezone=self.timezone_choices),
                               self.processed_text.lower())
 
-        if not patterns and self.bot_message:
-            if re.findall(r"Time|time", self.bot_message.lower()):
-                patterns = re.findall(r'\b(({timezone})?\s*([0-2]?[0-9])'
-                                      r'()\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
-                                      self.processed_text.lower())
+        if not patterns and self.bot_message and re.findall(r"Time|time", self.bot_message.lower()):
+            patterns = re.findall(r'\b(({timezone})?\s*([0-2]?[0-9])'
+                                  r'()\s*({timezone})?)\b'.format(timezone=self.timezone_choices),
+                                  self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0].strip()
             t1 = pattern[2]
@@ -1423,9 +1422,7 @@ class TimeDetector(object):
             return 'hrs'
         if current_hour >= TWELVE_HOUR:
             current_hour -= 12
-            if current_hour < hours:
-                return PM_MERIDIEM
-            elif current_hour == hours and current_min < mins:
+            if (current_hour < hours) or (current_hour == hours and current_min < mins):
                 return PM_MERIDIEM
         else:
             if current_hour > hours:
@@ -1739,10 +1736,7 @@ class TimeDetector(object):
         time_list_final = []
         original_list_final = []
         for i, entity in enumerate(time_list):
-            if 'range' not in entity:
-                time_list_final.append(entity)
-                original_list_final.append(original_list[i])
-            elif not entity['range']:
+            if not entity.get('range'):
                 time_list_final.append(entity)
                 original_list_final.append(original_list[i])
         return time_list_final, original_list_final

@@ -9,8 +9,8 @@ CLIENT_APPLICATIONS_SETUP_NAME = os.environ.get('CLIENT_APPLICATIONS_SETUP_NAME'
 
 # Support for Sentry DSN
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
-SENTRY_ENABLED = os.environ.get('SENTRY_ENABLED')
-SENTRY_ENABLED = True if SENTRY_ENABLED == 'True' and 'test' not in sys.argv else False
+_sentry_enabled = (os.environ.get('SENTRY_ENABLED') or '').strip().lower()
+SENTRY_ENABLED = (_sentry_enabled == 'true' and 'test' not in sys.argv)
 
 
 def setup_sentry():

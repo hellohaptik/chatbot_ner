@@ -9,14 +9,13 @@ from lib.nlp.spacy_utils import spacy_utils
 from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
-from ner_v1.detectors.textual.name.hindi_const import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
-                                                       INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
-                                                       COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
+from ner_v1.detectors.textual.name.lang_constants import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
+                                                          INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
+                                                          COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
 from six.moves import range
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
-# TODO: Make this module python 3 compatible
 
 class NameDetector(object):
     """
@@ -62,21 +61,24 @@ class NameDetector(object):
         2.The original text.
 
         Args:
-            name_tokens (list): List of tokens in the name
-            Example:
-                 ['yash', 'doshi']
+            name_tokens (list): List of tokens in the name. e.g. ['yash', 'doshi']
 
         Returns:
-            (
-                [{first_name: "yash", middle_name: None, last_name: "doshi"}],
-                ["yash modi"]
-            )
+            (list, list): tuple containing
+                list: list of dictionaries, one for each detected name
+                list: list of str, the original text span for each detected name
+
+        Examples:
+            >>> NameDetector.get_format_name(['yash', 'p.', 'm.', 'doshi'], 'my name is yash p. m. doshi')
+            ([{first_name: 'yash', middle_name: 'p. m.', last_name: 'doshi'}],
+            ['yash p. m. doshi'])
         """
         entity_value = []
         original_text = []
+        if not name_tokens:
+            return entity_value, original_text
 
         name_text = " ".join(name_tokens)
-
         first_name = name_tokens[0]
         middle_name = None
         last_name = None
@@ -166,7 +168,7 @@ class NameDetector(object):
             if self.language in EUROPEAN_LANGUAGES_SET | {ENGLISH_LANG}:
                 entity_value, original_text = self.detect_english_name()
             elif self.language in INDIC_LANGUAGES_SET:
-                entity_value, original_text = self.detect_hindi_name()
+                entity_value, original_text = self.detect_indic_name()
 
             for entity_value_dict in entity_value:
                 entity_value_dict.update({DATASTORE_VERIFIED: True, MODEL_VERIFIED: False})
@@ -201,7 +203,7 @@ class NameDetector(object):
         entity_value, original_text = self.get_name_using_pos_tagger(text)
         return entity_value, original_text
 
-    def detect_hindi_name(self):
+    def detect_indic_name(self):
         """
         This method is used to detect Hindi names from the provided text
 
@@ -216,7 +218,7 @@ class NameDetector(object):
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
 
         """
-        if self.detect_abusive_phrases_hindi(text=self.text) or self.detect_question_hindi(text=self.text):
+        if self.detect_abusive_phrases_indic(text=self.text) or self.detect_question_indic(text=self.text):
             return [], []
 
         text = self.remove_emojis(text=self.text)
@@ -224,7 +226,7 @@ class NameDetector(object):
         regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=INDIC_UNICODE_RANGE[self.language]), re.U)
         text = regex.sub(string=text, repl='')
 
-        entity_value, original_text = self.get_hindi_names_without_regex(text=text)
+        entity_value, original_text = self.get_indic_names_without_regex(text=text)
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
             english_present_regex = re.compile(u'[a-zA-Z]+', re.U)
@@ -364,6 +366,7 @@ class NameDetector(object):
     def context_check_botmessage(self, botmessage):
         """
         Checks if previous botmessage conatins name as a keyword or not
+
         Args:
             botmessage: it consists of the previous botmessage
 
@@ -377,12 +380,12 @@ class NameDetector(object):
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
-        for variant in NAME_VARIATIONS[self.language]:
+        for variant in NAME_VARIATIONS.get(self.language, []):
             if " " + variant + " " in botmessage:
                 return True
         return False
 
-    def get_hindi_names_without_regex(self, text):
+    def get_indic_names_without_regex(self, text):
         """
         This method is used to get detect hindi names without any regex pattern (This method is called only if
         detection from regex patterns fails)
@@ -430,7 +433,7 @@ class NameDetector(object):
 
         return ""
 
-    def detect_abusive_phrases_hindi(self, text):
+    def detect_abusive_phrases_indic(self, text):
         """
         This method is used to check for hindi abuses in the sentence
         Args:
@@ -457,7 +460,7 @@ class NameDetector(object):
         text = emoji_pattern.sub(repl='', string=text)
         return text
 
-    def detect_question_hindi(self, text):
+    def detect_question_indic(self, text):
         """
         This method is used to detect if the given text has a hindi question present in it
         Args:
