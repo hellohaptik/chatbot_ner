@@ -10,12 +10,14 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from __future__ import absolute_import
+
 import os
 import sys
 
 from chatbot_ner.setup_sentry import setup_sentry
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+ENVIRONMENT = os.environ.get('ENVIRONMENT') or os.environ.get('HAPTIK_ENV')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -59,6 +61,28 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# APM
+_elastic_apm_enabled = (os.environ.get('ELASTIC_APM_ENABLED') or '').strip().lower()
+ELASTIC_APM_ENABLED = (_elastic_apm_enabled == 'true') and 'test' not in sys.argv
+ELASTIC_APM_SERVER_URL = os.environ.get('ELASTIC_APM_SERVER_URL')
+if ELASTIC_APM_ENABLED:
+    ELASTIC_APM = {
+        'DEBUG': DEBUG,
+        'SERVICE_NAME': 'chatbot_ner',
+        'SERVER_URL': ELASTIC_APM_SERVER_URL,
+        'SPAN_FRAMES_MIN_DURATION': '5ms',
+        'STACK_TRACE_LIMIT': 500,
+        'ENVIRONMENT': ENVIRONMENT,
+        'TRANSACTION_SAMPLE_RATE': '0.1',
+        'TRANSACTION_MAX_SPANS': 500,
+        'INSTRUMENT': 'True',
+        'DISABLE_SEND': 'False',
+        'CAPTURE_BODY': 'off',
+        'SERVER_TIMEOUT': '2s',
+    }
+    INSTALLED_APPS.append('elasticapm.contrib.django')
+    MIDDLEWARE.append('elasticapm.contrib.django.middleware.TracingMiddleware')
+
 ROOT_URLCONF = 'chatbot_ner.urls'
 
 WSGI_APPLICATION = 'chatbot_ner.wsgi.application'
@@ -96,27 +120,25 @@ if 'test' in sys.argv:
         'CONN_MAX_AGE': 60
     }
 
-#    MIGRATION_MODULES = DisableMigrations()
-
-
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 NOSE_ARGS = [
     '--nocapture',
     '--nologcapture',
     '--verbosity=3',
-    '--ignore-files=urls.py',
-    '--ignore-files=wsgi.py',
+    '--exclude-dir=chatbot_ner/',
+    '--exclude-dir=docs/',
+    '--exclude-dir=docker/',
+    '--exclude-dir=data/',
     '--ignore-files=manage.py',
     '--ignore-files=nltk_setup.py',
     '--ignore-files=__init__.py',
     '--ignore-files=const.py',
     '--ignore-files=constant.py',
     '--ignore-files=constants.py',
-    '--ignore-files=settings.py',
     '--ignore-files=run_postman_tests.py',
-    '--exclude-dir=docs/',
-    '--exclude-dir=docker/',
-    '--exclude-dir=data/',
+    '--cover-erase',
+    '--cover-package=datastore,external_api,language_utilities,lib,models,ner_v1,ner_v2',
+    '--cover-inclusive',
 ]
 
 # Internationalization

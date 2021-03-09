@@ -429,8 +429,7 @@
         },
         "expected": [
             {
-                "original_text": "6754321",
-                "value": "6754321"
+                "data": null
             }
         ]
     },

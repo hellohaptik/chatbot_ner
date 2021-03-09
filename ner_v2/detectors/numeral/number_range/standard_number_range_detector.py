@@ -1,20 +1,25 @@
 # coding=utf-8
 from __future__ import absolute_import
-import pandas as pd
+
 import collections
 import os
-import ner_v2.detectors.numeral.constant as numeral_constant
-from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
-from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+
+import pandas as pd
 from six.moves import zip
+
+import ner_v2.detectors.numeral.constant as numeral_constant
+from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+from ner_v2.detectors.numeral.utils import get_list_from_pipe_sep_string
 
 try:
     import regex as re
+
     _re_flags = re.UNICODE | re.V1 | re.WORD
 
 except ImportError:
 
     import re
+
     _re_flags = re.UNICODE
 
 NumberRangeVariant = collections.namedtuple('NumberRangeVariant', ['position', 'range_type'])
@@ -64,8 +69,7 @@ class BaseNumberRangeDetector(object):
                                      self._detect_min_num_range_with_suffix_variants,
                                      self._detect_max_num_range_with_prefix_variants,
                                      self._detect_max_num_range_with_suffix_variants,
-                                     self._detect_absolute_number
-                                     ]
+                                     self._detect_absolute_number]
 
     def _init_regex_for_range(self, data_directory_path):
         """
@@ -98,7 +102,7 @@ class BaseNumberRangeDetector(object):
 
         self.min_range_suffix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == 1 and
-                                          value.range_type == numeral_constant.NUMBER_RANGE_MIN_TYPE)]
+                                              value.range_type == numeral_constant.NUMBER_RANGE_MIN_TYPE)]
 
         self.max_range_prefix_variants = [re.escape(variant) for variant, value in self.range_variants_map.items()
                                           if (value.position == -1 and
@@ -128,10 +132,11 @@ class BaseNumberRangeDetector(object):
         """
         tagged_number_text = processed_text
         sorted_number_detected_map = sorted(list(self.number_detected_map.items()),
-                                            key=lambda kv: len(kv[1].original_text),
-                                            reverse=True)
-        for number_tag in sorted_number_detected_map:
-            tagged_number_text = tagged_number_text.replace(number_tag[1].original_text, number_tag[0], 1)
+                                            key=lambda kv: len(kv[1].original_text), reverse=True)
+        span_template = self.number_detector.language_number_detector._SPAN_BOUNDARY_TEMPLATE
+        for number_tag, value_text_pair in sorted_number_detected_map:
+            tagged_number_text = re.sub(span_template.format(re.escape(value_text_pair.original_text)), number_tag,
+                                        tagged_number_text, count=1, flags=_re_flags)
         return tagged_number_text
 
     def _get_number_tag_dict(self):
@@ -148,8 +153,8 @@ class BaseNumberRangeDetector(object):
         detected_number_dict = {}
         entity_value_list, original_text_list = self.number_detector.detect_entity(self.processed_text)
         for index, (entity_value, original_text) in enumerate(zip(entity_value_list, original_text_list)):
-            detected_number_dict[numeral_constant.NUMBER_REPLACE_TEXT + str(index)] = ValueTextPair(
-                entity_value=entity_value, original_text=original_text)
+            key = '{number}{index}__'.format(number=numeral_constant.NUMBER_REPLACE_TEXT, index=index)
+            detected_number_dict[key] = ValueTextPair(entity_value=entity_value, original_text=original_text)
         return detected_number_dict
 
     def _get_original_text_from_tagged_text(self, number_tag_text):
@@ -194,7 +199,7 @@ class BaseNumberRangeDetector(object):
     def _detect_absolute_number(self, number_list, original_list):
         number_list = number_list or []
         original_list = original_list or []
-        abs_number_pattern = re.compile(u'({number}\\d+)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
+        abs_number_pattern = re.compile(r'({number}\d+__)'.format(number=numeral_constant.NUMBER_REPLACE_TEXT),
                                         re.UNICODE)
         abs_number_matches = abs_number_pattern.findall(self.processed_text)
         for match in abs_number_matches:
@@ -282,7 +287,7 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_prefix_variants:
             min_prefix_choices = '|'.join(self.min_range_prefix_variants)
-            min_range_start_pattern = re.compile(u'((?:{min_prefix_choices})\\s+({number}\\d+))'.format(
+            min_range_start_pattern = re.compile(r'((?:{min_prefix_choices})\s+({number}\d+__))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_prefix_choices=min_prefix_choices), re.UNICODE)
             number_range_matches = min_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -310,7 +315,7 @@ class BaseNumberRangeDetector(object):
 
         if self.min_range_suffix_variants:
             min_suffix_choices = '|'.join(self.min_range_suffix_variants)
-            min_range_end_pattern = re.compile(u'(({number}\\d+)\\s+(?:{min_suffix_choices}))'.format(
+            min_range_end_pattern = re.compile(r'(({number}\d+__)\s+(?:{min_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, min_suffix_choices=min_suffix_choices), re.UNICODE)
             number_range_matches = min_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -340,7 +345,7 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_prefix_variants:
             max_prefix_choices = '|'.join(self.max_range_prefix_variants)
-            max_range_start_pattern = re.compile(u'((?:{max_prefix_choices})\\s+({number}\\d+))'.format(
+            max_range_start_pattern = re.compile(r'((?:{max_prefix_choices})\s+({number}\d+__))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_prefix_choices=max_prefix_choices), re.UNICODE)
             number_range_matches = max_range_start_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -369,7 +374,7 @@ class BaseNumberRangeDetector(object):
 
         if self.max_range_suffix_variants:
             max_suffix_choices = '|'.join(self.max_range_suffix_variants)
-            max_range_end_pattern = re.compile(u'(({number}\\d+)\\s+(?:{max_suffix_choices}))'.format(
+            max_range_end_pattern = re.compile(r'(({number}\d+__)\s+(?:{max_suffix_choices}))'.format(
                 number=numeral_constant.NUMBER_REPLACE_TEXT, max_suffix_choices=max_suffix_choices), re.UNICODE)
             number_range_matches = max_range_end_pattern.findall(self.processed_text)
             for match in number_range_matches:
@@ -399,9 +404,9 @@ class BaseNumberRangeDetector(object):
 
         if self.min_max_range_variants:
             min_max_choices = '|'.join(self.min_max_range_variants)
-            min_max_range_pattern = re.compile(u'(({number}\\d+)\\s*(?:{min_max_choices})\\s*'
-                                               u'({number}\\d+))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
-                                                                         min_max_choices=min_max_choices), re.UNICODE)
+            min_max_range_pattern = re.compile(r'(({number}\d+__)\s*(?:{min_max_choices})\s*'
+                                               r'({number}\d+__))'.format(number=numeral_constant.NUMBER_REPLACE_TEXT,
+                                                                          min_max_choices=min_max_choices), re.UNICODE)
             number_range_matches = min_max_range_pattern.findall(self.processed_text)
             for match in number_range_matches:
                 number_range, original_text = self._get_number_range(min_part_match=match[1], max_part_match=match[2],
@@ -423,7 +428,7 @@ class BaseNumberRangeDetector(object):
                                        created from entity_name
         """
         for detected_text in original_number_list:
-            _pattern = re.compile(u'\\b%s\\b' % re.escape(detected_text), flags=_re_flags)
+            _pattern = re.compile(r'\b%s\b' % re.escape(detected_text), flags=_re_flags)
             self.tagged_text = _pattern.sub(self.tag, self.tagged_text)
 
 

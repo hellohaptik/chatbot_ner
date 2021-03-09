@@ -103,7 +103,7 @@ ENV/
 /newrelic.ini
 sftp-config.json
 .DS_Store
-logs/
+logs/*.log*
 
 .vscode
 newman_reports/
