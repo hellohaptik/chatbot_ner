@@ -2,7 +2,7 @@ phonenumberslite==8.10.18
 six==1.11.0
 pytz==2014.2
 nltk==3.4.5
-numpy==1.16
+numpy==1.16.5
 elasticsearch==5.5.0
 elastic-apm==5.10.0
 requests==2.20.0
@@ -16,7 +16,7 @@ python-crfsuite==0.9.6
 boto==2.49.0
 boto3==1.8.4
 python-dateutil==2.7.3
-pandas==0.19.0
+pandas==0.21.0
 pyaml==19.4.1
 spacy==2.3.2
 https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.3.1/en_core_web_sm-2.3.1.tar.gz#egg=en_core_web_sm
