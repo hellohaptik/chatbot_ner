@@ -8,13 +8,13 @@ import re
 import warnings
 
 from six import string_types
+from six.moves import range
+from six.moves import zip
 
 from datastore import constants
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
-from six.moves import range
-from six.moves import zip
 
 # Local imports
 
@@ -213,9 +213,14 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
 
     if value_search_term:
         data['query']['bool']['minimum_should_match'] = 1
+        _search_field = 'value'
+        _search_term = value_search_term.lower()
+        if len(_search_term.split()) > 1:
+            # terms with spaces in them do not support wild queries on analyzed fields
+            _search_field = 'value.keyword'
         data['query']['bool']['should'].append({
             "wildcard": {
-                "value": u"*{0}*".format(value_search_term.lower())
+                _search_field: u"*{0}*".format(_search_term)
             }
         })
 
