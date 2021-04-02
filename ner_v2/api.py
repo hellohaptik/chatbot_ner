@@ -6,6 +6,7 @@ import json
 import six
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
@@ -687,6 +688,14 @@ def text(request):
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)
             return JsonResponse(response, status=400)
+        except es_exceptions.ConnectionTimeout as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.exception(response)
+            return JsonResponse(response, status=500)
+        except es_exceptions.ConnectionError as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.exception(response)
+            return JsonResponse(response, status=500)
         except Exception as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(response)

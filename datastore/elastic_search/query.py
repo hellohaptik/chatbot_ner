@@ -336,6 +336,8 @@ def _run_es_search(connection, msearch=False, **kwargs):
         raise ValueError('Scrolling is not supported in msearch mode')
 
     result = connection.search(scroll=scroll, **kwargs)
+    if 'hits' not in result:
+        raise KeyError('No hits from ES search')
     scroll_id = result['_scroll_id']
     scroll_size = result['hits']['total']
     hit_list = result['hits']['hits']

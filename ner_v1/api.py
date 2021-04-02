@@ -5,6 +5,7 @@ import json
 
 import six
 from django.http import HttpResponse
+from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
@@ -275,6 +276,16 @@ def text(request):
     except TypeError as e:
         ner_logger.exception('Exception for text_synonym: %s ' % e)
         return HttpResponse(status=500)
+    except KeyError as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
+    except es_exceptions.ConnectionTimeout as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
+    except es_exceptions.ConnectionError as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
+
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
 
