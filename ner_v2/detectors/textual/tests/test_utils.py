@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.http import HttpRequest
 
 from ner_v2.detectors.textual.utils import get_text_entity_detection_data, validate_text_request, \
-    get_output_for_fallback_entities, get_detection
+    get_output_for_fallback_entities, get_detection, InvalidTextRequest
 
 tests_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -32,31 +32,31 @@ class TestTextualUtils(TestCase):
 
         self.assertDictEqual(result, assert_output_data)
 
-    def test_verify_text_request_ok(self):
+    def test_validate_text_request_ok(self):
         request = HttpRequest()
 
         # test if everything is ok
         request._body = b'{"messages":["something"], "entities":{"something":""}}'
         validate_text_request(request)
 
-    def test_verify_text_request_exceptions(self):
+    def test_validate_text_request_exceptions(self):
         request = HttpRequest()
 
         # test if no message
         request._body = b'{}'
-        self.assertRaises(KeyError, validate_text_request, request=request)
+        self.assertRaises(InvalidTextRequest, validate_text_request, request=request)
 
         # test if no entities
         request._body = b'{"messages": "something"}'
-        self.assertRaises(KeyError, validate_text_request, request=request)
+        self.assertRaises(InvalidTextRequest, validate_text_request, request=request)
 
         # test if message not in proper format
         request._body = b'{"messages":"something", "entities":"something"}'
-        self.assertRaises(TypeError, validate_text_request, request=request)
+        self.assertRaises(InvalidTextRequest, validate_text_request, request=request)
 
         # test if entities not in proper format
         request._body = b'{"messages":["something"], "entities":"something"}'
-        self.assertRaises(TypeError, validate_text_request, request=request)
+        self.assertRaises(InvalidTextRequest, validate_text_request, request=request)
 
     @patch('ner_v2.detectors.textual.utils.get_detection')
     def test_get_text_entity_detection_data(self, mock_get_detection):
