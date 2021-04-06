@@ -19,7 +19,7 @@ from ner_v2.detectors.numeral.number_range.number_range_detection import NumberR
 from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
-from ner_v2.detectors.textual.utils import get_text_entity_detection_data, verify_text_request, InvalidTextRequest
+from ner_v2.detectors.textual.utils import get_text_entity_detection_data, validate_text_request, InvalidTextRequest
 
 
 def get_parameters_dictionary(request):
@@ -672,7 +672,7 @@ def text(request):
 
     elif request.method == "POST":
         try:
-            verify_text_request(request)
+            validate_text_request(request)
             data = get_text_entity_detection_data(request)
         except InvalidTextRequest as err:
             response = {"success": False, "error": str(err)}

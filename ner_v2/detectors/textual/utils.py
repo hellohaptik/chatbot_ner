@@ -4,7 +4,6 @@ import json
 
 import six
 
-from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
@@ -17,12 +16,11 @@ class InvalidTextRequest(Exception):
     pass
 
 
-def verify_text_request(request):
+def validate_text_request(request):
     """
-    Check the request object
-    1. If proper message or entity is present in required
-    format.
+    Validate the request body for v2/text
 
+    1. If messages and entities are present in required format.
     2. If length of message or entity is in allowed range
 
     Args:
@@ -42,29 +40,17 @@ def verify_text_request(request):
     messages = request_data.get("messages", [])
     entities = request_data.get("entities", {})
 
-    if not messages:
-        ner_logger.error("messages param is not passed")
-        raise InvalidTextRequest("Key `messages` should be a non-empty list of strings")
+    if not messages or not isinstance(messages, list):
+        raise InvalidTextRequest(f"Key `messages` is required to be a non-empty List[str], but got {type(messages)}")
 
-    if not entities:
-        ner_logger.error("Entities param is not passed")
-        raise InvalidTextRequest("Key `entities` should be a non-empty dict")
-
-    if not isinstance(messages, list):
-        ner_logger.error("messages param is not in correct format")
-        raise InvalidTextRequest("Key `messages` should be a non-empty list of strings")
-
-    if not isinstance(entities, dict):
-        ner_logger.error("Entities param is not in correct format")
-        raise InvalidTextRequest("Key `entities` should be a dict of entity details")
+    if not entities or not isinstance(entities, dict):
+        raise InvalidTextRequest(f"Key `entities` is required to be a non-empty Dict[str, Dict], "
+                                 f"but got {type(messages)}")
 
     if len(messages) > MAX_NUMBER_BULK_MESSAGE:
-        ner_logger.error(f"Maximum number of message can be {MAX_NUMBER_BULK_MESSAGE} for bulk detection")
         raise InvalidTextRequest(f"Length of key `messages` can be at most {MAX_NUMBER_BULK_MESSAGE}"
                                  f" for bulk detection but got {len(messages)}")
-
     if len(entities) > MAX_NUMBER_MULTI_ENTITIES:
-        ner_logger.error(f"Maximum number of entities can be {MAX_NUMBER_MULTI_ENTITIES} for detection")
         raise InvalidTextRequest(f"Length of key `entities` can be at most {MAX_NUMBER_MULTI_ENTITIES} "
                                  f"for bulk detection but got {len(entities)}")
 
@@ -191,7 +177,6 @@ def get_text_entity_detection_data(request):
 
         for each_entity, value in entities.items():
             ignore_message = value.get('ignore_message', False)
-
             if ignore_message:
                 fallback_value_entities[each_entity] = value
             else:
