@@ -433,6 +433,15 @@ def city(request):
     except TypeError as e:
         ner_logger.exception('Exception for city: %s ' % e)
         return HttpResponse(status=500)
+    except KeyError as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
+    except es_exceptions.ConnectionTimeout as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
+    except es_exceptions.ConnectionError as e:
+        ner_logger.exception('Exception for text_synonym: %s ' % e)
+        return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
 
