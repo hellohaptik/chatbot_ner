@@ -8,7 +8,6 @@ from six.moves import zip
 from six import string_types
 
 from datastore import constants
-from datastore.exceptions import DataStoreRequestException
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 
