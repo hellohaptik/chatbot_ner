@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger
+from datastore.exceptions import DataStoreRequestException
 from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX,
@@ -273,17 +274,20 @@ def text(request):
             predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS]
         )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
-        ner_logger.exception('Exception for text_synonym: %s ' % e)
+    except DataStoreRequestException as err:
+        ner_logger.exception(f"Error in text_synonym for requesting ES {request.path}, error: {err}")
         return HttpResponse(status=500)
-    except KeyError as e:
-        ner_logger.exception('Exception for text_synonym: %s ' % e)
+    except TypeError as err:
+        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
         return HttpResponse(status=500)
-    except es_exceptions.ConnectionTimeout as e:
-        ner_logger.exception('Exception for text_synonym: %s ' % e)
+    except KeyError as err:
+        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
         return HttpResponse(status=500)
-    except es_exceptions.ConnectionError as e:
-        ner_logger.exception('Exception for text_synonym: %s ' % e)
+    except es_exceptions.ConnectionTimeout as err:
+        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
+        return HttpResponse(status=500)
+    except es_exceptions.ConnectionError as err:
+        ner_logger.exception(f"Error in text_synonym for:  {request.path}, error: {err}")
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')

@@ -12,6 +12,7 @@ from six.moves import range
 from six.moves import zip
 
 from datastore import constants
+from datastore.exceptions import DataStoreRequestException
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
@@ -337,7 +338,8 @@ def _run_es_search(connection, msearch=False, **kwargs):
 
     result = connection.search(scroll=scroll, **kwargs)
     if 'hits' not in result:
-        raise KeyError('No hits from ES search')
+        raise DataStoreRequestException(f'No hits from ES search for kwargs -> {kwargs}')
+
     scroll_id = result['_scroll_id']
     scroll_size = result['hits']['total']
     hit_list = result['hits']['hits']

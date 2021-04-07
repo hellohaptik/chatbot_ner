@@ -8,6 +8,7 @@ from six.moves import zip
 from six import string_types
 
 from datastore import constants
+from datastore.exceptions import DataStoreRequestException
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
 
@@ -200,7 +201,7 @@ def _parse_multi_entity_es_results(results_list):
             entity_dict = {}
             entity_variants_to_values_dict = {}
             if 'hits' not in results:
-                raise KeyError('No hits from ES')
+                raise DataStoreRequestException(f'No hits from ES search for results -> {results}')
             if results['hits']['total'] > 0:
                 for hit in results['hits']['hits']:
                     if 'highlight' not in hit:
