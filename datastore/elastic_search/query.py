@@ -308,8 +308,13 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
     data = '\n'.join(data)
 
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
-    results = _run_es_search(connection, msearch=True, **kwargs)
-    results = _parse_es_search_results(results.get("responses"))
+    response = None
+    try:
+        response = _run_es_search(connection, msearch=True, **kwargs)
+        results = _parse_es_search_results(response.get("responses"))
+    except Exception as e:
+        raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
+                                        request=json.dumps(data), response=json.dumps(response)) from e
     return results
 
 
@@ -337,9 +342,6 @@ def _run_es_search(connection, msearch=False, **kwargs):
         raise ValueError('Scrolling is not supported in msearch mode')
 
     result = connection.search(scroll=scroll, **kwargs)
-    if 'hits' not in result:
-        raise DataStoreRequestException(f'No hits from ES search for kwargs -> {kwargs}')
-
     scroll_id = result['_scroll_id']
     scroll_size = result['hits']['total']
     hit_list = result['hits']['hits']

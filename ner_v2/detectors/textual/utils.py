@@ -42,7 +42,7 @@ def validate_text_request(request):
 
     if not entities or not isinstance(entities, dict):
         raise InvalidTextRequest(f"Key `entities` is required to be a non-empty Dict[str, Dict], "
-                                 f"but got {type(messages)}")
+                                 f"but got {type(entities)}")
 
     if len(messages) > MAX_NUMBER_BULK_MESSAGE:
         raise InvalidTextRequest(f"Length of key `messages` can be at most {MAX_NUMBER_BULK_MESSAGE}"
@@ -207,7 +207,8 @@ def get_text_entity_detection_data(request):
 
     else:
         ner_logger.debug("No valid message provided")
-        raise InvalidTextRequest("Message is required")
+        raise InvalidTextRequest(f"Key `messages` is required to be a non-empty List[str], "
+                                 f"but got a list with length {message_len}")
 
     return data
 

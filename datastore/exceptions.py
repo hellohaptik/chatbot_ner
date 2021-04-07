@@ -107,4 +107,8 @@ class DeleteIndexFromAliasException(BaseDataStoreException):
 
 
 class DataStoreRequestException(BaseDataStoreException):
-    DEFAULT_ERROR_MESSAGE = 'ES request causes an exception or no results'
+    def __init__(self, message, engine, request, response=None):
+        self.engine = engine
+        self.request = request
+        self.response = response
+        super().__init__(message)

@@ -685,11 +685,8 @@ def text(request):
             return JsonResponse(response, status=400)
         except DataStoreRequestException as err:
             response = {"success": False, "error": str(err)}
-            ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}")
-            return JsonResponse(response, status=400)
-        except TypeError as err:
-            response = {"success": False, "error": str(err)}
-            ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+            ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                                 f" response: {err.response}")
             return JsonResponse(response, status=400)
         except es_exceptions.ConnectionTimeout as err:
             response = {"success": False, "error": str(err)}
@@ -699,6 +696,10 @@ def text(request):
             response = {"success": False, "error": str(err)}
             ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
             return JsonResponse(response, status=500)
+        except (TypeError, KeyError) as err:
+            response = {"success": False, "error": str(err)}
+            ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+            return JsonResponse(response, status=400)
         except Exception as err:
             response = {"success": False, "error": str(err)}
             ner_logger.exception(f"General exception for {request.path}, error: {err}")

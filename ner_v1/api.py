@@ -275,19 +275,17 @@ def text(request):
         )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except DataStoreRequestException as err:
-        ner_logger.exception(f"Error in text_synonym for requesting ES {request.path}, error: {err}")
-        return HttpResponse(status=500)
-    except TypeError as err:
-        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
-        return HttpResponse(status=500)
-    except KeyError as err:
-        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
         return HttpResponse(status=500)
     except es_exceptions.ConnectionTimeout as err:
         ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
         return HttpResponse(status=500)
     except es_exceptions.ConnectionError as err:
         ner_logger.exception(f"Error in text_synonym for:  {request.path}, error: {err}")
+        return HttpResponse(status=500)
+    except (TypeError, KeyError) as err:
+        ner_logger.exception(f"Error in text_synonym for: {request.path}, error: {err}")
         return HttpResponse(status=500)
 
     return HttpResponse(json.dumps({'data': entity_output}), content_type='application/json')
