@@ -12,6 +12,7 @@ from six.moves import range
 from six.moves import zip
 
 from datastore import constants
+from datastore.exceptions import DataStoreRequestException
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
@@ -307,8 +308,13 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
     data = '\n'.join(data)
 
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
-    results = _run_es_search(connection, msearch=True, **kwargs)
-    results = _parse_es_search_results(results.get("responses"))
+    response = None
+    try:
+        response = _run_es_search(connection, msearch=True, **kwargs)
+        results = _parse_es_search_results(response.get("responses"))
+    except Exception as e:
+        raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
+                                        request=json.dumps(data), response=json.dumps(response)) from e
     return results
 
 

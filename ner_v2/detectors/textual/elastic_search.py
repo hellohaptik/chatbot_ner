@@ -9,7 +9,7 @@ from elasticsearch import Elasticsearch
 from lib.singleton import Singleton
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import constants
-from datastore.exceptions import DataStoreSettingsImproperlyConfiguredException
+from datastore.exceptions import DataStoreSettingsImproperlyConfiguredException, DataStoreRequestException
 from language_utilities.constant import ENGLISH_LANG
 
 from ner_v2.detectors.textual.queries import _generate_multi_entity_es_query, \
@@ -177,9 +177,13 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
 
         kwargs = dict(body=query_data, doc_type=self.doc_type, index=index_name,
                       request_timeout=request_timeout)
-
-        results = self._run_es_search(self._connection, **kwargs)
-        results = _parse_multi_entity_es_results(results.get("responses"))
+        response = None
+        try:
+            response = self._run_es_search(self._connection, **kwargs)
+            results = _parse_multi_entity_es_results(response.get("responses"))
+        except Exception as e:
+            raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
+                                            request=json.dumps(data), response=json.dumps(response)) from e
 
         return results
 
