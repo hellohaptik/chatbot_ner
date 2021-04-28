@@ -1,11 +1,22 @@
 from __future__ import absolute_import
-import re
-import nltk
-import regex
 
-# constants
-from lib.singleton import Singleton
+from chatbot_ner.config import ner_logger
+
+try:
+    import regex as re
+
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+    ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
+    import re
+
+    _re_flags = re.UNICODE
+
+import nltk
 import six
+
+from lib.singleton import Singleton
 
 NLTK_TOKENIZER = 'WORD_TOKENIZER'
 PRELOADED_NLTK_TOKENIZER = 'PRELOADED_NLTK_TOKENIZER'
@@ -52,7 +63,8 @@ class Tokenizer(six.with_metaclass(Singleton, object)):
         Tokenizer that mimicks Elasticsearch/Lucene's standard tokenizer
         Uses word boundaries defined in Unicode Annex 29
         """
-        words_pattern = regex.compile(r'\w(?:\B\S)*', flags=regex.V1 | regex.WORD | regex.UNICODE)
+
+        words_pattern = re.compile(r'\w(?:\B\S)*', flags=_re_flags)
 
         def word_tokenize(text):
             return words_pattern.findall(text)
