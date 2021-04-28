@@ -15,12 +15,14 @@ try:
     import regex as re
 
     _re_flags = re.UNICODE | re.V1 | re.WORD
+    _regex_available = True
 
 except ImportError:
     ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
     import re
 
     _re_flags = re.UNICODE
+    _regex_available = False
 
 
 class RegexDetector(object):
@@ -45,7 +47,7 @@ class RegexDetector(object):
             entity_name (str): an indicator value as tag to replace detected values
             pattern (raw str or str or unicode): pattern to be compiled into a re object
             re_flags (int): flags to pass to re.compile.
-                Defaults to regex.V1 | regex.WORD | regex.UNICODE. for regex lib to re.U for stdlib re and
+                Defaults to `regex.U | regex.V1 | regex.WORD`  for `regex` lib  and `re.U` for stdlib `re`
             max_matches (int): maximum number of matches to consider.
 
         Raises:
@@ -55,7 +57,17 @@ class RegexDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.pattern = re.compile(pattern, re_flags)
+        try:
+            self.pattern = re.compile(pattern, flags=re_flags)
+        except re.error:
+            # In very rare cases it is possible we encounter a pattern that is invalid for V1 engine but works just
+            # fine on V0 engine/Python's built in re. E.g. nested character sets '[[]]'
+            if _regex_available and (re_flags & re.V1):
+                re_flags = (re_flags ^ re.V1) | re.V0
+                self.pattern = re.compile(pattern, flags=re_flags)
+                ner_logger.warning(f'Failed to compile `{pattern}` with regex.V1, falling back to regex.V0')
+            else:
+                raise
         self.max_matches = max_matches
         self.tag = '__' + self.entity_name + '__'
 
