@@ -1,6 +1,16 @@
 from __future__ import absolute_import
 
-import re
+import unittest
+
+try:
+    import regex as re
+
+    _regex_available = True
+
+except ImportError:
+    import re
+
+    _regex_available = False
 
 from django.test import TestCase
 
@@ -96,5 +106,38 @@ class TestRegexDetector(TestCase):
         expected_tagged_text = '{t}'.format(t=tag)
         values, original_texts = regex_detector.detect_entity(text)
         self.assertEqual(regex_detector.tagged_text, expected_tagged_text)
+        self.assertEqual(values, expected_values)
+        self.assertEqual(original_texts, expected_original_texts)
+
+    def test_invalid_pattern_compile(self):
+        """Test compiling invalid pattern raises re.error"""
+        entity_name = 'test'
+        pattern = '(invalid!'
+        with self.assertRaises(re.error):
+            RegexDetector(entity_name=entity_name, pattern=pattern)
+
+    @unittest.skipIf(not _regex_available, 'skipping test because `regex` lib is not available')
+    def test_nested_character_group_compile(self):
+        """Test compiling patterns that fail with regex.V1 but work with regex.V0"""
+        entity_name = 'test'
+        pattern = '[[\\]]'
+        text = 'this pattern should extract box brackets [] [][[[ ]]]]]'
+        expected_values = ['[', ']', '[', ']', '[', '[', '[', ']', ']', ']', ']', ']']
+        expected_original_texts = ['[', ']', '[', ']', '[', '[', '[', ']', ']', ']', ']', ']']
+        regex_detector = RegexDetector(entity_name=entity_name, re_flags=RegexDetector.DEFAULT_FLAGS, pattern=pattern)
+        self.assertTrue((regex_detector.pattern.flags & re.V1) == 0)
+        self.assertTrue((regex_detector.pattern.flags & re.V0) != 0)
+        values, original_texts = regex_detector.detect_entity(text)
+        self.assertEqual(values, expected_values)
+        self.assertEqual(original_texts, expected_original_texts)
+
+        pattern = '[[]]'
+        text = 'this pattern should extract box brackets pairs [] [][[[ ]]]]]'
+        expected_values = ['[]', '[]']
+        expected_original_texts = ['[]', '[]']
+        regex_detector = RegexDetector(entity_name=entity_name, re_flags=RegexDetector.DEFAULT_FLAGS, pattern=pattern)
+        self.assertTrue((regex_detector.pattern.flags & re.V1) == 0)
+        self.assertTrue((regex_detector.pattern.flags & re.V0) != 0)
+        values, original_texts = regex_detector.detect_entity(text)
         self.assertEqual(values, expected_values)
         self.assertEqual(original_texts, expected_original_texts)
