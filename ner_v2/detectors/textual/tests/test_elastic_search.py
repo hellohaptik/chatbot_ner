@@ -25,24 +25,24 @@ class TestESDataStore(TestCase):
             'es_index_1': 'test_index',
             'doc_type': 'test_doc_type',
         }
+        self.esds = ElasticSearchDataStore()
+        self.esds._clear_connections()  # Needed because `ElasticSearchDataStore` is a singleton instance
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
     def test_elasticsearch_default_connection(self, mocked_es_ping):
         """Test default connection on `ElasticSearchDataStore`"""
         mocked_es_ping.return_value = True
-        esdb = ElasticSearchDataStore()
-        self.assertIsInstance(esdb._default_connection, Elasticsearch)
+        self.assertIsInstance(self.esds._default_connection, Elasticsearch)
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
     def test_elasticsearch_reconnection(self, mocked_es_ping):
         """Test that `ElasticSearchDataStore` recovers connection after a ping fails"""
-        esdb = ElasticSearchDataStore()
         mocked_es_ping.return_value = False
         with self.assertRaises(EngineConnectionException):
-            _ = esdb._default_connection
+            _ = self.esds._default_connection
 
         mocked_es_ping.return_value = True
-        self.assertIsInstance(esdb._default_connection, Elasticsearch)
+        self.assertIsInstance(self.esds._default_connection, Elasticsearch)
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
     def test_elasticsearch_connect_ping_success(self, mocked_es_ping):
@@ -55,15 +55,14 @@ class TestESDataStore(TestCase):
     def test_elasticsearch_connect_ping_fail(self, mocked_es_ping):
         """Test `ElasticSearchDataStore.connect` when ping fails"""
         mocked_es_ping.return_value = False
-        with self.assertRaises(EngineConnectionException):
-            ElasticSearchDataStore.connect(**self.elasticsearch_engine_settings)
+        connection = ElasticSearchDataStore.connect(**self.elasticsearch_engine_settings)
+        self.assertIs(connection, None)
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
     def test_elasticsearch_get_connection_ping_success(self, mocked_es_ping):
         """Test `ElasticSearchDataStore._get_or_create_new_connection` when ping succeeds"""
         mocked_es_ping.return_value = True
-        esdb = ElasticSearchDataStore()
-        connection = esdb._get_or_create_new_connection(alias='test', **self.elasticsearch_engine_settings)
+        connection = self.esds._get_or_create_new_connection(alias='test', **self.elasticsearch_engine_settings)
         self.assertIsInstance(connection, Elasticsearch)
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
@@ -71,33 +70,31 @@ class TestESDataStore(TestCase):
         """Test `ElasticSearchDataStore._get_or_create_new_connection` when ping fails"""
         mocked_es_ping.return_value = False
         with self.assertRaises(EngineConnectionException):
-            esdb = ElasticSearchDataStore()
-            esdb._get_or_create_new_connection(alias='test', **self.elasticsearch_engine_settings)
+            self.esds._get_or_create_new_connection(alias='test', **self.elasticsearch_engine_settings)
 
     @mock.patch('ner_v2.detectors.textual.elastic_search.Elasticsearch.ping')
     def test_elasticsearch_add_connection(self, mocked_es_ping):
         """Test `ElasticSearchDataStore._get_or_create_new_connection` with multiple connections"""
-        esdb = ElasticSearchDataStore()
-        self.assertEqual(len(esdb._conns), 0)
+        self.assertEqual(len(self.esds._conns), 0)
 
         mocked_es_ping.return_value = False
         with self.assertRaises(EngineConnectionException):
-            esdb._get_or_create_new_connection()
-        self.assertEqual(len(esdb._conns), 0)
+            self.esds._get_or_create_new_connection(alias='default', **self.elasticsearch_engine_settings)
+        self.assertEqual(len(self.esds._conns), 0)
 
         mocked_es_ping.return_value = True
-        esdb._get_or_create_new_connection()
-        self.assertEqual(len(esdb._conns), 1)
+        self.esds._get_or_create_new_connection(alias='default', **self.elasticsearch_engine_settings)
+        self.assertEqual(len(self.esds._conns), 1)
 
-        esdb._get_or_create_new_connection('new', **self.elasticsearch_engine_settings)
-        self.assertEqual(len(esdb._conns), 2)
+        self.esds._get_or_create_new_connection(alias='new', **self.elasticsearch_engine_settings)
+        self.assertEqual(len(self.esds._conns), 2)
 
-        esdb._get_or_create_new_connection()
-        esdb._get_or_create_new_connection('new', **self.elasticsearch_engine_settings)
-        self.assertEqual(len(esdb._conns), 2)
+        self.esds._get_or_create_new_connection(alias='default', **self.elasticsearch_engine_settings)
+        self.esds._get_or_create_new_connection(alias='new', **self.elasticsearch_engine_settings)
+        self.assertEqual(len(self.esds._conns), 2)
 
-        self.assertIn('default', esdb._conns)
-        self.assertIn('new', esdb._conns)
+        self.assertIn('default', self.esds._conns)
+        self.assertIn('new', self.esds._conns)
 
     def test_elasticsearch_get_dynamic_fuzziness_threshold(self):
         fuzzy = 1
@@ -113,12 +110,10 @@ class TestESDataStore(TestCase):
         self.assertEqual(fuzzy_threshold, 'auto')
 
     def test_add_query(self):
-        esdb = ElasticSearchDataStore()
-
         entity_list_1 = ['city', 'restaurant']
         text_1 = "I want to go to mumbai"
 
-        query_data = esdb.generate_query_data(entities=entity_list_1, texts=text_1)
+        query_data = self.esds.generate_query_data(entities=entity_list_1, texts=text_1)
         query_data = [json.loads(x) for x in query_data]
 
         assert_data = [

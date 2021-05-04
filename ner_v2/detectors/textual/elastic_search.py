@@ -30,6 +30,9 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         self._doc_type = None
         self._configure_store()
 
+    def _clear_connections(self):
+        self._conns = {}
+
     def _configure_store(self):
         """
         Configure self variables and connection settings.
@@ -160,7 +163,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
             kwargs: any additional arguments will be passed on to the Transport class and, subsequently,
                     to the Connection instances.
         Returns:
-            Elasticsearch client connection object
+            Elasticsearch client connection object or None
 
         """
         # TODO: This does not account for ES_SCHEME unless the connection is being made via `connection_url`
