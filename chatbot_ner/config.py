@@ -44,15 +44,9 @@ ES_INDEX_1 = os.environ.get('ES_INDEX_1')
 ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE', 'data_dictionary')
 ES_AUTH_NAME = os.environ.get('ES_AUTH_NAME')
 ES_AUTH_PASSWORD = os.environ.get('ES_AUTH_PASSWORD')
-ES_BULK_MSG_SIZE = os.environ.get('ES_BULK_MSG_SIZE', '10000')
-ES_SEARCH_SIZE = os.environ.get('ES_SEARCH_SIZE', '10000')
-
-try:
-    ES_BULK_MSG_SIZE = int(ES_BULK_MSG_SIZE)
-    ES_SEARCH_SIZE = int(ES_SEARCH_SIZE)
-except ValueError:
-    ES_BULK_MSG_SIZE = 1000
-    ES_SEARCH_SIZE = 1000
+ES_BULK_MSG_SIZE = int((os.environ.get('ES_BULK_MSG_SIZE') or '').strip() or '1000')
+ES_SEARCH_SIZE = int((os.environ.get('ES_SEARCH_SIZE') or '').strip() or '1000')
+ES_REQUEST_TIMEOUT = int((os.environ.get('ES_REQUEST_TIMEOUT') or '').strip() or '20')
 
 ELASTICSEARCH_CRF_DATA_INDEX_NAME = os.environ.get('ELASTICSEARCH_CRF_DATA_INDEX_NAME')
 ELASTICSEARCH_CRF_DATA_DOC_TYPE = os.environ.get('ELASTICSEARCH_CRF_DATA_DOC_TYPE')
@@ -91,7 +85,7 @@ CHATBOT_NER_DATASTORE = {
         'retry_on_timeout': False,
         'max_retries': 1,
         'timeout': 20,
-        'request_timeout': 20,
+        'request_timeout': ES_REQUEST_TIMEOUT,
 
         # Transfer Specific constants (ignore if only one elasticsearch is setup)
         # For detailed explanation datastore.elastic_search.transfer.py

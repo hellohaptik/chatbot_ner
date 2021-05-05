@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'^v2/number_range_bulk/$', api_v2.number_range),
     url(r'^v2/phone_number_bulk/$', api_v2.phone_number),
 
-    # Dictionary Read Write
+    # Deprecated dictionary read write, use entities/data/v1/*
     url(r'^entities/get_entity_word_variants', external_api.get_entity_word_variants),
     url(r'^entities/update_dictionary', external_api.update_dictionary),
 
@@ -54,7 +54,7 @@ urlpatterns = [
     url(r'^entities/get_crf_training_data', external_api.get_crf_training_data),
     url(r'^entities/update_crf_training_data', external_api.update_crf_training_data),
 
-    #  Train Crf Model
+    # Deprecated train crf model
     url(r'^entities/train_crf_model', external_api.train_crf_model),
 
     url(r'^entities/languages/v1/(?P<entity_name>.+)$', external_api.entity_language_view),

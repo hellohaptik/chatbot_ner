@@ -3,8 +3,14 @@ from __future__ import absolute_import
 
 import re
 
+try:
+    import regex
+
+    _regex_available = True
+except ImportError:
+    _regex_available = False
+
 import phonenumbers
-import regex
 from six.moves import zip
 
 from language_utilities.constant import ENGLISH_LANG
@@ -35,6 +41,10 @@ class PhoneDetector(BaseDetector):
         super(PhoneDetector, self).__init__(language, locale)
         self.language = language
         self.locale = locale or 'en-IN'
+        if _regex_available:
+            # This will replace all types of dashes(em or en) by hyphen.
+            self.locale = regex.sub('\\p{Pd}', '-', self.locale)
+
         self.text = ''
         self.phone, self.original_phone_text = [], []
         self.country_code = self.get_country_code_from_locale()
@@ -55,8 +65,6 @@ class PhoneDetector(BaseDetector):
         This method sets self.country_code from given locale
         """
         regex_pattern = re.compile('[-_](.*$)', re.U)
-        self.locale = regex.sub("\\p{Pd}", "-",
-                                self.locale)  # This will replace all types of dashes(em or en) by hyphen.
         match = regex_pattern.findall(self.locale)
         if match:
             return match[0].upper()
