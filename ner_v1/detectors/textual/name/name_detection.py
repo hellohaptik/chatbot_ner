@@ -1,18 +1,20 @@
 # coding=utf-8
 from __future__ import absolute_import
+
 import re
 import string
+from six.moves import range
 
+from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from lib.nlp.spacy_utils import spacy_utils
-from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.lang_constants import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
-                                                          INDIC_STOPWORDS, PREVIOUS_MESSAGE_VARIATIONS, INDIC_UNICODE_RANGE,
+                                                          INDIC_STOPWORDS, PREVIOUS_MESSAGE_VARIATIONS,
+                                                          INDIC_UNICODE_RANGE,
                                                           COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
-from six.moves import range
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -387,7 +389,7 @@ class NameDetector(object):
 
     def get_indic_names_without_regex(self, text):
         """
-        This method is used to get detect names inn Indic languages without any regex pattern (This method is called only if
+        This method is used to get detect names in Indic languages without any regex pattern (This method is called only if
         detection from regex patterns fails)
         This method removes common indic words occurring in context of name and indic stop words
         COMMON_INDIC_WORDS_OCCURING_WITH_NAME set of indic language words occurring in context of name
