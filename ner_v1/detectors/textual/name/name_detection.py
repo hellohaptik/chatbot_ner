@@ -389,8 +389,8 @@ class NameDetector(object):
 
     def get_indic_names_without_regex(self, text):
         """
-        This method is used to get detect names in Indic languages without any regex pattern (This method is called only if
-        detection from regex patterns fails)
+        This method is used to get detect names in Indic languages without any regex pattern (This method is called
+        only if detection from regex patterns fails)
         This method removes common indic words occurring in context of name and indic stop words
         COMMON_INDIC_WORDS_OCCURING_WITH_NAME set of indic language words occurring in context of name
         Args:
