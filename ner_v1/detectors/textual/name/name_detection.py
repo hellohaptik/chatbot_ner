@@ -383,7 +383,7 @@ class NameDetector(object):
 
         botmessage = " " + botmessage.lower().strip() + " "
         for variant in PREVIOUS_MESSAGE_VARIATIONS.get(self.language, []):
-            if variant.lower() in botmessage:
+            if " " + variant.lower() + " " in botmessage:
                 return True
         return False
 
