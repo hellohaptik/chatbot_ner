@@ -1,4 +1,5 @@
 # coding=utf-8
+# pylint: disable=E501
 INDIC_BADWORDS = {
     'mr': ['बकरीची रजा', 'हात सोडा', 'शस्त्रास्त्र', 'आर्म टाळी', 'बकलंड', 'मुलगी रजा', 'भडवा', 'हिमस्खलन', 'भाऊ सोडा',
            'भांड खा', 'भोसरी', 'भूतान', 'भोसड सोडा', 'भिजलेले', 'सॉस हाताळा', 'टोचलेले', 'स्नॅगल', 'स्निफर', 'हरभरा',
@@ -964,7 +965,7 @@ PREVIOUS_MESSAGE_VARIATIONS = {
         "Veuillez saisir un nom",
         "Vous pouvez entrer votre nom maintenant",
         "Vous êtes au bon endroit. Je peux certainement vous aider à trouver le bon régime d'assurance qui répond à vos besoins! Mais d'abord, j'aimerais mieux vous connaître. Quel est votre nom?",
-        "Vous êtes sur le point d'avoir votre propre chatbot                                       Veuillez me donner les détails suivants. , Puis-je connaitre votre nom ??",
+        "Vous êtes sur le point d'avoir votre propre chatbot Veuillez me donner les détails suivants. Puis-je connaitre votre nom ??",
         "Voyage sous quel nom est réservé?",
         "bien! Veuillez entrer votre nom ci-dessous",
         "comment dois-je vous appeler?",
@@ -1165,3 +1166,4 @@ INDIC_UNICODE_RANGE = {
     'kn': '\u0C80-\u0CFF',
     'gu': '\u0A80-\u0AFF',
 }
+# pylint: enable=E501
