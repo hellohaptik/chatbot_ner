@@ -5,6 +5,7 @@ import re
 import string
 from six.moves import range
 
+from language_utilities.constant import (ENGLISH_LANG)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from lib.nlp.spacy_utils import spacy_utils
@@ -13,7 +14,7 @@ from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.lang_constants import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
                                                           INDIC_STOPWORDS, PREVIOUS_MESSAGE_VARIATIONS,
                                                           INDIC_UNICODE_RANGE,
-                                                          COMMON_INDIC_WORDS_OCCURRING_WITH_NAME, ENGLISH_LANG,
+                                                          COMMON_INDIC_WORDS_OCCURRING_WITH_NAME,
                                                           INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET,
                                                           OTHER_AVAILABLE_LANGUAGES)
 
