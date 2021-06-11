@@ -43,7 +43,7 @@ urlpatterns = [
     url(r'^v2/number_range_bulk/$', api_v2.number_range),
     url(r'^v2/phone_number_bulk/$', api_v2.phone_number),
 
-    # Dictionary Read Write
+    # Deprecated dictionary read write, use entities/data/v1/*
     url(r'^entities/get_entity_word_variants', external_api.get_entity_word_variants),
     url(r'^entities/update_dictionary', external_api.update_dictionary),
 

@@ -3,157 +3,112 @@ __all__ = [
     'IndexForTransferException', 'AliasForTransferException', 'NonESEngineTransferException',
     'IndexNotFoundException', 'InvalidESURLException', 'SourceDestinationSimilarException',
     'InternalBackupException', 'AliasNotFoundException', 'PointIndexToAliasException',
-    'FetchIndexForAliasException', 'DeleteIndexFromAliasException'
-
+    'FetchIndexForAliasException', 'DeleteIndexFromAliasException', 'DataStoreRequestException'
 ]
 
 
-class DataStoreSettingsImproperlyConfiguredException(Exception):
+class BaseDataStoreException(Exception):
+    DEFAULT_ERROR_MESSAGE = None
+
     def __init__(self, message=None):
-        self.value = 'Chatbot NER datastore settings are not configured correctly. Please make sure the required' \
-                     ' connection settings are available in the environment variables'
+        message = message or self.DEFAULT_ERROR_MESSAGE
         if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
-
-
-class EngineNotImplementedException(Exception):
-    def __init__(self, message=None):
-        self.value = "Chatbot NER datastore currently supports only the following engines: ['elasticsearch'] . " \
-                     "Please make sure the ENGINE environment variable is correctly set"
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+            super().__init__(message)
+        else:
+            super().__init__()
 
 
-class EngineConnectionException(Exception):
-    def __init__(self, message=None, engine='the configured engine'):
-        self.value = "Chatbot NER datastore was unable to connect to " + engine + \
-                     ". Please make sure the " + engine + " service is reachable."
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+class DataStoreSettingsImproperlyConfiguredException(BaseDataStoreException):
+    DEFAULT_ERROR_MESSAGE = 'Chatbot NER datastore settings are not configured correctly. ' \
+                            'Please make sure the required connection settings are available ' \
+                            'in the environment variables'
 
 
-class IndexForTransferException(Exception):
-    def __init__(self, message=None):
-        self.value = "ES index has not been configured for transfer. Please configure before transfer."
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+class EngineNotImplementedException(BaseDataStoreException):
+    DEFAULT_ERROR_MESSAGE = 'Chatbot NER datastore currently supports only the following ' \
+                            'engines: ["elasticsearch"]. Please make sure the ENGINE environment ' \
+                            'variable is correctly set'
 
 
-class AliasForTransferException(Exception):
-    def __init__(self, message=None):
-        self.value = "ES alias has not been configured for transfer. Please configure before transfer."
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+class EngineConnectionException(BaseDataStoreException):
+    def __init__(self, message=None, engine='configured engine'):
+        if not message:
+            message = 'Chatbot NER datastore was unable to connect to {engine}. ' \
+                      'Please make sure the {engine} service is reachable.'.format(engine=engine)
+        super().__init__(message)
 
 
-class NonESEngineTransferException(Exception):
-    def __init__(self, message=None):
-        self.value = "Transfer has been triggered for datastore engone other than elastic search"
-        if message:
-            self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+class IndexForTransferException(BaseDataStoreException):
+    DEFAULT_ERROR_MESSAGE = 'ES index has not been configured for transfer. Please configure before transfer.'
 
 
-class IndexNotFoundException(Exception):
+class AliasForTransferException(BaseDataStoreException):
+    DEFAULT_ERROR_MESSAGE = 'ES alias has not been configured for transfer. Please configure before transfer.'
+
+
+class NonESEngineTransferException(BaseDataStoreException):
+    DEFAULT_ERROR_MESSAGE = 'Transfer has been triggered for datastore engone other than elastic search'
+
+
+class IndexNotFoundException(BaseDataStoreException):
     """
     This exception will be raised if index is not found in ES
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class InvalidESURLException(Exception):
+class InvalidESURLException(BaseDataStoreException):
     """
     This exception will be raised if the ES URL is invalid
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class SourceDestinationSimilarException(Exception):
+class SourceDestinationSimilarException(BaseDataStoreException):
     """
     This exception will be raised if source is the same as destination
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class InternalBackupException(Exception):
+class InternalBackupException(BaseDataStoreException):
     """
     This exception will be raised for transfer of documents from one index to other within a ES URL
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class AliasNotFoundException(Exception):
+class AliasNotFoundException(BaseDataStoreException):
     """
     This exception will be raised if alias not found in ES
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class PointIndexToAliasException(Exception):
+class PointIndexToAliasException(BaseDataStoreException):
     """
     This exception is raised if the assignment of an index to an alias fails
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class FetchIndexForAliasException(Exception):
+class FetchIndexForAliasException(BaseDataStoreException):
     """
     This exception is raised if fetch for indices for an alias fails
     """
-    def __init__(self, message=None):
-        self.value = message
-
-    def __str__(self):
-        return repr(self.value)
+    pass
 
 
-class DeleteIndexFromAliasException(Exception):
+class DeleteIndexFromAliasException(BaseDataStoreException):
     """
     This exception is raised if deletion of an index from an alias fails
     """
-    def __init__(self, message=None):
-        self.value = message
+    pass
 
-    def __str__(self):
-        return repr(self.value)
+
+class DataStoreRequestException(BaseDataStoreException):
+    def __init__(self, message, engine, request, response=None):
+        self.engine = engine
+        self.request = request
+        self.response = response
+        super().__init__(message)

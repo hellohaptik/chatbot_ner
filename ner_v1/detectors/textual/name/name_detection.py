@@ -1,18 +1,20 @@
 # coding=utf-8
 from __future__ import absolute_import
+
 import re
 import string
+from six.moves import range
 
+from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from lib.nlp.spacy_utils import spacy_utils
-from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
 from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.lang_constants import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
-                                                          INDIC_STOPWORDS, NAME_VARIATIONS, INDIC_UNICODE_RANGE,
+                                                          INDIC_STOPWORDS, PREVIOUS_MESSAGE_VARIATIONS,
+                                                          INDIC_UNICODE_RANGE,
                                                           COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
-from six.moves import range
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -205,7 +207,7 @@ class NameDetector(object):
 
     def detect_indic_name(self):
         """
-        This method is used to detect Hindi names from the provided text
+        This method is used to detect names from the provided text
 
         Returns:
             detect_text_lists (tuple): two dimensional tuple
@@ -214,7 +216,7 @@ class NameDetector(object):
 
         Examples:
             text = u'प्रतिक श्रीदत्त जयराओ'
-            detect_entity_hindi(text=text)
+            detect_indic_name(text=text)
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
 
         """
@@ -222,7 +224,7 @@ class NameDetector(object):
             return [], []
 
         text = self.remove_emojis(text=self.text)
-        text_before_hindi_regex_operations = text
+        text_before_indic_regex_operations = text
         regex = re.compile(u'[^{unicode_range}\\s]+'.format(unicode_range=INDIC_UNICODE_RANGE[self.language]), re.U)
         text = regex.sub(string=text, repl='')
 
@@ -230,10 +232,10 @@ class NameDetector(object):
         # Further check for name, if it might have been written in latin script.
         if not entity_value:
             english_present_regex = re.compile(u'[a-zA-Z]+', re.U)
-            if english_present_regex.search(text_before_hindi_regex_operations):
+            if english_present_regex.search(text_before_indic_regex_operations):
                 remove_everything_except_english = re.compile(u'[^a-zA-Z\\s]+', re.U)
                 text_only_english = remove_everything_except_english.sub(
-                    string=text_before_hindi_regex_operations, repl='')
+                    string=text_before_indic_regex_operations, repl='')
                 entity_value, original_text = self.detect_english_name(text=text_only_english.strip())
 
         return entity_value, original_text
@@ -380,30 +382,30 @@ class NameDetector(object):
         botmessage = regex_pattern.sub(r'', botmessage)
 
         botmessage = " " + botmessage.lower().strip() + " "
-        for variant in NAME_VARIATIONS.get(self.language, []):
-            if " " + variant + " " in botmessage:
+        for variant in PREVIOUS_MESSAGE_VARIATIONS.get(self.language, []):
+            if " " + variant.lower() + " " in botmessage:
                 return True
         return False
 
     def get_indic_names_without_regex(self, text):
         """
-        This method is used to get detect hindi names without any regex pattern (This method is called only if
-        detection from regex patterns fails)
-        This method removes common hindi words ocurring in context of name and hindi stop words
-        COMMON_HINDI_WORDS_OCCURING_WITH_NAME set of hindi words ocurring in context of name
+        This method is used to get detect names in Indic languages without any regex pattern (This method is called
+        only if detection from regex patterns fails)
+        This method removes common indic words occurring in context of name and indic stop words
+        COMMON_INDIC_WORDS_OCCURING_WITH_NAME set of indic language words occurring in context of name
         Args:
-            text (str): the text from which hindi text has to be detected
+            text (str): the text from which text has to be detected
         Returns:
             person_name (tuple): two dimensional tuple
             1. entity_value (list): representing the entity values of names
             2. original_text (list): representing the original text detected
         Example:
             text = u'प्रतिक श्रीदत्त जयराओ'
-            get_hindi_names_without_regex(text=text)
+            get_indic_names_without_regex(text=text)
             >> [{first_name: u"प्रतिक", middle_name: u"श्रीदत्त", last_name: u"जयराओ"}], [ u'प्रतिक श्रीदत्त जयराओ']
         """
         text_original = text
-        text = self.replace_stopwords_hindi(text)
+        text = self.replace_indic_stopwords(text)
         text = " ".join(
             [word for word in text.split(" ") if word not in COMMON_INDIC_WORDS_OCCURRING_WITH_NAME[self.language]])
 
@@ -417,14 +419,14 @@ class NameDetector(object):
         replaced_text = self.replace_detected_text((original_text_list, original_text_list), text=text)
         return self.detect_person_name_entity(replaced_text=replaced_text)
 
-    def replace_stopwords_hindi(self, text):
+    def replace_indic_stopwords(self, text):
         """
-        This method is used to replace hindi stop words from the text
+        This method is used to replace language specific stop words from the text
         Args:
-            text (str): The text from which hindi stop words have to be removed
+            text (str): The text from which stop words have to be removed
 
         Returns:
-            clean_text (str): text from which hindi stop words have been removed
+            clean_text (str): text from which stop words have been removed
         """
         split_list = text.split(" ")
         split_list = [word for word in split_list if word not in INDIC_STOPWORDS[self.language]]
@@ -435,7 +437,7 @@ class NameDetector(object):
 
     def detect_abusive_phrases_indic(self, text):
         """
-        This method is used to check for hindi abuses in the sentence
+        This method is used to check for abuses in the Indic sentence
         Args:
             text (str): text in which abuses have to be checked
 
@@ -462,7 +464,7 @@ class NameDetector(object):
 
     def detect_question_indic(self, text):
         """
-        This method is used to detect if the given text has a hindi question present in it
+        This method is used to detect if the given text has a Indic question present in it
         Args:
             text (str): the text for which the question check has to be run
 

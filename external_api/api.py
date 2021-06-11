@@ -53,7 +53,7 @@ def get_entity_word_variants(request):
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException as e:
+    except Exception as e:
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -90,7 +90,7 @@ def update_dictionary(request):
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException as e:
+    except Exception as e:
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -123,7 +123,7 @@ def transfer_entities(request):
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException as e:
+    except Exception as e:
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -164,7 +164,7 @@ def get_crf_training_data(request):
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException as e:
+    except Exception as e:
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
@@ -191,8 +191,7 @@ def update_crf_training_data(request):
         external_api_data = json.loads(request.POST.get(EXTERNAL_API_DATA))
         sentences = external_api_data.get(SENTENCES)
         entity_name = external_api_data.get(ENTITY_NAME)
-        DataStore().update_entity_crf_data(entity_name=entity_name,
-                                           sentences=sentences)
+        DataStore().update_entity_crf_data(entity_name=entity_name, sentences=sentences)
         response['success'] = True
 
     except (DataStoreSettingsImproperlyConfiguredException,
@@ -202,7 +201,7 @@ def update_crf_training_data(request):
         ner_logger.exception('Error: %s' % error_message)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
 
-    except BaseException as e:
+    except Exception as e:
         response['error'] = str(e)
         ner_logger.exception('Error: %s' % e)
         return HttpResponse(json.dumps(response), content_type='application/json', status=500)
