@@ -5,7 +5,7 @@ import re
 import string
 from six.moves import range
 
-from language_utilities.constant import (ENGLISH_LANG, INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET)
+from language_utilities.constant import (ENGLISH_LANG)
 from lib.nlp.const import nltk_tokenizer
 from lib.nlp.pos import POS
 from lib.nlp.spacy_utils import spacy_utils
@@ -14,7 +14,9 @@ from ner_v1.constant import EMOJI_RANGES, FIRST_NAME, MIDDLE_NAME, LAST_NAME
 from ner_v1.detectors.textual.name.lang_constants import (INDIC_BADWORDS, INDIC_QUESTIONWORDS,
                                                           INDIC_STOPWORDS, PREVIOUS_MESSAGE_VARIATIONS,
                                                           INDIC_UNICODE_RANGE,
-                                                          COMMON_INDIC_WORDS_OCCURRING_WITH_NAME)
+                                                          COMMON_INDIC_WORDS_OCCURRING_WITH_NAME,
+                                                          INDIC_LANGUAGES_SET, EUROPEAN_LANGUAGES_SET,
+                                                          OTHER_AVAILABLE_LANGUAGES)
 
 
 # TODO: Refactor this module for readability and useability. Remove any hacks
@@ -169,7 +171,7 @@ class NameDetector(object):
                     return [], []
             if self.language in EUROPEAN_LANGUAGES_SET | {ENGLISH_LANG}:
                 entity_value, original_text = self.detect_english_name()
-            elif self.language in INDIC_LANGUAGES_SET:
+            elif self.language in INDIC_LANGUAGES_SET or self.language in OTHER_AVAILABLE_LANGUAGES:
                 entity_value, original_text = self.detect_indic_name()
 
             for entity_value_dict in entity_value:
@@ -319,7 +321,7 @@ class NameDetector(object):
             replaced_text_tokens = nltk_tokenizer.tokenize(text.lower())
         elif self.language in EUROPEAN_LANGUAGES_SET:
             replaced_text_tokens = spacy_utils.tokenize(text.lower())
-        elif self.language in INDIC_LANGUAGES_SET:
+        elif self.language in INDIC_LANGUAGES_SET or self.language in OTHER_AVAILABLE_LANGUAGES:
             replaced_text_tokens = text.lower().strip().split()
 
         for detected_original_text in (text_detection_result[1]):
