@@ -23,6 +23,8 @@ def setup_sentry():
         from sentry_sdk.integrations.logging import LoggingIntegration
 
         def before_sentry_send(event, hint):
+            if event.get('logger', None) == 'elasticapm.transport':
+                return None
             event.setdefault("tags", {})["cas_name"] = CLIENT_APPLICATIONS_SETUP_NAME
             return event
 
