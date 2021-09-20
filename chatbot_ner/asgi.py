@@ -1,3 +1,4 @@
+# pylint: disable=W1618
 """
 ASGI config for chatbot_ner project.
 

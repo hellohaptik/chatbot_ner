@@ -153,15 +153,6 @@ if ELASTIC_APM_ENABLED:
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 if 'test' in sys.argv:
-    class DisableMigrations(object):
-
-        def __contains__(self, item):
-            return True
-
-        def __getitem__(self, item):
-            return None
-
-
     # FOR TEST CASES - COMMON SETTINGS FOR ALL ENVIRONMENTS
     TEST_DB_PATH = os.environ.get('TEST_DB_PATH') or '/dev/shm/chatbot_ner_test.db.sqlite3'
     DATABASES['default'] = {
@@ -169,7 +160,11 @@ if 'test' in sys.argv:
         'NAME': TEST_DB_PATH,
         'CONN_MAX_AGE': 60
     }
-    MIGRATION_MODULES = DisableMigrations()
+    MIGRATION_MODULES = {
+        'datastore': None,
+        'ner_v1': None,
+        'ner_v2': None,
+    }
     NOSE_ARGS = [
         '--nocapture',
         '--nologcapture',
