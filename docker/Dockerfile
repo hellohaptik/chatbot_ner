@@ -31,7 +31,7 @@ ENV NUM_WORKERS=4
 ENV DJANGO_SETTINGS_MODULE=chatbot_ner.settings
 ENV PORT=8081
 ENV TIMEOUT=600
-# Important change this via .env (the file copied from config.example)
+# Important change this via .env (the file copied from .env.example)
 ENV SECRET_KEY=!yqqcz-v@(s@kpygpvomcuu3il0q1&qtpz)e_g0ulo-sdv%c0c
 
 ADD . /app

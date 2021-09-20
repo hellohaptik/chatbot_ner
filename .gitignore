@@ -3,9 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# haptik ner config file
-config
-
 # C Extensions
 *.so
 
@@ -79,6 +76,7 @@ celerybeat-schedule
 
 # dotenv
 .env
+!.env.example
 update_env.sh
 
 # virtualenv

@@ -2,7 +2,7 @@
 
 A `config.example` file is provided at the root of the repository. It is an example file containing all variables that Chatbot NER sets in the environment for future use when connecting to the underlying engine.
 
-Copy it to a file called `config` at the root of the repository and edit it to configure your settings. Chatbot NER will read and set variables from this file into the environment.
+Copy it to a file called `.env` at the root of the repository and edit it to configure your settings. Chatbot NER will read and set variables from this file into the environment.
 
 > **Note**: Do not use quotes while specifying values for variables. Do not put spaces around the '=' sign.
 >
@@ -22,7 +22,7 @@ Copy it to a file called `config` at the root of the repository and edit it to c
 
 - `ENGINE`
 
-  This specifies the which engine to use. In case multiple engines are supported and configured in the `config` file, the settings under the value provided by `ENGINE` are used. In other words, the value of `ENGINE` is used as key to access its connection settings from the constructed dictionary as shown above.
+  This specifies the which engine to use. In case multiple engines are supported and configured in the `.env` file, the settings under the value provided by `ENGINE` are used. In other words, the value of `ENGINE` is used as key to access its connection settings from the constructed dictionary as shown above.
 
   At this point only Elasticsearch is supported and valid values for engine are:	
 
@@ -62,9 +62,9 @@ Copy it to a file called `config` at the root of the repository and edit it to c
 
 
 
-#### Example `config` file
+#### Example `.env` file
 
 ----------
 
-Please check [config.example](../config.example) file
+Please check [.env.example](../.env.example) file
 
