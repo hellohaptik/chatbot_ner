@@ -10,8 +10,9 @@ botocore==1.21.35
 s3transfer==0.5.0
 boto3==1.18.35
 
-numpy==1.16.5
-pandas==0.21.0
+scipy==1.4.1
+numpy==1.19.2
+pandas==1.0.5
 
 urllib3==1.26.5
 requests==2.26.0
