@@ -11,17 +11,12 @@ WORKDIR /app
 
 COPY docker/install.sh nltk_setup.py datastore_setup.py /app/
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
+COPY requirements.txt /app/requirements.txt
 # cython is installed because pandas build fails otherwise
 RUN /app/install.sh && \
     touch /app/config && \
-    pip install -U pip && \
-    pip install --no-cache-dir -I uwsgi && \
-    pip install cython
-
-COPY requirements.txt /app/requirements.txt
-
-RUN pip install --no-cache-dir -r /app/requirements.txt
+    pip install --no-cache-dir -U pip &&  \
+    pip install --no-cache-dir -r /app/requirements.txt
 
 ENV NAME="chatbot_ner"
 ENV DJANGODIR=/app
