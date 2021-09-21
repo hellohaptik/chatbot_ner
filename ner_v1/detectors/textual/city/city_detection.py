@@ -1,12 +1,11 @@
 # coding=utf-8
 from __future__ import absolute_import
+
 import re
 
-import models.crf.constant as model_constant
-import ner_v1.constant as detector_constant
 import language_utilities.constant as lang_constant
-from models.crf.models import Models
-from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+import ner_v1.constant as detector_constant
+from ner_constants import FROM_MESSAGE
 from ner_v1.detectors.textual.text.text_detection import TextDetector
 
 
@@ -46,12 +45,11 @@ class CityDetector(object):
         self.text_detection_object = TextDetector(entity_name=entity_name, source_language_script=language)
         self.tag = '__' + self.entity_name + '__'
 
-    def detect_entity(self, text, run_model=False):
+    def detect_entity(self, text):
         """Detects city in the text string
 
         Args:
             text: string to extract entities from
-            run_model: True if model needs to be run else False
         Returns:
             It returns the list of dictionary containing the fields like detection_method, from, normal, to,
             text, value, via
@@ -78,11 +76,7 @@ class CityDetector(object):
         self.text = self.text.lower()
         self.processed_text = self.text
         self.tagged_text = self.text
-        city_data = []
-        if run_model:
-            city_data = self._city_model_detection()
-        if not run_model or not city_data:
-            city_data = self._detect_city()
+        city_data = self._detect_city()
         self.city = city_data
         return city_data
 
@@ -457,79 +451,3 @@ class CityDetector(object):
             original_list.append(entity_dict[detector_constant.ORIGINAL_CITY_TEXT])
             detection_list.append(entity_dict[detector_constant.CITY_DETECTION_METHOD])
         return entity_list, original_list, detection_list
-
-    def _city_model_detection(self):
-        """
-        This function calls run_model functionality from class Models() and verifies the values returned by it through
-        datastore.
-        If the cities provided by the model are present in the datastore, it sets the value to FROM_MODEL_VERIFIED
-        else FROM_MODEL_NOT_VERFIED is set.
-
-        For Example:
-            Note:  before calling this method you need to call set_bot_message() to set a bot message.
-
-            self.bot_message = 'Please help me with your departure city?'
-            self.text = 'mummbai
-
-            Output:
-                [
-                    {
-                        'city':'mumbai',
-                        'original_text': 'mummbai',
-                        'from': true,
-                        'to': false,
-                        'via': false,
-                        'normal': false
-                        'detection_method': model_verified
-                    }
-                ]
-
-
-        For Example:
-
-            self.bot_message = 'Please help me with your departure city?'
-            self.text = 'dehradun'
-
-            Output:
-                 [
-                    {
-                        'city':'dehradun',
-                        'original_text': 'dehradun',
-                        'from': true,
-                        'to': false,
-                        'via': false,
-                        'normal': false
-                        'detection_method': model_not_verified
-
-                    }
-                ]
-
-                 Note: Dehradun is not present in out datastore so it will take original value as entity value.
-
-        """
-        city_dict_list = []
-        model_object = Models()
-        model_output = model_object.run_model(entity_type=model_constant.CITY_ENTITY_TYPE,
-                                              bot_message=self.bot_message, user_message=self.text)
-        for output in model_output:
-            entity_value_list, original_text_list = self._city_value(text=output[model_constant.MODEL_CITY_VALUE])
-            if entity_value_list:
-                city_value = entity_value_list[0]
-                detection_method = FROM_MODEL_VERIFIED
-            else:
-                city_value = output[model_constant.MODEL_CITY_VALUE]
-                detection_method = FROM_MODEL_NOT_VERIFIED
-
-            city_dict_list.append(
-                {
-                    detector_constant.CITY_VALUE: city_value,
-                    detector_constant.ORIGINAL_CITY_TEXT: output[model_constant.MODEL_CITY_VALUE],
-                    detector_constant.CITY_FROM_PROPERTY: output[model_constant.MODEL_CITY_FROM],
-                    detector_constant.CITY_TO_PROPERTY: output[model_constant.MODEL_CITY_TO],
-                    detector_constant.CITY_VIA_PROPERTY: output[model_constant.MODEL_CITY_VIA],
-                    detector_constant.CITY_NORMAL_PROPERTY: output[model_constant.MODEL_CITY_NORMAL],
-                    detector_constant.CITY_DETECTION_METHOD: detection_method
-                }
-
-            )
-        return city_dict_list

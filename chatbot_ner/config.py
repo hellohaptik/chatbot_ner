@@ -3,13 +3,10 @@ from __future__ import absolute_import
 import logging.handlers
 import os
 
-import dotenv
 from elasticsearch import RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-MODEL_CONFIG_PATH = os.path.join(BASE_DIR, 'model_config')
-
 LOG_PATH = os.path.join(BASE_DIR, 'logs')
 
 # TODO: Set this up via Django LOGGING
@@ -116,34 +113,7 @@ else:
     ner_logger.warning('`ES_AWS_SERVICE` and `ES_AWS_REGION` are not set. '
                        'This is not a problem if you are using self hosted ES')
 
-# TODO: Remove non functional crf code and cleanup
-# Model Vars
-# Crf Model Specific (Mandatory to use CRF Model)
-CRF_MODELS_PATH = os.environ.get('MODELS_PATH')
-CRF_EMBEDDINGS_PATH_VOCAB = os.environ.get('EMBEDDINGS_PATH_VOCAB')
-CRF_EMBEDDINGS_PATH_VECTORS = os.environ.get('EMBEDDINGS_PATH_VECTORS')
-
-if os.path.exists(MODEL_CONFIG_PATH):
-    dotenv.read_dotenv(MODEL_CONFIG_PATH)
-else:
-    ner_logger.warning('Warning: no file named "model_config" found at %s. This is not a problem if you '
-                       'dont want to run NER with ML models', MODEL_CONFIG_PATH)
-
-CITY_MODEL_TYPE = os.environ.get('CITY_MODEL_TYPE')
-CITY_MODEL_PATH = os.environ.get('CITY_MODEL_PATH')
-DATE_MODEL_TYPE = os.environ.get('DATE_MODEL_TYPE')
-DATE_MODEL_PATH = os.environ.get('DATE_MODEL_PATH')
-if not CITY_MODEL_PATH:
-    CITY_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'city', 'model_13062017.crf')
-if not DATE_MODEL_PATH:
-    DATE_MODEL_PATH = os.path.join(BASE_DIR, 'data', 'models', 'crf', 'date', 'model_date.crf')
-
-# Crf Model Specific with additional AWS storage (optional)
-CRF_MODEL_S3_BUCKET_NAME = os.environ.get('CRF_MODEL_S3_BUCKET_NAME')
-CRF_MODEL_S3_BUCKET_REGION = os.environ.get('CRF_MODEL_S3_BUCKET_REGION')
-WORD_EMBEDDING_REMOTE_URL = os.environ.get('WORD_EMBEDDING_REMOTE_URL')
 GOOGLE_TRANSLATE_API_KEY = os.environ.get('GOOGLE_TRANSLATE_API_KEY')
-
 if not GOOGLE_TRANSLATE_API_KEY:
     ner_logger.warning('Google Translate API key is null or not set')
     GOOGLE_TRANSLATE_API_KEY = ''

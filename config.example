@@ -53,14 +53,3 @@ DESTINATION_PORT=
 # In order to enable entity detection for multiple languages, we use google translate. Please enter the key(optional)
 GOOGLE_TRANSLATE_API_KEY=
 
-# Deprecated CRF models configuration
-MODELS_PATH=
-WORD_EMBEDDING_REMOTE_URL=
-EMBEDDINGS_PATH_VECTORS=
-EMBEDDINGS_PATH_VOCAB=
-CITY_MODEL_PATH=
-CITY_MODEL_TYPE=crf
-CRF_MODEL_S3_BUCKET_NAME=
-CRF_MODEL_S3_BUCKET_REGION=
-DATE_MODEL_PATH=
-DATE_MODEL_TYPE=
