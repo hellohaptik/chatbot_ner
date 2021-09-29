@@ -1,23 +1,22 @@
 # coding=utf-8
 from __future__ import absolute_import
+
 import copy
 import datetime
 import re
 
 import pytz
+from six.moves import range
+from six.moves import zip
 
-import models.crf.constant as model_constant
 import ner_v1.constant as detector_constant
 from chatbot_ner.config import ner_logger
-from models.crf.models import Models
-from ner_constants import FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED
+from ner_constants import FROM_MESSAGE
 from ner_v1.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_TODAY,
                              TYPE_TOMORROW, TYPE_YESTERDAY, TYPE_DAY_AFTER, TYPE_DAY_BEFORE, TYPE_NEXT_DAY,
                              TYPE_THIS_DAY, TYPE_PAST,
                              TYPE_POSSIBLE_DAY, TYPE_REPEAT_DAY, WEEKDAYS, WEEKENDS, REPEAT_WEEKDAYS,
                              REPEAT_WEEKENDS, MONTH_DICT, DAY_DICT, TYPE_N_DAYS_AFTER)
-from six.moves import range
-from six.moves import zip
 
 
 class DateAdvancedDetector(object):
@@ -60,14 +59,13 @@ class DateAdvancedDetector(object):
         self.date_detector_object = DateDetector(entity_name=entity_name, timezone=timezone)
         self.bot_message = None
 
-    def detect_entity(self, text, run_model=False):
+    def detect_entity(self, text):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.
 
         Args:
             text: string to extract date entities from
-            run_model: if set true will run the crf model otherwise default value is set to False
 
         Returns:
             Tuple containing two lists, first containing dictionaries, each containing 'date_return'
@@ -104,11 +102,7 @@ class DateAdvancedDetector(object):
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        date_data = []
-        if run_model:
-            date_data = self._date_model_detection()
-        if not run_model or not date_data:
-            date_data = self._detect_date()
+        date_data = self._detect_date()
         return date_data
 
     def _detect_date(self):
@@ -505,89 +499,6 @@ class DateAdvancedDetector(object):
             detector_constant.DATE_NORMAL_PROPERTY: normal_property,
             detector_constant.DATE_DETECTION_METHOD: detection_method,
         }
-
-    def _date_model_detection(self):
-        """
-        This function calls run_model functionality from class Models() and verifies the values returned by it through
-        datastore.
-        If the dates provided by the model are present in the datastore, it sets the value to FROM_MODEL_VERIFIED
-        else FROM_MODEL_NOT_VERFIED is set.
-
-        For Example:
-            Note:  before calling this method you need to call set_bot_message() to set a bot message.
-
-            self.bot_message = 'Please help me with your departure date?'
-            self.text = '26th november'
-
-            Output:
-               [
-                 {
-
-                  'detection_method': 'message',
-                  'end_range': False,
-                  'from': False,
-                  'normal': True,
-                  'start_range': False,
-                  'text': '26th november',
-                  'to': False,
-                  'value': {'dd': 26, 'mm': 11, 'type': 'date', 'yy': 2017}
-                  'detection_method': model_verified
-
-                  }
-               ]
-
-
-
-        For Example:
-
-            self.bot_message = 'Please help me with your departure date?'
-            self.text = 'monday'
-
-            Output:
-                 [
-                    {
-
-                      'detection_method': 'message',
-                      'end_range': False,
-                      'from': False,
-                      'normal': True,
-                      'start_range': False,
-                      'text': 'monday',
-                      'to': False,
-                      'value': {'dd': 21, 'mm': 8, 'type': 'day_within_one_week', 'yy': 2017}
-                      'detection_method': model_not_verified
-
-                    }
-                 ]
-
-        """
-        date_dict_list = []
-        model_object = Models()
-        model_output = model_object.run_model(entity_type=model_constant.DATE_ENTITY_TYPE,
-                                              bot_message=self.bot_message, user_message=self.text)
-        for output in model_output:
-            entity_value_list, original_text_list = self._date_value(text=output[model_constant.MODEL_DATE_VALUE])
-            if entity_value_list:
-                date_value = entity_value_list[0]
-                detection_method = FROM_MODEL_VERIFIED
-            else:
-                date_value = output[model_constant.MODEL_DATE_VALUE]
-                detection_method = FROM_MODEL_NOT_VERIFIED
-
-            date_dict_list.append(
-                {
-                    detector_constant.DATE_VALUE: date_value,
-                    detector_constant.ORIGINAL_DATE_TEXT: output[model_constant.MODEL_DATE_VALUE],
-                    detector_constant.DATE_FROM_PROPERTY: output[model_constant.MODEL_DATE_FROM],
-                    detector_constant.DATE_TO_PROPERTY: output[model_constant.MODEL_DATE_TO],
-                    detector_constant.DATE_START_RANGE_PROPERTY: output[model_constant.MODEL_START_DATE_RANGE],
-                    detector_constant.DATE_END_RANGE_PROPERTY: output[model_constant.MODEL_END_DATE_RANGE],
-                    detector_constant.DATE_NORMAL_PROPERTY: output[model_constant.MODEL_DATE_NORMAL],
-                    detector_constant.DATE_DETECTION_METHOD: detection_method
-                }
-
-            )
-        return date_dict_list
 
 
 class DateDetector(object):
@@ -1473,7 +1384,8 @@ class DateDetector(object):
             original_list = []
         if date_list is None:
             date_list = []
-        regex_pattern = re.compile(r'\b((yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday))\b')
+        regex_pattern = re.compile(
+            r'\b((yesterday|sterday|yesterdy|yestrdy|yestrday|previous day|prev day|prevday))\b')
         patterns = regex_pattern.findall(self.processed_text.lower())
         for pattern in patterns:
             original = pattern[0]

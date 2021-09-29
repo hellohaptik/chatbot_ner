@@ -21,9 +21,7 @@ from ner_v1.chatbot.entity_detection import (get_location, get_phone_number, get
                                              get_person_name, get_regex, get_text)
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS,
-                             PARAMETER_MAX_DIGITS, PARAMETER_READ_MODEL_FROM_S3,
-                             PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL,
-                             PARAMETER_LIVE_CRF_MODEL_PATH)
+                             PARAMETER_MAX_DIGITS)
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -70,9 +68,6 @@ def get_parameters_dictionary(request):
         PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request.GET.get('min_token_len_fuzziness'),
         PARAMETER_MIN_DIGITS: request.GET.get('min_number_digits'),
         PARAMETER_MAX_DIGITS: request.GET.get('max_number_digits'),
-        PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request.GET.get('read_embeddings_from_remote_url')),
-        PARAMETER_READ_MODEL_FROM_S3: to_bool(request.GET.get('read_model_from_s3')),
-        PARAMETER_LIVE_CRF_MODEL_PATH: request.GET.get('live_crf_model_path'),
         PARAMETER_PRIOR_RESULTS: json.loads(request.GET.get("predetected_values", '[]'))
     }
     ner_logger.debug("parameters dict - {}".format(parameters_dict))
@@ -105,9 +100,6 @@ def parse_post_request(request):
         PARAMETER_MIN_TOKEN_LEN_FUZZINESS: request_data.get('min_token_len_fuzziness'),
         PARAMETER_MIN_DIGITS: request_data.get('min_number_digits'),
         PARAMETER_MAX_DIGITS: request_data.get('max_number_digits'),
-        PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL: to_bool(request_data.get('read_embeddings_from_remote_url')),
-        PARAMETER_READ_MODEL_FROM_S3: to_bool(request_data.get('read_model_from_s3')),
-        PARAMETER_LIVE_CRF_MODEL_PATH: request_data.get('live_crf_model_path'),
         PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
@@ -268,9 +260,6 @@ def text(request):
             language=parameters_dict[PARAMETER_SOURCE_LANGUAGE],
             fuzziness=parameters_dict[PARAMETER_FUZZINESS],
             min_token_len_fuzziness=parameters_dict[PARAMETER_MIN_TOKEN_LEN_FUZZINESS],
-            live_crf_model_path=parameters_dict[PARAMETER_LIVE_CRF_MODEL_PATH],
-            read_model_from_s3=parameters_dict[PARAMETER_READ_MODEL_FROM_S3],
-            read_embeddings_from_remote_url=parameters_dict[PARAMETER_READ_EMBEDDINGS_FROM_REMOTE_URL],
             predetected_values=parameters_dict[PARAMETER_PRIOR_RESULTS]
         )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))

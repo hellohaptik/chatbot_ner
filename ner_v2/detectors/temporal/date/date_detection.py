@@ -10,12 +10,10 @@ import re
 from six.moves import range
 from six.moves import zip
 
-import models.crf.constant as model_constant
 import ner_v2.detectors.temporal.constant as temporal_constant
 from language_utilities.constant import ENGLISH_LANG, TRANSLATED_TEXT
 from language_utilities.utils import translate_text
-from models.crf.models import Models
-from ner_constants import (FROM_MESSAGE, FROM_MODEL_VERIFIED, FROM_MODEL_NOT_VERIFIED, FROM_STRUCTURE_VALUE_VERIFIED,
+from ner_constants import (FROM_MESSAGE, FROM_STRUCTURE_VALUE_VERIFIED,
                            FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_FALLBACK_VALUE)
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.temporal.constant import (TYPE_EXACT, TYPE_EVERYDAY, TYPE_PAST,
@@ -95,14 +93,13 @@ class DateAdvancedDetector(BaseDetector):
     def supported_languages(self):
         return self._supported_languages
 
-    def detect_entity(self, text, run_model=False, **kwargs):
+    def detect_entity(self, text, **kwargs):
         """
         Detects all date strings in text and returns two lists of detected date entities and their corresponding
         original substrings in text respectively.
 
         Args:
             text: string to extract date entities from
-            run_model: if set true will run the crf model otherwise default value is set to False
 
         Returns:
             Tuple containing two lists, first containing dictionaries, each containing 'date_return'
@@ -135,17 +132,11 @@ class DateAdvancedDetector(BaseDetector):
 
         Additionally this function assigns these lists to self.date and self.original_date_text attributes
         respectively.
-        :param text: text
-        :param run_model: run_model
         """
         self.text = ' ' + text.lower() + ' '
         self.processed_text = self.text
         self.tagged_text = self.text
-        date_data = []
-        if run_model:
-            date_data = self._date_model_detection()
-        if not run_model or not date_data:
-            date_data = self._detect_date()
+        date_data = self._detect_date()
         return self.unzip_convert_date_dictionaries(date_data)
 
     def _detect_date(self):
@@ -571,85 +562,6 @@ class DateAdvancedDetector(BaseDetector):
             temporal_constant.DATE_NORMAL_PROPERTY: normal_property,
             temporal_constant.DATE_DETECTION_METHOD: detection_method,
         }
-
-    def _date_model_detection(self):
-        """
-        This function calls run_model functionality from class Models() and verifies the values returned by it through
-        datastore.
-        If the dates provided by the model are present in the datastore, it sets the value to FROM_MODEL_VERIFIED
-        else FROM_MODEL_NOT_VERFIED is set.
-
-        For Example:
-            Note:  before calling this method you need to call set_bot_message() to set a bot message.
-
-            self.bot_message = 'Please help me with your departure date?'
-            self.text = '26th november'
-
-            Output:
-               [
-                 {
-
-                  'detection_method': 'message',
-                  'end_range': False,
-                  'from': False,
-                  'normal': True,
-                  'start_range': False,
-                  'text': '26th november',
-                  'to': False,
-                  'value': {'dd': 26, 'mm': 11, 'type': 'date', 'yy': 2017}
-                  'detection_method': model_verified
-
-                  }
-               ]
-
-
-
-        For Example:
-
-            self.bot_message = 'Please help me with your departure date?'
-            self.text = 'monday'
-
-            Output:
-                 [
-                    {
-
-                      'detection_method': 'message',
-                      'end_range': False,
-                      'from': False,
-                      'normal': True,
-                      'start_range': False,
-                      'text': 'monday',
-                      'to': False,
-                      'value': {'dd': 21, 'mm': 8, 'type': 'day_within_one_week', 'yy': 2017}
-                      'detection_method': model_not_verified
-
-                    }
-                 ]
-
-        """
-        date_dict_list = []
-        model_object = Models()
-        model_output = model_object.run_model(entity_type=model_constant.DATE_ENTITY_TYPE,
-                                              bot_message=self.bot_message, user_message=self.text)
-        for output in model_output:
-            entity_value_list, original_text_list = self._date_value(text=output[model_constant.MODEL_DATE_VALUE])
-            if entity_value_list:
-                date_value = entity_value_list[0]
-                detection_method = FROM_MODEL_VERIFIED
-            else:
-                date_value = output[model_constant.MODEL_DATE_VALUE]
-                detection_method = FROM_MODEL_NOT_VERIFIED
-
-            data_dict = self._to_output_dict(date_dict=date_value,
-                                             original_text=output[model_constant.MODEL_DATE_VALUE],
-                                             from_property=output[model_constant.MODEL_DATE_FROM],
-                                             to_property=output[model_constant.MODEL_DATE_TO],
-                                             start_range_property=output[model_constant.MODEL_START_DATE_RANGE],
-                                             end_range_property=output[model_constant.MODEL_END_DATE_RANGE],
-                                             normal_property=output[model_constant.MODEL_DATE_NORMAL],
-                                             detection_method=detection_method)
-            date_dict_list.append(data_dict)
-        return date_dict_list
 
     def detect(self, message=None, structured_value=None, fallback_value=None, **kwargs):
         """

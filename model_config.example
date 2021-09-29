@@ -1,9 +1,0 @@
-
-# configuration to detect cities using ML models
-# model_type can be crf or rnn
-
-CITY_MODEL_TYPE=crf
-CITY_MODEL_PATH=
-
-DATE_MODEL_TYPE=crf
-DATE_MODEL_PATH=
