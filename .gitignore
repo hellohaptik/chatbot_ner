@@ -3,9 +3,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# haptik ner config file
-config
-
 # C Extensions
 *.so
 
@@ -79,6 +76,7 @@ celerybeat-schedule
 
 # dotenv
 .env
+!.env.example
 update_env.sh
 
 # virtualenv
@@ -94,16 +92,18 @@ ENV/
 .idea/
 .realsync
 
-/Dockerfile*
-/post-merge
-/entrypoint.sh
-/setup.py
-/docker-compose.yml
-/newrelic.ini
-sftp-config.json
+Dockerfile*
+post-merge
+entrypoint.sh
+setup.py
+docker-compose.yml
+.dockerignore
+newrelic.ini
+dbdata/
 .DS_Store
 logs/*.log*
 
 .vscode
 newman_reports/
+sftp-config.json
 dev.json
