@@ -1,4 +1,4 @@
-FROM python:3.6.10
+FROM python:3.6.15
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y wget build-essential curl nginx supervisor
