@@ -1,11 +1,11 @@
 """
-Django settings for predictive_server project.
+Django settings for chatbot_ner project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.11/topics/settings/
+https://docs.djangoproject.com/en/3.2/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.11/ref/settings/
+https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 ENVIRONMENT = os.environ.get('ENVIRONMENT') or os.environ.get('HAPTIK_ENV')
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY')
@@ -76,7 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'chatbot_ner.wsgi.application'
 
 # Internationalization
-# https://docs.djangoproject.com/en/1.11/topics/i18n/
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -95,7 +95,7 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

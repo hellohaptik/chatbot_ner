@@ -1,6 +1,6 @@
 ## DataStore Environment Variables Description
 
-A `config.example` file is provided at the root of the repository. It is an example file containing all variables that Chatbot NER sets in the environment for future use when connecting to the underlying engine.
+A `.env.example` file is provided at the root of the repository. It is an example file containing all variables that Chatbot NER sets in the environment for future use when connecting to the underlying engine.
 
 Copy it to a file called `.env` at the root of the repository and edit it to configure your settings. Chatbot NER will read and set variables from this file into the environment.
 

@@ -15,7 +15,7 @@ RUN touch /app/config && \
 
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/default.nginx.conf /etc/nginx/sites-available/default
+COPY docker/default.site.conf /etc/nginx/sites-available/default
 
 # TODO: Separate this out to a dev/test docker image
 RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
