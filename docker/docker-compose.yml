@@ -1,6 +1,6 @@
 # Will start the application, mount local directory,
 # If you don't want to keep env variables in compose, you can keep an env file that can be copied and source while building the image
-# Variables used in the Django app itself can also be configured at chatbot_ner/config (copy config.example to config and edit it)
+# Variables used in the Django app itself can also be configured at chatbot_ner/.env (copy .env.example to .env and edit it)
 # This will also bring up local Elasticsearch, you could even use your already setup ES
 # I have defined a common network for these 2 services so that containers can communicate with each other
 
@@ -12,8 +12,8 @@ services:
   chatbot-ner:
     build:
       context: ..
-      dockerfile: docker/Dockerfile-python3
-# Vars being used are defined in config.example and used in settings.py
+      dockerfile: docker/Dockerfile
+# Vars being used are defined in .env.example and used in settings.py
 # ENV vars defined in Dockerfile can be overwritten here before docker-compose up
 # just add to .env
     env_file:

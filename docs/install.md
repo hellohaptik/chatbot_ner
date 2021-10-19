@@ -51,8 +51,7 @@ Following are the steps to create the Docker image and run NER with Docker.
 ```shell
 git clone https://github.com/hellohaptik/chatbot_ner.git
 cd chatbot_ner 
-cp config.example .env    # (This will have all the basic environment variables to get started, You can update values accordingly)
-cp .env docker/.env
+cp .env.example docker/.env    # (This will have all the basic environment variables to get started, You can update values accordingly)
 cd docker
 docker-compose up --build -d
 ```
