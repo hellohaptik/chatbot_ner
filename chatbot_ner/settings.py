@@ -147,7 +147,7 @@ if ELASTIC_APM_ENABLED:
         'DJANGO_AUTOINSERT_MIDDLEWARE': False,
         'DISABLE_LOG_RECORD_FACTORY': True,
     }
-    INSTALLED_APPS.append('elasticapm')
+    INSTALLED_APPS.append('elasticapm.contrib.django')
     MIDDLEWARE.append('elasticapm.contrib.django.middleware.TracingMiddleware')
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
