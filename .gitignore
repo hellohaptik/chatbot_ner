@@ -96,7 +96,7 @@ Dockerfile*
 post-merge
 entrypoint.sh
 setup.py
-docker-compose.yml
+docker-compose*.yml
 .dockerignore
 newrelic.ini
 dbdata/
