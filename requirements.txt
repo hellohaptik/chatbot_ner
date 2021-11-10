@@ -20,7 +20,7 @@ requests-aws4auth==0.9
 Django==3.2.7
 
 elasticsearch==5.5.3
-nltk==3.4.5
+nltk==3.6.5
 phonenumberslite==8.10.18
 pyaml==19.4.1
 python-dateutil==2.7.3
