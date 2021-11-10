@@ -121,6 +121,69 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+DJANGO_LOG_LEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'warning').upper()
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
+    'formatters': {
+        'default': {
+            'format': '"%(asctime)s %(levelname)s %(message)s %(module)s:%(lineno)d'
+        },
+    },
+    'handlers': {
+        'stdout': {
+            'level': DJANGO_LOG_LEVEL,
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,
+            'formatter': 'default'
+        },
+        'requests_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'requests.log'),
+            'formatter': 'default'
+        },
+        'chatbot_ner_file': {
+            'level': DJANGO_LOG_LEVEL,
+            'class': 'logging.handlers.WatchedFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'ner_log.log'),
+            'formatter': 'default'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['chatbot_ner_file'],  # TODO: switch to `requests_file` later
+            'level': DJANGO_LOG_LEVEL,
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['stdout'],
+            'level': DJANGO_LOG_LEVEL,
+            'propagate': True,
+        },
+        'chatbot_ner': {
+            'handlers': ['chatbot_ner_file'],
+            'level': DJANGO_LOG_LEVEL,
+            'propagate': False
+        },
+        'sentry_sdk.errors': {
+            'handlers': ['stdout'],
+            'level': 'WARNING',
+            'propagate': True
+        },
+        'elasticapm': {
+            'handlers': ['stdout'],
+            'level': 'WARNING',
+            'propagate': False
+        }
+    }
+}
+
 # setup sentry
 setup_sentry()
 
