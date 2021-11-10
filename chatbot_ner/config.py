@@ -1,34 +1,12 @@
 from __future__ import absolute_import
 
-import logging.handlers
+import logging
 import os
 
 from elasticsearch import RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-LOG_PATH = os.path.join(BASE_DIR, 'logs')
-
-# TODO: Set this up via Django LOGGING
-LOG_LEVEL = os.environ.get('DJANGO_LOG_LEVEL', 'error').upper()
-
-# Common formatter
-formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s %(module)s:%(lineno)d")
-
-# Handler for Docker stdout
-handler_stdout = logging.StreamHandler()
-handler_stdout.setLevel(LOG_LEVEL)
-handler_stdout.setFormatter(formatter)
-
-# SETUP NER LOGGING
-NER_LOG_FILENAME = os.path.join(LOG_PATH, 'ner_log.log')
-handler = logging.handlers.WatchedFileHandler(NER_LOG_FILENAME)
-handler.setFormatter(formatter)
-
-ner_logger = logging.getLogger('NERLogger')
-ner_logger.setLevel(LOG_LEVEL)
-ner_logger.addHandler(handler)
-ner_logger.addHandler(handler_stdout)
+ner_logger = logging.getLogger('chatbot_ner')
 
 ENGINE = os.environ.get('ENGINE')
 # ES settings (Mandatory to use Text type entities)
