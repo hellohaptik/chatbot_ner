@@ -51,4 +51,4 @@ nose-exclude==0.5.0
 # Other convenience libs, ideally should only be installed in dev
 flake8==3.4.1
 jedi==0.17.2
-ipython==7.16.1
+ipython==7.16.3
