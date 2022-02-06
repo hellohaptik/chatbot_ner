@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import random
+
 """
 Note:
 'word' and 'value' mean the same in this context and hasn't been cleaned because of dependency
@@ -153,8 +155,10 @@ def search_entity_values(
         value_search_term=None,
         variant_search_term=None,
         empty_variants_only=False,
-        pagination_size=None,
-        pagination_from=None
+        shuffle=False,
+        from_=0,
+        size=None,
+        seed=None,
 ):
     """
     Searches for values within the specific entity. If pagination details not specified, all
@@ -168,24 +172,23 @@ def search_entity_values(
             If not provided, results are not filtered by variants
         empty_variants_only (bool, optional): Flag to search for values with empty variants only
             If not provided, all variants are included
-        pagination_size (int, optional): No. of records to fetch data when paginating
+        size (int, optional): No. of records to fetch data when paginating
             If it is None, the results will not be paginated
-        pagination_from (int, optional): Offset to skip initial data (useful for pagination queries)
+        from_ (int, optional): Offset to skip initial data (useful for pagination queries)
             If it is None, the results will not be paginated
     Returns:
         dict: total records (for pagination) and a list of individual records which match by the search filters
     """
-    values = None
-    total_records = None
-    # TODO: If possible search and paginate in single ES query instead of
+    # TODO: If possible search, sample, paginate in single ES query instead of
     #       two (get_entity_unique_values + get_records_from_values)
-    # TODO: This is not the most optimal way to paginate for a large number of values! Current approach fetches
+    # TODO: This is not the most optimal way to paginate/sample for a large number of values! Current approach fetches
     #       everything and then applies slicing in memory. It also relies on `get_entity_unique_values` always
     #       maintaining a fixed ordering of results
     #       Instead for ES, we can implement collapse by value -> sort -> provide from and size.
     #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-collapse.html
     #       Also read: https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
-    if value_search_term or variant_search_term or empty_variants_only or pagination_size or pagination_from:
+    #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/query-dsl-function-score-query.html#score-functions
+    if value_search_term or variant_search_term or empty_variants_only or (not shuffle and (from_ or size)):
         values = get_entity_unique_values(
             entity_name=entity_name,
             value_search_term=value_search_term,
@@ -193,20 +196,28 @@ def search_entity_values(
             empty_variants_only=empty_variants_only,
         )
         total_records = len(values)
-        if pagination_size > 0 and pagination_from >= 0:
-            values = values[pagination_from:pagination_from + pagination_size]
-
-    records_dict = get_records_from_values(entity_name, values)
-    records_list = []
-    if not values:
+        records_dict = None
+    else:
+        records_dict = get_records_from_values(entity_name, values=None)
         values = sorted(records_dict.keys())
+        total_records = len(values)
+
+    if shuffle:
+        random.Random(seed).shuffle(values)
+    if size > 0 and from_ >= 0:
+        values = values[from_:from_ + size]
+
+    if records_dict is None:
+        records_dict = get_records_from_values(entity_name, values=values)
+
+    records_list = []
     for value in values:
         records_list.append({
             "word": value,
             "variants": records_dict.get(value, {}),
         })
 
-    if total_records is None:
+    if not total_records:
         total_records = len(records_list)
 
     return {

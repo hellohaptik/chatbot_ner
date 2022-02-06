@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 import json
+import random
+
 from django.http import HttpResponse
 from datastore.datastore import DataStore
 from datastore.exceptions import (DataStoreSettingsImproperlyConfiguredException, EngineNotImplementedException,
@@ -238,10 +240,15 @@ def entity_data_view(request, entity_name):
     """
     if request.method == 'GET':
         params = request.GET.dict()
-        # Fetch Languages supported by the entity
+
+        shuffle = (params.get('shuffle', 'false') or '').lower() == 'true'
+        try:
+            seed = int(params.get('seed', random.randint(0, 1000000000)))
+        except ValueError:
+            raise APIHandlerException('seed should be sent as a number')
 
         try:
-            pagination_size = int(params.get('size', 10))
+            size = int(params.get('size', 10))
         except ValueError:
             raise APIHandlerException('size should be sent as a number')
 
@@ -255,8 +262,10 @@ def entity_data_view(request, entity_name):
             value_search_term=params.get('value_search_term', None),
             variant_search_term=params.get('variant_search_term', None),
             empty_variants_only=params.get('empty_variants_only', False),
-            pagination_size=pagination_size,
-            pagination_from=pagination_from
+            shuffle=shuffle,
+            from_=pagination_from,
+            size=size,
+            seed=seed,
         )
 
     elif request.method == 'POST':
