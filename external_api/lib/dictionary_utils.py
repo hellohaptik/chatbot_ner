@@ -51,6 +51,8 @@ def entity_update_languages(entity_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
+    # TODO: If possible add records in single ES query instead of
+    #       two (get_entity_unique_values + db.add_entity_data)
     values = get_entity_unique_values(entity_name=entity_name)
     if not values:
         raise APIHandlerException('This entity does not have any records. Please verify the entity name')
@@ -175,6 +177,14 @@ def search_entity_values(
     """
     values = None
     total_records = None
+    # TODO: If possible search and paginate in single ES query instead of
+    #       two (get_entity_unique_values + get_records_from_values)
+    # TODO: This is not the most optimal way to paginate for a large number of values! Current approach fetches
+    #       everything and then applies slicing in memory. It also relies on `get_entity_unique_values` always
+    #       maintaining a fixed ordering of results
+    #       Instead for ES, we can implement collapse by value -> sort -> provide from and size.
+    #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-collapse.html
+    #       Also read: https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
     if value_search_term or variant_search_term or empty_variants_only or pagination_size or pagination_from:
         values = get_entity_unique_values(
             entity_name=entity_name,
@@ -188,10 +198,12 @@ def search_entity_values(
 
     records_dict = get_records_from_values(entity_name, values)
     records_list = []
-    for value, variant_data in records_dict.items():
+    if not values:
+        values = sorted(records_dict.keys())
+    for value in values:
         records_list.append({
             "word": value,
-            "variants": variant_data,
+            "variants": records_dict.get(value, {}),
         })
 
     if total_records is None:
@@ -221,6 +233,8 @@ def update_entity_records(entity_name, data):
     replace_data = data.get('replace')
 
     if replace_data:
+        # TODO: Delete everything for the `entity_name` without having to fetch values first!
+        # https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docs-delete-by-query.html
         values_to_delete = get_entity_unique_values(entity_name)
     else:
         values_to_delete = [record['word'] for record in records_to_delete]
