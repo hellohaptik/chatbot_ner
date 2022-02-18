@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import random
+
 """
 Note:
 'word' and 'value' mean the same in this context and hasn't been cleaned because of dependency
@@ -51,6 +53,8 @@ def entity_update_languages(entity_name, new_language_list):
         raise APIHandlerException('No new languages provided. Nothing changed.')
 
     # fetch all words
+    # TODO: If possible add records in single ES query instead of
+    #       two (get_entity_unique_values + db.add_entity_data)
     values = get_entity_unique_values(entity_name=entity_name)
     if not values:
         raise APIHandlerException('This entity does not have any records. Please verify the entity name')
@@ -146,13 +150,23 @@ def delete_records_by_values(entity_name, values):
     )
 
 
+def _shuffle_sample_values(values, shuffle, seed, size, offset=0):
+    if shuffle:
+        random.Random(seed).shuffle(values)
+    if size > 0 and offset >= 0:
+        values = values[offset:offset + size]
+    return values
+
+
 def search_entity_values(
         entity_name,
         value_search_term=None,
         variant_search_term=None,
         empty_variants_only=False,
-        pagination_size=None,
-        pagination_from=None
+        shuffle=False,
+        size=None,
+        offset=0,
+        seed=None,
 ):
     """
     Searches for values within the specific entity. If pagination details not specified, all
@@ -166,16 +180,32 @@ def search_entity_values(
             If not provided, results are not filtered by variants
         empty_variants_only (bool, optional): Flag to search for values with empty variants only
             If not provided, all variants are included
-        pagination_size (int, optional): No. of records to fetch data when paginating
+        shuffle (bool, optional): whether to shuffle the records randomly. Defaults to False
+        size (int, optional): No. of records to fetch data when paginating
             If it is None, the results will not be paginated
-        pagination_from (int, optional): Offset to skip initial data (useful for pagination queries)
+        offset (int, optional): Offset to skip initial data (useful for pagination queries)
             If it is None, the results will not be paginated
+        seed: (int or None, optional): seed to initialize the random instance for shuffling. Defaults to None
     Returns:
         dict: total records (for pagination) and a list of individual records which match by the search filters
     """
-    values = None
-    total_records = None
-    if value_search_term or variant_search_term or empty_variants_only or pagination_size or pagination_from:
+    # TODO: If possible search, sample, paginate in single ES query instead of
+    #       two (get_entity_unique_values + get_records_from_values)
+    # TODO: This is not the most optimal way to paginate/sample for a large number of values! Current approach fetches
+    #       everything and then applies slicing in memory. It also relies on `get_entity_unique_values` always
+    #       maintaining a fixed ordering of results
+    #       Instead for ES, we can implement collapse by value -> sort -> provide from and size.
+    #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-collapse.html
+    #       Also read: https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
+    #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/query-dsl-function-score-query.html#score-functions
+    is_search_query = value_search_term or variant_search_term or empty_variants_only
+    if is_search_query and shuffle:
+        raise ValueError('`shuffle=True` is not supported with following args: '
+                         '[value_search_term, variant_search_term, empty_variants_only]')
+    has_pagination_args_without_shuffling = (not shuffle) and (offset or size)
+    if is_search_query or has_pagination_args_without_shuffling:
+        # Here we first figure out which values we need to return, sample them if needed (shuffling is not supported),
+        # and then fetch records for these filtered values
         values = get_entity_unique_values(
             entity_name=entity_name,
             value_search_term=value_search_term,
@@ -183,18 +213,17 @@ def search_entity_values(
             empty_variants_only=empty_variants_only,
         )
         total_records = len(values)
-        if pagination_size > 0 and pagination_from >= 0:
-            values = values[pagination_from:pagination_from + pagination_size]
+        values = _shuffle_sample_values(values=values, shuffle=False, seed=seed, size=size, offset=offset)
+        records_dict = get_records_from_values(entity_name, values=values)
+    else:
+        # Here we do the inverse - fetch all records first, shuffle and sample them if needed, then discard the rest
+        records_dict = get_records_from_values(entity_name, values=None)
+        values = sorted(records_dict.keys())
+        total_records = len(values)
+        values = _shuffle_sample_values(values=values, shuffle=shuffle, seed=seed, size=size, offset=offset)
 
-    records_dict = get_records_from_values(entity_name, values)
-    records_list = []
-    for value, variant_data in records_dict.items():
-        records_list.append({
-            "word": value,
-            "variants": variant_data,
-        })
-
-    if total_records is None:
+    records_list = [{"word": value, "variants": records_dict.get(value, {})} for value in values]
+    if not total_records:
         total_records = len(records_list)
 
     return {
@@ -221,6 +250,8 @@ def update_entity_records(entity_name, data):
     replace_data = data.get('replace')
 
     if replace_data:
+        # TODO: Delete everything for the `entity_name` without having to fetch values first!
+        # https://www.elastic.co/guide/en/elasticsearch/reference/5.6/docs-delete-by-query.html
         values_to_delete = get_entity_unique_values(entity_name)
     else:
         values_to_delete = [record['word'] for record in records_to_delete]
