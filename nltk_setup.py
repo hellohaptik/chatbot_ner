@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import nltk
 
-NLTK_RESOURCES = ['punkt', 'wordnet', 'maxent_treebank_pos_tagger', 'averaged_perceptron_tagger']
+NLTK_RESOURCES = ['punkt', 'wordnet', 'maxent_treebank_pos_tagger', 'averaged_perceptron_tagger', 'omw', 'omw-1.4']
 
 
 def download_nltk_resources():
