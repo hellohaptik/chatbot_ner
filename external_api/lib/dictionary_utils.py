@@ -199,6 +199,9 @@ def search_entity_values(
     #       Also read: https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
     #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/query-dsl-function-score-query.html#score-functions
     is_search_query = value_search_term or variant_search_term or empty_variants_only
+    if is_search_query and shuffle:
+        raise ValueError('`shuffle=True` is not supported with following args: '
+                         '[value_search_term, variant_search_term, empty_variants_only]')
     has_pagination_args_without_shuffling = (not shuffle) and (offset or size)
     if is_search_query or has_pagination_args_without_shuffling:
         # Here we first figure out which values we need to return, sample them if needed (shuffling is not supported),

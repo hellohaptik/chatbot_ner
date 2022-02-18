@@ -257,16 +257,19 @@ def entity_data_view(request, entity_name):
         except ValueError:
             raise APIHandlerException('from should be sent as a number')
 
-        return dictionary_utils.search_entity_values(
-            entity_name=entity_name,
-            value_search_term=params.get('value_search_term', None),
-            variant_search_term=params.get('variant_search_term', None),
-            empty_variants_only=params.get('empty_variants_only', False),
-            shuffle=shuffle,
-            offset=pagination_from,
-            size=size,
-            seed=seed,
-        )
+        try:
+            return dictionary_utils.search_entity_values(
+                entity_name=entity_name,
+                value_search_term=params.get('value_search_term', None),
+                variant_search_term=params.get('variant_search_term', None),
+                empty_variants_only=params.get('empty_variants_only', False),
+                shuffle=shuffle,
+                offset=pagination_from,
+                size=size,
+                seed=seed,
+            )
+        except ValueError as e:
+            raise APIHandlerException(str(e)) from e
 
     elif request.method == 'POST':
         # Update language support in the specified entity
