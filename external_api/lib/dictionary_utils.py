@@ -150,14 +150,22 @@ def delete_records_by_values(entity_name, values):
     )
 
 
+def _shuffle_sample_values(values, shuffle, seed, size, offset=0):
+    if shuffle:
+        random.Random(seed).shuffle(values)
+    if size > 0 and offset >= 0:
+        values = values[offset:offset + size]
+    return values
+
+
 def search_entity_values(
         entity_name,
         value_search_term=None,
         variant_search_term=None,
         empty_variants_only=False,
         shuffle=False,
-        from_=0,
         size=None,
+        offset=0,
         seed=None,
 ):
     """
@@ -172,10 +180,12 @@ def search_entity_values(
             If not provided, results are not filtered by variants
         empty_variants_only (bool, optional): Flag to search for values with empty variants only
             If not provided, all variants are included
+        shuffle (bool, optional): whether to shuffle the records randomly. Defaults to False
         size (int, optional): No. of records to fetch data when paginating
             If it is None, the results will not be paginated
-        from_ (int, optional): Offset to skip initial data (useful for pagination queries)
+        offset (int, optional): Offset to skip initial data (useful for pagination queries)
             If it is None, the results will not be paginated
+        seed: (int or None, optional): seed to initialize the random instance for shuffling. Defaults to None
     Returns:
         dict: total records (for pagination) and a list of individual records which match by the search filters
     """
@@ -188,7 +198,11 @@ def search_entity_values(
     #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/search-request-collapse.html
     #       Also read: https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
     #       https://www.elastic.co/guide/en/elasticsearch/reference/5.6/query-dsl-function-score-query.html#score-functions
-    if value_search_term or variant_search_term or empty_variants_only or (not shuffle and (from_ or size)):
+    is_search_query = value_search_term or variant_search_term or empty_variants_only
+    has_pagination_args_without_shuffling = (not shuffle) and (offset or size)
+    if is_search_query or has_pagination_args_without_shuffling:
+        # Here we first figure out which values we need to return, sample them if needed (shuffling is not supported),
+        # and then fetch records for these filtered values
         values = get_entity_unique_values(
             entity_name=entity_name,
             value_search_term=value_search_term,
@@ -196,27 +210,16 @@ def search_entity_values(
             empty_variants_only=empty_variants_only,
         )
         total_records = len(values)
-        records_dict = None
+        values = _shuffle_sample_values(values=values, shuffle=False, seed=seed, size=size, offset=offset)
+        records_dict = get_records_from_values(entity_name, values=values)
     else:
+        # Here we do the inverse - fetch all records first, shuffle and sample them if needed, then discard the rest
         records_dict = get_records_from_values(entity_name, values=None)
         values = sorted(records_dict.keys())
         total_records = len(values)
+        values = _shuffle_sample_values(values=values, shuffle=shuffle, seed=seed, size=size, offset=offset)
 
-    if shuffle:
-        random.Random(seed).shuffle(values)
-    if size > 0 and from_ >= 0:
-        values = values[from_:from_ + size]
-
-    if records_dict is None:
-        records_dict = get_records_from_values(entity_name, values=values)
-
-    records_list = []
-    for value in values:
-        records_list.append({
-            "word": value,
-            "variants": records_dict.get(value, {}),
-        })
-
+    records_list = [{"word": value, "variants": records_dict.get(value, {})} for value in values]
     if not total_records:
         total_records = len(records_list)
 

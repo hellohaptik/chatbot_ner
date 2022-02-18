@@ -263,7 +263,7 @@ def entity_data_view(request, entity_name):
             variant_search_term=params.get('variant_search_term', None),
             empty_variants_only=params.get('empty_variants_only', False),
             shuffle=shuffle,
-            from_=pagination_from,
+            offset=pagination_from,
             size=size,
             seed=seed,
         )
