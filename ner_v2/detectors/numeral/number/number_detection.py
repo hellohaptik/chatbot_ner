@@ -134,7 +134,7 @@ class NumberDetector(BaseDetector):
 
         """
         self.text = ' ' + text.lower() + ' '
-        self.processed_text = self.text
+        self.processed_text = self.preprocess_punctuation(self.text)
         self.tagged_text = self.text
         number_data = self.language_number_detector.detect_number(self.processed_text)
         validated_number, validated_number_text = [], []
@@ -171,6 +171,13 @@ class NumberDetector(BaseDetector):
         """
         self.min_digit = min_digit
         self.max_digit = max_digit
+
+    @staticmethod
+    def preprocess_punctuation(text):
+        escaped_punct = re.escape('!"#%&\'()*/:;<=>?@[\\]^_`{|}~।')
+        punct = re.compile(f'[{escaped_punct}]')
+        text = re.sub(punct, ' ', text)
+        return re.sub('  ', ' ', text)
 
     @staticmethod
     def _num_digits(value):
