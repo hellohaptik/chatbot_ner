@@ -3,7 +3,6 @@ from __future__ import absolute_import
 
 import collections
 import os
-
 import pandas as pd
 from six.moves import zip
 
@@ -87,7 +86,9 @@ class BaseNumberDetector(object):
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
             self._update_processed_text(original_list)
-        return number_list, original_list
+        sorted_number_list = sorted(number_list, key=lambda num: num['span'], reverse=False)
+        # FIXME: original_list also to be sorted spanwise
+        return sorted_number_list, original_list
 
     def init_regex_and_parser(self, data_directory_path):
         """
@@ -225,10 +226,10 @@ class BaseNumberDetector(object):
         # hence we need to separate them into [two thousand, three thousand] using '-' or ':' as split char
         numeral_text_list = re.split(r'[\-\:]', self.processed_text)
         for numeral_text in numeral_text_list:
-            numbers, original_texts = get_number_from_number_word(numeral_text, self.numbers_word_map)
-            full_list = list(zip(numbers, original_texts))
-            sorted_full_list = sorted(full_list, key=lambda kv: len(kv[1]), reverse=True)
-            for number, original_text in sorted_full_list:
+            numbers, original_texts, spans = get_number_from_number_word(numeral_text, self.numbers_word_map)
+            full_list = list(zip(numbers, original_texts, spans))
+            sorted_full_list = sorted(full_list, key=lambda kv: kv[2], reverse=False)
+            for number, original_text, span_idx in sorted_full_list:
                 unit = None
                 if self.unit_type:
                     unit, original_text = self._get_unit_from_text(original_text, numeral_text)
@@ -237,7 +238,8 @@ class BaseNumberDetector(object):
                     numeral_text = _pattern.sub(self.tag, numeral_text, 1)
                     number_list.append({
                         NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
-                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit
+                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit,
+                        'span': span_idx
                     })
                     original_list.append(original_text)
         return number_list, original_list
@@ -288,6 +290,9 @@ class BaseNumberDetector(object):
 
         regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))[\s\-\:]' +
                                             r'|([\d,]+\.?[\d]*)', re.UNICODE)
+        start_span = 0
+        end_span = 0
+        spanned_text = processed_text
         patterns = regex_numeric_patterns.findall(processed_text)
         for pattern in patterns:
             number, scale, original_text = None, None, None
@@ -295,11 +300,19 @@ class BaseNumberDetector(object):
                 number = pattern[1].replace(',', '')
                 original_text = pattern[0].strip().strip(',.').strip()
                 scale = self.scale_map[pattern[2].strip()]
+                span = re.search(original_text, spanned_text).span()
+                start_span = end_span + span[0]
+                end_span += span[1]
+                spanned_text = spanned_text[span[1]:]
 
             elif pattern[3] and pattern[3].replace(',', '').replace('.', '').isdigit():
                 number = pattern[3].replace(',', '')
                 original_text = pattern[3].strip().strip(',.').strip()
                 scale = 1
+                span = re.search(original_text, spanned_text).span()
+                start_span = end_span + span[0]
+                end_span += span[1]
+                spanned_text = spanned_text[span[1]:]
 
             if number:
                 if '.' not in number:
@@ -316,7 +329,8 @@ class BaseNumberDetector(object):
                     processed_text = _pattern.sub(self.tag, processed_text, 1)
                     number_list.append({
                         NUMBER_DETECTION_RETURN_DICT_VALUE: str(number),
-                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit
+                        NUMBER_DETECTION_RETURN_DICT_UNIT: unit,
+                        'span': (start_span, end_span)
                     })
                     original_list.append(original_text)
 

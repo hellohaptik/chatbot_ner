@@ -1,6 +1,8 @@
 from __future__ import absolute_import
+
 import re
 from six.moves import range
+
 
 def get_number_from_number_word(text, number_word_dict):
     """
@@ -29,6 +31,7 @@ def get_number_from_number_word(text, number_word_dict):
     # FIXME: conversion from float -> int is lossy, consider using Decimal class
     detected_number_list = []
     detected_original_text_list = []
+    detected_number_spans = []
 
     # exclude single char scales word from word number map dict
     number_word_dict = {word: number_map for word, number_map in number_word_dict.items()
@@ -36,6 +39,10 @@ def get_number_from_number_word(text, number_word_dict):
     text = text.strip()
     if not text:
         return detected_number_list, detected_original_text_list
+
+    start_span = 0
+    end_span = 0
+    spanned_text = text
 
     whitespace_pattern = re.compile(r'(\s+)', re.UNICODE)
     parts = []
@@ -76,10 +83,17 @@ def get_number_from_number_word(text, number_word_dict):
                     if float(number_detected).is_integer():
                         number_detected = int(number_detected)
                     detected_number_list.append(number_detected)
+                    detected_number_spans.append((start_span, end_span))
                     detected_original_text_list.append(original)
 
                 result = current = 0
                 result_text, current_text = '', ''
+
+            span = re.search(word, spanned_text).span()
+            start_span = end_span + span[0]
+            end_span += span[1]
+            spanned_text = spanned_text[span[1]:]
+            detected_number_spans.append((start_span, end_span))
 
             # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
             current = 1 if (scale > 1 and current == 0 and increment == 0) else current
@@ -102,7 +116,7 @@ def get_number_from_number_word(text, number_word_dict):
         detected_number_list.append(number_detected)
         detected_original_text_list.append(original)
 
-    return detected_number_list, detected_original_text_list
+    return detected_number_list, detected_original_text_list, detected_number_spans
 
 
 def get_list_from_pipe_sep_string(text_string):
