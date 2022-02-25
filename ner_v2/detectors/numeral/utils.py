@@ -38,7 +38,7 @@ def get_number_from_number_word(text, number_word_dict):
                         if (len(word) > 1 and number_map.increment == 0) or number_map.scale == 1}
     text = text.strip()
     if not text:
-        return detected_number_list, detected_original_text_list
+        return detected_number_list, detected_original_text_list, []
 
     start_span = 0
     end_span = 0
