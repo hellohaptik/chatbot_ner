@@ -1,6 +1,8 @@
 from __future__ import absolute_import
+
 import re
 from six.moves import range
+
 
 def get_number_from_number_word(text, number_word_dict):
     """
@@ -47,11 +49,9 @@ def get_number_from_number_word(text, number_word_dict):
     current_text, result_text = '', ''
     on_number = False
     prev_digit_len = 0
-<<<<<<< HEAD
-=======
+
     prev_scale = 0
     is_double_or_triple = False
->>>>>>> 9228976... Add support for double and triple for numeric entity
 
     for part in parts:
         word = part.strip()
@@ -77,6 +77,12 @@ def get_number_from_number_word(text, number_word_dict):
                 continue
 
             digit_len = max(len(str(int(increment))), len(str(scale)))
+
+            if prev_scale > 1 and not prev_scale < scale:
+                result += current
+                result_text += current_text
+                current = 0
+                current_text = ''
 
             if digit_len == prev_digit_len:
                 if on_number:
@@ -110,13 +116,9 @@ def get_number_from_number_word(text, number_word_dict):
             current = 1 if (scale > 1 and current == 0 and increment == 0) else current
             current = current * scale + increment
             current_text += part
-            if scale > 1:
-                result += current
-                result_text += current_text
-                current = 0
-                current_text = ''
             on_number = True
             prev_digit_len = digit_len
+            prev_scale = scale
 
     if on_number:
         result_text += current_text
