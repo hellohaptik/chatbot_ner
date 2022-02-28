@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import importlib
 import math
 import os
+from chatbot_ner.config import ner_logger
 try:
     import regex as re
 
