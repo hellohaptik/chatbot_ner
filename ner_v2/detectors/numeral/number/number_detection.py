@@ -2,6 +2,15 @@ from __future__ import absolute_import
 import importlib
 import math
 import os
+try:
+    import regex as re
+
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+    _regex_available = True
+
+except ImportError:
+    ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
+    import re
 
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
