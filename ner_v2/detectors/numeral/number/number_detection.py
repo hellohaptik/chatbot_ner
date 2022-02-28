@@ -3,6 +3,17 @@ import importlib
 import math
 import os
 
+from chatbot_ner.config import ner_logger
+try:
+    import regex as re
+
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+    _regex_available = True
+
+except ImportError:
+    ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
+    import re
+
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT

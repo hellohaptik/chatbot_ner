@@ -47,6 +47,11 @@ def get_number_from_number_word(text, number_word_dict):
     current_text, result_text = '', ''
     on_number = False
     prev_digit_len = 0
+<<<<<<< HEAD
+=======
+    prev_scale = 0
+    is_double_or_triple = False
+>>>>>>> 9228976... Add support for double and triple for numeric entity
 
     for part in parts:
         word = part.strip()
@@ -66,6 +71,11 @@ def get_number_from_number_word(text, number_word_dict):
             on_number = False
         else:
             scale, increment = number_word_dict[word].scale, number_word_dict[word].increment
+            if scale % 100 == 11:
+                is_double_or_triple = True
+                prev_scale = scale
+                continue
+
             digit_len = max(len(str(int(increment))), len(str(scale)))
 
             if digit_len == prev_digit_len:
@@ -80,6 +90,21 @@ def get_number_from_number_word(text, number_word_dict):
 
                 result = current = 0
                 result_text, current_text = '', ''
+
+            if digit_len > prev_digit_len and on_number and prev_scale == scale:
+                current = current * (10 ** digit_len)
+
+            span = re.search(word, spanned_text).span()
+            start_span = end_span + span[0]
+            end_span += span[1]
+            spanned_text = spanned_text[span[1]:]
+            detected_number_spans.append((start_span, end_span))
+
+            if is_double_or_triple:
+                scale = prev_scale
+                current = increment
+                increment = 0
+                is_double_or_triple = False
 
             # handle where only scale is mentioned without unit, for ex - thousand(for 1000), hundred(for 100)
             current = 1 if (scale > 1 and current == 0 and increment == 0) else current
