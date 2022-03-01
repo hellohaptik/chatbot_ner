@@ -1,7 +1,9 @@
 from __future__ import absolute_import
+
 import re
-from ner_v1.detectors.base_detector import BaseDetector
+
 from language_utilities.constant import ENGLISH_LANG
+from ner_v1.detectors.base_detector import BaseDetector
 
 
 class EmailDetector(BaseDetector):
@@ -102,7 +104,7 @@ class EmailDetector(BaseDetector):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
+        self.processed_text = self._preprocess_for_asr(self.text)
         self.tagged_text = self.text
         email_data = self._detect_email()
         self.email = email_data[0]
@@ -145,6 +147,9 @@ class EmailDetector(BaseDetector):
             email_list.append(email)
             original_list.append(original)
         return email_list, original_list
+
+    def _preprocess_for_asr(self, text):
+        return re.sub('@?(at)? ?(the)? ?(rate)', '@', text)
 
     def _update_processed_text(self, original_email_strings):
         """
