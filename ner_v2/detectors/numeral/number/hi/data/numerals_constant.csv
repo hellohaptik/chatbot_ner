@@ -105,3 +105,5 @@ number,name_variants,number_value,number_type
 १०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar|k,1000,scale
 १०००००,लाख|lakh|laakh|lac,100000,scale
 १०००००००,करोड़|crore|karor|caror,10000000,scale
+११,डबल|डाबल|डॉबल|double,11,scale
+१११,ट्रिपल|थ्रीपल|ट्रीपल|त्रिपल|ट्रिप्ल|triple,111,scale
