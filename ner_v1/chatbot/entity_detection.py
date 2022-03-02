@@ -349,7 +349,7 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
                                   bot_message=bot_message)
 
 
-def get_email(message, entity_name, structured_value, fallback_value, bot_message):
+def get_email(message, entity_name, structured_value, fallback_value, bot_message, is_asr):
     """Use EmailDetector to detect email ids
 
     Args:
@@ -398,7 +398,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
             'entity_value': {'value': 'apurv.nagvenkar@gmail.com'}}]
 
     """
-    email_detection = EmailDetector(entity_name=entity_name)
+    email_detection = EmailDetector(entity_name=entity_name, is_asr=is_asr)
     return email_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
                                   bot_message=bot_message)
 

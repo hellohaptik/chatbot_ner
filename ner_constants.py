@@ -50,6 +50,7 @@ PARAMETER_TIMEZONE = 'timezone'
 PARAMETER_REGEX = 'regex'
 PARAMETER_PAST_DATE_REFERENCED = 'past_date_referenced'
 PARAMETER_RANGE_ENABLED = 'range_enabled'
+PARAMETER_IS_ASR = 'is_asr'
 
 # Language parameters of the query.
 PARAMETER_LANGUAGE_SCRIPT = 'language_script'  # ISO 639 code for language. For eg, 'en' for 'Namaste', 'Hello'

@@ -1,7 +1,10 @@
 from __future__ import absolute_import
+
 import re
-from ner_v1.detectors.base_detector import BaseDetector
+
 from language_utilities.constant import ENGLISH_LANG
+from ner_v1.detectors.base_detector import BaseDetector
+from ner_v2.utils.asr_correction import fix_email_format
 
 
 class EmailDetector(BaseDetector):
@@ -36,7 +39,7 @@ class EmailDetector(BaseDetector):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False, is_asr=False):
         """Initializes a EmailDetector object
 
         Args:
@@ -50,7 +53,7 @@ class EmailDetector(BaseDetector):
         # assigning values to superclass attributes
         self._supported_languages = [ENGLISH_LANG]
         super(EmailDetector, self).__init__(source_language_script, translation_enabled)
-
+        self.is_asr = is_asr
         self.entity_name = entity_name
         self.text = ''
         self.tagged_text = ''
@@ -102,7 +105,10 @@ class EmailDetector(BaseDetector):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
+        if self.is_asr:
+            self.processed_text = fix_email_format(self.text)
+        else:
+            self.processed_text = self.text
         self.tagged_text = self.text
         email_data = self._detect_email()
         self.email = email_data[0]
