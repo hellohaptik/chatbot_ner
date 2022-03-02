@@ -19,7 +19,7 @@ def perform_asr_correction(text, pattern_to_match, **kwargs):
 
 
 def format_adherence_match(inp_str, format_str, insert_edits=None, delete_edits=None):
-    print(f'INP:{inp_str}\nFORM:{format_str}')
+    #TODO: Make search greedy (at the moment it matches smalled output). Will increase latency, but must do.
     if insert_edits:
         if delete_edits:
             form_str = f'(?b)({format_str}){{i<={insert_edits},d<={delete_edits}}}'
@@ -32,10 +32,8 @@ def format_adherence_match(inp_str, format_str, insert_edits=None, delete_edits=
     form = re.compile(form_str)
     try:
         m = form.search(inp_str)
-        print(m)
         return m.group(), m.fuzzy_counts
     except Exception as e:
-        print(form, inp_str, e)
         return None, None
 
 

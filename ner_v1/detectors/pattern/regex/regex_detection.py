@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from typing import List
 
 from chatbot_ner.config import ner_logger
+from ner_v2.utils.asr_correction import perform_asr_correction
 
 try:
     import regex as re
@@ -41,7 +42,7 @@ class RegexDetector(object):
          pattern (raw str or str or unicode): pattern to be compiled into a re object
     """
 
-    def __init__(self, entity_name, pattern, re_flags=DEFAULT_FLAGS, max_matches=50):
+    def __init__(self, entity_name, pattern, re_flags=DEFAULT_FLAGS, max_matches=50, is_asr=False):
         """
         Args:
             entity_name (str): an indicator value as tag to replace detected values
@@ -57,6 +58,7 @@ class RegexDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
+        self.is_asr = is_asr
         try:
             self.pattern = re.compile(pattern, flags=re_flags)
         except re.error:
@@ -95,7 +97,10 @@ class RegexDetector(object):
 
         """
         self.text = text
-        self.processed_text = self.text
+        if self.is_asr:
+            self.processed_text = perform_asr_correction(self.text)
+        else:
+            self.processed_text = self.text
         self.tagged_text = self.text
         match_list, original_list = self._detect_regex()
         self._update_processed_text(match_list)
