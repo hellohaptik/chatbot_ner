@@ -20,6 +20,7 @@ NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME = 'unit_type'
 # Return type keys of number detection
 NUMBER_DETECTION_RETURN_DICT_VALUE = 'value'
 NUMBER_DETECTION_RETURN_DICT_UNIT = 'unit'
+NUMBER_DETECTION_RETURN_DICT_SPAN = 'span'
 
 
 # Number range data file name and columns
