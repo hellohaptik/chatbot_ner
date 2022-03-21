@@ -1,13 +1,27 @@
 from __future__ import absolute_import
+
 import importlib
 import math
 import os
+from six.moves import zip
+
+try:
+    import regex as re
+
+    _re_flags = re.UNICODE | re.V1 | re.WORD
+
+except ImportError:
+    ner_logger.warning('Error importing `regex` lib, falling back to stdlib re')
+    import re
+
+    _re_flags = re.UNICODE
 
 from language_utilities.constant import ENGLISH_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
-from six.moves import zip
+
+COMMON_NON_NUMERIC_PUNCTUATIONS = re.escape('!"#%&\'()*/:;<=>?@[\\]^_`{|}~।')
 
 
 class NumberDetector(BaseDetector):
@@ -93,6 +107,7 @@ class NumberDetector(BaseDetector):
         self.language = language
         self.unit_type = unit_type
         self.detect_without_unit = detect_without_unit
+        self.punctuations_to_filter = re.compile(f'[{COMMON_NON_NUMERIC_PUNCTUATIONS}]')
         try:
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
@@ -134,7 +149,7 @@ class NumberDetector(BaseDetector):
 
         """
         self.text = ' ' + text.lower() + ' '
-        self.processed_text = self.text
+        self.processed_text = self._filter_non_num_punctuations(self.text)
         self.tagged_text = self.text
         number_data = self.language_number_detector.detect_number(self.processed_text)
         validated_number, validated_number_text = [], []
@@ -143,11 +158,27 @@ class NumberDetector(BaseDetector):
             number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
             if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
                 if self.unit_type and (number_unit is None or
-                                       self.language_number_detector.units_map[number_unit].type != self.unit_type)\
+                                       self.language_number_detector.units_map[number_unit].type != self.unit_type) \
                         and not self.detect_without_unit:
                     continue
                 validated_number.append(number_value_dict)
                 validated_number_text.append(original_text)
+
+        if not validated_number:
+            number_value = ''
+            prev_original_text = ''
+
+            for number_value_dict, original_text in zip(number_data[0], number_data[1]):
+                prev_original_text = prev_original_text + " " + original_text
+                number_value = int(str(number_value) + str(number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]))
+                number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
+                if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
+                    if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
+                        number_unit].type != self.unit_type) and not self.detect_without_unit:
+                        continue
+                    number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE] = number_value
+                    validated_number.append(number_value_dict)
+                    validated_number_text.append(prev_original_text.strip())
 
         self.number = validated_number
         self.original_number_text = validated_number_text
@@ -188,3 +219,7 @@ class NumberDetector(BaseDetector):
         """
         v = abs(float(value))
         return 1 if int(v) == 0 else (1 + int(math.log10(v)))
+
+    @staticmethod
+    def _filter_non_num_punctuations(text):
+        return re.sub(self.punctuations_to_filter, '', text)
