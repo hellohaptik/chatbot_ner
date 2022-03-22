@@ -5,6 +5,8 @@ import math
 import os
 from six.moves import zip
 
+from chatbot_ner.config import ner_logger
+
 try:
     import regex as re
 
