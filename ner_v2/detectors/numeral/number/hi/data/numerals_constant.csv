@@ -1,17 +1,17 @@
 number,name_variants,number_value,number_type
 ०,शून्य|zero|sunya,0,unit
-१,एक|ek|ik,1,unit
+१,एक|ek|ik|वैन|वन,1,unit
 १.५,डेढ़|ढेड़|देढ़|dedh|dhed,1.5,unit
-२,दो|do|du,2,unit
+२,दो|do|du|टु|टो|टू|टौ,2,unit
 २.५,ढाई|ढ़ाई|धाइ|धाई|dhaai|daai|dhai|dai,2.5,unit
-३,तीन|teen|tin,3,unit
-४,चार|char|chaar,4,unit
-५,पाँच|पांच|panch|paanch|paach,5,unit
-६,छह|chhe|chhah|chheh,6,unit
-७,सात|saat,7,unit
-८,आठ|ath|aath,8,unit
-९,नौ|nau|nao,9,unit
-१०,दस| dus|das,10,unit
+३,तीन|teen|tin|थ्री|थरी|थ्रीं|त्री,3,unit
+४,चार|char|chaar|फोर|फॉर|फ़ॉर|फ़ौर|फूर|फ़ोर,4,unit
+५,पाँच|पांच|panch|paanch|paach|फाइव|फाईव|फ़ाइव|फैव|फाइब,5,unit
+६,छह|chhe|chhah|chheh|सिक्स|सीक्स|सींस|सिस्क,6,unit
+७,सात|saat|सेवन|सेवेन|सवेन|सेवीन|सेवैन|सैवन|सैवेन,7,unit
+८,आठ|ath|aath|एट|ऐंठ|ऐट|ऐठ|एथ,8,unit
+९,नौ|nau|nao|नाइन|नैन|नइं|नेँ|नाइँ,9,unit
+१०,दस| dus|das|टेन|टें|टैन,10,unit
 ११,ग्यारह|gyareh|gyarah,11,unit
 १२,बारह| bareh|barah,12,unit
 १३,तेरह| terah|tereh,13,unit
@@ -105,5 +105,5 @@ number,name_variants,number_value,number_type
 १०००,हज़ार|हजार|hajar|hajaar|hazar|hazaar|k,1000,scale
 १०००००,लाख|lakh|laakh|lac,100000,scale
 १०००००००,करोड़|crore|karor|caror,10000000,scale
-11,डबल|double, 11, scale
-111,ट्रिपल|ट्रिप्ल|triple, 111, scale
+११,डबल|डाबल|डॉबल|double,11,scale
+१११,ट्रिपल|थ्रीपल|ट्रीपल|त्रिपल|ट्रिप्ल|triple,111,scale
