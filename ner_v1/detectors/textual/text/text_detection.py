@@ -1,18 +1,18 @@
 from __future__ import absolute_import
-import collections
-import string
 
+import collections
 import six
+import string
 from six import iteritems
+from six.moves import range
 
 import language_utilities.constant as lang_constant
 from chatbot_ner.config import ner_logger
 from datastore import DataStore
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
-from lib.nlp.levenshtein_distance import edit_distance
-from ner_v1.detectors.base_detector import BaseDetector
+from lib.nlp.text_normalization import edit_distance
 from ner_constants import ENTITY_VALUE_DICT_KEY
-from six.moves import range
+from ner_v1.detectors.base_detector import BaseDetector
 
 try:
     import regex as re

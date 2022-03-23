@@ -2,9 +2,10 @@ from __future__ import absolute_import
 
 import ast
 import json
-
 import six
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger
@@ -13,7 +14,6 @@ from language_utilities.constant import ENGLISH_LANG
 from ner_constants import (PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE,
                            PARAMETER_FALLBACK_VALUE, PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_REGEX,
                            PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, PARAMETER_PRIOR_RESULTS)
-
 from ner_v1.chatbot.combine_detection_logic import combine_output_of_detection_logic_and_tag
 from ner_v1.chatbot.entity_detection import (get_location, get_phone_number, get_email, get_city, get_pnr,
                                              get_number, get_passenger_count, get_shopping_size, get_time,
@@ -22,8 +22,6 @@ from ner_v1.chatbot.entity_detection import (get_location, get_phone_number, get
 from ner_v1.chatbot.tag_message import run_ner
 from ner_v1.constant import (PARAMETER_MIN_TOKEN_LEN_FUZZINESS, PARAMETER_FUZZINESS, PARAMETER_MIN_DIGITS,
                              PARAMETER_MAX_DIGITS)
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 
 
 def to_bool(value):
@@ -62,6 +60,7 @@ def get_parameters_dictionary(request):
         PARAMETER_BOT_MESSAGE: request.GET.get('bot_message'),
         PARAMETER_TIMEZONE: request.GET.get('timezone'),
         PARAMETER_REGEX: request.GET.get('regex'),
+        PARAMETER_ASR: request.GET.get('is_asr', False),
         PARAMETER_LANGUAGE_SCRIPT: request.GET.get('language_script', ENGLISH_LANG),
         PARAMETER_SOURCE_LANGUAGE: request.GET.get('source_language', ENGLISH_LANG),
         PARAMETER_FUZZINESS: request.GET.get('fuzziness'),
@@ -94,6 +93,7 @@ def parse_post_request(request):
         PARAMETER_BOT_MESSAGE: request_data.get('bot_message'),
         PARAMETER_TIMEZONE: request_data.get('timezone'),
         PARAMETER_REGEX: request_data.get('regex'),
+        PARAMETER_ASR: request_data.get('is_asr'),
         PARAMETER_LANGUAGE_SCRIPT: request_data.get('language_script', ENGLISH_LANG),
         PARAMETER_SOURCE_LANGUAGE: request_data.get('source_language', ENGLISH_LANG),
         PARAMETER_FUZZINESS: request_data.get('fuzziness'),
@@ -345,7 +345,8 @@ def regex(request):
                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                   parameters_dict[PARAMETER_FALLBACK_VALUE],
                                   parameters_dict[PARAMETER_BOT_MESSAGE],
-                                  parameters_dict[PARAMETER_REGEX])
+                                  parameters_dict[PARAMETER_REGEX],
+                                  parameters_dict[PARAMETER_ASR])
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
     except TypeError as e:
         ner_logger.exception('Exception for regex: %s ' % e)

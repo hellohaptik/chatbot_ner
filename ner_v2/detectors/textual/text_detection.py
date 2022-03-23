@@ -1,27 +1,21 @@
 from __future__ import absolute_import
 
 import collections
-import string
-
 import six
+import string
 from six import iteritems
+from six.moves import range
 
 import language_utilities.constant as lang_constant
 from chatbot_ner.config import ner_logger
-
-from ner_v2.detectors.textual.elastic_search import ElasticSearchDataStore
-
+from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER, whitespace_tokenizer
-from lib.nlp.levenshtein_distance import edit_distance
-from six.moves import range
-
+from lib.nlp.text_normalization import edit_distance
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED,
                            FROM_MESSAGE, FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE,
                            DETECTION_METHOD, DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-
 from ner_v1.constant import DATASTORE_VERIFIED, MODEL_VERIFIED
-
-from language_utilities.constant import ENGLISH_LANG
+from ner_v2.detectors.textual.elastic_search import ElasticSearchDataStore
 
 try:
     import regex as re

@@ -621,7 +621,7 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
                                 bot_message=bot_message)
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern):
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern, is_asr=False):
     """Use RegexDetector to detect text that abide by the specified
         pattern.
         The meta_data consists the pattern
@@ -658,7 +658,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
             >> [{'detection': 'message', 'original_text': '123', 'entity_value': {'value': '123'}}]
 
     """
-    regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern)
+    regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern, enable_asr=is_asr)
     if structured_value:
         entity_list, original_text_list = regex_detector.detect_entity(text=structured_value)
         if entity_list:
