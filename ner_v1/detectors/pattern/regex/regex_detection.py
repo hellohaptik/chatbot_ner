@@ -42,11 +42,12 @@ class RegexDetector(object):
          pattern (raw str or str or unicode): pattern to be compiled into a re object
     """
 
-    def __init__(self, entity_name, pattern, enable_asr=False, re_flags=DEFAULT_FLAGS, max_matches=50):
+    def __init__(self, entity_name, pattern, asr_enabled=False, re_flags=DEFAULT_FLAGS, max_matches=50):
         """
         Args:
             entity_name (str): an indicator value as tag to replace detected values
             pattern (raw str or str or unicode): pattern to be compiled into a re object
+            asr_enabled (bool) : True if message is from ASR and needs to be processed accordingly
             re_flags (int): flags to pass to re.compile.
                 Defaults to `regex.U | regex.V1 | regex.WORD`  for `regex` lib  and `re.U` for stdlib `re`
             max_matches (int): maximum number of matches to consider.
@@ -58,7 +59,7 @@ class RegexDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
-        self.enable_asr = enable_asr
+        self.asr_enabled = asr_enabled
         self.uncompiled_pattern = pattern
         try:
             self.pattern = re.compile(pattern, flags=re_flags)
@@ -98,7 +99,7 @@ class RegexDetector(object):
 
         """
         self.text = text
-        if self.enable_asr:
+        if self.asr_enabled:
             self.processed_text = perform_asr_correction(self.text, self.uncompiled_pattern)
         else:
             self.processed_text = self.text
