@@ -1,37 +1,37 @@
-number,name_variants, number_value, number_type
-0, zero, 0, unit
-1, one, 1, unit
-2, two, 2, unit
-3, three,3, unit
-4, four, 4, unit
-5, five, 5, unit
-6, six, 6, unit
-7, seven, 7,unit
-8, eight, 8, unit
-9,nine, 9, unit
-10, ten, 10, unit
-11, eleven, 11, unit
-12, twelve|tweleve, 12, unit
-13,thirteen, 13, unit
-14, fourteen, 14, unit
-15, fifteen, 15, unit
-16, sixteen, 16, unit
-17, seventeen,17, unit
-18, eighteen, 18, unit
-19, nineteen, 19, unit
-20, twenty, 20, unit
-30, thirty, 30,unit
-40, forty|fourty, 40, unit
-50, fifty, 50, unit
-60, sixty, 60, unit
-70, seventy, 70,unit
-80, eighty, 80, unit
-90,ninty|ninety, 90, unit
-100, hundred, 100, scale
-1000, Thousand|thousands|k, 1000, scale
-100000, lakh|lakhs|lac|lacs|l, 100000, scale
-100000, million|mil|m, 1000000,scale
-10000000, crore|crores|c|cr, 10000000, scale
-100000000, billion|bil|b, 1000000000, scale
-11, double, 11, scale
-111, triple, 111, scale
+number,name_variants,number_value,number_type
+0,zero,0,unit
+1,one,1,unit
+2,two,2,unit
+3,three,3,unit
+4,four,4,unit
+5,five,5,unit
+6,six,6,unit
+7,seven,7,unit
+8,eight,8,unit
+9,nine,9,unit
+10,ten,10,unit
+11,eleven,11,unit
+12,twelve|tweleve,12,unit
+13,thirteen,13,unit
+14,fourteen,14,unit
+15,fifteen,15,unit
+16,sixteen,16,unit
+17,seventeen,17,unit
+18,eighteen,18,unit
+19,nineteen,19,unit
+20,twenty,20,unit
+30,thirty,30,unit
+40,forty|fourty,40,unit
+50,fifty,50,unit
+60,sixty,60,unit
+70,seventy,70,unit
+80,eighty,80,unit
+90,ninty|ninety,90,unit
+100,hundred,100,scale
+1000,Thousand|thousands|k,1000,scale
+100000,lakh|lakhs|lac|lacs|l,100000,scale
+100000,million|mil|m,1000000,scale
+10000000,crore|crores|c|cr,10000000,scale
+100000000,billion|bil|b,1000000000,scale
+11,double,11,scale
+111,triple,111,scale

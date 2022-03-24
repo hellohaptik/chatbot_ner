@@ -17,7 +17,7 @@ except ImportError:
 
 from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME, \
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
-    NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, \
+    NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_SPAN, \
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
     NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE, NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME
 from ner_v2.detectors.numeral.utils import get_number_from_number_word, get_list_from_pipe_sep_string
@@ -90,7 +90,7 @@ class BaseNumberDetector(object):
         return sorted_number_list, sorted_original_list
 
 
-def init_regex_and_parser(data_directory_path):
+def init_regex_and_parser(self, data_directory_path):
     """
     Initialise numbers word from from data file
     Args:

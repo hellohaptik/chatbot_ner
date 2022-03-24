@@ -7,6 +7,8 @@ from ner_v1.detectors.pattern.regex.data.character_constants import CHARACTER_CO
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 
+# Constants
+_re_flags = re.UNICODE | re.V1
 PUNCTUATION_CHARACTERS = list(string.punctuation + '। ')
 CAPTURE_RANGE_RE = "{(?P<minimum>\d+),(?P<maximum>\d+)}"
 EMAIL_CORRECTION_RE = '@? ?(at)? ?(the)? ?(rate)'
@@ -79,7 +81,7 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
         insert_edits = count(input_text, PUNCTUATION_CHARACTERS) + 2
 
     pattern = f'(?b)({regex_pattern}){{i<={insert_edits}}}'
-    pattern = re.compile(pattern)
+    pattern = re.compile(pattern, flags=_re_flags)
     matched_format = pattern.search(input_text)
 
     # Fuzzy matching acts in a non-greedy fashion, hence the following resolution of reverse iterations

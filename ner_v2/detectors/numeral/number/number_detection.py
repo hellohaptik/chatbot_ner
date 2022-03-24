@@ -222,6 +222,5 @@ class NumberDetector(BaseDetector):
         v = abs(float(value))
         return 1 if int(v) == 0 else (1 + int(math.log10(v)))
 
-    @staticmethod
-    def _filter_non_num_punctuations(text):
+    def _filter_non_num_punctuations(self, text):
         return re.sub(self.punctuations_to_filter, '', text)
