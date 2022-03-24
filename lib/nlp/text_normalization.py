@@ -123,6 +123,7 @@ def resolve_numerals(text) -> str:
     """
     processed_text = text
     number_detector = NumberDetector('asr_dummy', language='en')
+    # FIXME: Detection fails if text starts with '0' since number detector discards it
     detected_numerals, original_texts = number_detector.detect_entity(text=text)
     detected_numerals_hi, original_texts_hi = number_detector.detect_entity(text=text, language='hi')
     detected_numerals.extend(detected_numerals_hi)
