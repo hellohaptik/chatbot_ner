@@ -8,6 +8,7 @@ from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 
 PUNCTUATION_CHARACTERS = list(string.punctuation + '। ')
+CAPTURE_RANGE_RE = "{(?P<minimum>\d+),(?P<maximum>\d+)}"
 EMAIL_CORRECTION_RE = '@? ?(at)? ?(the)? ?(rate)'
 AT_SYMBOL = '@'
 
@@ -72,14 +73,31 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
     Returns:
         input_text (str): modified text
     """
-    if insert_edits:
-        pattern = f'(?b)({regex_pattern}){{i<={insert_edits}}}'
-    else:
+
+    if not insert_edits:
         count = lambda l1, l2: sum([1 for x in l1 if x in l2])
         insert_edits = count(input_text, PUNCTUATION_CHARACTERS) + 2
-        pattern = f'(?b)({regex_pattern}){{i<={insert_edits}}}'
+
+    pattern = f'(?b)({regex_pattern}){{i<={insert_edits}}}'
     pattern = re.compile(pattern)
     matched_format = pattern.search(input_text)
+
+    # Fuzzy matching acts in a non-greedy fashion, hence the following resolution of reverse iterations
+    range_matches = re.finditer(CAPTURE_RANGE_RE, regex_pattern)
+    for match in range_matches:
+        min_range = int(match["minimum"])
+        max_range = int(match["maximum"])
+        for i in range(max_range, min_range - 1, -1):
+            temp_pattern = regex_pattern.replace(match.group(), f'{{{i}}}')
+            pattern = f'(?b)({temp_pattern}){{i<={insert_edits}}}'
+            pattern = re.compile(pattern)
+            matched_format = pattern.search(input_text)
+            if matched_format:
+                regex_pattern = temp_pattern
+                break
+            if i == min_range:
+                return input_text
+
     if matched_format:
         if any(matched_format.fuzzy_counts):
             fuzzy_edits = matched_format.fuzzy_changes[1]  # Insert edits are returned at position 1 in the tuple
