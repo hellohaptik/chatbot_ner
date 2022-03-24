@@ -1,7 +1,10 @@
 from __future__ import absolute_import
+
 import re
-from ner_v1.detectors.base_detector import BaseDetector
+
 from language_utilities.constant import ENGLISH_LANG
+from lib.nlp.text_normalization import preprocess_asr_email
+from ner_v1.detectors.base_detector import BaseDetector
 
 
 class EmailDetector(BaseDetector):
@@ -102,7 +105,7 @@ class EmailDetector(BaseDetector):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
+        self.processed_text = preprocess_asr_email(self.text)
         self.tagged_text = self.text
         email_data = self._detect_email()
         self.email = email_data[0]

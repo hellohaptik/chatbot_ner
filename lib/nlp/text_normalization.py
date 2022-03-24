@@ -8,6 +8,8 @@ from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 
 PUNCTUATION_CHARACTERS = list(string.punctuation + '। ')
+EMAIL_CORRECTION_RE = '@? ?(at)? ?(the)? ?(rate)'
+AT_SYMBOL = '@'
 
 
 def edit_distance(string1, string2, insertion_cost=1, deletion_cost=1, substitution_cost=2, max_distance=None):
@@ -81,7 +83,8 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
     if matched_format:
         if any(matched_format.fuzzy_counts):
             fuzzy_edits = matched_format.fuzzy_changes[1]  # Insert edits are returned at position 1 in the tuple
-            for index in fuzzy_edits:
+            for corrector, index in enumerate(sorted(fuzzy_edits, reverse=False)):
+                index -= corrector
                 input_text = _omit_character_by_index(input_text, index)
     return input_text
 
@@ -102,8 +105,9 @@ def resolve_numerals(text) -> str:
     number_detector = NumberDetector('asr_dummy', language='en')
     detected_numerals, original_texts = number_detector.detect_entity(text=text)
     detected_numerals_hi, original_texts_hi = number_detector.detect_entity(text=text, language='hi')
-    for number, original_text in zip(detected_numerals.extend(detected_numerals_hi),
-                                     original_texts.extend(original_texts_hi)):
+    detected_numerals.extend(detected_numerals_hi)
+    original_texts.extend(original_texts_hi)
+    for number, original_text in zip(detected_numerals, original_texts):
         substitution_reg = re.compile(re.escape(original_text), re.IGNORECASE)
         processed_text = substitution_reg.sub(number[NUMBER_DETECTION_RETURN_DICT_VALUE], processed_text)
     return processed_text
@@ -133,6 +137,18 @@ def perform_asr_correction(input_text, regex_pattern):
     Performs resolution for numerics and characters
     and uses fuzzy matching to modify text as per the RegEx provided.
 
+    Example procedure:
+        input_text = "बी nine nine three zero"
+        regex = "\w\d{4}"
+
+        >> resolve_numerals(input_text)
+            "बी 9 9 3 0"
+        >> resolve_characters(processed_text)
+            "B 9 9 3 0"
+        >> fit_text_to_format(processed_text, regex_pattern)
+            "B9930"
+        Returns:
+            'B9930'
     Args:
         input_text (str): original text (as per ASR engine output)
         regex_pattern (str): Regex pattern to match
@@ -142,4 +158,18 @@ def perform_asr_correction(input_text, regex_pattern):
     processed_text = resolve_numerals(input_text)
     processed_text = resolve_characters(processed_text)
     processed_text = fit_text_to_format(processed_text, regex_pattern)
+    return processed_text
+
+
+def preprocess_asr_email(text):
+    """
+    Handles common error occurrences in Email ASR
+
+    Args:
+        text (str): original text (as per ASR engine output)
+    Returns:
+        processed_text (str): modified text
+    """
+    processed_text = re.sub(EMAIL_CORRECTION_RE, AT_SYMBOL, text)
+    processed_text = re.sub(' at ', AT_SYMBOL, processed_text)
     return processed_text
