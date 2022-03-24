@@ -580,7 +580,9 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             ]
             }
     """
-
+    # TODO: Enable sorting on ES side after verifying mappings are correctly setup.
+    #       Currently in datastore.elastic_search.create.create_crf_index we dont add keyword fields to
+    #       `language_script` and `sentence`. We need to add integration tests for these too
     data = {
         "query": {
             "bool": {
@@ -615,8 +617,10 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     # Parse hits
     results = search_results['hits']['hits']
 
-    language_mapped_results = collections.defaultdict(list)
+    # TODO: Remove and switch to sorting on ES side once mappings are set correctly
+    results.sort(key=lambda _doc: (_doc['_source']['language_script'], _doc['_source']['sentence']))
 
+    language_mapped_results = collections.defaultdict(list)
     for result in results:
         language_mapped_results[result['_source']['language_script']].append(
             {

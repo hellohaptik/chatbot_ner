@@ -23,5 +23,12 @@ BAHASA_LANG = 'id'
 SWAHILI_LANG = 'sw'
 ARABIC_LANG = 'ar'
 
+POLISH_LANG='pl'
+TAGALOG_LANG = 'tl'
+SWEDISH_LANG = 'sv'
+FINNISH_LANG = 'fi'
+PORTUGUESE_LANG = 'pt'
+TURKISH_LANG = 'tr'
+
 # language translation status
 TRANSLATED_TEXT = 'translated_text'

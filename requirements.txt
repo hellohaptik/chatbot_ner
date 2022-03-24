@@ -17,7 +17,7 @@ pandas==1.0.5
 urllib3==1.26.5
 requests==2.26.0
 requests-aws4auth==0.9
-Django==3.2.7
+Django==3.2.12
 
 elasticsearch==5.5.3
 nltk==3.4.5
@@ -51,4 +51,4 @@ nose-exclude==0.5.0
 # Other convenience libs, ideally should only be installed in dev
 flake8==3.4.1
 jedi==0.17.2
-ipython==7.16.1
+ipython==7.16.3
