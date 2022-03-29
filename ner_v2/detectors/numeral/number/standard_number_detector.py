@@ -76,6 +76,12 @@ class BaseNumberDetector(object):
             original_list (list): list containing original numeral text
 
         """
+
+        def _pop_key_from_dict(xdict, key_name):
+            temp_dict = xdict.copy()
+            temp_dict.pop(key_name, None)
+            return temp_dict
+
         self.text = text
         self.processed_text = text
         self.tagged_text = text
@@ -84,11 +90,14 @@ class BaseNumberDetector(object):
         for detector in self.detector_preferences:
             number_list, original_list = detector(number_list, original_list)
             self._update_processed_text(original_list)
-        sorted_number_list = sorted(number_list, key=lambda num: num['span'], reverse=False)
-        sorted_original_list = [x for _, x in
-                                sorted(zip(number_list, original_list), key=lambda num: num[0]['span'], reverse=False)]
+        sorted_number_list = [_pop_key_from_dict(num_dict, NUMBER_DETECTION_RETURN_DICT_SPAN) for num_dict in
+                              sorted(number_list,
+                                     key=lambda n: n[NUMBER_DETECTION_RETURN_DICT_SPAN],
+                                     reverse=False)]
+        sorted_original_list = [x for _, x in sorted(zip(number_list, original_list),
+                                                     key=lambda num: num[0][NUMBER_DETECTION_RETURN_DICT_SPAN],
+                                                     reverse=False)]
         return sorted_number_list, sorted_original_list
-
 
     def init_regex_and_parser(self, data_directory_path):
         """
