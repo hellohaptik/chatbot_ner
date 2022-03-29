@@ -23,7 +23,7 @@ from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
 
-COMMON_NON_NUMERIC_PUNCTUATIONS = re.escape('!"#%&\'()*/:;<=>?@[\\]^_`{|}~।')
+COMMON_NON_NUMERIC_PUNCTUATIONS = re.escape('!"#%&\'()*/;<=>?@[\\]^_`{|}~।')
 
 
 class NumberDetector(BaseDetector):
