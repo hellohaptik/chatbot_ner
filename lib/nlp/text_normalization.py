@@ -10,7 +10,7 @@ from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 # Constants
 _re_flags = re.UNICODE | re.V1
 PUNCTUATION_CHARACTERS = list(string.punctuation + '। ')
-CAPTURE_RANGE_RE = "{(?P<minimum>\d+),(?P<maximum>\d+)}"
+CAPTURE_RANGE_RE = re.escape(r"{(?P<minimum>\d+),(?P<maximum>\d+)}")
 EMAIL_CORRECTION_RE = '@? ?(at)? ?(the)? ?(rate)'
 AT_SYMBOL = '@'
 
@@ -74,10 +74,15 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
 
     Returns:
         input_text (str): modified text
+
+    Example:
+        fit_text_to_format(input_text='1 2 3 45', regex_pattern='\d{5}')
+        >> "12345"
     """
 
     if not insert_edits:
-        count = lambda l1, l2: sum([1 for x in l1 if x in l2])
+        # A rough heuristic to allow (#_of_punctuations + 2) extra characters during fuzzy matching
+        count = lambda l1, l2: sum([1 for x in l1 if x in l2])  # pylint: disable=E731
         insert_edits = count(input_text, PUNCTUATION_CHARACTERS) + 2
 
     pattern = f'(?b)({regex_pattern}){{i<={insert_edits}}}'
@@ -85,6 +90,8 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
     matched_format = pattern.search(input_text)
 
     # Fuzzy matching acts in a non-greedy fashion, hence the following resolution of reverse iterations
+    # Eg. For regex="\d{3,5}" text="12345", fuzzy match detects "123"
+    # Therefore we start checking from the maximum number
     range_matches = re.finditer(CAPTURE_RANGE_RE, regex_pattern)
     for match in range_matches:
         min_range = int(match["minimum"])
@@ -102,7 +109,9 @@ def fit_text_to_format(input_text, regex_pattern, insert_edits=None):
 
     if matched_format:
         if any(matched_format.fuzzy_counts):
-            fuzzy_edits = matched_format.fuzzy_changes[1]  # Insert edits are returned at position 1 in the tuple
+            # Insert edit positions are returned at position 1 in the fuzzy_changes tuple
+            fuzzy_edits = matched_format.fuzzy_changes[1]
+            # Removing "additional characters" in text
             for corrector, index in enumerate(sorted(fuzzy_edits, reverse=False)):
                 index -= corrector
                 input_text = _omit_character_by_index(input_text, index)
@@ -113,16 +122,17 @@ def _omit_character_by_index(text, index) -> str:
     return text[:index] + text[index + 1:]
 
 
-def resolve_numerals(text) -> str:
+def resolve_numerals(text, language) -> str:
     """
     Uses NumberDetector to resolve numeric occurrences in text for both English and Hindi.
     Args:
         text (str): processed string with numerals and character constants fixed
+        language (str): Language for NumberDetector
     Returns:
         processed_text (str): modified text
     """
     processed_text = text
-    number_detector = NumberDetector('asr_dummy', language='en')
+    number_detector = NumberDetector('asr_dummy', language=language)
     # FIXME: Detection fails if text starts with '0' since number detector discards it
     detected_numerals, original_texts = number_detector.detect_entity(text=text)
     detected_numerals_hi, original_texts_hi = number_detector.detect_entity(text=text, language='hi')
@@ -152,7 +162,7 @@ def resolve_characters(text) -> str:
     return processed_text
 
 
-def perform_asr_correction(input_text, regex_pattern):
+def perform_asr_correction(input_text, regex_pattern, language='en'):
     """
     Main function for text normalization for ASR retrieved input.
     Performs resolution for numerics and characters
@@ -160,7 +170,7 @@ def perform_asr_correction(input_text, regex_pattern):
 
     Example procedure:
         input_text = "बी nine nine three zero"
-        regex = "\w\d{4}"
+        regex = r"\w\d{4}"
 
         >> resolve_numerals(input_text)
             "बी 9 9 3 0"
@@ -173,12 +183,14 @@ def perform_asr_correction(input_text, regex_pattern):
     Args:
         input_text (str): original text (as per ASR engine output)
         regex_pattern (str): Regex pattern to match
+        language (str): Source language
     Returns:
         processed_text (str): modified text
     """
-    processed_text = resolve_numerals(input_text)
+    processed_text = resolve_numerals(input_text, language)
     processed_text = resolve_characters(processed_text)
     processed_text = fit_text_to_format(processed_text, regex_pattern)
+    ner_logger.info(f'ASR Processing converted {input_text} --> {processed_text}')
     return processed_text
 
 
