@@ -176,7 +176,7 @@ class NumberDetector(BaseDetector):
                 number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
                 if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
                     if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
-                        number_unit].type != self.unit_type) and not self.detect_without_unit:
+                       number_unit].type != self.unit_type) and not self.detect_without_unit:
                         continue
                     number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE] = number_value
                     validated_number.append(number_value_dict)
