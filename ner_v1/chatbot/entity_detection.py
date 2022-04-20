@@ -349,7 +349,7 @@ def get_phone_number(message, entity_name, structured_value, fallback_value, bot
                                   bot_message=bot_message)
 
 
-def get_email(message, entity_name, structured_value, fallback_value, bot_message):
+def get_email(message, entity_name, structured_value, fallback_value, bot_message, is_asr):
     """Use EmailDetector to detect email ids
 
     Args:
@@ -363,6 +363,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
+        is_asr (bool): True if message comes in from a voice only bot
 
 
     Returns:
@@ -400,7 +401,7 @@ def get_email(message, entity_name, structured_value, fallback_value, bot_messag
     """
     email_detection = EmailDetector(entity_name=entity_name)
     return email_detection.detect(message=message, structured_value=structured_value, fallback_value=fallback_value,
-                                  bot_message=bot_message)
+                                  bot_message=bot_message, asr_enabled=is_asr)
 
 
 def get_city(message, entity_name, structured_value, fallback_value, bot_message, language, **kwargs):
@@ -621,7 +622,8 @@ def get_pnr(message, entity_name, structured_value, fallback_value, bot_message)
                                 bot_message=bot_message)
 
 
-def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern):
+def get_regex(message, entity_name, structured_value, fallback_value, bot_message, pattern, is_asr=False,
+              language='en'):
     """Use RegexDetector to detect text that abide by the specified
         pattern.
         The meta_data consists the pattern
@@ -631,13 +633,15 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
                                 detection is run on structured value instead of message
         entity_name (str): name of the entity. Also acts as elastic-search dictionary name
                            if entity uses elastic-search lookup
+        pattern (str): Regex pattern to match
         structured_value (str): Value obtained from any structured elements. Note if structured value is
                                 detection is run on structured value instead of message
                                 (For example, UI elements like form, payload, etc)
         fallback_value (str): If the detection logic fails to detect any value either from structured_value
                           or message then we return a fallback_value as an output.
         bot_message (str): previous message from a bot/agent.
-
+        is_asr (bool): True if message comes in from a voice only bot
+        language (str): Source language of the message
 
     Returns:
         dict or None: dictionary containing entity_value, original_text and detection;
@@ -658,7 +662,7 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
             >> [{'detection': 'message', 'original_text': '123', 'entity_value': {'value': '123'}}]
 
     """
-    regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern)
+    regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern, asr_enabled=is_asr, language=language)
     if structured_value:
         entity_list, original_text_list = regex_detector.detect_entity(text=structured_value)
         if entity_list:
