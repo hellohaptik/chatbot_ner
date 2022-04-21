@@ -10,6 +10,7 @@ from __future__ import absolute_import
 from typing import List
 
 from chatbot_ner.config import ner_logger
+from lib.nlp.text_normalization import perform_asr_correction
 
 try:
     import regex as re
@@ -41,14 +42,16 @@ class RegexDetector(object):
          pattern (raw str or str or unicode): pattern to be compiled into a re object
     """
 
-    def __init__(self, entity_name, pattern, re_flags=DEFAULT_FLAGS, max_matches=50):
+    def __init__(self, entity_name, pattern, asr_enabled=False, re_flags=DEFAULT_FLAGS, max_matches=50, language='en'):
         """
         Args:
             entity_name (str): an indicator value as tag to replace detected values
             pattern (raw str or str or unicode): pattern to be compiled into a re object
+            asr_enabled (bool) : True if message is from ASR and needs to be processed accordingly
             re_flags (int): flags to pass to re.compile.
                 Defaults to `regex.U | regex.V1 | regex.WORD`  for `regex` lib  and `re.U` for stdlib `re`
             max_matches (int): maximum number of matches to consider.
+            language (str): Source language for the message
 
         Raises:
             TypeError: if the given pattern fails to compile
@@ -57,6 +60,9 @@ class RegexDetector(object):
         self.text = ''
         self.tagged_text = ''
         self.processed_text = ''
+        self.asr_enabled = asr_enabled
+        self.uncompiled_pattern = pattern
+        self.language = language
         try:
             self.pattern = re.compile(pattern, flags=re_flags)
         except re.error:
@@ -95,7 +101,10 @@ class RegexDetector(object):
 
         """
         self.text = text
-        self.processed_text = self.text
+        if self.asr_enabled:
+            self.processed_text = perform_asr_correction(self.text, self.uncompiled_pattern, self.language)
+        else:
+            self.processed_text = self.text
         self.tagged_text = self.text
         match_list, original_list = self._detect_regex()
         self._update_processed_text(match_list)

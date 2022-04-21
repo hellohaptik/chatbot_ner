@@ -1,7 +1,10 @@
 from __future__ import absolute_import
+
 import re
-from ner_v1.detectors.base_detector import BaseDetector
+
 from language_utilities.constant import ENGLISH_LANG
+from lib.nlp.text_normalization import preprocess_asr_email
+from ner_v1.detectors.base_detector import BaseDetector
 
 
 class EmailDetector(BaseDetector):
@@ -36,15 +39,16 @@ class EmailDetector(BaseDetector):
         text and tagged_text will have a extra space prepended and appended after calling detect_entity(text)
     """
 
-    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False):
+    def __init__(self, entity_name, source_language_script=ENGLISH_LANG, translation_enabled=False, asr_enabled=False):
         """Initializes a EmailDetector object
 
         Args:
-           entity_name: A string by which the detected email addresses would be replaced with on
+            entity_name: A string by which the detected email addresses would be replaced with on
                        calling detect_entity()
-           source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
-           translation_enabled: True if messages needs to be translated in case detector does not support a
+            source_language_script: ISO 639 code for language of entities to be detected by the instance of this class
+            translation_enabled: True if messages needs to be translated in case detector does not support a
                                 particular language, else False
+            asr_enabled: True if message comes from ASR and needs to be processed
 
         """
         # assigning values to superclass attributes
@@ -58,6 +62,7 @@ class EmailDetector(BaseDetector):
         self.email = []
         self.original_email_text = []
         self.tag = '__' + self.entity_name + '__'
+        self.asr_enabled = asr_enabled
 
     @property
     def supported_languages(self):
@@ -102,7 +107,10 @@ class EmailDetector(BaseDetector):
 
         """
         self.text = ' ' + text + ' '
-        self.processed_text = self.text
+        if self.asr_enabled:
+            self.processed_text = preprocess_asr_email(self.text)
+        else:
+            self.processed_text = self.text
         self.tagged_text = self.text
         email_data = self._detect_email()
         self.email = email_data[0]

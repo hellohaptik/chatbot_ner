@@ -48,6 +48,7 @@ PARAMETER_FALLBACK_VALUE = 'fallback_value'
 PARAMETER_BOT_MESSAGE = 'bot_message'
 PARAMETER_TIMEZONE = 'timezone'
 PARAMETER_REGEX = 'regex'
+PARAMETER_ASR = 'is_asr'
 PARAMETER_PAST_DATE_REFERENCED = 'past_date_referenced'
 PARAMETER_RANGE_ENABLED = 'range_enabled'
 
