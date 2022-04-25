@@ -175,7 +175,10 @@ class NumberDetector(BaseDetector):
                 try:
                     number_value = float(
                         str(number_value) + str(number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]))
-                except Exception:
+                except ValueError:
+                    # This will occur in cases of concatenating numbers that are incompatible-
+                    # E.g: Dates such as 23.04.21
+                    # In this case, we don't want to go ahead with concatenations.
                     break
                 number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
                 if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
