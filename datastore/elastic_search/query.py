@@ -598,13 +598,18 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
             }
         }
     }
-
-    if languages:
-        data['query']['bool']['filter'] = {
-            "terms": {
-                "language_script": languages
+    #       match query does not support array(list of languages).
+    #       building a list of dictionaries corresponding to match query for each language
+    list_query_langs = []
+    for lang in languages:
+        query_lang={
+            "match": {
+                "language_script": i
             }
         }
+        list_query_langs.append(query_lang)
+
+    data['query']['bool']['should'] =list_query_langs
 
     kwargs = dict(kwargs,
                   body=data,
