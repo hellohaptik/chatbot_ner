@@ -600,7 +600,7 @@ def get_crf_data_for_entity_name(connection, index_name, doc_type, entity_name, 
     }
     #       match query does not support array(list of languages).
     #       building a list of dictionaries corresponding to match query for each language
-    if languages :
+    if languages:
         list_query_langs = []
         for lang in languages:
             query_lang = {
