@@ -5,7 +5,6 @@ import six
 
 from chatbot_ner.config import ner_logger
 from language_utilities.constant import ENGLISH_LANG
-
 from ner_constants import (DATASTORE_VERIFIED, MODEL_VERIFIED,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY, MAX_NUMBER_BULK_MESSAGE,
@@ -49,7 +48,8 @@ def validate_text_request(request):
                                  f" for bulk detection but got {len(messages)}")
     if len(entities) > MAX_NUMBER_MULTI_ENTITIES:
         raise InvalidTextRequest(f"Length of key `entities` can be at most {MAX_NUMBER_MULTI_ENTITIES} "
-                                 f"for bulk detection but got {len(entities)}")
+                                 f"for bulk detection but got {len(entities)}. Please check bot for the "
+                                 f"entity - {list(entities)[-1]}")
 
 
 def get_detection(message, entity_dict, bot_message=None, language=ENGLISH_LANG, target_language_script=ENGLISH_LANG,
