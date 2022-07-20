@@ -11,7 +11,6 @@ CLIENT_APPLICATIONS_SETUP_NAME = os.environ.get('CLIENT_APPLICATIONS_SETUP_NAME'
 SENTRY_DSN = os.environ.get('SENTRY_DSN')
 _sentry_enabled = (os.environ.get('SENTRY_ENABLED') or '').strip().lower()
 SENTRY_ENABLED = (_sentry_enabled == 'true' and 'test' not in sys.argv)
-SENTRY_SAMPLE_RATE = os.environ.get('SENTRY_SAMPLE_RATE', 0.1)
 
 
 def setup_sentry():
@@ -42,6 +41,6 @@ def setup_sentry():
             dsn=SENTRY_DSN,
             integrations=[DjangoIntegration(), sentry_logging, sentry_exception],
             environment=ENVIRONMENT,
-            sample_rate=float(SENTRY_SAMPLE_RATE),
+            sample_rate=1.0,
             before_send=before_sentry_send
         )
