@@ -160,9 +160,8 @@ class NumberDetector(BaseDetector):
             number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
             try:
                 if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
-                    if self.unit_type and (number_unit is None or
-                                          self.language_number_detector.units_map[number_unit].type != self.unit_type) \
-                            and not self.detect_without_unit:
+                    if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
+                       number_unit].type != self.unit_type) and not self.detect_without_unit:
                         continue
                     validated_number.append(number_value_dict)
                     validated_number_text.append(original_text)
