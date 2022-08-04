@@ -166,7 +166,8 @@ class NumberDetector(BaseDetector):
                     validated_number.append(number_value_dict)
                     validated_number_text.append(original_text)
             except (OverflowError, ValueError) as error_message:
-                ner_logger.exception(f'Exception for NumberDetector: {error_message}')
+                ner_logger.warning(f'Incompatible input received for NumberDetector: {error_message}')
+                break
 
         if not validated_number:
             number_value = ''
@@ -192,7 +193,8 @@ class NumberDetector(BaseDetector):
                         validated_number.append(number_value_dict)
                         validated_number_text.append(prev_original_text.strip())
                 except (OverflowError, ValueError) as error_message:
-                    ner_logger.exception(f'Exception for NumberDetector: {error_message}')
+                    ner_logger.warning(f'Incompatible input received for NumberDetector: {error_message}')
+                    break
 
         self.number = validated_number
         self.original_number_text = validated_number_text
