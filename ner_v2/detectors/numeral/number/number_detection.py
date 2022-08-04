@@ -167,7 +167,6 @@ class NumberDetector(BaseDetector):
                     validated_number_text.append(original_text)
             except (OverflowError, ValueError) as error_message:
                 ner_logger.warning(f'Incompatible input received for NumberDetector: {error_message}')
-                break
 
         if not validated_number:
             number_value = ''
