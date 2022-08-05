@@ -190,3 +190,13 @@ tests:
         output_id: 2
         unit: null
         value: "987654321012345678901"
+  - id: en_15
+    message: "visitor uploaded: 16595754269574824670701503495223.jpg url: https://google.com/video/oeyaapwgxy3jmxwmywmtlofvmdxsyj31a1/t78199ab80h83f451b3f0312e1514c1ec6b3dca2b4.jpg type: image/jpeg size: 3829649"
+    unit_type: null
+    min_digit: 1
+    max_digit: 1
+    outputs:
+      - output_id: 1
+        value: null
+        unit: null
+        original_text: null
