@@ -158,13 +158,15 @@ class NumberDetector(BaseDetector):
         for number_value_dict, original_text in zip(number_data[0], number_data[1]):
             number_value = number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE]
             number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
-            if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
-                if self.unit_type and (number_unit is None or
-                                       self.language_number_detector.units_map[number_unit].type != self.unit_type) \
-                        and not self.detect_without_unit:
-                    continue
-                validated_number.append(number_value_dict)
-                validated_number_text.append(original_text)
+            try:
+                if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
+                    if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
+                       number_unit].type != self.unit_type) and not self.detect_without_unit:
+                        continue
+                    validated_number.append(number_value_dict)
+                    validated_number_text.append(original_text)
+            except (OverflowError, ValueError) as error_message:
+                ner_logger.warning(f'Incompatible input received for NumberDetector: {error_message}')
 
         if not validated_number:
             number_value = ''
@@ -181,13 +183,17 @@ class NumberDetector(BaseDetector):
                     # In this case, we don't want to go ahead with concatenations.
                     break
                 number_unit = number_value_dict[NUMBER_DETECTION_RETURN_DICT_UNIT]
-                if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
-                    if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
-                       number_unit].type != self.unit_type) and not self.detect_without_unit:
-                        continue
-                    number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE] = number_value
-                    validated_number.append(number_value_dict)
-                    validated_number_text.append(prev_original_text.strip())
+                try:
+                    if self.min_digit <= self._num_digits(number_value) <= self.max_digit:
+                        if self.unit_type and (number_unit is None or self.language_number_detector.units_map[
+                           number_unit].type != self.unit_type) and not self.detect_without_unit:
+                            continue
+                        number_value_dict[NUMBER_DETECTION_RETURN_DICT_VALUE] = number_value
+                        validated_number.append(number_value_dict)
+                        validated_number_text.append(prev_original_text.strip())
+                except (OverflowError, ValueError) as error_message:
+                    ner_logger.warning(f'Incompatible input received for NumberDetector: {error_message}')
+                    break
 
         self.number = validated_number
         self.original_number_text = validated_number_text
