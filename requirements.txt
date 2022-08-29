@@ -1,6 +1,6 @@
 # Python-C stuff
-Cython==0.28.2
-six==1.15.0
+Cython==0.29.28
+six==1.16.0
 
 # WSGI compatible server
 uwsgi==2.0.19.1
@@ -10,9 +10,9 @@ botocore==1.21.35
 s3transfer==0.5.0
 boto3==1.18.35
 
-scipy==1.4.1
-numpy==1.19.2
-pandas==1.0.5
+scipy==1.8.0
+numpy==1.21.0
+pandas==1.4.1
 
 urllib3==1.26.5
 requests==2.26.0
@@ -20,13 +20,13 @@ requests-aws4auth==0.9
 Django==3.2.12
 
 elasticsearch==5.5.3
-nltk==3.4.5
+nltk==3.6.6
 phonenumberslite==8.10.18
 pyaml==19.4.1
-python-dateutil==2.7.3
+python-dateutil==2.8.1
 pytz==2020.1
-regex==2020.7.14
-weighted-levenshtein==0.1
+regex==2021.8.3
+weighted-levenshtein==0.2.1
 word2number==1.1
 
 # Spacy and models
@@ -50,5 +50,4 @@ nose-exclude==0.5.0
 
 # Other convenience libs, ideally should only be installed in dev
 flake8==3.4.1
-jedi==0.17.2
-ipython==7.16.3
+ipython==8.0.1
