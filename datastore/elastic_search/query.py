@@ -315,11 +315,13 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
         response = _run_es_search(connection, msearch=True, **kwargs)
         results = _parse_es_search_results(response.get("responses"))
     except es_exceptions.NotFoundError as e:
-        raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}', engine='elasticsearch',
-                                        request=json.dumps(data), response=json.dumps(response))
+        raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}',
+                                        engine='elasticsearch', request=json.dumps(data),
+                                        response=json.dumps(response)) from e
     except es_exceptions.ConnectionError as e:
         raise DataStoreRequestException(f'Error while connecting to ES, in datastore query on index: {index_name}',
-                                        engine='elasticsearch', request=json.dumps(data), response=json.dumps(response))
+                                        engine='elasticsearch', request=json.dumps(data),
+                                        response=json.dumps(response)) from e
     except Exception as e:
         raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
                                         request=json.dumps(data), response=json.dumps(response)) from e

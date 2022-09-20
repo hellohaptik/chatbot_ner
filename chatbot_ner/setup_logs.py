@@ -1,5 +1,5 @@
 import collections
-from typing import Dict, Any, NamedTuple, List, Union, Optional
+from typing import Dict, Any, NamedTuple, List
 
 import logging
 import structlog
@@ -9,13 +9,12 @@ from django_structlog.middlewares.request import get_request_header
 from django_structlog.signals import bind_extra_request_metadata
 
 
-
-
 class _LoggingKey(NamedTuple):
     namespace: str
     bind_key: str
     header_key: str
     meta_key: str
+
 
 class LoggingKeys(object):
     # Copied attributes from django-structlog
@@ -42,7 +41,6 @@ for loggingkey in LoggingKeys.members():
     ALLOWED_BIND_KEYS.add(loggingkey.bind_key)
     NAMESPACE_TO_LOGGING_KEYS[loggingkey.namespace].append(loggingkey)
 ALLOWED_BIND_KEYS = frozenset(ALLOWED_BIND_KEYS)
-
 
 
 def add_module_and_lineno(logger: logging.Logger, name: str, event_dict: Dict[str, Any]) -> Dict[str, Any]:
