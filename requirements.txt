@@ -52,3 +52,7 @@ nose-exclude==0.5.0
 flake8==3.4.1
 jedi==0.17.2
 ipython==7.16.3
+
+#logging
+structlog==21.1.0
+django-structlog==1.5.2

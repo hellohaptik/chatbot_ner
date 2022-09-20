@@ -13,8 +13,10 @@ from __future__ import absolute_import
 
 import os
 import sys
+import structlog
 
 from chatbot_ner.setup_sentry import setup_sentry
+from chatbot_ner.setup_logs import setup_logs
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 ENVIRONMENT = os.environ.get('ENVIRONMENT') or os.environ.get('HAPTIK_ENV')
@@ -53,6 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_structlog.middlewares.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'chatbot_ner.urls'
@@ -134,6 +137,13 @@ LOGGING = {
         'default': {
             'format': '%(asctime)s %(levelname)s %(message)s %(module)s:%(lineno)d'
         },
+        'time_log': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+        },
+        "json_formatter": {
+            "()": structlog.stdlib.ProcessorFormatter,
+            "processor": structlog.processors.JSONRenderer(),
+        }
     },
     'handlers': {
         'stdout': {
@@ -152,7 +162,12 @@ LOGGING = {
             'level': DJANGO_LOG_LEVEL,
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'ner_log.log'),
-            'formatter': 'default'
+            'formatter': 'json_formatter'
+        },
+        'audit': {
+            "class": "logging.handlers.WatchedFileHandler",
+            "filename": os.path.join(BASE_DIR, 'logs', 'audit.log'),
+            "formatter": "json_formatter",
         }
     },
     'loggers': {
@@ -180,12 +195,19 @@ LOGGING = {
             'handlers': ['stdout'],
             'level': 'WARNING',
             'propagate': False
+        },
+        "django_structlog": {
+            "handlers": ["audit"],
+            "level": "INFO",
         }
     }
 }
 
 # setup sentry
 setup_sentry()
+
+# setup logs
+setup_logs()
 
 # APM
 _elastic_apm_enabled = (os.environ.get('ELASTIC_APM_ENABLED') or '').strip().lower()
