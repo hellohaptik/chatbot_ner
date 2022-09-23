@@ -1,3 +1,7 @@
+"""
+This module contains functions and classes required for configuring structlog
+"""
+
 import collections
 from typing import Dict, Any, NamedTuple, List
 
@@ -17,16 +21,16 @@ class _LoggingKey(NamedTuple):
 
 
 class LoggingKeys(object):
+    """
+    This class contains attributes that need to be logged,
+    they will be logged in case they are present in request headers
+    """
     # Copied attributes from django-structlog
     REQUEST_ID = _LoggingKey(namespace='default', bind_key='request_id',
                              header_key='x-request-id', meta_key='HTTP_X_REQUEST_ID')
     CORRELATION_ID = _LoggingKey(namespace='default', bind_key='correlation_id',
                                  header_key='x-correlation-id', meta_key='HTTP_X_CORRELATION_ID')
     # Things haptik wants bound to log lines for filtering
-    BUSINESS_ID = _LoggingKey(namespace='haptik', bind_key='business_id',
-                              header_key='x-haptik-business-id', meta_key='HTTP_X_HAPTIK_BUSINESS_ID')
-    BOT_NAME = _LoggingKey(namespace='haptik', bind_key='bot_name',
-                           header_key='x-haptik-bot-name', meta_key='HTTP_X_HAPTIK_BOT_NAME')
     MESSAGE_ID = _LoggingKey(namespace='haptik', bind_key='message_id',
                              header_key='x-haptik-message-id', meta_key='HTTP_X_HAPTIK_MESSAGE_ID')
 
@@ -86,8 +90,6 @@ def update_request_metadata(
         request_header = get_request_header(request, loggingkey.header_key, loggingkey.meta_key)
         if request_header:
             context[loggingkey.bind_key] = request_header
-    context['request_path'] = request.get_full_path()
-    context['username'] = request.user.username
     logger.bind(**context)
     unbind_extras(logger)
 
