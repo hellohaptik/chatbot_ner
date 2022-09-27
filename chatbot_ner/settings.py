@@ -150,13 +150,13 @@ LOGGING = {
             'level': DJANGO_LOG_LEVEL,
             'class': 'logging.StreamHandler',
             'stream': sys.stdout,
-            'formatter': 'default'
+            'formatter': 'json_formatter'
         },
         'requests_file': {
             'level': 'WARNING',
             'class': 'logging.handlers.WatchedFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs', 'requests.log'),
-            'formatter': 'default'
+            'formatter': 'json_formatter'
         },
         'chatbot_ner_file': {
             'level': DJANGO_LOG_LEVEL,

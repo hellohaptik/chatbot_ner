@@ -33,8 +33,6 @@ class LoggingKeys(object):
     # Things haptik wants bound to log lines for filtering
     MESSAGE_ID = _LoggingKey(namespace='haptik', bind_key='message_id',
                              header_key='x-haptik-message-id', meta_key='HTTP_X_HAPTIK_MESSAGE_ID')
-    USER_NAME = _LoggingKey(namespace='haptik', bind_key='username',
-                            header_key='x-haptik-user-name', meta_key='HTTP_X_HAPTIK_USER_NAME')
 
     @classmethod
     def members(cls) -> List[_LoggingKey]:
@@ -66,7 +64,7 @@ def add_module_and_lineno(logger: logging.Logger, name: str, event_dict: Dict[st
 
 def unbind_extras(logger):
     # TODO: disabled to avoid too much logging, discuss with team
-    logger.try_unbind('ip', 'user_id', 'request_path', 'task_id', 'parent_task_id')
+    logger.try_unbind('ip', 'username', 'user_id', 'request_path', 'task_id', 'parent_task_id')
 
 
 def update_request_metadata(
@@ -91,7 +89,6 @@ def update_request_metadata(
         request_header = get_request_header(request, loggingkey.header_key, loggingkey.meta_key)
         if request_header:
             context[loggingkey.bind_key] = request_header
-    context['username'] = request.user.username
     logger.bind(**context)
     unbind_extras(logger)
 
