@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 
-import logging
+import structlog
 import os
 
 from elasticsearch import RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 
-ner_logger = logging.getLogger('chatbot_ner')
+ner_logger = structlog.getLogger('chatbot_ner')
 
 ENGINE = os.environ.get('ENGINE')
 # ES settings (Mandatory to use Text type entities)

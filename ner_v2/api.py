@@ -128,6 +128,7 @@ def date(request):
            >>  [{'detection': 'message', 'original_text': 'agle mahine k 5 tarikh',
                  'entity_value': {'value': {'mm': 12, 'yy': 2018, 'dd': 5, 'type': 'date'}}}]
     """
+    entity_output = None
     try:
         parameters_dict = {}
         if request.method == "POST":
@@ -150,7 +151,6 @@ def date(request):
         date_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
         message = parameters_dict[PARAMETER_MESSAGE]
-        entity_output = None
 
         if isinstance(message, six.string_types):
             entity_output = date_detection.detect(message=message,
@@ -161,11 +161,34 @@ def date(request):
             entity_output = date_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
-        ner_logger.exception('Exception for date: %s ' % e)
-        return HttpResponse(status=500)
+    except InvalidTextRequest as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
+        return JsonResponse(response, status=400)
+    except DataStoreRequestException as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
+        return JsonResponse(response, status=400)
+    except es_exceptions.ConnectionTimeout as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Connection timed out for ES   {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except es_exceptions.ConnectionError as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except (TypeError, KeyError) as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except Exception as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f'General exception for {request.path}, error: {err}')
+        return JsonResponse(response, status=500)
 
-    return JsonResponse({'data': entity_output})
+    response = {"success": True, "error": None, "data": entity_output}
+    return JsonResponse(response, status=200)
 
 
 @csrf_exempt
@@ -209,6 +232,8 @@ def time(request):
            >>  [{'detection': 'message', 'original_text': '12:30 pm',
                 'entity_value': {'mm': 30, 'hh': 12, 'nn': 'pm'}}]
     """
+
+    entity_output = None
     try:
         parameters_dict = {}
         if request.method == "POST":
@@ -228,7 +253,6 @@ def time(request):
         time_detection.set_bot_message(bot_message=parameters_dict[PARAMETER_BOT_MESSAGE])
 
         message = parameters_dict[PARAMETER_MESSAGE]
-        entity_output = None
 
         if isinstance(message, six.string_types):
             entity_output = time_detection.detect(message=message,
@@ -240,11 +264,34 @@ def time(request):
             entity_output = time_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
-        ner_logger.exception('Exception for time: %s ' % e)
-        return HttpResponse(status=500)
+    except InvalidTextRequest as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
+        return JsonResponse(response, status=400)
+    except DataStoreRequestException as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
+        return JsonResponse(response, status=400)
+    except es_exceptions.ConnectionTimeout as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Connection timed out for ES   {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except es_exceptions.ConnectionError as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except (TypeError, KeyError) as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except Exception as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f'General exception for {request.path}, error: {err}')
+        return JsonResponse(response, status=500)
 
-    return JsonResponse({'data': entity_output})
+    response = {"success": True, "error": None, "data": entity_output}
+    return JsonResponse(response, status=200)
 
 
 @csrf_exempt
@@ -306,6 +353,7 @@ def number(request):
                                                                         {'value': '3', 'unit': 'people'}}]
 
        """
+    entity_output = None
     try:
         parameters_dict = {}
         if request.method == "POST":
@@ -325,7 +373,6 @@ def number(request):
             number_detection.set_min_max_digits(min_digit=min_digit, max_digit=max_digit)
 
         message = parameters_dict[PARAMETER_MESSAGE]
-        entity_output = None
 
         if isinstance(message, six.string_types):
             entity_output = number_detection.detect(message=message,
@@ -336,11 +383,34 @@ def number(request):
             entity_output = number_detection.detect_bulk(messages=message)
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
-        ner_logger.exception('Exception for numeric: %s ' % e)
-        return HttpResponse(status=500)
+    except InvalidTextRequest as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
+        return JsonResponse(response, status=400)
+    except DataStoreRequestException as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
+        return JsonResponse(response, status=400)
+    except es_exceptions.ConnectionTimeout as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Connection timed out for ES   {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except es_exceptions.ConnectionError as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except (TypeError, KeyError) as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except Exception as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f'General exception for {request.path}, error: {err}')
+        return JsonResponse(response, status=500)
 
-    return JsonResponse({'data': entity_output})
+    response = {"success": True, "error": None, "data": entity_output}
+    return JsonResponse(response, status=200)
 
 
 @csrf_exempt
@@ -381,6 +451,7 @@ def number_range(request):
            >> [{'detection': 'message', 'original_text': '200-300', 'entity_value': {'min_value': '200',
                 'max_value': '300', 'unit': None}}]
        """
+    entity_output = None
     try:
         parameters_dict = {}
         if request.method == "POST":
@@ -395,7 +466,6 @@ def number_range(request):
                                                     unit_type=parameters_dict[PARAMETER_NUMBER_UNIT_TYPE])
 
         message = parameters_dict[PARAMETER_MESSAGE]
-        entity_output = None
 
         if isinstance(message, six.string_types):
             entity_output = number_range_detector.detect(message=message,
@@ -407,11 +477,34 @@ def number_range(request):
 
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
 
-    except TypeError as e:
-        ner_logger.exception('Exception for numeric: %s ' % e)
-        return HttpResponse(status=500)
+    except InvalidTextRequest as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
+        return JsonResponse(response, status=400)
+    except DataStoreRequestException as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
+        return JsonResponse(response, status=400)
+    except es_exceptions.ConnectionTimeout as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Connection timed out for ES   {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except es_exceptions.ConnectionError as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except (TypeError, KeyError) as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except Exception as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f'General exception for {request.path}, error: {err}')
+        return JsonResponse(response, status=500)
 
-    return JsonResponse({'data': entity_output})
+    response = {"success": True, "error": None, "data": entity_output}
+    return JsonResponse(response, status=200)
 
 
 @csrf_exempt
@@ -525,6 +618,8 @@ def phone_number(request):
             ]
         ]
         """
+    entity_output = None
+
     try:
         parameters_dict = {}
         if request.method == "POST":
@@ -542,7 +637,7 @@ def phone_number(request):
         phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
                                                locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
-        entity_output = None
+
         ner_logger.debug(parameters_dict)
         if isinstance(message, six.string_types):
             entity_output = phone_number_detection.detect(message=message,
@@ -552,11 +647,34 @@ def phone_number(request):
         elif isinstance(message, (list, tuple)):
             entity_output = phone_number_detection.detect_bulk(messages=message)
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
-    except TypeError as e:
-        ner_logger.exception('Exception for phone_number: %s ' % e)
-        return HttpResponse(status=500)
+    except InvalidTextRequest as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating request body for {request.path}, error: {err}")
+        return JsonResponse(response, status=400)
+    except DataStoreRequestException as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in requesting ES {request.path}, error: {err}, query: {err.request},"
+                             f" response: {err.response}")
+        return JsonResponse(response, status=400)
+    except es_exceptions.ConnectionTimeout as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Connection timed out for ES   {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except es_exceptions.ConnectionError as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in connection to ES {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except (TypeError, KeyError) as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f"Error in validating type {request.path}, error: {err}")
+        return JsonResponse(response, status=500)
+    except Exception as err:
+        response = {"success": False, "error": str(err)}
+        ner_logger.exception(f'General exception for {request.path}, error: {err}')
+        return JsonResponse(response, status=500)
 
-    return JsonResponse({'data': entity_output})
+    response = {"success": True, "error": None, "data": entity_output}
+    return JsonResponse(response, status=200)
 
 
 @csrf_exempt
