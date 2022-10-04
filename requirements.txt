@@ -17,7 +17,7 @@ pandas==1.0.5
 urllib3==1.26.5
 requests==2.26.0
 requests-aws4auth==0.9
-Django==3.2.13
+Django==3.2.15
 
 elasticsearch==5.5.3
 nltk==3.4.5
