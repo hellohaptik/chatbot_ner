@@ -389,7 +389,7 @@ class ESTransfer(object):
         }
 
         ner_logger.debug('Start post request made with es_url reindex'
-                            'es_url: %s' % (es_url))
+                         'es_url: %s' % (es_url))
         reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
                                          params={"refresh": "true", "wait_for_completion": "true"})
         ner_logger.debug('End post request made with es_url ')
