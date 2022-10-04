@@ -352,7 +352,11 @@ class ESTransfer(object):
             format(**{"es_url": es_url, "backup_index": backup_index})
 
         # Fetch index to backup config
+        ner_logger.debug('Start get request made with index_to_backup_url '
+                         'index_to_backup_url: %s' % (index_to_backup_url))
         index_to_backup_url_response = requests.get(index_to_backup_url)
+        ner_logger.debug('End get request made with index_to_backup_url')
+
 
         if index_to_backup_url_response.status_code != 200:
             message = "index to backup details could not be fetched"
@@ -365,9 +369,14 @@ class ESTransfer(object):
         index_to_backup_config["settings"]["index"].pop("version", None)
         index_to_backup_config.pop("aliases", None)
 
+        ner_logger.debug('Start delete request made with backup_index_url '
+                         'backup_index_url: %s' % (backup_index_url))
         requests.delete(backup_index_url)
+        ner_logger.debug('End delete request made with backup_index_url ')
 
+        ner_logger.debug('Start put request made with backup_index_url ')
         requests.put(backup_index_url, json=index_to_backup_config)
+        ner_logger.debug('End put request made with backup_index_url ')
 
         final_request_dict = {
             "source": {
@@ -378,8 +387,12 @@ class ESTransfer(object):
                 "index": backup_index
             }
         }
+
+        ner_logger.debug('Start post request made with es_url reindex'
+                            'es_url: %s' % (es_url))
         reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
                                          params={"refresh": "true", "wait_for_completion": "true"})
+        ner_logger.debug('End post request made with es_url ')
         if reindex_response.status_code != 200:
             message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
             raise InternalBackupException(message)
