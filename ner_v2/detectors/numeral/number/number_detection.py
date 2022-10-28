@@ -81,7 +81,7 @@ class NumberDetector(BaseDetector):
         cwd = os.path.dirname(os.path.abspath(__file__))
         cwd_dirs = [x for x in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, x))]
         for _dir in cwd_dirs:
-            if len(_dir.rstrip(os.sep)) == 2:
+            if len(_dir.rstrip(os.sep)) in [2,5]:
                 supported_languages.append(_dir)
         return supported_languages
 

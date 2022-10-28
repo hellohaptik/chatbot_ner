@@ -4,6 +4,7 @@
 NUMBER_NUMERAL_CONSTANT_FILE_NAME = 'numerals_constant.csv'
 NUMBER_NUMERAL_FILE_VARIANTS_COLUMN_NAME = 'name_variants'
 NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME = 'number_value'
+NUMBER_NUMERAL_FILE_NUMBER_COLUMN_NAME = 'number'
 NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME = 'number_type'
 
 # type value of number in numeral_constant data file
