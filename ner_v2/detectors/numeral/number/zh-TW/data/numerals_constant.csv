@@ -1,0 +1,17 @@
+number,name_variants,number_value,number_type
+零,零|líng,0,unit
+〇,零|líng,0,unit
+一,一|壹|yī,1,unit
+二,二|貳|èr|liǎng,2,unit
+三,三|叁|sān,3,unit
+四,四|肆|sì,4,unit
+五,五|伍|wǔ,5,unit
+六,六|陸|lìu,6,unit
+七,七|柒|qī,7,unit
+八,八|捌|bā,8,unit
+九,九|玖|jiǔ,9,unit
+十,十|拾|shí,10,scale
+百,百|佰,100,scale
+千,千|仟,1000,scale
+萬,萬|萬,10000,scale
+億,億|億,100000000,scale
