@@ -17,6 +17,11 @@ from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberD
 
 
 class NumberDetector(BaseNumberDetector):
+    """
+    Number detector to detect numbers in chinese text
+    It map the chinese to latin character as per data file and extract the numeric values
+    """
+
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
                                        LANGUAGE_DATA_DIRECTORY)
 
@@ -40,6 +45,9 @@ class NumberDetector(BaseNumberDetector):
         ]
 
     def _filter_base_numbers_map(self):
+        """
+        Only require the chinese digits mapping for digit from 0 to 9
+        """
         new_base_numbers_map = {}
         for k, v in self.base_numbers_map.items():
             if 0 <= v <= 9:
@@ -47,6 +55,10 @@ class NumberDetector(BaseNumberDetector):
         self.base_numbers_map = new_base_numbers_map
 
     def _detect_number_digit_by_digit(self, number_list=None, original_list=None):
+        """
+        It extract the digits out of the chinese text ( lating as well as chinese)
+        and then map the chinese digit to latin and extract out the number
+        """
         number_list = number_list or []
         original_list = original_list or []
         start_span = 0
@@ -70,7 +82,7 @@ class NumberDetector(BaseNumberDetector):
                 end_span += span[1]
                 spanned_text = spanned_text[span[1]:]
                 non_latin = original_text
-                number  = ''.join([str(self.base_numbers_map.get(_t, _t)) for _t in non_latin])
+                number = ''.join([str(self.base_numbers_map.get(_t, _t)) for _t in non_latin])
                 if number.isnumeric():
                     latin_number = number
 

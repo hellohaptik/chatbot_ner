@@ -135,7 +135,7 @@ class BaseNumberDetector(object):
                     self.scale_map[numeral] = value
                     # map the name of number to latin numeric value
                     self.base_numbers_map[numeral] = value
-            
+
             number_text = row[NUMBER_NUMERAL_FILE_NUMBER_COLUMN_NAME]
             self.base_numbers_map[number_text] = value
 
