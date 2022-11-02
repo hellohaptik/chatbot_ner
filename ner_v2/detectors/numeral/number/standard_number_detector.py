@@ -124,6 +124,8 @@ class BaseNumberDetector(object):
                 for numeral in name_variants:
                     # tuple values to corresponds to (scale, increment), for unit type, scale will always be 1.
                     self.numbers_word_map[numeral] = NumberVariant(scale=1, increment=value)
+                    # map the name of number to latin numeric value
+                    self.base_numbers_map[numeral] = value
 
             elif number_type == NUMBER_TYPE_SCALE:
                 for numeral in name_variants:
@@ -131,6 +133,8 @@ class BaseNumberDetector(object):
                     self.numbers_word_map[numeral] = NumberVariant(scale=value, increment=0)
                     # Dict map to store scale and their values
                     self.scale_map[numeral] = value
+                    # map the name of number to latin numeric value
+                    self.base_numbers_map[numeral] = value
             
             number_text = row[NUMBER_NUMERAL_FILE_NUMBER_COLUMN_NAME]
             self.base_numbers_map[number_text] = value

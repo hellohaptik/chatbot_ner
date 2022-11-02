@@ -24,20 +24,19 @@ class NumberDetector(BaseNumberDetector):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path,
                                              unit_type=unit_type)
-
-        ner_logger.debug(f'>>> Chinese Number Detector : Here <<<')
-        ner_logger.debug(f'>>> Units map : {self.units_map}')
         
         self._filter_base_numbers_map()
 
-        sorted_len_base_number_keys = sorted(list(self.base_numbers_map.keys()))
-        self.base_numbers_map_choices = "|".join([re.escape(x) for x in sorted_len_base_number_keys])
+        number_set = set()
+        for key,val in self.base_numbers_map.items():
+            number_set.add(str(key))
+            number_set.add(str(val))
+
+        sorted_len_base_number_key_vals = sorted(list(number_set))
+        self.base_numbers_map_choices = "|".join([re.escape(x) for x in sorted_len_base_number_key_vals])
         
-        ner_logger.debug(f' base number choices : {self.base_numbers_map_choices}')
         self.detector_preferences = [
-            self._detect_number_digit_by_digit,
-            self._detect_number_from_digit,
-            # self._detect_number_from_words
+            self._detect_number_digit_by_digit
         ]
 
 
@@ -53,29 +52,32 @@ class NumberDetector(BaseNumberDetector):
         original_list = original_list or []
         start_span = 0
         end_span = -1
+
+        # removing hyphen
+        self.processed_text = re.sub(r'[-]+', '', self.processed_text)
+
         spanned_text = self.processed_text
         processed_text = self.processed_text
 
-        regex_digit_patterns = re.compile(r'([' + self.base_numbers_map_choices + r']+\s?)')
-
+        rgx_pattern = r'(\+?)([' + self.base_numbers_map_choices + r']+\s?[' + self.base_numbers_map_choices +'])'
+        regex_digit_patterns = re.compile(rgx_pattern)
         patterns = regex_digit_patterns.findall(self.processed_text)
         for pattern in patterns:
             non_latin, latin_number, original_text = None, None, None
-
-            if pattern:
-                original_text = pattern.strip().strip(',.').strip()
+            if pattern[1].strip():
+                ner_logger.debug(f'{pattern[1]}')
+                original_text = pattern[1].strip()
                 span = re.search(original_text, spanned_text).span()
                 start_span = end_span + span[0]
                 end_span += span[1]
                 spanned_text = spanned_text[span[1]:]
                 non_latin = original_text
-                number  = ''.join([str(self.base_numbers_map.get(_t,_t)) for _t in pattern ])
-                
+                number  = ''.join([str(self.base_numbers_map.get(_t,_t)) for _t in non_latin ])
                 if number.isnumeric():
                     latin_number = number
             
             if latin_number:
-                _pattern = re.compile(self._SPAN_BOUNDARY_TEMPLATE.format(re.escape(original_text)), flags=_re_flags)
+                _pattern = re.compile(re.escape(original_text), flags=_re_flags)
                 if _pattern.search(processed_text):
                     processed_text = _pattern.sub(self.tag, processed_text, 1)
                     number_list.append({
@@ -84,7 +86,6 @@ class NumberDetector(BaseNumberDetector):
                         NUMBER_DETECTION_RETURN_DICT_SPAN: (start_span, end_span)
                     })
                     original_list.append(original_text)
-
         return number_list, original_list
 
 
