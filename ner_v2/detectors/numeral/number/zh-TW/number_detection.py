@@ -11,10 +11,10 @@ except ImportError:
     _re_flags = re.UNICODE
 
 from ner_v2.constant import LANGUAGE_DATA_DIRECTORY
-from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_SPAN, NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
+from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_SPAN, \
+    NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
 
-from chatbot_ner.config import ner_logger
 
 class NumberDetector(BaseNumberDetector):
     data_directory_path = os.path.join((os.path.dirname(os.path.abspath(__file__)).rstrip(os.sep)),
@@ -24,30 +24,29 @@ class NumberDetector(BaseNumberDetector):
         super(NumberDetector, self).__init__(entity_name=entity_name,
                                              data_directory_path=NumberDetector.data_directory_path,
                                              unit_type=unit_type)
-        
+
         self._filter_base_numbers_map()
 
         number_set = set()
-        for key,val in self.base_numbers_map.items():
+        for key, val in self.base_numbers_map.items():
             number_set.add(str(key))
             number_set.add(str(val))
 
         sorted_len_base_number_key_vals = sorted(list(number_set))
         self.base_numbers_map_choices = "|".join([re.escape(x) for x in sorted_len_base_number_key_vals])
-        
+
         self.detector_preferences = [
             self._detect_number_digit_by_digit
         ]
 
-
     def _filter_base_numbers_map(self):
         new_base_numbers_map = {}
-        for k,v in self.base_numbers_map.items():
+        for k, v in self.base_numbers_map.items():
             if 0 <= v <= 9:
                 new_base_numbers_map[k] = v
         self.base_numbers_map = new_base_numbers_map
-    
-    def _detect_number_digit_by_digit(self,number_list=None, original_list=None):
+
+    def _detect_number_digit_by_digit(self, number_list=None, original_list=None):
         number_list = number_list or []
         original_list = original_list or []
         start_span = 0
@@ -59,23 +58,22 @@ class NumberDetector(BaseNumberDetector):
         spanned_text = self.processed_text
         processed_text = self.processed_text
 
-        rgx_pattern = r'(\+?)([' + self.base_numbers_map_choices + r']+\s?[' + self.base_numbers_map_choices +'])'
+        rgx_pattern = r'(\+?)([' + self.base_numbers_map_choices + r']+\s?[' + self.base_numbers_map_choices + r'])'
         regex_digit_patterns = re.compile(rgx_pattern)
         patterns = regex_digit_patterns.findall(self.processed_text)
         for pattern in patterns:
             non_latin, latin_number, original_text = None, None, None
             if pattern[1].strip():
-                ner_logger.debug(f'{pattern[1]}')
                 original_text = pattern[1].strip()
                 span = re.search(original_text, spanned_text).span()
                 start_span = end_span + span[0]
                 end_span += span[1]
                 spanned_text = spanned_text[span[1]:]
                 non_latin = original_text
-                number  = ''.join([str(self.base_numbers_map.get(_t,_t)) for _t in non_latin ])
+                number  = ''.join([str(self.base_numbers_map.get(_t, _t)) for _t in non_latin])
                 if number.isnumeric():
                     latin_number = number
-            
+
             if latin_number:
                 _pattern = re.compile(re.escape(original_text), flags=_re_flags)
                 if _pattern.search(processed_text):
@@ -87,7 +85,3 @@ class NumberDetector(BaseNumberDetector):
                     })
                     original_list.append(original_text)
         return number_list, original_list
-
-
-
-    
