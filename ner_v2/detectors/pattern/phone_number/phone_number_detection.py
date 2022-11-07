@@ -13,9 +13,11 @@ except ImportError:
 import phonenumbers
 from six.moves import zip
 
-from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG, CHINESE_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+
+from chatbot_ner.config import ner_logger
 
 
 class PhoneDetector(BaseDetector):
@@ -38,8 +40,10 @@ class PhoneDetector(BaseDetector):
             locale(str, optional): locale of the country from which you are dialing. Ex: 'en-IN'
         """
         self._supported_languages = NumberDetector.get_supported_languages()
+        ner_logger.debug(f'-= PHONE : {language}')
         super(PhoneDetector, self).__init__(language, locale)
         self.language = language
+        ner_logger.debug(f'-= PHONE : {self.language}')
         self.locale = locale or 'en-IN'
         if _regex_available:
             # This will replace all types of dashes(em or en) by hyphen.
@@ -101,6 +105,7 @@ class PhoneDetector(BaseDetector):
         """
         self.text = " " + text.lower().strip() + " "
         self.phone, self.original_phone_text = [], []
+        ner_logger.debug(f'### PH :{self.text} {self.country_code}')
         for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code, leniency=0):
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                 self.phone.append(self.check_for_country_code(str(match.number.national_number)))
@@ -110,6 +115,7 @@ class PhoneDetector(BaseDetector):
                 self.phone.append({"country_calling_code": str(match.number.country_code),
                                    "value": str(match.number.national_number)})
                 self.original_phone_text.append(self.text[match.start:match.end])
+            ner_logger.info(f'### {self.phone} {self.original_phone_text}')
         self.phone, self.original_phone_text = self.check_for_alphas()
         return self.phone, self.original_phone_text
 
@@ -152,3 +158,74 @@ class PhoneDetector(BaseDetector):
             phone_dict['value'] = phone_num
 
         return phone_dict
+
+class ChinesePhoneDetector(PhoneDetector):
+    """
+    This method is used to detect phone numbers present in chinese text.
+    """
+
+    def __init__(self, entity_name, language=CHINESE_LANG, locale=None):
+        """
+        Args:
+            entity_name (str): A string by which the detected numbers would be replaced with
+            on calling detect_entity()
+            language (str, optional): language code of number text, defaults to 'en'
+            locale(str, optional): locale of the country from which you are dialing. Ex: 'en-IN'
+        """
+        self._supported_languages = NumberDetector.get_supported_languages()
+        ner_logger.debug(f'-= CHINESE : {language}')
+        super(ChinesePhoneDetector, self).__init__(entity_name, language, locale)
+        self.language = language
+        ner_logger.debug(f'-= CHINESE : {self.language}')
+        self.locale = locale or CHINESE_LANG
+        if _regex_available:
+            # This will replace all types of dashes(em or en) by hyphen.
+            self.locale = regex.sub('\\p{Pd}', '-', self.locale)
+
+        self.text = ''
+        self.phone, self.original_phone_text = [], []
+        self.country_code = self.get_country_code_from_locale()
+        self.entity_name = entity_name
+        self.tag = '__' + self.entity_name + '__'
+        
+        # Using Chinese number detector here
+        self.number_detector = NumberDetector(self.entity_name, language=self.language)
+        self.language_number_detector = self.number_detector.get_language_number_detector()
+
+    def _text_list_for_detection(self, text=None):
+        """
+        This function is use to preprocess text before detecting phone number
+        and return a list of string on which phone number detection need to be made
+
+        parameters : text (string)
+        return : list[string]
+        """
+        text = text or ''
+        ner_logger.debug(f'<<< Sanitizeing text : {text}')
+        matches = self.language_number_detector.extract_digits_only(text)
+        return matches
+
+    def detect_entity(self, text, **kwargs):
+        ner_logger.debug(f'<<< chinese phone number detect entity')
+        
+        number_matches = self._text_list_for_detection(text)
+        self.phone, self.original_phone_text = [], []
+        try:
+            for _text in number_matches:
+                original_text = " " + _text.lower().strip() + " "
+                sanitized_text = self.language_number_detector.get_number_digit_by_digit(original_text)
+
+                ner_logger.debug(f'### PH : {sanitized_text} {self.country_code} {original_text}')
+                for match in phonenumbers.PhoneNumberMatcher(sanitized_text, self.country_code, leniency=0):
+                    if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
+                        self.phone.append(self.check_for_country_code(str(match.number.national_number)))
+                        self.original_phone_text.append(original_text[match.start:match.end])
+                    else:
+                        # This means our detector has detected some other country code.
+                        self.phone.append({"country_calling_code": str(match.number.country_code),
+                                        "value": str(match.number.national_number)})
+                        self.original_phone_text.append(original_text[match.start:match.end])
+        except Exception as exp:
+            ner_logger.error(f'Exception in detect_entity for ChinesePhoneDetector, {str(exp)}')
+        ner_logger.debug(f'==== {self.phone}, {self.original_phone_text}')
+        return self.phone, self.original_phone_text

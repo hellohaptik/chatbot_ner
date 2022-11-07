@@ -23,6 +23,8 @@ from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_UNIT
 from ner_v2.detectors.utils import get_lang_data_path
 
+from chatbot_ner.config import ner_logger
+
 COMMON_NON_NUMERIC_PUNCTUATIONS = re.escape('!"#%&\'()*/;<=>?@[\\]^_`{|}~।')
 
 
@@ -111,11 +113,12 @@ class NumberDetector(BaseDetector):
         self.detect_without_unit = detect_without_unit
         self.punctuations_to_filter = re.compile(f'[{COMMON_NON_NUMERIC_PUNCTUATIONS}]')
         try:
+            ner_logger.debug(f'MODEL LOADING FOR : {self.language}')
             number_detector_module = importlib.import_module(
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
             self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name,
                                                                                   unit_type=self.unit_type)
-
+            ner_logger.debug(f'MODEL LOADED FOR : {self.language}')
         except ImportError:
             standard_number_regex = importlib.import_module(
                 'ner_v2.detectors.numeral.number.standard_number_detector'
@@ -126,6 +129,9 @@ class NumberDetector(BaseDetector):
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language)
             )
+
+    def get_language_number_detector(self):
+        return self.language_number_detector
 
     @property
     def supported_languages(self):

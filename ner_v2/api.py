@@ -18,7 +18,7 @@ from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_ST
     PARAMETER_LOCALE, PARAMETER_RANGE_ENABLED
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
 from ner_v2.detectors.numeral.number_range.number_range_detection import NumberRangeDetector
-from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector
+from ner_v2.detectors.pattern.phone_number.phone_number_detection import PhoneDetector, ChinesePhoneDetector
 from ner_v2.detectors.temporal.date.date_detection import DateAdvancedDetector
 from ner_v2.detectors.temporal.time.time_detection import TimeDetector
 from ner_v2.detectors.textual.utils import get_text_entity_detection_data, validate_text_request, InvalidTextRequest
@@ -634,12 +634,17 @@ def phone_number(request):
         ner_logger.debug('Entity Name %s' % entity_name)
         ner_logger.debug('Source Language %s' % language)
 
-        phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
-                                               locale=parameters_dict[PARAMETER_LOCALE])
+        if language == 'zh-TW':
+            phone_number_detection = ChinesePhoneDetector(entity_name=entity_name, language=language,
+                                                           locale=parameters_dict[PARAMETER_LOCALE])
+        else:
+            phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
+                                                    locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
 
         ner_logger.debug(parameters_dict)
         if isinstance(message, six.string_types):
+            ner_logger.debug(f'++ API msg : {message}')
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                           fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
