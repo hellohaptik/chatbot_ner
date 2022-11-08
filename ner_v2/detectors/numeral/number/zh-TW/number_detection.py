@@ -67,7 +67,7 @@ class NumberDetector(BaseNumberDetector):
     def _have_digits_only(self, text=None, scale_map=None):
         text = text or ''
         scale_map = scale_map or {}
-        
+
         scaling_digits = set(list(scale_map.keys()))
         only_digits = True
         for _digit in text:
@@ -113,12 +113,10 @@ class NumberDetector(BaseNumberDetector):
                 start_span = end_span + span[0]
                 end_span += span[1]
                 spanned_text = spanned_text[span[1]:]
-                if self._have_digits_only(original_text, self.scale_map):
-                    number = self.get_number_digit_by_digit(original_text)
-                else:
-                    number = self.get_number_with_digit_scaling(original_text)
+                number = self.get_number(original_text)
                 if number.isnumeric():
                     full_number = number
+
             if full_number:
                 _pattern = re.compile(re.escape(original_text), flags=_re_flags)
                 if _pattern.search(processed_text):
@@ -130,6 +128,11 @@ class NumberDetector(BaseNumberDetector):
                     })
                     original_list.append(original_text)
         return number_list, original_list
+
+    def get_number(self, original_text):
+        if self._have_digits_only(original_text, self.scale_map):
+            return self.get_number_digit_by_digit(original_text)
+        return self.get_number_with_digit_scaling(original_text)
 
     def extract_digits_only(self, text, with_scale=False):
         text = text or ''
