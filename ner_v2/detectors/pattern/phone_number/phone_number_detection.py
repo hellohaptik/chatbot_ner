@@ -153,6 +153,7 @@ class PhoneDetector(BaseDetector):
 
         return phone_dict
 
+
 class ChinesePhoneDetector(PhoneDetector):
     """
     This method is used to detect phone numbers present in chinese text.
@@ -168,7 +169,7 @@ class ChinesePhoneDetector(PhoneDetector):
         """
         self._supported_languages = NumberDetector.get_supported_languages()
         super(ChinesePhoneDetector, self).__init__(entity_name, language, locale)
-        
+
         # Using Chinese number detector here
         self.number_detector = NumberDetector(self.entity_name, language=self.language)
         self.language_number_detector = self.number_detector.get_language_number_detector()
@@ -201,6 +202,6 @@ class ChinesePhoneDetector(PhoneDetector):
                 else:
                     # This means our detector has detected some other country code.
                     self.phone.append({"country_calling_code": str(match.number.country_code),
-                                    "value": str(match.number.national_number)})
+                                       "value": str(match.number.national_number)})
                     self.original_phone_text.append(original_text[match.start:match.end])
         return self.phone, self.original_phone_text

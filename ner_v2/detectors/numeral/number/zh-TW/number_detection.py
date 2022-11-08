@@ -41,8 +41,8 @@ class NumberDetector(BaseNumberDetector):
         ]
 
         self.special_chars_mapping = {
-            ',': '、', # comma character
-            '.': '點' #dian ( period )
+            ',': '、',
+            '.': '點'
         }
 
     def _get_base_map_choices(self, base_map):
@@ -63,7 +63,7 @@ class NumberDetector(BaseNumberDetector):
             if 0 <= v <= 9:
                 new_base_numbers_map[k] = v
         self.base_numbers_map = new_base_numbers_map
-    
+
     def _have_digits_only(self, text=None, scale_map=None):
         text = text or ''
         scale_map = scale_map or {}
@@ -75,13 +75,13 @@ class NumberDetector(BaseNumberDetector):
                 only_digits = False
                 break
         return only_digits
-    
+
     def replace_special_chars(self, text=None):
         text = text or ''
         for _char, _native_char in self.special_chars_mapping.items():
             text = text.replace(_native_char, _char)
         return text
-            
+
     def _detect_number_from_text(self, number_list=None, original_list=None):
         """
         extract out the numbers from chinese text ( roman as well as chinese )
@@ -98,16 +98,15 @@ class NumberDetector(BaseNumberDetector):
         processed_text = self.processed_text
 
         # need to handle decimal points as well
-        
         rgx_pattern = r'([{}]+)({}?([{}]*))'.format(
             self.base_numbers_map_full,
-            self.special_chars_mapping.get('.', '\.'),
+            self.special_chars_mapping.get('.', '.'),
             self.base_numbers_map_full
         )
         regex_digit_patterns = re.compile(rgx_pattern)
         patterns = regex_digit_patterns.findall(self.processed_text)
         for pattern in patterns:
-            full_number, number, original_text =  None, None, None
+            full_number, number, original_text = None, None, None
             if pattern[0].strip():
                 original_text = pattern[0].strip()
                 span = re.search(original_text, spanned_text).span()
@@ -118,10 +117,8 @@ class NumberDetector(BaseNumberDetector):
                     number = self.get_number_digit_by_digit(original_text)
                 else:
                     number = self.get_number_with_digit_scaling(original_text)
-                    
                 if number.isnumeric():
                     full_number = number
-
             if full_number:
                 _pattern = re.compile(re.escape(original_text), flags=_re_flags)
                 if _pattern.search(processed_text):
@@ -133,7 +130,7 @@ class NumberDetector(BaseNumberDetector):
                     })
                     original_list.append(original_text)
         return number_list, original_list
-    
+
     def extract_digits_only(self, text, with_scale=False):
         text = text or ''
         rgx_pattern = r'[-,.+\s{}]+'
@@ -142,11 +139,10 @@ class NumberDetector(BaseNumberDetector):
         else:
             rgx_pattern = re.compile(rgx_pattern.format(self.base_numbers_map_choices_full))
         return rgx_pattern.findall(text)
-    
+
     def get_number_digit_by_digit(self, text=''):
         return ''.join([str(self.base_numbers_map.get(_t, _t)) for _t in text])
-        
+
     def get_number_with_digit_scaling(self, text=''):
         # change the below logic to work with scaling
         return text
-        

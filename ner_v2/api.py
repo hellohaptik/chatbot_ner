@@ -636,10 +636,10 @@ def phone_number(request):
 
         if language == CHINESE_TRADITIONAL_LANG:
             phone_number_detection = ChinesePhoneDetector(entity_name=entity_name, language=language,
-                                                           locale=parameters_dict[PARAMETER_LOCALE])
+                                                          locale=parameters_dict[PARAMETER_LOCALE])
         else:
             phone_number_detection = PhoneDetector(entity_name=entity_name, language=language,
-                                                    locale=parameters_dict[PARAMETER_LOCALE])
+                                                   locale=parameters_dict[PARAMETER_LOCALE])
         message = parameters_dict[PARAMETER_MESSAGE]
 
         ner_logger.debug(parameters_dict)
