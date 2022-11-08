@@ -10,7 +10,6 @@ from language_utilities.utils import translate_text
 from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_NOT_VERIFIED, FROM_MESSAGE,
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
-from chatbot_ner.config import ner_logger
 
 class BaseDetector(object):
     """
@@ -32,9 +31,7 @@ class BaseDetector(object):
              language (str): ISO 639 language code of language of original query
              translation_enabled (bool): Decides to either enable or disable translation API
         """
-        ner_logger.debug(f'-= BASE : {language}')
         self._language = language
-        ner_logger.debug(f'-= PHONE : {self._language}')
         self._processing_language = ENGLISH_LANG
         self._translation_enabled = translation_enabled
         self._set_language_processing_script()
@@ -59,7 +56,6 @@ class BaseDetector(object):
             tuple: Two lists of same length containing detected values and original substring from text which is used
             to derive the detected value respectively
         """
-        ner_logger.debug(f'>>> base detector detect entity')
         return [], []
 
     def _set_language_processing_script(self):
@@ -67,7 +63,6 @@ class BaseDetector(object):
         This method is used to decide the language in which detector should run it's logic based on
         supported language and query language for which subclass is initialized
         """
-        ner_logger.debug(f'-+-+ {self._language} , {self.supported_languages}')
         if self._language in self.supported_languages:
             self._processing_language = self._language
         elif ENGLISH_LANG in self.supported_languages and self._translation_enabled:
@@ -135,8 +130,6 @@ class BaseDetector(object):
                     >> [{'detection': 'message', 'original_text': 'inferno', 'entity_value': {'value': u'Inferno'}}]
 
         """
-
-        ner_logger.debug(f'==== M :{message}')
         if self._language != self._processing_language and self._translation_enabled:
             if structured_value:
                 translation_output = translate_text(structured_value, self._language,
@@ -148,23 +141,18 @@ class BaseDetector(object):
                 message = translation_output[TRANSLATED_TEXT] if translation_output['status'] else None
 
         text = structured_value if structured_value else message
-        ner_logger.debug(f'==== M :{message}')
         entity_list, original_text_list = self.detect_entity(text=text, **kwargs)
         if structured_value:
-            ner_logger.debug(f'structured ==== {entity_list}, {original_text_list}')
             if entity_list:
                 value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list
             else:
                 value, method, original_text = [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED, \
                                                [structured_value]
         elif entity_list:
-            ner_logger.debug(f'entity list ==== {entity_list}, {original_text_list}')
             value, method, original_text = entity_list, FROM_MESSAGE, original_text_list
         elif fallback_value:
-            ner_logger.debug(f'fallback value ==== {entity_list}, {original_text_list}')
             value, method, original_text = [fallback_value], FROM_FALLBACK_VALUE, [fallback_value]
         else:
-            ner_logger.debug(f'None ==== {entity_list}, {original_text_list}')
             return None
 
         return self.output_entity_dict_list(entity_value_list=value, original_text_list=original_text,

@@ -15,18 +15,6 @@ from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_SPAN,
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
 
-from chatbot_ner.config import ner_logger
-
-
-"""
-mapping some special character for chinese (traditional)
-use to replace in text string
-"""
-special_chars_mapping = {
-    ',' : '、', # comma character
-    '.' : '點' #dian ( period )
-}
-
 
 class NumberDetector(BaseNumberDetector):
     """
@@ -51,7 +39,11 @@ class NumberDetector(BaseNumberDetector):
         self.detector_preferences = [
             self._detect_number_from_text
         ]
-        ner_logger.debug(f'-=-= CHINESE NUMBER DETECTOR')
+
+        self.special_chars_mapping = {
+            ',': '、', # comma character
+            '.': '點' #dian ( period )
+        }
 
     def _get_base_map_choices(self, base_map):
         number_set = set()
@@ -86,7 +78,7 @@ class NumberDetector(BaseNumberDetector):
     
     def replace_special_chars(self, text=None):
         text = text or ''
-        for _char, _native_char in special_chars_mapping.items():
+        for _char, _native_char in self.special_chars_mapping.items():
             text = text.replace(_native_char, _char)
         return text
             
@@ -109,13 +101,13 @@ class NumberDetector(BaseNumberDetector):
         
         rgx_pattern = r'([{}]+)({}?([{}]*))'.format(
             self.base_numbers_map_full,
-            special_chars_mapping.get('.', '\.'),
+            self.special_chars_mapping.get('.', '\.'),
             self.base_numbers_map_full
         )
         regex_digit_patterns = re.compile(rgx_pattern)
         patterns = regex_digit_patterns.findall(self.processed_text)
         for pattern in patterns:
-            full_number = number, after_decimal, original_text =  None, None, None
+            full_number, number, original_text =  None, None, None
             if pattern[0].strip():
                 original_text = pattern[0].strip()
                 span = re.search(original_text, spanned_text).span()
@@ -129,7 +121,6 @@ class NumberDetector(BaseNumberDetector):
                     
                 if number.isnumeric():
                     full_number = number
-            
 
             if full_number:
                 _pattern = re.compile(re.escape(original_text), flags=_re_flags)
@@ -144,9 +135,8 @@ class NumberDetector(BaseNumberDetector):
         return number_list, original_list
     
     def extract_digits_only(self, text, with_scale=False):
-        ner_logger.debug(f'++++ extracting')
         text = text or ''
-        rgx_pattern = r'[\s-.+{}]+'
+        rgx_pattern = r'[-,.+\s{}]+'
         if not with_scale:
             rgx_pattern = re.compile(rgx_pattern.format(self.base_numbers_map_choices))
         else:
@@ -158,5 +148,5 @@ class NumberDetector(BaseNumberDetector):
         
     def get_number_with_digit_scaling(self, text=''):
         # change the below logic to work with scaling
-        return ''
+        return text
         

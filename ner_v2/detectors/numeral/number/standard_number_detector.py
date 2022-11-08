@@ -318,6 +318,7 @@ class BaseNumberDetector(object):
         start_span = 0
         end_span = -1
         spanned_text = self.processed_text
+
         regex_numeric_patterns = re.compile(r'(([\d,]+\.?[\d]*)\s?(' + self.scale_map_choices + r'))[\s\-\:]' +
                                             r'|([\d,]+\.?[\d]*)', re.UNICODE)
         patterns = regex_numeric_patterns.findall(processed_text)

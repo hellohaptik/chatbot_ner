@@ -10,7 +10,7 @@ from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger
 from datastore.exceptions import DataStoreRequestException
-from language_utilities.constant import ENGLISH_LANG
+from language_utilities.constant import ENGLISH_LANG, CHINESE_TRADITIONAL_LANG
 from ner_constants import PARAMETER_MESSAGE, PARAMETER_ENTITY_NAME, PARAMETER_STRUCTURED_VALUE, \
     PARAMETER_FALLBACK_VALUE, \
     PARAMETER_BOT_MESSAGE, PARAMETER_TIMEZONE, PARAMETER_LANGUAGE_SCRIPT, PARAMETER_SOURCE_LANGUAGE, \
@@ -634,7 +634,7 @@ def phone_number(request):
         ner_logger.debug('Entity Name %s' % entity_name)
         ner_logger.debug('Source Language %s' % language)
 
-        if language == 'zh-TW':
+        if language == CHINESE_TRADITIONAL_LANG:
             phone_number_detection = ChinesePhoneDetector(entity_name=entity_name, language=language,
                                                            locale=parameters_dict[PARAMETER_LOCALE])
         else:
@@ -644,7 +644,6 @@ def phone_number(request):
 
         ner_logger.debug(parameters_dict)
         if isinstance(message, six.string_types):
-            ner_logger.debug(f'++ API msg : {message}')
             entity_output = phone_number_detection.detect(message=message,
                                                           structured_value=parameters_dict[PARAMETER_STRUCTURED_VALUE],
                                                           fallback_value=parameters_dict[PARAMETER_FALLBACK_VALUE],
