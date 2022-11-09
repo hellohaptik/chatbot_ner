@@ -183,8 +183,15 @@ class ChinesePhoneDetector(PhoneDetector):
         return : list[string]
         """
         text = text or ''
-        matches = self.language_number_detector.extract_digits_only(text)
+        phone_number_format_regex = r'[-(),.+\s{}]+'
+        matches = self.language_number_detector.extract_digits_only(text, phone_number_format_regex, True)
         return matches
+
+    def _sanitize_text(self, text=None):
+        text = text or ''
+        sanitized_text = self.language_number_detector.replace_special_chars(text)
+        sanitized_text = self.language_number_detector.get_number_digit_by_digit(sanitized_text)
+        return sanitized_text
 
     def detect_entity(self, text, **kwargs):
         """
@@ -194,7 +201,7 @@ class ChinesePhoneDetector(PhoneDetector):
         self.phone, self.original_phone_text = [], []
         for _text in number_matches:
             original_text = " " + _text.lower().strip() + " "
-            sanitized_text = self.language_number_detector.get_number_digit_by_digit(original_text)
+            sanitized_text = self._sanitize_text(original_text)
             for match in phonenumbers.PhoneNumberMatcher(sanitized_text, self.country_code, leniency=0):
                 if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                     self.phone.append(self.check_for_country_code(str(match.number.national_number)))

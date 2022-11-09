@@ -42,7 +42,8 @@ class NumberDetector(BaseNumberDetector):
 
         self.special_chars_mapping = {
             ',': '、',
-            '.': '點'
+            '.': '點',
+            '+': '加'
         }
 
     def _get_base_map_choices(self, base_map):
@@ -134,13 +135,13 @@ class NumberDetector(BaseNumberDetector):
             return self.get_number_digit_by_digit(original_text)
         return self.get_number_with_digit_scaling(original_text)
 
-    def extract_digits_only(self, text, with_scale=False):
+    def extract_digits_only(self, text, rgx_pattern=None, with_special_chars=False):
         text = text or ''
-        rgx_pattern = r'[-,.+\s{}]+'
-        if not with_scale:
-            rgx_pattern = re.compile(rgx_pattern.format(self.base_numbers_map_choices))
-        else:
-            rgx_pattern = re.compile(rgx_pattern.format(self.base_numbers_map_choices_full))
+        rgx_pattern = rgx_pattern or r'[-,.+\s{}]+'
+        digit_choices = self.base_numbers_map_choices
+        if with_special_chars:
+            digit_choices += '|'.join(self.special_chars_mapping.values())
+        rgx_pattern = re.compile(rgx_pattern.format(digit_choices))
         return rgx_pattern.findall(text)
 
     def get_number_digit_by_digit(self, text=''):
