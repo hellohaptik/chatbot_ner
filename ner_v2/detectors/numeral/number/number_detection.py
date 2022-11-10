@@ -81,7 +81,7 @@ class NumberDetector(BaseDetector):
         cwd = os.path.dirname(os.path.abspath(__file__))
         cwd_dirs = [x for x in os.listdir(cwd) if os.path.isdir(os.path.join(cwd, x))]
         for _dir in cwd_dirs:
-            if len(_dir.rstrip(os.sep)) == 2:
+            if len(_dir.rstrip(os.sep)) in [2, 5]:
                 supported_languages.append(_dir)
         return supported_languages
 
@@ -115,7 +115,6 @@ class NumberDetector(BaseDetector):
                 'ner_v2.detectors.numeral.number.{0}.number_detection'.format(self.language))
             self.language_number_detector = number_detector_module.NumberDetector(entity_name=self.entity_name,
                                                                                   unit_type=self.unit_type)
-
         except ImportError:
             standard_number_regex = importlib.import_module(
                 'ner_v2.detectors.numeral.number.standard_number_detector'
@@ -126,6 +125,12 @@ class NumberDetector(BaseDetector):
                 data_directory_path=get_lang_data_path(detector_path=os.path.abspath(__file__),
                                                        lang_code=self.language)
             )
+
+    def get_language_number_detector(self):
+        """
+        To get the language number detector being used by current Number detector
+        """
+        return self.language_number_detector
 
     @property
     def supported_languages(self):
