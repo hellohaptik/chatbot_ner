@@ -11,7 +11,6 @@ from ner_constants import (FROM_STRUCTURE_VALUE_VERIFIED, FROM_STRUCTURE_VALUE_N
                            FROM_FALLBACK_VALUE, ORIGINAL_TEXT, ENTITY_VALUE, DETECTION_METHOD,
                            DETECTION_LANGUAGE, ENTITY_VALUE_DICT_KEY)
 
-
 class BaseDetector(object):
     """
     This class is the base class from which will be inherited by individual detectors. It primarily contains the
@@ -143,7 +142,6 @@ class BaseDetector(object):
 
         text = structured_value if structured_value else message
         entity_list, original_text_list = self.detect_entity(text=text, **kwargs)
-
         if structured_value:
             if entity_list:
                 value, method, original_text = entity_list, FROM_STRUCTURE_VALUE_VERIFIED, original_text_list

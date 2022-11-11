@@ -19,7 +19,8 @@ from ner_v2.detectors.numeral.constant import NUMBER_NUMERAL_FILE_VARIANTS_COLUM
     NUMBER_NUMERAL_FILE_VALUE_COLUMN_NAME, NUMBER_NUMERAL_FILE_TYPE_COLUMN_NAME, NUMBER_TYPE_UNIT, \
     NUMBER_NUMERAL_CONSTANT_FILE_NAME, NUMBER_DETECTION_RETURN_DICT_VALUE, NUMBER_DETECTION_RETURN_DICT_SPAN, \
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_UNITS_FILE_NAME, NUMBER_DATA_FILE_UNIT_VARIANTS_COLUMN_NAME, \
-    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE, NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME
+    NUMBER_DATA_FILE_UNIT_VALUE_COLUMN_NAME, NUMBER_TYPE_SCALE, NUMBER_DATA_FILE_UNIT_TYPE_COLUMN_NAME, \
+    NUMBER_NUMERAL_FILE_NUMBER_COLUMN_NAME
 from ner_v2.detectors.numeral.utils import get_number_from_number_word, get_list_from_pipe_sep_string
 
 NumberVariant = collections.namedtuple('NumberVariant', ['scale', 'increment'])
@@ -46,6 +47,7 @@ class BaseNumberDetector(object):
         self.entity_name = entity_name
         self.tag = '__' + entity_name + '__'
 
+        self.base_numbers_map = {}
         self.numbers_word_map = {}
         self.scale_map = {}
         self.units_map = {}
@@ -122,6 +124,8 @@ class BaseNumberDetector(object):
                 for numeral in name_variants:
                     # tuple values to corresponds to (scale, increment), for unit type, scale will always be 1.
                     self.numbers_word_map[numeral] = NumberVariant(scale=1, increment=value)
+                    # map the name of number to latin numeric value
+                    self.base_numbers_map[numeral] = value
 
             elif number_type == NUMBER_TYPE_SCALE:
                 for numeral in name_variants:
@@ -129,6 +133,11 @@ class BaseNumberDetector(object):
                     self.numbers_word_map[numeral] = NumberVariant(scale=value, increment=0)
                     # Dict map to store scale and their values
                     self.scale_map[numeral] = value
+                    # map the name of number to latin numeric value
+                    self.base_numbers_map[numeral] = value
+
+            number_text = row[NUMBER_NUMERAL_FILE_NUMBER_COLUMN_NAME]
+            self.base_numbers_map[number_text] = value
 
         # create units_dict having unit variants and their corresponding value
         unit_file_path = os.path.join(data_directory_path, NUMBER_UNITS_FILE_NAME)

@@ -30,5 +30,7 @@ FINNISH_LANG = 'fi'
 PORTUGUESE_LANG = 'pt'
 TURKISH_LANG = 'tr'
 
+CHINESE_TRADITIONAL_LANG = 'zh-TW'
+
 # language translation status
 TRANSLATED_TEXT = 'translated_text'
