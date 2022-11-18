@@ -15,7 +15,6 @@ from ner_v2.detectors.numeral.constant import NUMBER_DETECTION_RETURN_DICT_SPAN,
     NUMBER_DETECTION_RETURN_DICT_UNIT, NUMBER_DETECTION_RETURN_DICT_VALUE
 from ner_v2.detectors.numeral.number.standard_number_detector import BaseNumberDetector
 
-
 class NumberDetector(BaseNumberDetector):
     """
     Number detector to detect numbers in chinese text
@@ -45,6 +44,8 @@ class NumberDetector(BaseNumberDetector):
             '.': '點',
             '+': '加'
         }
+
+        self.power_of_10 = { 10 ** i for i in range(1,17)}
 
     def _get_base_map_choices(self, base_map):
         number_set = set()
@@ -131,14 +132,15 @@ class NumberDetector(BaseNumberDetector):
         return number_list, original_list
 
     def get_number(self, original_text):
+        original_text = original_text.strip()
         if self._have_digits_only(original_text, self.scale_map):
             return self.get_number_digit_by_digit(original_text)
         return self.get_number_with_digit_scaling(original_text)
 
-    def extract_digits_only(self, text, rgx_pattern=None, with_special_chars=False):
+    def extract_digits_only(self, text, rgx_pattern=None, with_special_chars=False, with_scale=False):
         text = text or ''
         rgx_pattern = rgx_pattern or r'[-,.+\s{}]+'
-        digit_choices = self.base_numbers_map_choices
+        digit_choices = self.base_numbers_map_choices_full if with_scale else self.base_numbers_map_choices
         if with_special_chars:
             digit_choices += '|'.join(self.special_chars_mapping.values())
         rgx_pattern = re.compile(rgx_pattern.format(digit_choices))
@@ -149,4 +151,73 @@ class NumberDetector(BaseNumberDetector):
 
     def get_number_with_digit_scaling(self, text=''):
         # change the below logic to work with scaling
-        return text
+        result = ''
+        if not text:
+            return result
+
+        # extract the digits and scales from the text
+        digit_list = []
+
+        pwr_index_map = {}
+        for t in text:
+            digit_val = self.base_numbers_map_full.get(t)
+            if digit_val == None:
+                return result
+            else:
+                digit_list.append(digit_val)
+                if digit_val in self.power_of_10:
+                    pwr_index_map[digit_val] = len(digit_list) - 1
+        if len(digit_list) == 0:
+            return result
+
+        pwr_index_map[1] = len(digit_list)
+
+        # starting from highest power aggregate digit and scales
+        pwr_index_list = sorted(pwr_index_map.items(), key= lambda kv : kv[0], reverse=True)
+
+        st = 0
+        final_val = 0
+        for pwr, indx in pwr_index_list:
+            value = self.combine_digit_and_scale(digit_list[ st : indx])
+            st = indx + 1
+            if value != None:
+                value = value * pwr
+                final_val += value
+
+        result = str(final_val)
+        return result
+
+    def combine_digit_and_scale(self, num_list: None):
+        """
+        params : list of numbers either digit or scale
+        return : int
+        example :
+            [ 2, 1000, 5, 100, 3, 10, 8 ]
+            output : 2538
+        """
+        value = None
+        num_list = num_list or []
+
+        if len(num_list) == 0:
+            return value
+
+        digit_scaled_list = [1]
+        start_index = 0
+        if num_list[0] not in self.power_of_10:
+            start_index = 1
+            digit_scaled_list[0] = num_list[0]
+
+        zero_found = False
+        for i in range(start_index, len(num_list)):
+            x = num_list[i]
+            if x == 0:
+                zero_found = True
+                continue
+            if x in self.power_of_10:
+                digit_scaled_list[-1] = digit_scaled_list[-1] * x
+            else:
+                digit_scaled_list.append(x)
+        value = sum(digit_scaled_list)
+        if (value == 0) and ( zero_found == False):
+            value = None
+        return value
