@@ -218,6 +218,6 @@ class NumberDetector(BaseNumberDetector):
             else:
                 digit_scaled_list.append(x)
         value = sum(digit_scaled_list)
-        if (value == 0) and (zero_found == False):
+        if (value == 0) and (zero_found is False):
             value = None
         return value
