@@ -45,7 +45,7 @@ class NumberDetector(BaseNumberDetector):
             '+': '加'
         }
 
-        self.power_of_10 = { 10 ** i for i in range(1,17)}
+        self.power_of_10 = {10 ** i for i in range(1, 17)}
 
     def _get_base_map_choices(self, base_map):
         number_set = set()
@@ -161,26 +161,26 @@ class NumberDetector(BaseNumberDetector):
         pwr_index_map = {}
         for t in text:
             digit_val = self.base_numbers_map_full.get(t)
-            if digit_val == None:
-                return result
-            else:
+            if digit_val is not None:
                 digit_list.append(digit_val)
                 if digit_val in self.power_of_10:
                     pwr_index_map[digit_val] = len(digit_list) - 1
+            else:
+                return result
         if len(digit_list) == 0:
             return result
 
         pwr_index_map[1] = len(digit_list)
 
         # starting from highest power aggregate digit and scales
-        pwr_index_list = sorted(pwr_index_map.items(), key= lambda kv : kv[0], reverse=True)
+        pwr_index_list = sorted(pwr_index_map.items(), key=lambda kv: kv[0], reverse=True)
 
         st = 0
         final_val = 0
         for pwr, indx in pwr_index_list:
-            value = self.combine_digit_and_scale(digit_list[ st : indx])
+            value = self.combine_digit_and_scale(digit_list[st: indx])
             st = indx + 1
-            if value != None:
+            if value is not None:
                 value = value * pwr
                 final_val += value
 
@@ -218,6 +218,6 @@ class NumberDetector(BaseNumberDetector):
             else:
                 digit_scaled_list.append(x)
         value = sum(digit_scaled_list)
-        if (value == 0) and ( zero_found == False):
+        if (value == 0) and (zero_found == False):
             value = None
         return value
