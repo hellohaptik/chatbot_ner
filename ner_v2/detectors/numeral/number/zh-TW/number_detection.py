@@ -45,7 +45,11 @@ class NumberDetector(BaseNumberDetector):
             '+': '加'
         }
 
-        self.power_of_10 = {10 ** i for i in range(1, 17)}
+        self.power_of_10 = set()
+        val = 1
+        for i in range(16):
+            val *= 10
+            self.power_of_10.add(val)
 
     def _get_base_map_choices(self, base_map):
         number_set = set()
@@ -150,7 +154,30 @@ class NumberDetector(BaseNumberDetector):
         return ''.join([str(self.base_numbers_map.get(_t, _t)) for _t in text])
 
     def get_number_with_digit_scaling(self, text=''):
-        # change the below logic to work with scaling
+        """
+        This will take the text and extract the digits with scale
+        and then divide into groups to calculate the exact number
+        Parameter : text ( string )
+        Return : number as string
+        Example :
+            text = '二百三十九萬三千五百七十六'
+            return = 2393576
+
+            the number will be splitted into digits and scales like below
+            [ 2, 100, 3, 10, 9, 10000, 3, 1000, 5, 100, 7, 10, 6 ]
+            The original number will be calcualted from this list by calculating
+            number formed on left side of power of 10, ( starting from highest power)
+            a simple expression will be like below
+            (239 * 10000) + (3 * 1000) + (5 * 100) + (7 * 10) + 6
+
+            for this will take sublist from number which is power of 10 to first left most power of 10
+            which is greater than it. so the multiple list which become are
+            st = 0 ( index of first number which is power of 10 and greater than 10,000 and is on left of 10000)
+            power_index_map[10000] = 5 ( last index of 10000 in list)
+            sub list to combine for it = [2, 100, 3, 10, 9]
+
+            simillarly other list to combine will be : [3], [5], [7], [6]
+        """
         result = ''
         if not text:
             return result
@@ -178,6 +205,8 @@ class NumberDetector(BaseNumberDetector):
         st = 0
         final_val = 0
         for pwr, indx in pwr_index_list:
+            if st > indx:
+                continue
             value = self.combine_digit_and_scale(digit_list[st: indx])
             st = indx + 1
             if value is not None:
@@ -187,13 +216,17 @@ class NumberDetector(BaseNumberDetector):
         result = str(final_val)
         return result
 
-    def combine_digit_and_scale(self, num_list: None):
+    def combine_digit_and_scale(self, num_list=[]):
         """
         params : list of numbers either digit or scale
         return : int
         example :
-            [ 2, 1000, 5, 100, 3, 10, 8 ]
-            output : 2538
+            original Number list = [ 2, 100, 3, 10, 9, 10000, 3, 1000, 5, 100, 7, 10, 6 ]
+            this function will get multiple list to process one by one
+            first one will be
+            num_list = [ 2, 100, 3, 10, 9]
+            output : 239
+            and following lists will be [3], [5], [7] and [6]
         """
         value = None
         num_list = num_list or []
