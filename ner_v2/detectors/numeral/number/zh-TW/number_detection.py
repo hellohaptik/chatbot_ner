@@ -139,10 +139,14 @@ class NumberDetector(BaseNumberDetector):
         signs = {'-', '+'}
         sign = None
         new_text = text
-        for i in range(len(text) - 1, -1, -1):
-            if text[i] in signs:
-                sign = text[i]
-                new_text = text[i + 1:]
+        for i in range(0, len(text)):
+            ch = text[i]
+            if ch in signs:
+                sign = ch
+            elif ch == ' ':
+                continue
+            else:
+                new_text = text[i:]
                 break
         return sign, new_text.strip()
 
