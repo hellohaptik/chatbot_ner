@@ -135,6 +135,17 @@ class NumberDetector(BaseNumberDetector):
                     original_list.append(original_text)
         return number_list, original_list
 
+    def check_sign(self, text=''):
+        signs = {'-','+'}
+        sign = None
+        new_text = text
+        for i in range(len(text)-1, -1, -1):
+            if text[i] in signs:
+                sign = text[i]
+                new_text = text[i+1:]
+                break
+        return sign, new_text.strip()
+
     def get_number(self, original_text):
         original_text = original_text.strip()
         if self._have_digits_only(original_text, self.scale_map):

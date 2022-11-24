@@ -190,7 +190,10 @@ class ChinesePhoneDetector(PhoneDetector):
     def _sanitize_text(self, text=None):
         text = text or ''
         sanitized_text = self.language_number_detector.replace_special_chars(text)
+        sign, sanitized_text = self.language_number_detector.check_sign(sanitized_text)
         sanitized_text = self.language_number_detector.get_number(sanitized_text)
+        if sign:
+            sanitized_text = sign + sanitized_text
         return sanitized_text
 
     def detect_entity(self, text, **kwargs):
