@@ -136,13 +136,13 @@ class NumberDetector(BaseNumberDetector):
         return number_list, original_list
 
     def check_sign(self, text=''):
-        signs = {'-','+'}
+        signs = {'-', '+'}
         sign = None
         new_text = text
-        for i in range(len(text)-1, -1, -1):
+        for i in range(len(text) - 1, -1, -1):
             if text[i] in signs:
                 sign = text[i]
-                new_text = text[i+1:]
+                new_text = text[i + 1:]
                 break
         return sign, new_text.strip()
 
