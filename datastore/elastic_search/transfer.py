@@ -144,6 +144,7 @@ class ESTransfer(object):
         self.es_alias = CHATBOT_NER_DATASTORE.get(self.engine).get('es_alias')
         if self.es_alias is None:
             raise AliasForTransferException()
+        self.disable_replicas = CHATBOT_NER_DATASTORE.get(self.engine).get('disable_replicas_while_transferring')
 
     def _validate_source_destination_index_name(self):
         """
@@ -336,7 +337,7 @@ class ESTransfer(object):
         self._run_update_query_on_es(update_query)
 
     @staticmethod
-    def transfer_data_internal(es_url, index_to_backup, backup_index):
+    def transfer_data_internal(es_url, index_to_backup, backup_index, disable_replicas=False):
         """
         Transfer data from index_to_backup to backup_index in ES
 
@@ -388,14 +389,54 @@ class ESTransfer(object):
             }
         }
 
-        ner_logger.debug('Start post request made with es_url reindex'
-                         'es_url: %s' % (es_url))
-        reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
-                                         params={"refresh": "true", "wait_for_completion": "true"})
-        ner_logger.debug('End post request made with es_url ')
-        if reindex_response.status_code != 200:
-            message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
-            raise InternalBackupException(message)
+        number_of_replicas = index_to_backup_config["settings"]["index"].get("number_of_replicas")
+        replicas_disabled = False
+
+        def update_index_settings(index_url, settings_object={}):
+            resp = requests.put(f'{index_url}/_settings', json=settings_object)
+            if resp.status_code == 200:
+                ner_logger.debug(f'transfer_data_internal, Index settings updated')
+            else:
+                ner_logger.debug(f'transfer_data_internal, Failed to update index settings')
+                message = f"Failed to update index settings for {index_url}"
+                raise InternalBackupException(message)
+
+        exception_messages = []
+        # if replica disabling flag is set, then disable replica and re-enable it once reindexing is done
+        if disable_replicas:
+            try:
+                index_settings = {'index': {'number_of_replicas': '0'}}
+                update_index_settings(backup_index_url, index_settings)
+                replicas_disabled = True
+            except InternalBackupException as ibe:
+                exception_messages.append('Failed to Disable Replica')
+                disable_replicas = False
+
+
+        try:
+            ner_logger.debug('Start post request made with es_url reindex'
+                            'es_url: %s' % (es_url))
+            reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
+                                            params={"refresh": "true", "wait_for_completion": "true"})
+            ner_logger.debug('End post request made with es_url ')
+            if reindex_response.status_code != 200:
+                message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
+                exception_messages.append(message)
+        except Exception as exp:
+            ner_logger.debug(f'transfer_data_internal, Error while reindexing : {str(exp)}')
+        finally:
+            # if disable_replicas flag was provided, then check it and re-enable replicas
+            try:
+                if disable_replicas and replicas_disabled:
+                    index_settings = {'index': {'number_of_replicas': number_of_replicas}}
+                    update_index_settings(backup_index_url, index_settings)
+            except InternalBackupException as ibe:
+                exception_messages.append('Failed to Re-Enable replicas')
+            finally:
+                if len(exception_messages) > 0:
+                    messages = str(exception_messages)
+                    raise InternalBackupException(messages)
+
 
     @staticmethod
     def point_an_alias_to_index(es_url, alias_name, index_name):
@@ -499,7 +540,7 @@ class ESTransfer(object):
 
         # Backup process
         ner_logger.debug('Start transfer_data_internal')
-        self.transfer_data_internal(self.destination, current_live_index, new_live_index)
+        self.transfer_data_internal(self.destination, current_live_index, new_live_index, self.disable_replicas)
         ner_logger.debug('End transfer_data_internal')
 
         # call utils function to transfer specific entities
