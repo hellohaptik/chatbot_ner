@@ -408,16 +408,14 @@ class ESTransfer(object):
                 index_settings = {'index': {'number_of_replicas': '0'}}
                 update_index_settings(backup_index_url, index_settings)
                 replicas_disabled = True
-            except InternalBackupException as ibe:
+            except InternalBackupException:
                 exception_messages.append('Failed to Disable Replica')
                 disable_replicas = False
-
-
         try:
             ner_logger.debug('Start post request made with es_url reindex'
-                            'es_url: %s' % (es_url))
+                             'es_url: %s' % (es_url))
             reindex_response = requests.post('{es_url}/_reindex'.format(**{'es_url': es_url}), json=final_request_dict,
-                                            params={"refresh": "true", "wait_for_completion": "true"})
+                                             params={"refresh": "true", "wait_for_completion": "true"})
             ner_logger.debug('End post request made with es_url ')
             if reindex_response.status_code != 200:
                 message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
@@ -430,7 +428,7 @@ class ESTransfer(object):
                 if disable_replicas and replicas_disabled:
                     index_settings = {'index': {'number_of_replicas': number_of_replicas}}
                     update_index_settings(backup_index_url, index_settings)
-            except InternalBackupException as ibe:
+            except InternalBackupException:
                 exception_messages.append('Failed to Re-Enable replicas')
             finally:
                 if len(exception_messages) > 0:
