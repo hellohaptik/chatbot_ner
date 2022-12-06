@@ -434,7 +434,7 @@ class ESTransfer(object):
             except InternalBackupException as ibe:
                 ner_logger.debug(f'Failed to Re-Enable replicas : {str(ibe)}')
             finally:
-                if reindex_exception > 0:
+                if reindex_exception:
                     raise InternalBackupException(reindex_exception)
 
 
