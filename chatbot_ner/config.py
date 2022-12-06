@@ -35,6 +35,8 @@ DESTINATION_URL = '{scheme}://{host}:{port}'.format(**{'scheme': DESTINATION_ES_
                                                        'host': DESTINATION_HOST,
                                                        'port': DESTINATION_PORT})
 
+DISABLE_REPLICAS_WHILE_TRANFERRING = os.environ.get('DISABLE_REPLICAS_WHILE_TRANFERRING', False)
+
 if ENGINE:
     ENGINE = ENGINE.lower()
     if ENGINE == 'elasticsearch':
@@ -66,6 +68,8 @@ CHATBOT_NER_DATASTORE = {
         # For detailed explanation datastore.elastic_search.transfer.py
         'es_index_2': ES_INDEX_2,  # Index 2 used for transfer
         'destination_url': DESTINATION_URL,  # Elastic search destination  URL
+        # flag to disable replicas and re-enable once transfer is done
+        'disable_replicas_while_transferring': DISABLE_REPLICAS_WHILE_TRANFERRING,
 
         # Training Data ES constants
         'elasticsearch_crf_data_index_name': ELASTICSEARCH_CRF_DATA_INDEX_NAME,
