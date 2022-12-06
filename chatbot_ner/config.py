@@ -35,7 +35,7 @@ DESTINATION_URL = '{scheme}://{host}:{port}'.format(**{'scheme': DESTINATION_ES_
                                                        'host': DESTINATION_HOST,
                                                        'port': DESTINATION_PORT})
 
-DISABLE_REPLICAS_WHILE_TRANFERRING = os.environ.get('DISABLE_REPLICAS_WHILE_TRANFERRING', True)
+DISABLE_REPLICAS_WHILE_TRANFERRING = os.environ.get('DISABLE_REPLICAS_WHILE_TRANFERRING', False)
 
 if ENGINE:
     ENGINE = ENGINE.lower()

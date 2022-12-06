@@ -144,7 +144,8 @@ class ESTransfer(object):
         self.es_alias = CHATBOT_NER_DATASTORE.get(self.engine).get('es_alias')
         if self.es_alias is None:
             raise AliasForTransferException()
-        self.disable_replicas = CHATBOT_NER_DATASTORE.get(self.engine).get('disable_replicas_while_transferring')
+        self.disable_replicas = CHATBOT_NER_DATASTORE.get(self.engine) \
+                                                     .get('disable_replicas_while_transferring', False)
 
     def _validate_source_destination_index_name(self):
         """
@@ -401,15 +402,15 @@ class ESTransfer(object):
                 message = f"Failed to update index settings for {index_url}"
                 raise InternalBackupException(message)
 
-        exception_messages = []
+        reindex_exception = None
         # if replica disabling flag is set, then disable replica and re-enable it once reindexing is done
         if disable_replicas:
             try:
                 index_settings = {'index': {'number_of_replicas': '0'}}
                 update_index_settings(backup_index_url, index_settings)
                 replicas_disabled = True
-            except InternalBackupException:
-                exception_messages.append('Failed to Disable Replica')
+            except InternalBackupException as ibe:
+                ner_logger.debug(f'Failed to Disable Replica : {str(ibe)}')
                 disable_replicas = False
         try:
             ner_logger.debug('Start post request made with es_url reindex'
@@ -419,21 +420,22 @@ class ESTransfer(object):
             ner_logger.debug('End post request made with es_url ')
             if reindex_response.status_code != 200:
                 message = "transfer from " + index_to_backup + "to " + backup_index + " failed"
-                exception_messages.append(message)
+                ner_logger.debug(message)
+                raise InternalBackupException(message)
         except Exception as exp:
-            ner_logger.debug(f'transfer_data_internal, Error while reindexing : {str(exp)}')
+            reindex_exception = str(exp)
+            ner_logger.exception(f'transfer_data_internal, Error while reindexing : {reindex_exception}')
         finally:
             # if disable_replicas flag was provided, then check it and re-enable replicas
             try:
-                if disable_replicas and replicas_disabled:
+                if disable_replicas and replicas_disabled and number_of_replicas:
                     index_settings = {'index': {'number_of_replicas': number_of_replicas}}
                     update_index_settings(backup_index_url, index_settings)
-            except InternalBackupException:
-                exception_messages.append('Failed to Re-Enable replicas')
+            except InternalBackupException as ibe:
+                ner_logger.debug(f'Failed to Re-Enable replicas : {str(ibe)}')
             finally:
-                if len(exception_messages) > 0:
-                    messages = str(exception_messages)
-                    raise InternalBackupException(messages)
+                if reindex_exception > 0:
+                    raise InternalBackupException(reindex_exception)
 
 
     @staticmethod
