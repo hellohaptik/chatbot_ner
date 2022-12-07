@@ -545,7 +545,7 @@ class ESTransfer(object):
         self.transfer_data_internal(self.destination, current_live_index, new_live_index, self.disable_replicas)
         end_time = datetime.datetime.now()
         duration = (end_time - start_time).total_seconds()
-        ner_logger.debug(f'End transfer_data_internal, total_time_taken_for_bot_transfer: %.2f' % duration)
+        ner_logger.debug(f'End transfer_data_internal, total_time_taken_for_internal_transfer: %.2f' % duration)
 
         # call utils function to transfer specific entities
         ner_logger.debug('Start fetch_index_alias_points_to '
