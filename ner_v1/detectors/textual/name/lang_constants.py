@@ -940,7 +940,7 @@ PREVIOUS_MESSAGE_VARIATIONS = {
                  "apna naam", "aapka naam", "naam batao", "aapka naam hai", "naam kya hai", "aapka poora naam",
                  "aapka naam bathaaea", "tumhe bulaaya", "apna naam patha hai", "naam kyaa hai aapka",
                  "apna naam share kare", "apna naam enter karei", "apna naam pradhaan karei",
-                 "tumhara naam kyaa hai", "apna poora naam"],
+                 "tumhara naam kyaa hai", "apna poora naam", "aapka naam kya hai", "please apna naam batayea"],
     MALAY_LANG: ["nama awak", "alamat awak", "panggil awak", "ketahui namamu", "nama penuh anda",
                  "sebutkan namamu", "siapa nama awak", "Adakah nama awak", "kongsi nama anda", "berikan nama anda",
                  "beritahu nama anda", "masukkan nama anda", "sebutkan nama anda", "Apakah nama penuh anda?",
