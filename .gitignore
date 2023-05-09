@@ -107,3 +107,6 @@ logs/*.log*
 newman_reports/
 sftp-config.json
 dev.json
+
+# alternate dev setup
+!dev_setup_examples/*

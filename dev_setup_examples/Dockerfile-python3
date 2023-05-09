@@ -1,0 +1,27 @@
+FROM python:3.6.15
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y wget build-essential curl nginx supervisor && \
+    curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash
+WORKDIR /app
+COPY requirements.txt nltk_setup.py /app/
+RUN touch /app/config && \
+    pip install --no-cache-dir -U pip &&  \
+    pip install --no-cache-dir -U Cython==0.28.2 newrelic==3.4.0.95 &&  \
+    pip install --no-cache-dir -I uwsgi==2.0.19.1 &&  \
+    pip install --no-cache-dir -r /app/requirements.txt && \
+    pip check && \
+    python /app/nltk_setup.py
+ENV NAME="chatbot_ner"
+ENV DJANGODIR=/app
+ENV NUM_WORKERS=4
+ENV DJANGO_SETTINGS_MODULE=chatbot_ner.settings
+ENV PORT=8081
+ENV TIMEOUT=600
+ENV MAX_REQUESTS=1000
+# ENV ENVKEY=
+# ENV NEWRELIC_LICENSE_KEY=
+EXPOSE 8081
+ADD . /app
+RUN chmod +x /app/entrypoint.sh
+CMD /app/entrypoint.sh

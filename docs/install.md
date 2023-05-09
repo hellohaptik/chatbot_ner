@@ -48,9 +48,12 @@ Following are the steps to create the Docker image and run NER with Docker.
 
 2. **Bring up chatbot_ner:**
 
+> **NOTE** : In case the below chatbot_ner do not work you can always refer to alternate ner setup [here](./ner_new_setup.md)
+
+**OLD SETUP as below** :
 ```shell
 git clone https://github.com/hellohaptik/chatbot_ner.git
-cd chatbot_ner 
+cd chatbot_ner
 cp .env.example docker/.env    # (This will have all the basic environment variables to get started, You can update values accordingly)
 cd docker
 docker-compose up --build -d
@@ -69,7 +72,7 @@ Please wait 5 seconds to run the first curl or do an API call to chatbot_ner.
      Now, on your local machine curl the chatbot api as shown shown below,
      host can be your local machine or a server IP on which you have been running docker on.
 
-   > Port mapping can be changed in docker-compose yml 
+   > Port mapping can be changed in docker-compose yml
 
 **Container commands:**
 
@@ -78,9 +81,9 @@ cd ~/chatbot_ner/docker  # (all compose commands from docker directory of repo)
 docker-compose ps or docker ps # (shows list of running container)
 docker exec -it container-name bash  # (login to container shell)
 docker-compose down # (to kill containers)
-docker-compose restart # (to restart containers, probably when you make code changes) 
+docker-compose restart # (to restart containers, probably when you make code changes)
    ```
-**Check logs** 
+**Check logs**
    ```shell
 docker logs -f docker_chatbot-ner_1
    ```
@@ -93,13 +96,15 @@ tail -f *.log
 >
 >   `LOG_LEVEL` can be changed in compose or chatbot_ner/config.py
 
+
+## Testing NER API
 **Example API call to test**
 
  Following is an example API call to test our service on your local system/server:
 
    ```python
 entities = ['date','time','restaurant']
-message = "Reserve me a table today at 6:30pm at Mainland China and on Monday at 7:00pm at Barbeque Nation" 
+message = "Reserve me a table today at 6:30pm at Mainland China and on Monday at 7:00pm at Barbeque Nation"
    ```
 
    ```shell
