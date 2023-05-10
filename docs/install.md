@@ -51,10 +51,10 @@ Following are the steps to create the Docker image and run NER with Docker.
   git clone https://github.com/hellohaptik/chatbot_ner.git
   cd chatbot_ner
   ```
-  - Copy the files from directory `dev_setup` to parent directory. This directory contains example files which can be configured and used in our new setup.
+  - Copy the files from directory `docker` to parent directory. This directory contains example files which can be configured and used in our new setup.
   ```bash
   cd ~/chatbot_ner/
-  cp -r ./dev_setup/*  ./
+  cp -r ./docker/*  ./
   ```
 
 3. **Seting up configuration:**
@@ -109,7 +109,7 @@ The above will also mount the local repo root directory inside the containers /a
 **Container commands:**
 
    ```shell
-cd ~/chatbot_ner/docker  # (all compose commands from docker directory of repo)
+cd ~/chatbot_ner/  # (all compose commands from main directory of the repo)
 docker-compose ps or docker ps # (shows list of running container)
 docker exec -it container-name bash  # (login to container shell)
 docker-compose down # (to kill containers)
