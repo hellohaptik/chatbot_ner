@@ -51,17 +51,12 @@ Following are the steps to create the Docker image and run NER with Docker.
   git clone https://github.com/hellohaptik/chatbot_ner.git
   cd chatbot_ner
   ```
-  - Copy the files from directory `dev_setup` to parent directory. This directory contains example files which can be configured and used in our new setup.
-  ```bash
-  cd ~/chatbot_ner/
-  cp -r ./dev_setup/*  ./
-  ```
 
 3. **Seting up configuration:**
   Setting up configuration: These setups should be in the parent level directory. Which means inside ~/chatbot_ner/
-  - (You should change the SECRET_KEY).
   - Copy file .env.example to .env and modify it based on requirements.
-    - **NOTE** : For updating the .env file Haptik employee can refer to internal notion doc [here]([here](https://www.notion.so/hellohaptik/Alternate-dev-setup-for-NER-env-file-Entity-syncing-7f47ee691aed41c3b7025f2b1976bd14)). If you don't have access to the notion doc, contact your manager or someone from the ML team.
+    - **NOTE** : For updating the .env file Haptik employee can refer to internal notion doc [here](https://www.notion.so/hellohaptik/Alternate-dev-setup-for-NER-env-file-Entity-syncing-7f47ee691aed41c3b7025f2b1976bd14). If you don't have access to the notion doc, contact your manager or someone from the ML team.
+  - In .env file you should change the `SECRET_KEY`.
   - Update permission for `entrypoint.sh` file
   ```bash
   sudo chmod 777 entrypoint.sh

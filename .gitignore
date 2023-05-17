@@ -109,4 +109,6 @@ sftp-config.json
 dev.json
 
 # alternate dev setup
-!dev_setup/*
+!docker-compose.yml
+!Dockerfile-python3
+!entrypoint.sh
