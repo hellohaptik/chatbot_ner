@@ -107,3 +107,5 @@ logs/*.log*
 newman_reports/
 sftp-config.json
 dev.json
+
+!/dev_docker/*
