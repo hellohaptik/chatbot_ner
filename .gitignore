@@ -107,8 +107,3 @@ logs/*.log*
 newman_reports/
 sftp-config.json
 dev.json
-
-# alternate dev setup
-!docker-compose.yml
-!Dockerfile-python3
-!entrypoint.sh
