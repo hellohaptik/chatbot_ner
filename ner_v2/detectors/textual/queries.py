@@ -10,6 +10,7 @@ from six import string_types
 from datastore import constants
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
+from chatbot_ner.config import ner_logger
 
 
 def _generate_multi_entity_es_query(entities, text,
@@ -194,12 +195,13 @@ def _parse_multi_entity_es_results(results_list):
 
     """
     entity_variants_to_values_list = []
-
+    ner_logger.debug(f"===== PARSING ========")
     if results_list:
         for results in results_list:
             entity_dict = {}
             entity_variants_to_values_dict = {}
-            if results['hits']['total'] > 0:
+            # if results['hits']['total'] > 0:
+            if results['hits']['total']['value'] > 0:
                 for hit in results['hits']['hits']:
                     if 'highlight' not in hit:
                         continue
@@ -215,6 +217,7 @@ def _parse_multi_entity_es_results(results_list):
                     entity_dict[entity_name]['variant'].extend(
                         [variant for variant in hit['highlight']['variants']])
 
+                ner_logger.debug(f"===== PARSING 1 1 1 1 1 ========")
                 for each_entity in entity_dict.keys():
                     entity_values = entity_dict[each_entity]['value']
                     entity_variants = entity_dict[each_entity]['variant']
@@ -227,6 +230,9 @@ def _parse_multi_entity_es_results(results_list):
                             variant = variant_no_highlight_tags
                             if variant not in entity_variants_to_values:
                                 entity_variants_to_values[variant] = value
+                            else:
+                                ner_logger.debug(f'        variant : {variant}    entity_variants_to_values: {entity_variants_to_values}   ')
                     entity_variants_to_values_dict[each_entity] = entity_variants_to_values
             entity_variants_to_values_list.append(entity_variants_to_values_dict)
+    ner_logger.debug(f'{" "*100}After parsing : {entity_variants_to_values_list}')
     return entity_variants_to_values_list

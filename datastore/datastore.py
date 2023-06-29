@@ -69,6 +69,8 @@ class DataStore(six.with_metaclass(Singleton, object)):
             All other exceptions raised by elasticsearch-py library
         """
         if self._engine == ELASTICSEARCH:
+            sp = "   "*100
+            ner_logger.debug(f'{sp} CONNECTING WITH : {self._connection_settings} {sp}')
             self._store_name = self._connection_settings[ELASTICSEARCH_ALIAS]
             self._client_or_connection = elastic_search.connect.connect(**self._connection_settings)
         else:
@@ -495,6 +497,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
         if self._engine == ELASTICSEARCH:
             self._check_doc_type_for_elasticsearch()
             request_timeout = self._connection_settings.get('request_timeout', 20)
+            ner_logger.debug(f"GET ENTITY UNIQUE VALUES : {kwargs}")
             results_dictionary = elastic_search.query.get_entity_unique_values(
                 connection=self._client_or_connection,
                 index_name=self._store_name,
@@ -503,6 +506,7 @@ class DataStore(six.with_metaclass(Singleton, object)):
                 request_timeout=request_timeout,
                 **kwargs
             )
+            ner_logger.debug(f"GET ENTITY UNIQUE VALUES RESULT: {results_dictionary}")
 
             return results_dictionary
 
@@ -583,6 +587,8 @@ class DataStore(six.with_metaclass(Singleton, object)):
                 request_timeout=request_timeout,
                 **kwargs
             )
+            sp  = '   '*100
+            ner_logger.debug(f"{sp} !!! {results_dictionary} !!! {sp}")
 
             return results_dictionary
 

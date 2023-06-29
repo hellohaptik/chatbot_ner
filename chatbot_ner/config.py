@@ -4,6 +4,7 @@ import structlog
 import os
 
 from elasticsearch import RequestsHttpConnection
+from elastic_transport import RequestsHttpNode
 from requests_aws4auth import AWS4Auth
 
 ner_logger = structlog.getLogger('chatbot_ner')
@@ -14,6 +15,9 @@ ES_SCHEME = os.environ.get('ES_SCHEME', 'http')
 ES_URL = os.environ.get('ES_URL')
 ES_HOST = os.environ.get('ES_HOST')
 ES_PORT = os.environ.get('ES_PORT')
+# Env flag to use ES8 client in code
+USE_ES8_CLIENT = (os.environ.get('USE_ES8_CLIENT').strip().lower() == 'true')
+
 ES_ALIAS = os.environ.get('ES_ALIAS')
 ES_INDEX_1 = os.environ.get('ES_INDEX_1')
 ES_DOC_TYPE = os.environ.get('ES_DOC_TYPE', 'data_dictionary')
@@ -87,6 +91,9 @@ if ES_AWS_SERVICE and ES_AWS_REGION:
     CHATBOT_NER_DATASTORE['elasticsearch']['use_ssl'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['verify_certs'] = True
     CHATBOT_NER_DATASTORE['elasticsearch']['connection_class'] = RequestsHttpConnection
+    # for es8
+    CHATBOT_NER_DATASTORE['elasticsearch']['node_class'] = RequestsHttpNode
+
     if ES_AWS_ACCESS_KEY_ID and ES_AWS_SECRET_ACCESS_KEY:
         CHATBOT_NER_DATASTORE['elasticsearch']['http_auth'] = AWS4Auth(ES_AWS_ACCESS_KEY_ID,
                                                                        ES_AWS_SECRET_ACCESS_KEY,

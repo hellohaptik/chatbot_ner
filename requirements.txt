@@ -19,7 +19,14 @@ requests==2.26.0
 requests-aws4auth==0.9
 Django==3.2.19
 
+# Keep both elasticsearch 5.x and 8.x to support the transition with environment variable
+# elasticsearch==5.5.3
 elasticsearch==5.5.3
+elasticsearch8==8.4.0
+elasticsearch7==7.9.0
+elastic-transport==8.4.0
+
+
 nltk==3.4.5
 phonenumberslite==8.10.18
 pyaml==19.4.1

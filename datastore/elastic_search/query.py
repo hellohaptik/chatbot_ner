@@ -13,6 +13,7 @@ from six.moves import zip
 
 from datastore import constants
 from datastore.exceptions import DataStoreRequestException
+from datastore.elastic_search.utils import filter_es_kwargs
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
 from lib.nlp.const import TOKENIZER
@@ -22,7 +23,9 @@ from elasticsearch import exceptions as es_exceptions
 # Local imports
 
 log_prefix = 'datastore.elastic_search.query'
-
+from chatbot_ner.config import ner_logger
+import inspect
+import traceback
 
 # Deprecated
 def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
@@ -54,6 +57,8 @@ def dictionary_query(connection, index_name, doc_type, entity_name, **kwargs):
     }
     kwargs = dict(kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE, index=index_name,
                   scroll='1m')
+    ner_logger.debug(f'{"+-"*20}')
+    ner_logger.debug(kwargs)
     search_results = _run_es_search(connection, **kwargs)
 
     # Parse hits
@@ -95,7 +100,7 @@ def get_entity_supported_languages(connection, index_name, doc_type, entity_name
                 }
             }
         },
-        "size": 0
+        # "size": 0
     }
     kwargs = dict(
         kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
@@ -134,8 +139,11 @@ def get_entity_data(connection, index_name, doc_type, entity_name, values=None, 
         "size": constants.ELASTICSEARCH_SEARCH_SIZE
     }
 
+    ner_logger.debug(f" GET ENTIY DATA (ES QUERY) : {data}")
+
     query_list = []
     if values is not None:
+        ner_logger.debug(f' WITH VALUES: {values}')
         values_chunks = [values[i:i + 500] for i in range(0, len(values), 500)]
         for chunk in values_chunks:
             updated_query = copy.deepcopy(data)
@@ -211,10 +219,12 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
                 }
             }
         },
-        "size": 0
+        # "size": 0,
+        # "track_total_hits": False
     }
 
     if value_search_term:
+        ner_logger.debug(f'++++++++++++ {value_search_term} +++++++++++')
         data['query']['bool']['minimum_should_match'] = 1
         _search_field = 'value'
         _search_term = value_search_term.lower()
@@ -247,10 +257,13 @@ def get_entity_unique_values(connection, index_name, doc_type, entity_name, valu
         kwargs, body=data, doc_type=doc_type, size=constants.ELASTICSEARCH_SEARCH_SIZE,
         index=index_name, filter_path=['aggregations.unique_values.buckets.key']
     )
+    ner_logger.info(f"@@@@@ RUNNING WITH KWARGS : {kwargs}")
     search_results = _run_es_search(connection, **kwargs)
     values = []
     if search_results:
         values = [bucket['key'] for bucket in search_results['aggregations']['unique_values']['buckets']]
+        sp = " "*500
+        ner_logger.debug(f"{sp}{values}{sp}")
     return values
 
 
@@ -298,7 +311,8 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
          u'mumbai': u'mumbai',
          u'pune': u'pune'}
     """
-    index_header = json.dumps({'index': index_name, 'type': doc_type})
+    # index_header = json.dumps({'index': index_name, 'type': doc_type})
+    index_header = json.dumps({'index': index_name})
     data = []
     for sentence in sentences:
         query = _generate_es_search_dictionary(entity_name=entity_name,
@@ -312,16 +326,21 @@ def full_text_query(connection, index_name, doc_type, entity_name, sentences, fu
     kwargs = dict(kwargs, body=data, doc_type=doc_type, index=index_name)
     response = None
     try:
+        sp = "  "*200
+        ner_logger.debug(f'{sp}{kwargs}{sp}')
+        # kwargs['body'].pop('type')
         response = _run_es_search(connection, msearch=True, **kwargs)
+        ner_logger.debug(f'===========================================')
         results = _parse_es_search_results(response.get("responses"))
     except es_exceptions.NotFoundError as e:
-        raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}',
+        raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}, {e}',
                                         engine='elasticsearch', request=json.dumps(data),
                                         response=json.dumps(response)) from e
     except es_exceptions.ConnectionError as e:
         raise e
     except Exception as e:
-        raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
+        ner_logger.error(traceback.format_exc())
+        raise DataStoreRequestException(f'Error in datastore query on index: {index_name}, {e}', engine='elasticsearch',
                                         request=json.dumps(data), response=json.dumps(response)) from e
     return results
 
@@ -339,25 +358,52 @@ def _run_es_search(connection, msearch=False, **kwargs):
     Returns:
         dictionary, search results from elasticsearch.ElasticSearch.msearch
     """
+    stack = inspect.stack()
+    callers = [frame.function for frame in stack[1:]][::-1]
+    calls = " -> ".join(callers)
+    ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+    ner_logger.debug(f'{"  "*50} KWARGS:  {kwargs}   {"  "*50}')
+
+    kwargs.pop('doc_type')
+
     scroll = kwargs.pop('scroll', False)
     if not scroll:
+        sp = "   "*100
         if msearch:
+            ner_logger.debug(f'{sp} msearch : {kwargs}{sp}')
+            kwargs = filter_es_kwargs(kwargs, connection.msearch)
+            ner_logger.debug(f'{sp} filtered msearch : {kwargs}{sp}')
+
             return connection.msearch(**kwargs)
         else:
+            ner_logger.debug(f'{sp} search : {kwargs}{sp}')
+            kwargs = filter_es_kwargs(kwargs, connection.search)
+            ner_logger.debug(f'{sp} filtered search : {kwargs}{sp}')
             return connection.search(**kwargs)
 
     if scroll and msearch:
         raise ValueError('Scrolling is not supported in msearch mode')
 
+    ner_logger.debug(f"######## SCROLLING WITH THEESE ONLY : {kwargs} #######")
+    ner_logger.debug(f"######## SCROLLING SHOULD HAVE : {filter_es_kwargs(kwargs, connection.search)} #######")
     result = connection.search(scroll=scroll, **kwargs)
     scroll_id = result['_scroll_id']
-    scroll_size = result['hits']['total']
+    ner_logger.debug(f"===========  >>>>>>   {result['hits']['total']}   {type(result['hits']['total'])} <<<<<<<<   ======")
+    ner_logger.debug(f"===========  >>>>>>   {result['hits'].keys()}   {type(result['hits']['hits'])} <<<<<<<<   ======")
+    # scroll_size = result['hits']['total']
+    scroll_size = result['hits']['total']['value']
     hit_list = result['hits']['hits']
     scroll_ids = [scroll_id]
     while scroll_size > 0:
+        ner_logger.debug(f"SCROLLING ------------- {scroll_size} --------")
         _result = connection.scroll(scroll_id=scroll_id, scroll=scroll)
+        for key in _result.keys():
+            if key not in ['hits']:
+                ner_logger.debug(f"-=-=-=-=-=####### {key} : {_result[key]}")
         scroll_id = _result['_scroll_id']
         scroll_ids.append(scroll_id)
+
+        ner_logger.debug(f"NEW HITS ------------- {len(_result['hits']['hits'])} --------")
         scroll_size = len(_result['hits']['hits'])
         hit_list += _result['hits']['hits']
 
@@ -533,7 +579,9 @@ def _parse_es_search_results(results_list):
         for results in results_list:
             entity_values, entity_variants = [], []
             variants_to_values = collections.OrderedDict()
-            if results and results['hits']['total'] > 0:
+            ner_logger.info(f'###########    {type(results["hits"]["total"])}    {results["hits"]["total"]}     ##########')
+            ner_logger.debug(f'-=-=-=-=-=-=-=      {results.keys()}     -=-=--=-=-=      {results["hits"].keys()}         -=-=-=-=-=-=-=-=-=')
+            if results and results['hits']['total']['value'] > 0:
                 for hit in results['hits']['hits']:
                     if 'highlight' not in hit:
                         continue

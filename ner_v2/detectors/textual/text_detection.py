@@ -292,8 +292,9 @@ class TextDetector(object):
                 variant = variant.lower()
                 if isinstance(variant, bytes):
                     variant = variant.decode('utf-8')
-
+                ner_logger.debug(f' variant to values before  : {variants_to_values}')
                 variants_to_values[variant] = value
+                ner_logger.debug(f' variant to values after  : {variants_to_values}')
             variants_list = list(variants_to_values.keys())
 
             exact_matches, fuzzy_variants = [], []
@@ -306,12 +307,14 @@ class TextDetector(object):
 
             exact_matches.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
             fuzzy_variants.sort(key=lambda s: len(TOKENIZER.tokenize(s)), reverse=True)
-
+            sp = " "*200
+            ner_logger.debug(f"{sp} exact match : {exact_matches}{sp} fuzzy_variants : {fuzzy_variants}")
             variants_list = exact_matches + fuzzy_variants
             for variant in variants_list:
 
                 original_text = self._get_entity_substring_from_text(_processed_text,
                                                                      variant, each_key)
+                ner_logger.debug(f' PROCESSING : {variant}, original {original_text}')
                 if original_text:
                     value_final_list.append(variants_to_values[variant])
                     original_final_list.append(original_text)
@@ -322,7 +325,7 @@ class TextDetector(object):
                     _pattern = re.compile(r'\b%s\b' % re.escape(original_text_), flags=_re_flags)
                     tag = '__' + each_key + '__'
                     _processed_text = _pattern.sub(tag, _processed_text)
-
+            ner_logger.debug(f'  variants_to_values : {variants_to_values}')
             value_final_list_.append(value_final_list)
             original_final_list_.append(original_final_list)
 
@@ -381,7 +384,7 @@ class TextDetector(object):
                                                         fuzziness_threshold=self._es_fuzziness,
                                                         search_language_script=self._target_language_script
                                                         )
-
+        ner_logger.debug(f"   SINGLE TEXT DETECTION ")
         final_list = []
         result_dict = {}
 
@@ -389,9 +392,12 @@ class TextDetector(object):
             processed_text = self.__processed_texts[index]
             text = texts[index]
             entity_list = es_entity_list[index]
+            ner_logger.debug(f"      entity list : {entity_list}")
             result_dict.update(self._process_es_result(entity_result=entity_result,
                                                        entity_list=entity_list,
                                                        text=text, processed_text=processed_text))
+
+        ner_logger.debug(f" result dict : {result_dict}")
 
         final_list.append(result_dict)
 
@@ -432,6 +438,7 @@ class TextDetector(object):
                                                         fuzziness_threshold=self._es_fuzziness,
                                                         search_language_script=self._target_language_script
                                                         )
+        ner_logger.debug(f' BULK TEXT DETECTION WITH VARIANTS')
 
         final_list = []
 

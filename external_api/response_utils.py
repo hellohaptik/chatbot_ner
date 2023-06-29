@@ -53,6 +53,8 @@ def external_api_response_wrapper(view_func):
             ner_logger.debug(response.result)
             ner_logger.debug(response.error)
             ner_logger.debug('*******************************')
+            ner_logger.debug(f'======>>>>>>  {str(e)}  <<<<=======')
+            ner_logger.debug('*******************************')
             response.success = False
             response.error = 'Unknown error: {0}'.format(str(e))
             response.status_code = 500

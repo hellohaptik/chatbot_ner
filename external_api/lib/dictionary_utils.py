@@ -11,6 +11,7 @@ TODO: Move to consistent terminology and use 'value' everywhere
 
 from external_api.exceptions import APIHandlerException
 from datastore.datastore import DataStore
+from chatbot_ner.config import ner_logger
 
 
 def entity_supported_languages(entity_name):
@@ -123,6 +124,8 @@ def get_records_from_values(entity_name, values=None):
         entity_name=entity_name,
         values=values
     )
+    sp = "   "*100
+    ner_logger.debug(f'{sp} {results} {sp}')
 
     merged_records = {}
     for result in results:
@@ -212,8 +215,10 @@ def search_entity_values(
             variant_search_term=variant_search_term,
             empty_variants_only=empty_variants_only,
         )
+        ner_logger.debug(f"SEARCH QUERY : {values}, {len(values)}")
         total_records = len(values)
         values = _shuffle_sample_values(values=values, shuffle=False, seed=seed, size=size, offset=offset)
+        ner_logger.debug(f"GETTING RECORDS FROM VALUES")
         records_dict = get_records_from_values(entity_name, values=values)
     else:
         # Here we do the inverse - fetch all records first, shuffle and sample them if needed, then discard the rest

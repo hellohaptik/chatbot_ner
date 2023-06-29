@@ -650,15 +650,18 @@ def ner(request):
         request: url parameters
 
     """
-    message = request.GET.get('message')
-    entities_data = request.GET.get('entities', [])
-    entities = []
-    if entities_data:
-        entities = ast.literal_eval(entities_data)
-    ner_logger.debug('Start: %s -- %s' % (message, entities))
-    output = run_ner(entities=entities, message=message)
-    ner_logger.debug('Finished %s : %s ' % (message, output))
-    return HttpResponse(json.dumps({'data': output}), content_type='application/json')
+    try:
+        message = request.GET.get('message')
+        entities_data = request.GET.get('entities', [])
+        entities = []
+        if entities_data:
+            entities = ast.literal_eval(entities_data)
+        ner_logger.debug('Start: %s -- %s' % (message, entities))
+        output = run_ner(entities=entities, message=message)
+        ner_logger.debug('Finished %s : %s ' % (message, output))
+        return HttpResponse(json.dumps({'data': output}), content_type='application/json')
+    except Exception as ep:
+        ner_logger.debug(f'*********** {ep} *********')
 
 
 @require_http_methods(["GET", "POST"])

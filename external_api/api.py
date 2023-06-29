@@ -218,6 +218,7 @@ def entity_language_view(request, entity_name):
     """
     if request.method == 'GET':
         # Fetch Languages supported by the entity
+        ner_logger.debug(f"Entity language view GET : {entity_name}")
         return {
             'supported_languages': dictionary_utils.entity_supported_languages(entity_name)
         }
@@ -225,6 +226,7 @@ def entity_language_view(request, entity_name):
     elif request.method == 'POST':
         # Update language support in the specified entity
         data = json.loads(request.body.decode(encoding='utf-8'))
+        ner_logger.debug(f"Entity language view POST : {data}")
         dictionary_utils.entity_update_languages(entity_name, data.get('supported_languages', []))
         return True
 
@@ -256,7 +258,7 @@ def entity_data_view(request, entity_name):
             pagination_from = int(params.get('from', 0))
         except ValueError:
             raise APIHandlerException('from should be sent as a number')
-
+        ner_logger.debug(f" entity data GET : {params}")
         try:
             return dictionary_utils.search_entity_values(
                 entity_name=entity_name,
@@ -274,6 +276,7 @@ def entity_data_view(request, entity_name):
     elif request.method == 'POST':
         # Update language support in the specified entity
         data = json.loads(request.body.decode(encoding='utf-8'))
+        ner_logger.debug(f"Entity data view POST : {data}")
         dictionary_utils.update_entity_records(entity_name, data)
         return True
 

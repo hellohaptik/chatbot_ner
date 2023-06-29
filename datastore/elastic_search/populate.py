@@ -10,6 +10,7 @@ from elasticsearch import helpers
 from chatbot_ner.config import ner_logger
 from datastore import constants
 from datastore.elastic_search.query import get_entity_data
+from datastore.elastic_search.utils import filter_es_kwargs
 from datastore.utils import get_files_from_directory, read_csv, remove_duplicate_data
 from external_api.constants import SENTENCE, ENTITIES
 from language_utilities.constant import ENGLISH_LANG
@@ -19,6 +20,7 @@ from six.moves import map
 # Local imports
 
 log_prefix = 'datastore.elastic_search.populate'
+import inspect
 
 
 def create_all_dictionary_data(connection, index_name, doc_type, logger, entity_data_directory_path=None,
@@ -165,15 +167,25 @@ def add_data_elastic_search(
                       'value': value,
                       'variants': dictionary_value[value],
                       "language_script": language_script,
-                      '_type': doc_type,
+                    #   '_type': doc_type,
                       '_op_type': 'index'
                       }
         str_query.append(query_dict)
         if len(str_query) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+            stack = inspect.stack()
+            callers = [frame.function for frame in stack[1:]][::-1]
+            calls = " -> ".join(callers)
+            ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+            ner_logger.debug(f'{"  "*50} KWARGS: {kwargs}  {"  "*50}')
+            ner_logger.debug(f'{"  "*50} str_query: {str_query}  {"  "*50}')
+
+            ner_logger.debug(f"=-=-=-=-=-=-=  add data entity search {filter_es_kwargs(kwargs, helpers.bulk)}")
             result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
             str_query = []
     if str_query:
+
+        ner_logger.debug(f"=-=-=-=-=-=-=  add data entity search {filter_es_kwargs(kwargs, helpers.bulk)}")
         result = helpers.bulk(connection, str_query, stats_only=True, **kwargs)
         logger.debug('%s: \t++ %s status %s ++' % (log_prefix, dictionary_key, result))
 
@@ -231,7 +243,7 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
         results = results['hits']['hits']
         for eid in results:
             delete_dict = {'_index': index_name,
-                           '_type': doc_type,
+                        #    '_type': doc_type,
                            '_id': eid["_id"],
                            '_op_type': 'delete',
                            }
@@ -245,7 +257,16 @@ def delete_entity_by_name(connection, index_name, doc_type, entity_name, logger,
     if str_query:
         delete_bulk_queries.append(str_query)
     for delete_query in delete_bulk_queries:
+
+        ner_logger.debug(f"=-=-=-=-=-=-=  Delete entity by name {filter_es_kwargs(kwargs, helpers.bulk)}")
         result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
+        stack = inspect.stack()
+        callers = [frame.function for frame in stack[1:]][::-1]
+        calls = " -> ".join(callers)
+        ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+        ner_logger.debug(f'{"  "*50} KWARGS: {kwargs}  {"  "*50}')
+        ner_logger.debug(f'{"  "*50} DElete query : {delete_query}  {"  "*50}')
+
         logger.debug('%s: \t++ %s Entity delete status %s ++' % (log_prefix, entity_name, result))
 
 
@@ -314,6 +335,13 @@ def delete_entity_crf_data(connection, index_name, doc_type, entity_name, langua
             }
         }
     }
+    stack = inspect.stack()
+    callers = [frame.function for frame in stack[1:]][::-1]
+    calls = " -> ".join(callers)
+    ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+    ner_logger.debug(f'{"  "*50} query: {query}  {"  "*50}')
+
+    ner_logger.debug(f"=-=-=-=-=-=-=  delete crf data {filter_es_kwargs(kwargs, connection.delete_by_query)}")
     return connection.delete_by_query(index=index_name, body=query, doc_type=doc_type)
 
 
@@ -381,17 +409,26 @@ def add_crf_training_data_elastic_search(connection, index_name, doc_type, entit
                           'sentence': sentence[SENTENCE],
                           'entities': sentence[ENTITIES],
                           'language_script': language,
-                          '_type': doc_type,
+                        #   '_type': doc_type,
                           '_op_type': 'index'
                           }
             queries.append(query_dict)
         if len(queries) > constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
+
+            ner_logger.debug(f"=-=-=-=-=-=-=  add crf 409 line data {filter_es_kwargs(kwargs, helpers.bulk)}")
             result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
             logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
             queries = []
     if queries:
+
+        ner_logger.debug(f"=-=-=-=-=-=-=  add crf data {filter_es_kwargs(kwargs, helpers.bulk)}")
         result = helpers.bulk(connection, queries, stats_only=True, **kwargs)
         logger.debug('[{0}]  Insert: {1} with status {2}'.format(log_prefix, entity_name, result))
+    stack = inspect.stack()
+    callers = [frame.function for frame in stack[1:]][::-1]
+    calls = " -> ".join(callers)
+    ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+    ner_logger.debug(f'{"  "*50} KWARGS: {kwargs}  {"  "*50}')
 
 
 def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, values=None, **kwargs):
@@ -422,7 +459,7 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
     for record in results:
         delete_dict = {
             '_index': index_name,
-            '_type': doc_type,
+            # '_type': doc_type,
             '_id': record["_id"],
             '_op_type': 'delete',
         }
@@ -435,6 +472,14 @@ def delete_entity_data_by_values(connection, index_name, doc_type, entity_name, 
         delete_bulk_queries.append(str_query)
 
     for delete_query in delete_bulk_queries:
+        stack = inspect.stack()
+        callers = [frame.function for frame in stack[1:]][::-1]
+        calls = " -> ".join(callers)
+        ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+        ner_logger.debug(f'{"  "*50} KWARGS: {kwargs}  {"  "*50}')
+        ner_logger.debug(f'{"  "*50} DELETE QUERY: {delete_query}  {"  "*50}')
+
+        ner_logger.debug(f"=-=-=-=-=-=-=  delete entity data {filter_es_kwargs(kwargs, helpers.bulk)}")
         result = helpers.bulk(connection, delete_query, stats_only=True, **kwargs)
         ner_logger.debug('delete_entity_data_by_values: entity_name: {0} result {1}'.format(entity_name, str(result)))
 
@@ -458,7 +503,7 @@ def add_entity_data(connection, index_name, doc_type, entity_name, value_variant
         query_dict = {
             '_index': index_name,
             '_op_type': 'index',
-            '_type': doc_type,
+            # '_type': doc_type, (not work in new)
             'dict_type': DICTIONARY_DATA_VARIANTS,
             'entity_data': entity_name,
             'language_script': record.get('language_script'),
@@ -469,6 +514,16 @@ def add_entity_data(connection, index_name, doc_type, entity_name, value_variant
         if len(str_query) == constants.ELASTICSEARCH_BULK_HELPER_MESSAGE_SIZE:
             helpers.bulk(connection, str_query, stats_only=True, **kwargs)
             str_query = []
+
+
+    stack = inspect.stack()
+    callers = [frame.function for frame in stack[1:]][::-1]
+    calls = " -> ".join(callers)
+    ner_logger.debug(f'{"  "*50} CALLS:  {calls}   {"  "*50}')
+    ner_logger.debug(f'{"  "*50} KWARGS: {kwargs}  {"  "*50}')
+    ner_logger.debug(f'{"  "*50} STR QUERY: {str_query}  {"  "*50}')
+
+    ner_logger.debug(f"=-=-=-=-=-=-=  add entity data {filter_es_kwargs(kwargs, helpers.bulk)}")
 
     if str_query:
         helpers.bulk(connection, str_query, stats_only=True, **kwargs)

@@ -8,6 +8,7 @@ from elasticsearch import exceptions as es_exceptions
 
 from chatbot_ner.config import ner_logger, CHATBOT_NER_DATASTORE
 from datastore import constants
+from datastore.elastic_search.utils import filter_es_kwargs
 from datastore.exceptions import (EngineConnectionException, DataStoreSettingsImproperlyConfiguredException,
                                   DataStoreRequestException)
 from language_utilities.constant import ENGLISH_LANG
@@ -83,12 +84,15 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
             texts = [texts]
 
         index_header = json.dumps({'index': self._index_name, 'type': self._doc_type})
+        index_header = json.dumps({'index': self._index_name})
         query_parts = []
         for text in texts:
             query_parts.append(index_header)
             text_query = _generate_multi_entity_es_query(entities=entities, text=text,
                                                          fuzziness_threshold=fuzziness_threshold,
                                                          language_script=search_language_script)
+            sp = " "*500
+            ner_logger.debug(f"{sp}text query : {text_query}{sp}")
             query_parts.append(json.dumps(text_query))
 
         return query_parts
@@ -132,15 +136,26 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         request_timeout = self._connection_settings.get('request_timeout', 20)
         index_name = self._index_name
 
+        # ok
+        sp = " "*500
+        ner_logger.debug(f'{sp}{entities}{sp}{texts}{sp}')
+        # entities = [entities[0]]
+        # texts = [texts[0]]
+
         data = []
         for entity_list, text_list in zip(entities, texts):
             data.extend(self.generate_query_data(entity_list, text_list, fuzziness_threshold, search_language_script))
 
         # add `\n` for each index_header and query data text entry
         query_data = '\n'.join(data)
+        sp = " "*500
+        ner_logger.debug(f"{sp} DATA : {data}{sp}")
+        ner_logger.debug(f"{sp} QUERY DATA : {query_data}{sp}")
         kwargs = dict(body=query_data, doc_type=self._doc_type, index=index_name, request_timeout=request_timeout)
+        kwargs.pop('doc_type')
         response = None
         try:
+            ner_logger.debug(f'Running get multi entity values : {kwargs}')
             response = self._run_es_search(self._default_connection, **kwargs)
             results = _parse_multi_entity_es_results(response.get("responses"))
         except es_exceptions.NotFoundError as e:
@@ -150,7 +165,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         except es_exceptions.ConnectionError as e:
             raise e
         except Exception as e:
-            raise DataStoreRequestException(f'Error in datastore query on index: {index_name}', engine='elasticsearch',
+            raise DataStoreRequestException(f'Error in datastore query on index: {index_name} {str(e)}', engine='elasticsearch',
                                             request=json.dumps(data), response=json.dumps(response)) from e
 
         return results
@@ -199,7 +214,13 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         Returns:
             dictionary, search results from elasticsearch.ElasticSearch.msearch
         """
-        return connection.msearch(**kwargs)
+        try:
+            # return connection.msearch(**kwargs)
+            x = connection.msearch(**kwargs)
+            return x
+        except Exception as e:
+            ner_logger.debug(f'RAIDED EXP : {e}')
+            raise e
 
     @staticmethod
     def _get_dynamic_fuzziness_threshold(fuzzy_setting):

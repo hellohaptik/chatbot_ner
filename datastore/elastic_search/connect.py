@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from elasticsearch import Elasticsearch
-from chatbot_ner.config import CHATBOT_NER_DATASTORE
+from elasticsearch8 import Elasticsearch as ES8
+from chatbot_ner.config import CHATBOT_NER_DATASTORE, USE_ES8_CLIENT, ner_logger
 from datastore.elastic_search.transfer import ESTransfer
 log_prefix = 'datastore.elastic_search.connect'
 
@@ -26,6 +27,8 @@ def connect(connection_url=None, host=None, port=None, user=None, password=None,
 
     """
     connection = None
+    msg = "  "* 50
+    ner_logger.debug(f'{msg} KWARGS CONNECT : {kwargs} {msg}')
     if user and password:
         kwargs = dict(kwargs, http_auth=(user, password))
     if connection_url:
