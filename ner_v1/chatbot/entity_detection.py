@@ -238,12 +238,14 @@ def get_text(message, entity_name, structured_value, fallback_value, bot_message
 
     ner_logger.debug("Predetected values: {}".format(predetected_values))
     if isinstance(message, six.string_types):
+        ner_logger.debug(f"Detecting entities in message {message}")
         entity_output = text_detector.detect(message=message,
                                              structured_value=structured_value,
                                              fallback_value=fallback_value,
                                              bot_message=bot_message,
                                              predetected_values=predetected_values)
     elif isinstance(message, (list, tuple)):
+        ner_logger.debug(f"Detecting bulk entities in {len(message)} messages.")
         entity_output = text_detector.detect_bulk(messages=message, fallback_values=fallback_value,
                                                   predetected_values=predetected_values)
     else:
@@ -710,7 +712,7 @@ def get_shopping_size(message, entity_name, structured_value, fallback_value, bo
                                    fallback_value=fallback_value, bot_message=bot_message)
         print output
 
-            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}}, 
+            >> [{'detection': 'message', 'original_text': 'large', 'entity_value': {'value': u'L'}},
                 {'detection': 'message', 'original_text': '36', 'entity_value': {'value': '36'}}]
 
     """
@@ -1048,20 +1050,20 @@ def output_entity_dict_list(entity_value_list, original_text_list, detection_met
 
     Args:
         entity_value_list (list): list of entity values which are identified from given detection logic
-        original_text_list (list): list original values or actual values from message/structured_value 
+        original_text_list (list): list original values or actual values from message/structured_value
                                    which are identified
-        detection_method (str, optional): how the entity was detected 
+        detection_method (str, optional): how the entity was detected
                                           i.e. whether from message, structured_value
                                                or fallback, verified from model or not.
                                           defaults to None
         detection_method_list(list, optional): list containing how each entity was detected in the entity_value list.
                                                if provided, this argument will be used over detection method
-                                               defaults to None 
-    
+                                               defaults to None
+
     Returns:
           list of dict: list containing dictionaries, each containing entity_value, original_text and detection;
                         entity_value is in itself a dict with its keys varying from entity to entity
-    
+
     Example Output:
         [
             {
