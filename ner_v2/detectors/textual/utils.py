@@ -78,8 +78,10 @@ def get_detection(message, entity_dict, bot_message=None, language=ENGLISH_LANG,
     if isinstance(message, six.string_types):
         entity_output = text_detector.detect(message=message,
                                              bot_message=bot_message)
+        ner_logger.debug(f'[Single Message Detection] Entity Output {entity_output}')
     elif isinstance(message, (list, tuple)):
         entity_output = text_detector.detect_bulk(messages=message)
+        ner_logger.debug(f'[Multiple Message Detection] Entity Output {entity_output}')
     else:
         raise TypeError('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
 
@@ -159,12 +161,12 @@ def get_text_entity_detection_data(request):
     """
     request_data = json.loads(request.body)
     messages = request_data.get("messages", [])
-    ner_logger.debug(f"Request message data", messages=messages)
+    ner_logger.debug(f"Request message data {messages}")
     bot_message = request_data.get("bot_message")
     entities = request_data.get("entities", {})
     target_language_script = request_data.get('language_script') or ENGLISH_LANG
     source_language = request_data.get('source_language') or ENGLISH_LANG
-    ner_logger.debug(f"Request entity data", entities=entities)
+    ner_logger.debug(f"Request entity data {entities}")
 
     data = []
 
@@ -191,12 +193,12 @@ def get_text_entity_detection_data(request):
         # get detection for text entities which has ignore_message flag
         if fallback_value_entities:
             output = get_output_for_fallback_entities(fallback_value_entities, source_language)
-            ner_logger.debug('[output_for_fallback_entities] output: ', output=output)
+            ner_logger.debug(f'[output_for_fallback_entities] output: {output}')
             data[0]["entities"].update(output)
 
         # get detection for text entities
         if text_value_entities:
-            ner_logger.debug('[output_for_fallback_entities] text_value_entities exist')
+            ner_logger.debug(f'[output_for_fallback_entities] text_value_entities {text_value_entities}')
             output = get_detection(message=message_str, entity_dict=text_value_entities,
                                    structured_value=None, bot_message=bot_message,
                                    language_script=source_language,
@@ -213,7 +215,7 @@ def get_text_entity_detection_data(request):
         ner_logger.debug("No valid message provided")
         raise InvalidTextRequest(f"Key `messages` is required to be a non-empty List[str], "
                                  f"but got a list with length {message_len}")
-    ner_logger.debug(f"Final data", data=data)
+    ner_logger.debug(f"Final data {data}")
     return data
 
 

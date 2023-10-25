@@ -668,7 +668,6 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
-        ner_logger.debug('[Single Message Detection] Final data', data_list=data_list)
         return data_list
 
     def detect_bulk(self, messages=None, **kwargs):
@@ -768,7 +767,6 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
-        ner_logger.debug('[Bulk Detection] Final data', data_list=data_list)
         return data_list
 
     @staticmethod
