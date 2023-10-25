@@ -159,7 +159,7 @@ def get_text_entity_detection_data(request):
     """
     request_data = json.loads(request.body)
     messages = request_data.get("messages", [])
-    ner_logger.debug(f"Request message data", entities=messages)
+    ner_logger.debug(f"Request message data", messages=messages)
     bot_message = request_data.get("bot_message")
     entities = request_data.get("entities", {})
     target_language_script = request_data.get('language_script') or ENGLISH_LANG
