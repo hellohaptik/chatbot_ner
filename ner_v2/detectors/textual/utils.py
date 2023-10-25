@@ -72,6 +72,7 @@ def get_detection(message, entity_dict, bot_message=None, language=ENGLISH_LANG,
 
         detected entity output
     """
+    ner_logger.debug(f'[get_detection] message: {message}')
     text_detector = TextDetector(entity_dict=entity_dict, source_language_script=language,
                                  target_language_script=target_language_script)
     if isinstance(message, six.string_types):
@@ -158,10 +159,12 @@ def get_text_entity_detection_data(request):
     """
     request_data = json.loads(request.body)
     messages = request_data.get("messages", [])
+    ner_logger.debug(f"Request message data", entities=messages)
     bot_message = request_data.get("bot_message")
     entities = request_data.get("entities", {})
     target_language_script = request_data.get('language_script') or ENGLISH_LANG
     source_language = request_data.get('source_language') or ENGLISH_LANG
+    ner_logger.debug(f"Request entity data", entities=entities)
 
     data = []
 
@@ -188,10 +191,12 @@ def get_text_entity_detection_data(request):
         # get detection for text entities which has ignore_message flag
         if fallback_value_entities:
             output = get_output_for_fallback_entities(fallback_value_entities, source_language)
+            ner_logger.debug('[output_for_fallback_entities] output: ', output=output)
             data[0]["entities"].update(output)
 
         # get detection for text entities
         if text_value_entities:
+            ner_logger.debug('[output_for_fallback_entities] text_value_entities exist')
             output = get_detection(message=message_str, entity_dict=text_value_entities,
                                    structured_value=None, bot_message=bot_message,
                                    language_script=source_language,
@@ -202,14 +207,13 @@ def get_text_entity_detection_data(request):
     elif len(messages) > 1:
         text_detection_result = get_detection(message=messages, entity_dict=entities,
                                               structured_value=None, bot_message=bot_message)
-
         data = [{"entities": x, "language": source_language} for x in text_detection_result]
 
     else:
         ner_logger.debug("No valid message provided")
         raise InvalidTextRequest(f"Key `messages` is required to be a non-empty List[str], "
                                  f"but got a list with length {message_len}")
-
+    ner_logger.debug(f"Final data", data=data)
     return data
 
 
