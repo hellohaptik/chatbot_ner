@@ -18,7 +18,7 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.site.conf /etc/nginx/sites-available/default
 
 # TODO: Separate this out to a dev/test docker image
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash && \
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash && \
     apt-get install nodejs && \
     npm install -g newman && \
     npm install -g newman-reporter-htmlextra && \
