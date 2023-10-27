@@ -166,7 +166,7 @@ def get_text_entity_detection_data(request):
     entities = request_data.get("entities", {})
     target_language_script = request_data.get('language_script') or ENGLISH_LANG
     source_language = request_data.get('source_language') or ENGLISH_LANG
-    ner_logger.debug(f"Request entity data {entities}")
+    ner_logger.info(f"Request entity data {entities}")
 
     data = []
 

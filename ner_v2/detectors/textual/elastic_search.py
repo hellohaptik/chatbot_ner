@@ -129,6 +129,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
                     ('TMOS', 'TMOS'), ('G.', 'G  Pulla Reddy Sweets')])}
             ]
         """
+        ner_logger.info(f'[get_multi_entity_results] entities {entities}')
         # entities for which es results need to be logged for debugging purposes
         log_results_for_entities = ['nsdc_language_select',
                                     'nsdc_choose_topik',
@@ -158,6 +159,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         try:
             response = self._run_es_search(self._default_connection, **kwargs)
             results = _parse_multi_entity_es_results(response.get("responses"))
+            ner_logger.info(f'[ES Result for Entities] log_es_result: {log_es_result}')
             if log_es_result:
                 ner_logger.info(f'[ES Result for Entities] result: {results}')
                 ner_logger.info(f'[ES Result for Entities] kwargs: {kwargs}')
