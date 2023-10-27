@@ -160,6 +160,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
             results = _parse_multi_entity_es_results(response.get("responses"))
             if log_es_result:
                 ner_logger.info(f'[ES Result for Entities] result: {results}')
+                ner_logger.info(f'[ES Result for Entities] kwargs: {kwargs}')
         except es_exceptions.NotFoundError as e:
             raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}',
                                             engine='elasticsearch', request=json.dumps(data),
