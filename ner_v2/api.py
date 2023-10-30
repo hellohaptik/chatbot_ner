@@ -799,6 +799,7 @@ def text(request):
 
         try:
             validate_text_request(request)
+            ner_logger.info("Valid text request")
             # if verify success get detection data
             data = get_text_entity_detection_data(request)
         except InvalidTextRequest as err:

@@ -442,7 +442,7 @@ class TextDetector(object):
                                                   entity_list=entity_list,
                                                   text=text, processed_text=processed_text)
             final_list.append(result_list)
-
+        ner_logger.debug(f'[bulk_text_detection_with_variants] final_list: {final_list}')
         return final_list
 
     def _get_entity_substring_from_text(self, text, variant, entity_name):
@@ -668,7 +668,6 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
-
         return data_list
 
     def detect_bulk(self, messages=None, **kwargs):
@@ -768,7 +767,6 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
-
         return data_list
 
     @staticmethod

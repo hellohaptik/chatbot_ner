@@ -129,6 +129,22 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
                     ('TMOS', 'TMOS'), ('G.', 'G  Pulla Reddy Sweets')])}
             ]
         """
+        ner_logger.info(f'[get_multi_entity_results] entities {entities}')
+        # entities for which es results need to be logged for debugging purposes
+        log_results_for_entities = ['nsdc_language_select',
+                                    'nsdc_choose_topik',
+                                    'test_giftcard_user_amount',
+                                    'pvr_giftcard_user_amount']
+        # this boolean will determine if the es result needs to be logged
+        # this will be set to true only if one of or all names mentioned in log_results_for_entities list
+        # are present in the entities list
+        log_es_result = False
+        for entity_name in log_results_for_entities:
+            if entity_name in entities:
+                # if we find at least one entity name for which the es results need to be logged
+                # we set the value for the boolean and break the loop
+                log_es_result = True
+                break
         request_timeout = self._connection_settings.get('request_timeout', 20)
         index_name = self._index_name
 
@@ -143,6 +159,10 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         try:
             response = self._run_es_search(self._default_connection, **kwargs)
             results = _parse_multi_entity_es_results(response.get("responses"))
+            ner_logger.info(f'[ES Result for Entities] log_es_result: {log_es_result}')
+            if log_es_result:
+                ner_logger.info(f'[ES Result for Entities] result: {results}')
+                ner_logger.info(f'[ES Result for Entities] kwargs: {kwargs}')
         except es_exceptions.NotFoundError as e:
             raise DataStoreRequestException(f'NotFoundError in datastore query on index: {index_name}',
                                             engine='elasticsearch', request=json.dumps(data),
