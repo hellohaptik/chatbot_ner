@@ -617,6 +617,7 @@ class TextDetector(object):
         """
 
         res_list = self._get_single_text_detection_with_variants(message)
+        ner_logger.info(f"[detect] method res_list - {res_list}")
         data_list = []
 
         for index, res in enumerate(res_list):
@@ -668,6 +669,7 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
+        ner_logger.info(f"[detect] method data_list - {data_list}")
         return data_list
 
     def detect_bulk(self, messages=None, **kwargs):
@@ -727,6 +729,7 @@ class TextDetector(object):
         """
 
         res_list = self._get_bulk_text_detection_with_variants(messages)
+        ner_logger.info(f"[detect_bulk] method res_list - {res_list}")
         data_list = []
 
         for index, res in enumerate(res_list):
@@ -767,6 +770,8 @@ class TextDetector(object):
 
                 entities[entity] = out
             data_list.append(entities)
+
+        ner_logger.info(f"[detect_bulk] method data_list - {data_list}")
         return data_list
 
     @staticmethod
