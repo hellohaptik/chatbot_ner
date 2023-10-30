@@ -102,7 +102,7 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
 
         Example:
             db = ElasticSearchDataStore()
-            entities = ['city', 'restaurant']
+            entities = [['city', 'restaurant']]
             texts = ['I want to go to mumbai and eat at dominoes pizza',
              ' I want to go Jabalpur']
 
@@ -139,12 +139,14 @@ class ElasticSearchDataStore(six.with_metaclass(Singleton, object)):
         # this will be set to true only if one of or all names mentioned in log_results_for_entities list
         # are present in the entities list
         log_es_result = False
-        for entity_name in log_results_for_entities:
-            if entity_name in entities:
-                # if we find at least one entity name for which the es results need to be logged
-                # we set the value for the boolean and break the loop
-                log_es_result = True
-                break
+        if len(entities) > 0:
+            entities_list = entities[0]
+            for entity_name in log_results_for_entities:
+                if entity_name in entities_list:
+                    # if we find at least one entity name for which the es results need to be logged
+                    # we set the value for the boolean and break the loop
+                    log_es_result = True
+                    break
         request_timeout = self._connection_settings.get('request_timeout', 20)
         index_name = self._index_name
 
