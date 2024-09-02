@@ -663,14 +663,17 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
 
     """
     regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern, asr_enabled=is_asr, language=language)
+    ner_logger.info(f"[Regex Detection] Step 1 {entity_name}")
     if structured_value:
         entity_list, original_text_list = regex_detector.detect_entity(text=structured_value)
+        ner_logger.info(f"[Regex Detection] Step 2 structured_value {entity_name}")
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
         else:
             return output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
     else:
         entity_list, original_text_list = regex_detector.detect_entity(text=message)
+        ner_logger.info(f"[Regex Detection] Step 2 {entity_name}")
         if entity_list:
             return output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
         elif fallback_value:
