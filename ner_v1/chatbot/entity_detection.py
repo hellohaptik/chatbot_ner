@@ -681,6 +681,69 @@ def get_regex(message, entity_name, structured_value, fallback_value, bot_messag
     return None
 
 
+def get_multi_regex(message, entities, bot_message, is_asr=False, language='en'):
+    """Use RegexDetector to detect text that abide by the specified
+        pattern.
+
+    Args:
+        message (str): natural text on which detection logic is to be run. Note if structured value is
+                       detection is run on structured value instead of message
+        entity_name (str): name of the entity. Also acts as elastic-search dictionary name
+                           if entity uses elastic-search lookup
+        pattern (str): Regex pattern to match
+        structured_value (str): Value obtained from any structured elements. Note if structured value is
+                                detection is run on structured value instead of message
+                                (For example, UI elements like form, payload, etc)
+        fallback_value (str): If the detection logic fails to detect any value either from structured_value
+                          or message then we return a fallback_value as an output.
+        bot_message (str): previous message from a bot/agent.
+        is_asr (bool): True if message comes in from a voice only bot
+        language (str): Source language of the message
+
+    Returns:
+        dict or None: dictionary containing entity_value, original_text and detection;
+                      entity_value is in itself a dict with its keys varying from entity to entity
+
+    Example:
+
+        message = 'abc123'
+        entity_name = 'numerals'
+        pattern = '\\d+'
+        structured_value = None
+        fallback_value = None
+        bot_message = None
+        output = get_regex(message=message, entity_name=entity_name, structured_value=structured_value,
+                           fallback_value=fallback_value, bot_message=bot_message, pattern=pattern)
+        print output
+
+            >> [{'detection': 'message', 'original_text': '123', 'entity_value': {'value': '123'}}]
+
+    """
+    data_list = {}
+
+    for entity_name, entity_dict in entities.items():
+        pattern = entity_dict.get('regex')
+        structured_value = entity_dict.get('structured_value')
+        fallback_value = entity_dict.get('fallback_value')
+        regex_detector = RegexDetector(entity_name=entity_name, pattern=pattern, asr_enabled=is_asr, language=language)
+        ner_logger.debug(f'get_multi_regex parameters', entity_name=entity_name, message=message)
+        if structured_value:
+            entity_list, original_text_list = regex_detector.detect_entity(text=structured_value)
+            if entity_list:
+                data_list[entity_name] = output_entity_dict_list(entity_list, original_text_list, FROM_STRUCTURE_VALUE_VERIFIED)
+            else:
+                data_list[entity_name] =  output_entity_dict_list([structured_value], [structured_value], FROM_STRUCTURE_VALUE_NOT_VERIFIED)
+        else:
+            entity_list, original_text_list = regex_detector.detect_entity(text=message)
+            if entity_list:
+                data_list[entity_name] =  output_entity_dict_list(entity_list, original_text_list, FROM_MESSAGE)
+            elif fallback_value:
+                data_list[entity_name] =  output_entity_dict_list([fallback_value], [fallback_value], FROM_FALLBACK_VALUE)
+
+    return data_list
+
+
+
 def get_shopping_size(message, entity_name, structured_value, fallback_value, bot_message):
     """Use ShoppingSizeDetector to detect cloth size
 
