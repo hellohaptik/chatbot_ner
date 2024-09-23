@@ -183,7 +183,25 @@ class ChinesePhoneDetector(PhoneDetector):
         return : list[string]
         """
         text = text or ''
-        phone_number_format_regex = r'[-(),.+\s{}]+'
+        """
+        Three cases are not covered in this regex:
+        - 123-4567
+        - (123) 4567
+        - +1 (800) 555-5555 ext. 1
+
+        But below ones are covered:
+        - +91 98765 43210
+        - +1-800-555-555
+        - 123, 456.7890
+        - +44 20 7123 4567
+        - 123 + 456 7890
+        - {123} {456} 7890
+
+        The pattern matches exactly 9 to 12 occurrences of characters that are either: [-(),.+\s{}]
+        """
+        # phone_number_format_regex =  (r'[-(),.+\s{}]+') )  # older logic
+        phone_number_format_regex = r'[-(),.+\s{}]{9,12}'   # new logic - with string length between 9-12
+
         matches = self.language_number_detector.extract_digits_only(text, phone_number_format_regex, True, True)
         return matches
 
