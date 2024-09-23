@@ -197,7 +197,7 @@ class ChinesePhoneDetector(PhoneDetector):
         - 123 + 456 7890
         - {123} {456} 7890
 
-        The pattern matches exactly 9 to 12 occurrences of characters that are either: [-(),.+\s{}]
+        The pattern matches exactly 9 to 12 occurrences of characters that are either one specified in square brackets
         """
         phone_number_format_regex = r'[-(),.+\s{}]{9,12}'
 
