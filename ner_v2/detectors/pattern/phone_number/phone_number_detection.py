@@ -183,23 +183,13 @@ class ChinesePhoneDetector(PhoneDetector):
         return : list[string]
         """
         text = text or ''
-        """
-        Three cases are not covered in this regex:
-        - 123-4567
-        - (123) 4567
-        - +1 (800) 555-5555 ext. 1
 
-        But below ones are covered:
-        - +91 98765 43210
-        - +1-800-555-555
-        - 123, 456.7890
-        - +44 20 7123 4567
-        - 123 + 456 7890
-        - {123} {456} 7890
+        # The pattern matches exactly 9 to 12 occurrences of chars that are either one specified in square brackets
+        # Whenever this regex is changed, please run below function in local system if repo is not installed on local.
+        # Steps: copy entire function added at the end _test__text_list_for_detection() in python shell and \
+        # Run this as: _test__text_list_for_detection(phone_number_format_regex)
 
-        The pattern matches exactly 9 to 12 occurrences of characters that are either one specified in square brackets
-        """
-        phone_number_format_regex = r'[-(),.+\s{}]{9,12}'
+        phone_number_format_regex = r'[0-9\-\(\)\.\+\s]{9,12}'
 
         matches = self.language_number_detector.extract_digits_only(text, phone_number_format_regex, True, True)
         return matches
@@ -232,3 +222,30 @@ class ChinesePhoneDetector(PhoneDetector):
                                        "value": str(match.number.national_number)})
                     self.original_phone_text.append(original_text[match.start:match.end])
         return self.phone, self.original_phone_text
+
+
+def _test__text_list_for_detection(phone_number_regex: str) -> None:
+    """
+    Test function: To validate Pattern to match phone numbers between 9 and 12 characters
+    This is to run on local pythonic shell when regex pattern is changed in function: _text_list_for_detection()
+    """
+    import re
+
+    test_numbers = [
+        "(123) 456-7890",    # Valid (12 chars including spaces and separators)
+        "+1 123-456-789",    # Valid (12 chars)
+        "123456789",         # Valid (9 digits)
+        "1234567890",         # Valid (10 digits)
+        "123-4567-890",      # Valid (11 chars with separators)
+        "+1 (123) 456",      # Valid (9 chars)
+        "123-4567",          # Invalid (below 9 characters)
+        "1234567",          # Invalid (below 9 characters), eg. Ticket No.
+        "1234567890123",     # valid (though above 12 characters)
+    ]
+
+    # Check each test case
+    for number in test_numbers:
+        if re.match(phone_number_regex, number):
+            print(f"'{number}' is a valid phone number.")
+        else:
+            print(f"'{number}' is NOT a valid phone number.")
