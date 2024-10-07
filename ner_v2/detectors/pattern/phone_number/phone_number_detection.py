@@ -115,8 +115,7 @@ class PhoneDetector(BaseDetector):
                     continue
             except Exception:
                 # Not logging exception object as structlog.exception() will print entire traceback
-                ner_logger.exception('Error in detect_entity function',
-                                     phonenumbers_match_obj=match.__dict__, text=self.text)
+                ner_logger.exception('Error in detect_entity function', text=self.text)
 
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                 self.phone.append(self.check_for_country_code(str(match.number.national_number)))
