@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import re
+import structlog
 
 try:
     import regex
@@ -16,6 +17,7 @@ from six.moves import zip
 from language_utilities.constant import ENGLISH_LANG, CHINESE_TRADITIONAL_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+ner_logger = structlog.getLogger('chatbot_ner')
 
 
 class PhoneDetector(BaseDetector):
@@ -112,7 +114,9 @@ class PhoneDetector(BaseDetector):
                     self.original_phone_text.append(self.text)
                     continue
             except Exception:
-                pass
+                # Not logging exception object as structlog.exception() will print entire traceback
+                ner_logger.exception('Error in detect_entity function',
+                                     phonenumbers_match_obj=match.__dict__, text=self.text)
 
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                 self.phone.append(self.check_for_country_code(str(match.number.national_number)))
