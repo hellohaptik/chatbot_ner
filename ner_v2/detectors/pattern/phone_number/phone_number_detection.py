@@ -2,7 +2,7 @@
 from __future__ import absolute_import
 
 import re
-# import structlog
+import structlog
 
 try:
     import regex
@@ -17,7 +17,7 @@ from six.moves import zip
 from language_utilities.constant import ENGLISH_LANG, CHINESE_TRADITIONAL_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
-# ner_logger = structlog.getLogger('chatbot_ner')
+ner_logger = structlog.getLogger('chatbot_ner')
 
 
 class PhoneDetector(BaseDetector):
@@ -110,16 +110,13 @@ class PhoneDetector(BaseDetector):
 
                 # Get the national number and check its length is below 8 (including contry code) and \
                 # Exclude numbers that are too short to be a valid phone number (e.g., ticket numbers)
-                print(f"\n detect_entity - national_number_len = {national_number_len}")
-                print(f"\n detect_entity - self.text = {self.text}")
                 if national_number_len < 8:
                     self.original_phone_text.append(self.text)
                     continue
-            except Exception as e:
-                print(f"\n detect_entity got an error as {str(e)}")
+            except Exception:
                 # Not logging exception object as structlog.exception() will print entire traceback
-                # ner_logger.exception('Error in detect_entity function',
-                #                      phonenumbers_match_obj=match.__dict__, text=self.text)
+                ner_logger.exception('Error in detect_entity function',
+                                     phonenumbers_match_obj=match.__dict__, text=self.text)
 
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                 self.phone.append(self.check_for_country_code(str(match.number.national_number)))
