@@ -103,8 +103,16 @@ def parse_post_request(request):
         PARAMETER_PRIOR_RESULTS: request_data.get("predetected_values", [])
     }
 
-    ner_logger.debug("parameters dict - {}".format(parameters_dict))
+    request_log_message = (
+        f"Request parameters: entity_name={parameters_dict['entity_name']}, "
+        f"fuzziness={parameters_dict['fuzziness']}, "
+    )
+    if isinstance(parameters_dict['message'], str):
+        request_log_message += f"message={parameters_dict['message']}"
+    elif isinstance(parameters_dict['message'], (list, tuple)):
+        request_log_message += f"message_count={len(parameters_dict['message'])}"
 
+    ner_logger.debug(request_log_message)
     return parameters_dict
 
 

@@ -78,10 +78,10 @@ def get_detection(message, entity_dict, bot_message=None, language=ENGLISH_LANG,
     if isinstance(message, six.string_types):
         entity_output = text_detector.detect(message=message,
                                              bot_message=bot_message)
-        ner_logger.debug(f'[Single Message Detection] Entity Output {entity_output}')
+        ner_logger.info(f'[Single Message Detection] Entity Output {entity_output}')
     elif isinstance(message, (list, tuple)):
         entity_output = text_detector.detect_bulk(messages=message)
-        ner_logger.debug(f'[Multiple Message Detection] Entity Output {entity_output}')
+        ner_logger.info(f'[Multiple Message Detection] Entity Output {entity_output}')
     else:
         raise TypeError('`message` argument must be either of type `str`, `unicode`, `list` or `tuple`.')
 
