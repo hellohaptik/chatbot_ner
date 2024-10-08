@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import re
+import structlog
 
 try:
     import regex
@@ -16,6 +17,7 @@ from six.moves import zip
 from language_utilities.constant import ENGLISH_LANG, CHINESE_TRADITIONAL_LANG
 from ner_v2.detectors.base_detector import BaseDetector
 from ner_v2.detectors.numeral.number.number_detection import NumberDetector
+ner_logger = structlog.getLogger('chatbot_ner')
 
 
 class PhoneDetector(BaseDetector):
@@ -101,7 +103,20 @@ class PhoneDetector(BaseDetector):
         """
         self.text = " " + text.lower().strip() + " "
         self.phone, self.original_phone_text = [], []
+
         for match in phonenumbers.PhoneNumberMatcher(self.text, self.country_code, leniency=0):
+            try:
+                national_number_len = len(str(match.number.national_number))
+
+                # Get the national number and check its length is below 8 (including contry code) and \
+                # Exclude numbers that are too short to be a valid phone number (e.g., ticket numbers)
+                if national_number_len < 8:
+                    self.original_phone_text.append(self.text)
+                    continue
+            except Exception:
+                # Not logging exception object as structlog.exception() will print entire traceback
+                ner_logger.exception('Error in detect_entity function', text=self.text)
+
             if match.number.country_code == phonenumbers.country_code_for_region(self.country_code):
                 self.phone.append(self.check_for_country_code(str(match.number.national_number)))
                 self.original_phone_text.append(self.text[match.start:match.end])
@@ -111,6 +126,7 @@ class PhoneDetector(BaseDetector):
                                    "value": str(match.number.national_number)})
                 self.original_phone_text.append(self.text[match.start:match.end])
         self.phone, self.original_phone_text = self.check_for_alphas()
+
         return self.phone, self.original_phone_text
 
     def check_for_alphas(self):
