@@ -349,6 +349,7 @@ def regex(request):
     """
     try:
         parameters_dict = parse_parameters_from_request(request)
+        ner_logger.info(f"[Regex Detection] Detection started for {parameters_dict[PARAMETER_ENTITY_NAME]}")
         entity_output = get_regex(parameters_dict[PARAMETER_MESSAGE],
                                   parameters_dict[PARAMETER_ENTITY_NAME],
                                   parameters_dict[PARAMETER_STRUCTURED_VALUE],
@@ -359,6 +360,7 @@ def regex(request):
                                   parameters_dict[PARAMETER_SOURCE_LANGUAGE]
                                   )
         ner_logger.debug('Finished %s : %s ' % (parameters_dict[PARAMETER_ENTITY_NAME], entity_output))
+        ner_logger.info(f"[Regex Detection] Detection done for {parameters_dict[PARAMETER_ENTITY_NAME]}")
     except TypeError as e:
         ner_logger.exception('Exception for regex: %s ' % e)
         return HttpResponse(status=500)
