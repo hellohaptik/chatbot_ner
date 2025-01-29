@@ -2,7 +2,17 @@ FROM python:3.6.15
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y wget build-essential curl nginx supervisor && \
-    curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash
+    apt-get install -y locales && \
+    echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+RUN apt-get update && apt-get install -y apt-transport-https ca-certificates curl gnupg && \
+    curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | gpg --dearmor -o /usr/share/keyrings/doppler-archive-keyring.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/doppler-archive-keyring.gpg] https://packages.doppler.com/public/cli/deb/debian any-version main" | tee /etc/apt/sources.list.d/doppler-cli.list && \
+    apt-get update && \
+    apt-get -y install doppler && \
+    rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY requirements.txt nltk_setup.py /app/
 RUN touch /app/config && \
@@ -24,4 +34,4 @@ ENV MAX_REQUESTS=1000
 EXPOSE 8081
 ADD . /app
 RUN chmod +x /app/entrypoint.sh
-CMD /app/entrypoint.sh
+CMD doppler run -- /app/entrypoint.sh
