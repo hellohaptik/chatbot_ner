@@ -1,7 +1,11 @@
 #!/bin/bash
 
-export $(envkey-source -f | sed -e 's/\<export\>//g' | sed -e 's/\s\+/\n/g' | xargs) > /dev/null
-export ENVKEY=""
+#export $(envkey-source -f | sed -e 's/\<export\>//g' | sed -e 's/\s\+/\n/g' | xargs) > /dev/null
+#export ENVKEY=""
+
+set -a
+source <(doppler secrets download --no-file --format env | /bin/sed 's/\\\\/\\/g' | /bin/sed -e 's/="/='\''/' -e 's/"$/'\''/' | /bin/sed -e  's/\\"/"/g')
+set +a
 
 cd $DJANGODIR
 
