@@ -3,9 +3,27 @@
 #export $(envkey-source -f | sed -e 's/\<export\>//g' | sed -e 's/\s\+/\n/g' | xargs) > /dev/null
 #export ENVKEY=""
 
-set -a
-source <(doppler secrets download --no-file --format env | /bin/sed 's/\\\\/\\/g' | /bin/sed -e 's/="/='\''/' -e 's/"$/'\''/' | /bin/sed -e  's/\\"/"/g')
-set +a
+if [ "$ENV_FROM_S3" == "true" ]; then
+
+    #.env file download command
+    ./s3cmd-2.4.0/s3cmd get s3://haptik-doppler-token-private/$DOPPLER_CAS\_$DOPPLER_SERVICE\_$DOPPLER_ENV.env .env
+    # Check if .env file exists in the current directory
+    if [ -s ".env" ]; then #file present and  not empty
+        # If .env file exists and not empty, source it
+        set -a
+        source .env
+        set +a
+        echo "all variables set from file"
+    else
+        # If .env file doesn't exist, print a message
+        echo "no file exists, running doppler command"
+        set -a
+        source <(doppler secrets download --no-file --format env | /bin/sed 's/\\\\/\\/g' | /bin/sed -e 's/="/='\''/' -e 's/"$/'\''/' | /bin/sed -e  's/\\"/"/g')
+        set +a
+    fi
+else
+echo "nothing to do.., go ahead"
+fi
 
 cd $DJANGODIR
 

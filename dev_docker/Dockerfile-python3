@@ -14,6 +14,12 @@ RUN apt-get update && apt-get install -y apt-transport-https ca-certificates cur
     apt-get -y install doppler && \
     rm -rf /var/lib/apt/lists/*
 WORKDIR /app
+
+#s3cmd download to perfrom s3 download for doppler config
+RUN wget https://github.com/s3tools/s3cmd/releases/download/v2.4.0/s3cmd-2.4.0.tar.gz \
+    && tar -xf s3cmd-2.4.0.tar.gz \
+    && rm s3cmd-2.4.0.tar.gz  # Clean up the tar file to save space
+
 COPY requirements.txt nltk_setup.py /app/
 RUN touch /app/config && \
     pip install --no-cache-dir -U pip &&  \
@@ -34,4 +40,4 @@ ENV MAX_REQUESTS=1000
 EXPOSE 8081
 ADD . /app
 RUN chmod +x /app/entrypoint.sh
-CMD doppler run -- /app/entrypoint.sh
+CMD  /app/entrypoint.sh
