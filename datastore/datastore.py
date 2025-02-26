@@ -150,7 +150,6 @@ class DataStore(six.with_metaclass(Singleton, object)):
             self._connect()
 
         if self._engine == ELASTICSEARCH:
-            es_url = elastic_search.connect.get_es_url()
             create_map = [  # TODO: use namedtuples
                 (True, ELASTICSEARCH_INDEX_1, ELASTICSEARCH_DOC_TYPE, self._store_name,
                  self._check_doc_type_for_elasticsearch, elastic_search.create.create_entity_index),
