@@ -13,3 +13,5 @@ def download_nltk_resources():
 
 if __name__ == '__main__':
     download_nltk_resources()
+
+#TEST
