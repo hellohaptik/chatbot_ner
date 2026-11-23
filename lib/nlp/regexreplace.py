@@ -3,7 +3,7 @@ import re
 
 
 class RegexReplace(object):
-    """
+    r"""
     This class is used to perform regex operations
     Its a class which can be used to perform various regex operations like substitution, pattern matching, searching,
     etc.
@@ -29,11 +29,11 @@ class RegexReplace(object):
             pattern_list: List of tuples -> [(pattern_to_search, pattern_to_replace),...]
         """
 
-        self.pattern_list = pattern_list
+        self.pattern_list = pattern_list or []
         self.pattern_compile = [re.compile(pattern[0], re.IGNORECASE | re.UNICODE) for pattern in self.pattern_list]
 
     def text_substitute(self, text):
-        """
+        r"""
         This function will substitute or replace the pattern with some other string from the text
 
         Args:
@@ -49,6 +49,8 @@ class RegexReplace(object):
                 >> 'Hey where are you going'
 
         """
+        if not text:
+            return text
         processed_text = text
         for i, compiled_pattern in enumerate(self.pattern_compile):
             processed_text = compiled_pattern.sub(self.pattern_list[i][1], processed_text)

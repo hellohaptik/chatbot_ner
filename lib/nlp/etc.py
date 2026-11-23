@@ -15,16 +15,17 @@ def store_data_in_list(file_path, stemmer=None, lower_case=True):
 
     """
     list_of_words = []
-    input_file = open(file_path, "rt")  # file containing words
-    csv_reader = csv.reader(input_file)
-    # populate list of words
-    for word in csv_reader:
-        token = word[0].lower() if lower_case else word[0]
-        if not stemmer:
-            list_of_words.append(str(token))
-        else:
-            list_of_words.append(str(stemmer.stem_word(token)))
-    input_file.close()
+    with open(file_path, "rt", encoding="utf-8") as input_file:  # file containing words
+        csv_reader = csv.reader(input_file)
+        # populate list of words
+        for word in csv_reader:
+            if not word or not word[0].strip():
+                continue
+            token = word[0].lower() if lower_case else word[0]
+            if not stemmer:
+                list_of_words.append(str(token))
+            else:
+                list_of_words.append(str(stemmer.stem_word(token)))
     return list_of_words
 
 
@@ -41,6 +42,7 @@ def filter_list(list_to_filter, remove_elements):
         print(output)
         >> ['hello']
     """
-    return [item for item in list_to_filter if item not in remove_elements]
+    remove_set = set(remove_elements) if remove_elements else set()
+    return [item for item in list_to_filter if item not in remove_set]
 
 

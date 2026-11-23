@@ -36,7 +36,7 @@ class Ngram(object):
             list of str: List of ngrams formed from the given word list except for those that have all their tokes in
                          stop words list
         """
-        stop_word_set = set(stop_word_list) if stop_word_list else []
+        stop_word_set = set(stop_word_list) if stop_word_list else set()
         all_ngrams = nltk.ngrams(word_list, n)
         ngram_list = []
         for ngram in all_ngrams:
